@@ -267,7 +267,7 @@ const AccountNumbers = () => {
                 setToast({
                   show: true,
                   title: "Error",
-                  message: "Something went wrong whilst importing account number masterlist..",
+                  message: "Something went wrong whilst importing account number masterlist.",
                   severity: "error"
                 })
               }
