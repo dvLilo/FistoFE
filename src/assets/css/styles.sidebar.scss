@@ -1,0 +1,100 @@
+.FstoBackdrop-root.MuiBackdrop-root {
+  // backdrop-filter: blur(3px);
+  justify-content: flex-start;
+  align-items: flex-start;
+  z-index: 1298;
+
+  @media (min-width: 1200px) {
+    display: none;
+  }
+}
+
+.FstoSidebar-root {
+  background: #283A47;
+  position: fixed;
+  top: 0;
+  width: 0;
+  min-height: 100vh;
+  overflow: hidden;
+  transition: width 200ms linear;
+  z-index: 1299;
+  
+  @media (min-width: 1200px) {
+    position: relative;
+    width: 240px;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+  }
+
+  // @media (prefers-color-scheme: dark) {
+  //   background-color: #212124;
+  //   color: #f0f0f0;
+  // }
+}
+
+.FstoSidebar-root.visible {
+  width: 240px;
+}
+
+.FstoSidebar-wrapper {
+  position: relative;
+  width: 240px;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  @media (min-width: 1200px) {
+    position: fixed;
+    width: inherit;
+  }
+}
+
+.FstoSidebar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 56px;
+  padding-right: 0.5em;
+}
+@media (min-width: 1200px)
+{
+  .FstoSidebar-toggle {
+    display: none;
+  }
+}
+
+.FstoSidebar-logo {
+  display: block;
+  max-width: 110px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 50px;
+}
+@media (min-width: 1200px)
+{
+  .FstoSidebar-logo {
+    margin-top: 50px;
+  }
+}
+
+.FstoButton-root.MuiButton-root {
+  justify-content: flex-start;
+}
+
+.FstoLink-root {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  color: rgba(255,255,255,0.8);
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+  text-transform: capitalize;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.FstoLink-root.active {
+  color: rgba(255,255,255,1);
+}

@@ -1,0 +1,89 @@
+{
+  "user": [
+    {
+      "general_info": {
+        "full_id_number":"RDFFLFI-10791",
+        "prefix_id":"RDFFLFI",
+        "id_number":10791,
+        "first_name":"LIMAY LOUIE",
+        "middle_name":"OCAMPO",
+        "last_name":"DUCUT",
+        "suffix":""
+      },
+      "position_info": {
+        "position_name":"System Developer"
+      },
+      "unit_info": {
+        "department_name":"Management Information System"
+      }
+    },
+    {
+      "general_info": {
+        "full_id_number":"RDFFLFI-10785",
+        "prefix_id":"RDFFLFI",
+        "id_number":10185,
+        "first_name":"VINCENT LOUIE",
+        "middle_name":"LAYNES",
+        "last_name":"ABAD",
+        "suffix":""
+      },
+      "position_info": {
+        "position_name":"System Developer"
+      },
+      "unit_info": {
+        "department_name":"Management Information System"
+      }
+    },
+    {
+      "general_info": {
+        "full_id_number":"RDFFLFI-10274",
+        "prefix_id":"RDFFLFI",
+        "id_number":10274,
+        "first_name":"ALDRYN",
+        "middle_name":"CAYANAN",
+        "last_name":"MANANSALA",
+        "suffix":"JR"
+      },
+      "position_info": {
+        "position_name":"System Support Specialist"
+      },
+      "unit_info": {
+        "department_name":"Management Information System"
+      }
+    },
+    {
+      "general_info": {
+        "full_id_number":"RDFFLFI-10390",
+        "prefix_id":"RDFFLFI",
+        "id_number":10390,
+        "first_name":"JOSE",
+        "middle_name":"DASCO",
+        "last_name":"PACHECO",
+        "suffix":"JR"
+      },
+      "position_info": {
+        "position_name":"System Developer"
+      },
+      "unit_info": {
+        "department_name":"Management Information System"
+      }
+    },
+    {
+      "general_info": {
+        "full_id_number":"RDFFLFI-10790",
+        "prefix_id":"RDFFLFI",
+        "id_number":10790,
+        "first_name":"HERNANIE ROY",
+        "middle_name":"TABALU",
+        "last_name":"PABUSTAN",
+        "suffix":""
+      },
+      "position_info": {
+        "position_name":"System Developer"
+      },
+      "unit_info": {
+        "department_name":"Management Information System"
+      }
+    }
+  ]
+}
