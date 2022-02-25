@@ -26,10 +26,10 @@
     flex-grow: 0 !important;
   }
 
-  // @media (prefers-color-scheme: dark) {
-  //   background-color: #212124;
-  //   color: #f0f0f0;
-  // }
+  @media (prefers-color-scheme: dark) {
+    background-color: #212124;
+    color: #f0f0f0;
+  }
 }
 
 .FstoSidebar-root.visible {

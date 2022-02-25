@@ -5,10 +5,15 @@ body {
   font-family: 'Open Sans', sans-serif;
   font-size: 1rem;
 
-  // @media (prefers-color-scheme: dark) {
-  //   background: #181818;
-  //   color: #ffffff;
-  // }
+  &.dark {
+      background: #181818;
+      color: #ffffff;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    background: #181818;
+    color: #ffffff;
+  }
 }
 
 #fsto {
@@ -184,7 +189,6 @@ body {
   display: flex;
   flex-direction: column;
 }
-
 
 
 

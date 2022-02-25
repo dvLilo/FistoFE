@@ -33,7 +33,7 @@ import {
 
   List,
   ListItem,
-  ListItemText,
+  ListItemText
 } from '@mui/material'
 
 import {
@@ -573,7 +573,7 @@ const UserAccounts = () => {
 
   const TableData = ({ data }) => {
     return (
-      <TableRow>
+      <TableRow hover>
         <TableCell className="FstoTableData-root" align="center">
           {data.id}
         </TableCell>

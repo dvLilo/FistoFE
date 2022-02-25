@@ -12,10 +12,19 @@
   backdrop-filter: blur(1em);
   z-index: 1297;
 
-  // @media (prefers-color-scheme: dark) {
-  //   background-color: #1d2022;
-  //   color: #f0f0f0;
-  // }
+  @media (prefers-color-scheme: dark) {
+    background-color: #1d2022;
+    color: #f0f0f0;
+  }
+
+  &.dark {
+    background-color: #1d2022;
+  }
+
+  &.light {
+    background-color: rgba(255, 255, 255, 0.75);
+    color: rgba(0, 0, 0, 0.87);
+  }
 }
 @media (min-width: 1200px)
 {

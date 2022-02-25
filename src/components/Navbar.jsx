@@ -3,7 +3,7 @@ import React from 'react'
 import axios from 'axios'
 
 import { useSelector, useDispatch } from 'react-redux'
-import { TOGGLE_SIDEBAR } from '../actions'
+import { TOGGLE_SIDEBAR, SET_COLOR } from '../actions'
 
 import {
   useNavigate,
@@ -16,12 +16,17 @@ import {
   IconButton,
   Divider,
   Popover,
-  Typography
+  Typography,
+  Button,
+
+  useMediaQuery
 } from '@mui/material'
 
 import {
   Reorder,
-  Person
+  Person,
+  DarkMode,
+  LightMode
 } from '@mui/icons-material'
 
 import '../assets/css/styles.navbar.scss'
@@ -30,10 +35,14 @@ const Navbar = () => {
 
   const [anchorEl, setAnchorEl] = React.useState(null)
   const open = Boolean(anchorEl)
+
   const navigate = useNavigate()
 
   const user = useSelector(state => state.user)
+  const color = useSelector(state => state.color)
   const dispatch = useDispatch()
+
+  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
 
   const showMenuHandler = $event => {
     setAnchorEl($event.currentTarget)
@@ -55,9 +64,29 @@ const Navbar = () => {
     window.localStorage.clear()
     navigate("/", { replace: true })
   }
+  const toggleColorHandler = () => {
+    if (color === "system") {
+      if (prefersDarkMode) {
+        window.localStorage.setItem("color", "light")
+        dispatch(SET_COLOR("light"))
+      }
+      else {
+        window.localStorage.setItem("color", "dark")
+        dispatch(SET_COLOR("dark"))
+      }
+    }
+    else if (color === "dark") {
+      window.localStorage.setItem("color", "light")
+      dispatch(SET_COLOR("light"))
+    }
+    else {
+      window.localStorage.setItem("color", "dark")
+      dispatch(SET_COLOR("dark"))
+    }
+  }
 
   return (
-    <nav className="FstoNavbar-root">
+    <nav className={"FstoNavbar-root " + color}>
       <Box className="FstoNavbar-toggle">
         <IconButton onClick={toggleSidebarHandler}>
           <Reorder />
@@ -126,13 +155,13 @@ const Navbar = () => {
 
         <Typography variant="subtitle1">
           <Link
+            color="inherit"
             to="change-password"
             component={RouterLink}
             onClick={closeMenuHandler}
             sx={{
               display: 'block',
               ml: 2,
-              color: 'black',
               textDecoration: 'none',
               '&:hover': {
                 textDecoration: 'underline'
@@ -142,6 +171,38 @@ const Navbar = () => {
             Change Password
           </Link>
         </Typography>
+
+        <Divider sx={{ my: 2 }} />
+
+        <Typography
+          variant="subtitle2"
+          sx={{
+            mb: 1,
+            fontWeight: 700
+          }}
+        >
+          Theme Settings
+        </Typography>
+
+        <Button
+          sx={{
+            ml: 2,
+            textTransform: 'capitalize'
+          }}
+          onClick={() => dispatch(SET_COLOR("system"))}
+          disabled={color === "system"}
+        >System Color</Button>
+        <IconButton
+          size="small"
+          sx={{
+            background: 'rgba(0,0,0,0.04)'
+          }}
+          onClick={toggleColorHandler}
+        >
+          {
+            color === "light" ? <DarkMode /> : <LightMode />
+          }
+        </IconButton>
         
         <Divider sx={{ my: 2 }} />
         
@@ -149,7 +210,6 @@ const Navbar = () => {
           variant="subtitle1"
           sx={{
             ml: 2,
-            color: 'black',
             cursor: 'pointer',
             '&:hover': {
               textDecoration: 'underline'

@@ -633,6 +633,10 @@ const AccountNumbers = () => {
           {data.id}
         </TableCell>
         
+        <TableCell className="FstoTableData-root">
+          {data.account_no}
+        </TableCell>
+        
         <TableCell className="FstoTableData-root" sx={{ textTransform: "capitalize" }}>
           {data.category_name}
         </TableCell>
@@ -643,10 +647,6 @@ const AccountNumbers = () => {
         
         <TableCell className="FstoTableData-root">
           {data.location_name}
-        </TableCell>
-        
-        <TableCell className="FstoTableData-root">
-          {data.account_no}
         </TableCell>
         
         <TableCell className="FstoTableData-root">
@@ -1000,29 +1000,29 @@ const AccountNumbers = () => {
             <TableHead>
               <TableRow>
                 <TableCell className="FstoTableHead-root" align="center">
-                  <TableSortLabel active={true}>ID NO.</TableSortLabel>
+                  <TableSortLabel active={false}>ID NO.</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>TYPE</TableSortLabel>
+                  <TableSortLabel active={false}>ACCOUNT NO.</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>SUPPLIER</TableSortLabel>
+                  <TableSortLabel active={false}>TYPE</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>LOCATION</TableSortLabel>
+                  <TableSortLabel active={false}>SUPPLIER</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>ACCOUNT NO.</TableSortLabel>
+                  <TableSortLabel active={false}>LOCATION</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root">STATUS</TableCell>
 
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>LAST MODIFIED</TableSortLabel>
+                  <TableSortLabel active={false}>LAST MODIFIED</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root" align="center">ACTIONS</TableCell>

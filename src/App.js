@@ -2,11 +2,16 @@ import React from 'react'
 
 import CryptoJS from 'crypto-js'
 
-import { useDispatch } from 'react-redux'
-import { SET_USER } from './actions'
+import { useDispatch, useSelector } from 'react-redux'
+import { SET_USER, SET_COLOR } from './actions'
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { ProtectedRoute } from './components/ProtectedRoute'
+
+
+import { ThemeProvider, createTheme, useMediaQuery, CssBaseline } from '@mui/material';
+
+
 
 import Landing from './Landing'
 import Dashboard from './Dashboard'
@@ -41,7 +46,6 @@ import TaggingRequest from './routes/requestor/TaggingRequest'
 import Sandbox from './Sandbox'
 
 
-
 const App = () => {
 
   const dispatch = useDispatch()
@@ -53,10 +57,74 @@ const App = () => {
       const decryptedUser = CryptoJS.AES.decrypt(data, "Fistocutie.");
       dispatch(SET_USER(JSON.parse(decryptedUser.toString(CryptoJS.enc.Utf8))))
     }
-  }, [dispatch])
+
+    const color = window.localStorage.getItem("color")
+
+    if (color) dispatch(SET_COLOR(color))
+    else window.localStorage.setItem("color", "light")
+
+    // eslint-disable-next-line
+  }, [])
+
+  const colorScheme = useSelector(state => state.color)
+  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
+
+  React.useEffect(() => {
+    document.body.className = colorScheme;
+    return () => { document.body.className = ''; }
+  });
+
+  const theme = React.useMemo(
+    () =>
+      createTheme({
+        typography: {
+          fontFamily: "'Open Sans', sans-serif",
+          fontSize: 12,
+          heading: {
+            margin: 0,
+            fontFamily: "'Open Sans', sans-serif",
+            fontSize: "1.35em",
+            fontWeight: 700
+          },
+          permission: {
+            margin: 0,
+            fontFamily: "'Open Sans', sans-serif",
+            fontSize: "0.95em",
+            fontWeight: 500
+          }
+        },
+        components: {
+          MuiInputLabel: {
+            styleOverrides: {
+              root: {
+                fontSize: '0.65em',
+                transform: 'translate(14px, 10px) scale(1)'
+              },
+              shrink: {
+                transform: 'translate(18px, -6px) scale(0.85)'
+              }
+            }
+          }
+        },
+        palette: {
+          // mode: prefersDarkMode ? "dark" : "light",
+          mode: colorScheme === "system" ? (prefersDarkMode ? "dark" : "light") : colorScheme,
+          ...(
+            colorScheme === "dark"
+            && {
+              background: {
+                default: "#181818"
+              }
+            }
+          )
+        },
+      }),
+    [colorScheme, prefersDarkMode],
+  );
 
   return (
-    <>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
       <Router>
         <Routes>
           <Route
@@ -116,7 +184,7 @@ const App = () => {
           </Route>
         </Routes>
       </Router>
-    </>
+    </ThemeProvider>
   )
 }
 

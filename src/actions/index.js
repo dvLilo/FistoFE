@@ -7,6 +7,15 @@ export const SET_USER = (object) => {
   }
 }
 
+export const SET_COLOR = (color) => {
+  return {
+    type: 'SET_COLOR',
+    payload: {
+      color: color
+    }
+  }
+}
+
 export const SET_AUTH = () => {
   return {
     type: 'SET_AUTH'
