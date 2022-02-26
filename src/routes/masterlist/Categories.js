@@ -437,6 +437,9 @@ const Categories = () => {
     setCategory({
       name
     })
+
+    document.body.scrollTop = 0
+    document.documentElement.scrollTop = 0
   }
   
   const TableData = ({ data }) => {

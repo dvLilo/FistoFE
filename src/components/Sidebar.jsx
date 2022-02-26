@@ -71,6 +71,7 @@ const AccordionSummary = styled((props) => (
 
 const Sidebar = () => {
   const open = useSelector(state => state.sidebar)
+  const color = useSelector(state => state.color)
   const dispatch = useDispatch()
 
   const hideSidebarHandler = () => {
@@ -106,7 +107,7 @@ const Sidebar = () => {
 
   return (
     <React.Fragment>
-      <aside className={open ? "FstoSidebar-root visible" : "FstoSidebar-root"}>
+      <aside className={open ? `FstoSidebar-root visible ${color}` : `FstoSidebar-root ${color}`}>
         <Box className="FstoSidebar-wrapper">
           <Box className="FstoSidebar-toggle">
             <IconButton onClick={toggleSidebarHandler} disableRipple>

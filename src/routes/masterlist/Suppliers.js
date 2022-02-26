@@ -629,6 +629,9 @@ const Suppliers = () => {
       type: dropdown.supplier_types.find(check => check.supplier_type_id === supplier_type_id),
       references: referrences
     })
+
+    document.body.scrollTop = 0
+    document.documentElement.scrollTop = 0
   }
 
   const TableData = ({ data }) => {

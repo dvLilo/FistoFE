@@ -13,8 +13,7 @@ import axios from 'axios';
 import './index.scss';
 
 axios.defaults.withCredentials = true;
-// axios.defaults.baseURL = 'http://localhost:8000';
-axios.defaults.baseURL = 'http://192.168.0.24:8000';
+axios.defaults.baseURL = 'http://localhost:8000';
 // axios.defaults.baseURL = 'http://10.10.12.219:8000';
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 

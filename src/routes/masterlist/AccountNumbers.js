@@ -624,6 +624,9 @@ const AccountNumbers = () => {
       category: dropdown.categories.find( category => category.category_id === category_id ),
       supplier: dropdown.suppliers.find( supplier => supplier.supplier_id === supplier_id )
     })
+
+    document.body.scrollTop = 0
+    document.documentElement.scrollTop = 0
   }
 
   const TableData = ({ data }) => {

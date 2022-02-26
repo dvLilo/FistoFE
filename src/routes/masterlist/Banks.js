@@ -630,6 +630,9 @@ const Banks = () => {
       account_title_1: dropdown.account_titles.find(check => check.account_title_id === account_title_1_id),
       account_title_2: dropdown.account_titles.find(check => check.account_title_id === account_title_2_id)
     })
+
+    document.body.scrollTop = 0
+    document.documentElement.scrollTop = 0
   }
 
   const TableData = ({ data }) => {

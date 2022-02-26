@@ -28,7 +28,14 @@
 
   @media (prefers-color-scheme: dark) {
     background-color: #212124;
-    color: #f0f0f0;
+  }
+
+  &.dark {
+    background-color: #212124;
+  }
+
+  &.light {
+    background: #283A47;
   }
 }
 

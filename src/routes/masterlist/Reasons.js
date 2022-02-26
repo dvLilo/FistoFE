@@ -444,6 +444,9 @@ const Reasons = () => {
       reason,
       remarks
     })
+
+    document.body.scrollTop = 0
+    document.documentElement.scrollTop = 0
   }
 
   const TableData = ({ data }) => {

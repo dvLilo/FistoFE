@@ -107,7 +107,6 @@ const App = () => {
           }
         },
         palette: {
-          // mode: prefersDarkMode ? "dark" : "light",
           mode: colorScheme === "system" ? (prefersDarkMode ? "dark" : "light") : colorScheme,
           ...(
             colorScheme === "dark"

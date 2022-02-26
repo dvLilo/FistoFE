@@ -61,7 +61,8 @@ const Navbar = () => {
       console.log(error.response)
     }
 
-    window.localStorage.clear()
+    window.localStorage.removeItem("token")
+    window.localStorage.removeItem("user")
     navigate("/", { replace: true })
   }
   const toggleColorHandler = () => {
@@ -83,6 +84,10 @@ const Navbar = () => {
       window.localStorage.setItem("color", "dark")
       dispatch(SET_COLOR("dark"))
     }
+  }
+  const systemColorHandler = () => {
+    window.localStorage.setItem("color", "system")
+    dispatch(SET_COLOR("system"))
   }
 
   return (
@@ -186,10 +191,13 @@ const Navbar = () => {
 
         <Button
           sx={{
+            background: 'rgba(0,0,0,0.04)',
             ml: 2,
-            textTransform: 'capitalize'
+            mr: 1,
+            borderRadius: '25px',
+            textTransform: 'capitalize',
           }}
-          onClick={() => dispatch(SET_COLOR("system"))}
+          onClick={systemColorHandler}
           disabled={color === "system"}
         >System Color</Button>
         <IconButton
