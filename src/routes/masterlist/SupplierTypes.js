@@ -446,8 +446,7 @@ const SupplierTypes = () => {
       transaction
     })
 
-    document.body.scrollTop = 0
-    document.documentElement.scrollTop = 0
+    window.scrollTo(0, 0)
   }
 
   const TableData = ({ data }) => {

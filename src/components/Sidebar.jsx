@@ -146,7 +146,7 @@ const Sidebar = () => {
               <Document sx={{ mr: 2.5 }} />Documents
             </AccordionSummary>
             <AccordionDetails>
-              <RouterLink className="FstoLink-root" to="tagging-of-request">Tagging of Request</RouterLink>
+              <RouterLink className="FstoLink-root" to="tagging-request">Tagging of Request</RouterLink>
               
             </AccordionDetails>
           </Accordion>

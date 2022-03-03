@@ -23,9 +23,6 @@ import UserAccounts from './routes/masterlist/UserAccounts'
   import ChangePassword from './routes/masterlist/ChangePassword'
 import DocumentTypes from './routes/masterlist/DocumentTypes'
 import Categories from './routes/masterlist/Categories'
-import Companies from './routes/masterlist/Companies'
-import Departments from './routes/masterlist/Departments'
-import Locations from './routes/masterlist/Locations'
 import References from './routes/masterlist/References'
 import SupplierTypes from './routes/masterlist/SupplierTypes'
 import Suppliers from './routes/masterlist/Suppliers'
@@ -41,6 +38,7 @@ import Reasons from './routes/masterlist/Reasons'
 
 // Requestor
 import TaggingRequest from './routes/requestor/TaggingRequest'
+import NewRequest from './routes/requestor/NewRequest'
 
 
 import Sandbox from './Sandbox'
@@ -97,7 +95,7 @@ const App = () => {
           MuiInputLabel: {
             styleOverrides: {
               root: {
-                fontSize: '0.65em',
+                fontSize: '0.75em',
                 transform: 'translate(14px, 10px) scale(1)'
               },
               shrink: {
@@ -160,9 +158,6 @@ const App = () => {
               <Route exact strict path="change-password" element={ <ChangePassword /> } />
               <Route exact strict path="categories" element={ <Categories /> } />
               <Route exact strict path="document-types" element={ <DocumentTypes /> } />
-              <Route exact strict path="companies" element={ <Companies /> } />
-              <Route exact strict path="departments" element={ <Departments /> } />
-              <Route exact strict path="locations" element={ <Locations /> } />
               <Route exact strict path="references" element={ <References /> } />
               <Route exact strict path="supplier-types" element={ <SupplierTypes /> } />
               <Route exact strict path="suppliers" element={ <Suppliers /> } />
@@ -176,9 +171,10 @@ const App = () => {
               <Route exact strict path="banks" element={ <Banks /> } />
               <Route exact strict path="reasons" element={ <Reasons /> } />
               
-              <Route exact strict path="tagging-of-request" element={ <TaggingRequest /> } />
+              <Route exact strict path="tagging-request" element={ <TaggingRequest /> } />
+              <Route exact strict path="tagging-request/new-request" element={ <NewRequest /> } />
               
-              <Route exact strict path="*" element={ <NewUser /> } />
+              <Route exact strict path="*" element={ <UserAccounts /> } />
             </Route>
           </Route>
         </Routes>

@@ -625,8 +625,7 @@ const AccountNumbers = () => {
       supplier: dropdown.suppliers.find( supplier => supplier.supplier_id === supplier_id )
     })
 
-    document.body.scrollTop = 0
-    document.documentElement.scrollTop = 0
+    window.scrollTo(0, 0)
   }
 
   const TableData = ({ data }) => {

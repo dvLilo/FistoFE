@@ -194,6 +194,15 @@ body {
   flex-direction: column;
 }
 
+.FstoPaperAttachment-root {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  min-height: 480px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 
 
 

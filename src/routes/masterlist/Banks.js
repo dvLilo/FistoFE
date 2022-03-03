@@ -631,8 +631,7 @@ const Banks = () => {
       account_title_2: dropdown.account_titles.find(check => check.account_title_id === account_title_2_id)
     })
 
-    document.body.scrollTop = 0
-    document.documentElement.scrollTop = 0
+    window.scrollTo(0, 0)
   }
 
   const TableData = ({ data }) => {
@@ -1079,7 +1078,7 @@ const Banks = () => {
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>NAME</TableSortLabel>
+                  <TableSortLabel active={true}>BRANCH</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root">

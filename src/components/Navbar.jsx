@@ -208,7 +208,9 @@ const Navbar = () => {
           onClick={toggleColorHandler}
         >
           {
-            color === "light" ? <DarkMode /> : <LightMode />
+            color === "system"
+            ? (prefersDarkMode ? <LightMode /> : <DarkMode />)
+            : (color === "dark" ? <LightMode /> : <DarkMode />)
           }
         </IconButton>
         

@@ -51,7 +51,7 @@ const ShowMore = ({data}) => {
         data.length > 2
         && (
           <React.Fragment>
-            <MoreRounded sx={{ color: 'rgba(0,0,0,0.35)', fontSize: '1.55em', cursor: 'pointer', '&:hover': { color: 'rgba(0,0,0,0.65)' } }} onClick={(e) => setAnchorEl(e.currentTarget)} />
+            <MoreRounded sx={{ opacity: 0.2, fontSize: '1.55em', cursor: 'pointer', '&:hover': { opacity: 0.45 } }} onClick={(e) => setAnchorEl(e.currentTarget)} />
             <Popover
               open={Boolean(anchorEl)}
               elevation={2}
@@ -566,8 +566,7 @@ const CreditCards = () => {
       categories: utility_categories
     })
 
-    document.body.scrollTop = 0
-    document.documentElement.scrollTop = 0
+    window.scrollTo(0, 0)
   }
 
   const TableData = ({ data }) => {
@@ -632,17 +631,11 @@ const CreditCards = () => {
         <form onSubmit={formSubmitHandler}>
           <TextField
             className="FstoTextfieldForm-root"
-            label="Credit Card Name"
+            label="Bank Name"
             variant="outlined"
             autoComplete="off"
             size="small"
             value={creditCard.name}
-            helperText={error.status && error.message}
-            error={error.status}
-            onBlur={() => setError({
-              status: false,
-              message: ""
-            })}
             onChange={(e) => setCreditCard({
               ...creditCard,
               name: e.target.value
@@ -655,7 +648,7 @@ const CreditCards = () => {
           
           <TextField
             className="FstoTextfieldForm-root"
-            label="Credit Card Number"
+            label="Account Number"
             variant="outlined"
             autoComplete="off"
             size="small"
@@ -866,29 +859,29 @@ const CreditCards = () => {
             <TableHead>
               <TableRow>
                 <TableCell className="FstoTableHead-root" align="center">
-                  <TableSortLabel active={true}>ID NO.</TableSortLabel>
+                  <TableSortLabel active={false}>ID NO.</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>BANK NAME</TableSortLabel>
+                  <TableSortLabel active={false}>BANK NAME</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>ACCOUNT NO.</TableSortLabel>
+                  <TableSortLabel active={false}>ACCOUNT NO.</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>CATEGORY</TableSortLabel>
+                  <TableSortLabel active={false}>CATEGORY</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>LOCATION</TableSortLabel>
+                  <TableSortLabel active={false}>LOCATION</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root">STATUS</TableCell>
 
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>LAST MODIFIED</TableSortLabel>
+                  <TableSortLabel active={false}>LAST MODIFIED</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root" align="center">ACTIONS</TableCell>
