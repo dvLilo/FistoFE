@@ -85,5 +85,53 @@
         "department_name":"Management Information System"
       }
     }
+  ],
+
+  "charging": [
+    {
+      "department_name": "Management Information System",
+      "company_name": "RDF Corporate Services",
+      "location_name": "Head Office"
+    },
+    {
+      "department_name": "Management Information System",
+      "company_name": "RDF Corporate Services",
+      "location_name": "Common"
+    },
+    {
+      "department_name": "Human Resources Common",
+      "company_name": "RDF Corporate Services",
+      "location_name": "Head Office"
+    },
+    {
+      "department_name": "Treasury",
+      "company_name": "RDF Corporate Services",
+      "location_name": "Common"
+    },
+    {
+      "department_name": "Audit",
+      "company_name": "RDF Corporate Services",
+      "location_name": "Common"
+    },
+    {
+      "department_name": "Finance Common",
+      "company_name": "RDF Corporate Services",
+      "location_name": "Head Office"
+    },
+    {
+      "department_name": "Boiler Farms",
+      "company_name": "Red Dragon Farm",
+      "location_name": "BrFarm - Lara 1"
+    },
+    {
+      "department_name": "Boiler Farms - Area 2",
+      "company_name": "Red Dragon Farm",
+      "location_name": "BrFarm - Nueva Ecija 1"
+    },
+    {
+      "department_name": "Boiler Farms - Area 2",
+      "company_name": "Red Dragon Farm",
+      "location_name": "BrFarm - Nueva Ecija 2"
+    }
   ]
 }

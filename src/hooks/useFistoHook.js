@@ -114,3 +114,5 @@ const useFistoHook = (URL) => {
 }
 
 export default useFistoHook
+
+// In God We Trust.

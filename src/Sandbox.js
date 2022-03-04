@@ -21,9 +21,9 @@ const Sandbox = () => {
     rowChange,
     switchDataStatus,
     state: { toast, setToast }
-   } = useFistoHook("/api/categories/")
+  } = useFistoHook("/api/categories/")
 
-  return ReactDOM.createPortal (
+  return ReactDOM.createPortal(
     <React.Fragment>
       <Mui.Box sx={{
         backgroundColor: '#eee',
@@ -41,7 +41,7 @@ const Sandbox = () => {
 
         {
           Boolean(error)
-          && <Mui.Typography variant="body2">{ error.status }</Mui.Typography>
+          && <Mui.Typography variant="body2">{error.status}</Mui.Typography>
         }
 
         <Mui.TextField label="Search" size="small" onKeyPress={searchData} />
@@ -77,19 +77,19 @@ const Sandbox = () => {
         <Mui.Button>Restore</Mui.Button>
 
         <Mui.Typography variant="body1" sx={{ textTransform: "capitalize" }}>
-          { data?.map(row => row.name).join(", ") }
+          {data?.map(row => row.name).join(", ")}
         </Mui.Typography>
 
         <Mui.Typography variant="body2">
-          Current Page: { paginate?.current_page }
+          Current Page: {paginate?.current_page}
         </Mui.Typography>
 
         <Mui.Typography variant="body2">
-          Row Per Page: { paginate?.per_page }
+          Row Per Page: {paginate?.per_page}
         </Mui.Typography>
-        
 
-        {/* <Mui.Typography variant="h1" title="h1">Fisto cutie.</Mui.Typography>
+
+        <Mui.Typography variant="h1" title="h1">Fisto cutie.</Mui.Typography>
         <Mui.Typography variant="h2" title="h2">Fisto cutie.</Mui.Typography>
         <Mui.Typography variant="h3" title="h3">Fisto cutie.</Mui.Typography>
         <Mui.Typography variant="h4" title="h4">Fisto cutie.</Mui.Typography>
@@ -102,9 +102,9 @@ const Sandbox = () => {
         <Mui.Typography variant="button" title="button">Fisto cutie.</Mui.Typography>
         <Mui.Typography variant="caption" title="caption">Fisto cutie.</Mui.Typography>
         <Mui.Typography variant="overline" title="overline">Fisto cutie.</Mui.Typography>
-        <Mui.Divider  variant="middle" flexItem />
+        <Mui.Divider variant="middle" flexItem />
         <Mui.Typography variant="heading" title="heading">Fisto cutie.</Mui.Typography>
-        <Mui.Typography variant="permission" title="permission">Fisto cutie.</Mui.Typography> */}
+        <Mui.Typography variant="permission" title="permission">Fisto cutie.</Mui.Typography>
 
       </Mui.Box>
 

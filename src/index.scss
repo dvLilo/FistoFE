@@ -199,8 +199,102 @@ body {
   flex-grow: 1;
   flex-direction: column;
   min-height: 480px;
+  padding: 3em 2em;
   overflow-x: auto;
   overflow-y: hidden;
+
+  .FstoLabelForm-attachment {
+    top: 6px
+  }
+
+  .FstoLabelForm-attachment.MuiInputLabel-shrink {
+    transform: translate(18px, -12px) scale(0.85)
+  }
+
+  .FstoTextfieldForm-attachment input {
+    padding: 14px 14px;
+  }
+
+  .FstoSelectForm-attachment .FstoTextfieldForm-attachment input.MuiOutlinedInput-input {
+    padding: 8px 14px;
+  }
+
+  .FstoButtonForm-attachment {
+    margin-left: 1em;
+    padding-left: 28px;
+    padding-right: 28px;
+    text-transform: capitalize;
+  }
+
+  .FstoButtonForm-attachment .MuiButton-startIcon {
+    margin-right: 0;
+  }
+}
+
+
+.FstoPurchaseOrder-root {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  // gap: 2em;
+  padding-top: 0.5em;
+  padding-left: 1em;
+  padding-bottom: 0.5em;
+  padding-right: 1em;
+  border: 1px solid #9A9A9A;
+  border-top-style: dashed;
+  border-bottom-style: dashed;
+  // border-radius: 5px;
+
+  &:first-of-type {
+    border-top-style: solid;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+
+  &:last-of-type {
+    border-bottom-style: solid;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+
+  &:before {
+    content: " ";
+    background: #fff;
+    position: absolute;
+    display: block;
+    bottom: -15px;
+    right: -15px;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    border-left: 2px solid #9A9A9A;
+    z-index: 1;
+  }
+
+  &:after {
+    content: " ";
+    background: #fff;
+    position: absolute;
+    display: block;
+    bottom: -15px;
+    left: -15px;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    border-right: 2px solid #9A9A9A;
+    z-index: 1;
+  }
+
+  &:last-of-type:before {
+    display: none;
+  }
+
+  &:last-of-type:after {
+    display: none;
+  }
 }
 
 
