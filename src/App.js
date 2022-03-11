@@ -18,9 +18,9 @@ import Dashboard from './Dashboard'
 
 // Masterlist
 import UserAccounts from './routes/masterlist/UserAccounts'
-  import NewUser from './routes/masterlist/NewUser'
-  import UpdateUser from './routes/masterlist/UpdateUser'
-  import ChangePassword from './routes/masterlist/ChangePassword'
+import NewUser from './routes/masterlist/NewUser'
+import UpdateUser from './routes/masterlist/UpdateUser'
+import ChangePassword from './routes/masterlist/ChangePassword'
 import DocumentTypes from './routes/masterlist/DocumentTypes'
 import Categories from './routes/masterlist/Categories'
 import References from './routes/masterlist/References'
@@ -31,8 +31,8 @@ import UtilityLocations from './routes/masterlist/UtilityLocations'
 import AccountNumbers from './routes/masterlist/AccountNumbers'
 import CreditCards from './routes/masterlist/CreditCards'
 import AccountTitles from './routes/masterlist/AccountTitles'
-import PayrollClients from './routes/masterlist/PayrollClients'
-import PayrollCategories from './routes/masterlist/PayrollCategories'
+import PayrollClients from './routes/masterlist/PayrollClients/'
+import PayrollCategories from './routes/masterlist/PayrollCategories/'
 import Banks from './routes/masterlist/Banks'
 import Reasons from './routes/masterlist/Reasons'
 
@@ -152,29 +152,29 @@ const App = () => {
                 <Dashboard />
               }
             >
-              <Route index exact strict element={ <UserAccounts /> } />
-              <Route exact strict path="new-user" element={ <NewUser /> } />
-              <Route exact strict path="update-user/:id" element={ <UpdateUser /> } />
-              <Route exact strict path="change-password" element={ <ChangePassword /> } />
-              <Route exact strict path="categories" element={ <Categories /> } />
-              <Route exact strict path="document-types" element={ <DocumentTypes /> } />
-              <Route exact strict path="references" element={ <References /> } />
-              <Route exact strict path="supplier-types" element={ <SupplierTypes /> } />
-              <Route exact strict path="suppliers" element={ <Suppliers /> } />
-              <Route exact strict path="utility-categories" element={ <UtilityCategories /> } />
-              <Route exact strict path="utility-locations" element={ <UtilityLocations /> } />
-              <Route exact strict path="account-numbers" element={ <AccountNumbers /> } />
-              <Route exact strict path="credit-cards" element={ <CreditCards /> } />
-              <Route exact strict path="account-titles" element={ <AccountTitles /> } />
-              <Route exact strict path="payroll-clients" element={ <PayrollClients /> } />
-              <Route exact strict path="payroll-categories" element={ <PayrollCategories /> } />
-              <Route exact strict path="banks" element={ <Banks /> } />
-              <Route exact strict path="reasons" element={ <Reasons /> } />
-              
-              <Route exact strict path="tagging-request" element={ <TaggingRequest /> } />
-              <Route exact strict path="tagging-request/new-request" element={ <NewRequest /> } />
-              
-              <Route exact strict path="*" element={ <UserAccounts /> } />
+              <Route index exact strict element={<UserAccounts />} />
+              <Route exact strict path="new-user" element={<NewUser />} />
+              <Route exact strict path="update-user/:id" element={<UpdateUser />} />
+              <Route exact strict path="change-password" element={<ChangePassword />} />
+              <Route exact strict path="categories" element={<Categories />} />
+              <Route exact strict path="document-types" element={<DocumentTypes />} />
+              <Route exact strict path="references" element={<References />} />
+              <Route exact strict path="supplier-types" element={<SupplierTypes />} />
+              <Route exact strict path="suppliers" element={<Suppliers />} />
+              <Route exact strict path="utility-categories" element={<UtilityCategories />} />
+              <Route exact strict path="utility-locations" element={<UtilityLocations />} />
+              <Route exact strict path="account-numbers" element={<AccountNumbers />} />
+              <Route exact strict path="credit-cards" element={<CreditCards />} />
+              <Route exact strict path="account-titles" element={<AccountTitles />} />
+              <Route exact strict path="payroll-clients" element={<PayrollClients />} />
+              <Route exact strict path="payroll-categories" element={<PayrollCategories />} />
+              <Route exact strict path="banks" element={<Banks />} />
+              <Route exact strict path="reasons" element={<Reasons />} />
+
+              <Route exact strict path="tagging-request" element={<TaggingRequest />} />
+              <Route exact strict path="tagging-request/new-request" element={<NewRequest />} />
+
+              <Route exact strict path="*" element={<UserAccounts />} />
             </Route>
           </Route>
         </Routes>

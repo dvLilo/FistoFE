@@ -6,14 +6,14 @@ import {
   Menu,
   MenuItem
 } from '@mui/material'
-import { 
+import {
   MoreHoriz as Action,
   EditOutlined as Edit,
   ArchiveOutlined as Archive,
   RestoreOutlined as Restore
 } from '@mui/icons-material'
 
-const ActionMenu = ({ data, view, onEdit, onArchive, onRestore }) => {
+const ActionMenu = ({ data, onUpdateChange, onStatusChange }) => {
 
   const [anchorEl, setAnchorEl] = React.useState(null)
 
@@ -46,20 +46,29 @@ const ActionMenu = ({ data, view, onEdit, onArchive, onRestore }) => {
         onClose={actionCloseHandler}
       >
         {
-          view
-          ? (
+          !Boolean(data.deleted_at)
+            ? (
               <Box>
-                <MenuItem dense={true} onClick={() => onEdit(data)}>
+                <MenuItem dense={true} onClick={() => {
+                  onUpdateChange(data)
+                  actionCloseHandler()
+                }}>
                   <Edit sx={{ mr: 1 }} /> Edit
                 </MenuItem>
 
-                <MenuItem dense={true} onClick={() => onArchive(data)}>
+                <MenuItem dense={true} onClick={() => {
+                  onStatusChange(data)
+                  actionCloseHandler()
+                }}>
                   <Archive sx={{ mr: 1 }} /> Archive
                 </MenuItem>
               </Box>
             )
-          : (
-              <MenuItem dense={true}  onClick={() => onRestore(data)}>
+            : (
+              <MenuItem dense={true} onClick={() => {
+                onStatusChange(data)
+                actionCloseHandler()
+              }}>
                 <Restore sx={{ mr: 1 }} /> Restore
               </MenuItem>
             )

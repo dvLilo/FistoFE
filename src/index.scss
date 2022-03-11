@@ -232,6 +232,11 @@ body {
 }
 
 
+.FstoPurchaseOrderBox-root {
+  display: flex;
+  flex-direction: column;
+}
+
 .FstoPurchaseOrder-root {
   position: relative;
   display: flex;
@@ -266,11 +271,13 @@ body {
     position: absolute;
     display: block;
     bottom: -15px;
-    right: -15px;
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    border-left: 2px solid #9A9A9A;
+    right: -1px;
+    width: 14px;
+    height: 28px;
+    border-top-left-radius: 14px;
+    border-bottom-left-radius: 14px;
+    border: 1px solid #9A9A9A;
+    border-right: 0;
     z-index: 1;
   }
 
@@ -280,11 +287,13 @@ body {
     position: absolute;
     display: block;
     bottom: -15px;
-    left: -15px;
-    width: 25px;
-    height: 25px;
-    border-radius: 50%;
-    border-right: 2px solid #9A9A9A;
+    left: -1px;
+    width: 14px;
+    height: 28px;
+    border-top-right-radius: 14px;
+    border-bottom-right-radius: 14px;
+    border: 1px solid #9A9A9A;
+    border-left: 0;
     z-index: 1;
   }
 

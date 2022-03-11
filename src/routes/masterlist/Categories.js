@@ -34,23 +34,19 @@ import ActionMenu from '../../components/ActionMenu'
 
 const Categories = () => {
 
-  const [isSaving, setIsSaving] = React.useState(false)
+  const searchRef = React.useRef(null)
+
+  const [params, setParams] = React.useState({
+    status: 1,
+    page: 1,
+    rows: 10,
+    search: null
+  })
   const [isFetching, setIsFetching] = React.useState(false)
-
-  const [isSearching, setIsSearching] = React.useState({
-    status: false,
-    keyword: ""
-  })
-
-  const [isUpdating, setIsUpdating] = React.useState({
-    status: false,
-    data: ""
-  })
-
-  const [error, setError] = React.useState({
-    status: false,
-    message: ""
-  })
+  // Categories Array
+  const [categories, setCategories] = React.useState(null)
+  // Pagination Object
+  const [pagination, setPagination] = React.useState(null)
 
   const [toast, setToast] = React.useState({
     show: false,
@@ -61,103 +57,26 @@ const Categories = () => {
   const [confirm, setConfirm] = React.useState({
     show: false,
     loading: false,
-    onConfirm: () => {}
+    onConfirm: () => { }
   })
 
-  // true = active, false = inactive
-  const [mode, setMode] = React.useState(true)
-
-  // Categories Array
-  const [categories, setCategories] = React.useState(null)
-  // Pagination Object
-  const [pagination, setPagination] = React.useState(null)
-
-  // Form Data State
-  const [category, setCategory] = React.useState({
-    name: ""
-  })
+  const [forUpdate, setForUpdate] = React.useState(null)
 
   React.useEffect(() => {
-    
-    if (mode) fetchCategories(true)
-    else  fetchCategories(false)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const fetchCategories = async (status) => {
-    setIsFetching(true)
-
-    let response
-    try {
-      response = await axios.get(`/api/categories/${status ? 1 : 0}/${pagination ? pagination.per_page : 10}/`).then(json => json.data)
-      const { data, ...paginate } = response.result
-
-      setCategories(data)
-      setPagination(paginate)
-    }
-    catch(error) {
-      if (error.request.status !== 404) {
-        setToast({
-          show: true,
-          title: "Error",
-          message: "Something went wrong whilst fetching Categories.",
-          severity: "error"
-        })
-      }
-
-      setCategories(null)
-      setPagination(null)
-
-      console.log("Fisto Error Details: ", error.request)
-    }
-
-    setIsFetching(false)
-  }
-
-  const modeChangeHandler = () => {
-    if (isFetching) return
-
-    if (mode) {
-      setMode(false)
-      fetchCategories(false)
-    }
-    else {
-      setMode(true)
-      fetchCategories(true)
-    }
-  }
-
-  const searchCloseHandler = () => {
-    if (mode) fetchCategories(true)
-    else fetchCategories(false)
-
-    setIsSearching({
-      status: false,
-      keyword: ""
-    })
-  }
-
-  const searchSubmitHandler = async (e) => {
-    if (e.key === "Enter")
-    {
+    (async () => {
       setIsFetching(true)
 
       let response
       try {
-        if (mode) {
-          response = await axios.post(`/api/categories/search/1/${pagination ? pagination.per_page : 10}/`, {
-            value: isSearching.keyword
-          })
-          .then(res => res.data)
-        }
-        else {
-          response = await axios.post(`/api/categories/search/0/${pagination ? pagination.per_page : 10}/`, {
-            value: isSearching.keyword
-          })
-          .then(res => res.data)
-        }
-
-        const { data, ...paginate } = response.result
+        response = await axios.get(`/api/admin/categories/`, {
+          params: {
+            status: params.status,
+            page: params.page,
+            rows: params.rows,
+            search: params.search
+          }
+        })
+        const { data, ...paginate } = response.data.result
 
         setCategories(data)
         setPagination(paginate)
@@ -171,197 +90,60 @@ const Categories = () => {
             severity: "error"
           })
         }
-  
+
         setCategories(null)
         setPagination(null)
 
         console.log("Fisto Error Details: ", error.request)
       }
-      
+
       setIsFetching(false)
+    })()
+  }, [params])
+
+  const modeChangeHandler = () => {
+    if (isFetching) return
+
+    setParams({
+      ...params,
+      status: params.status ? 0 : 1
+    })
+  }
+
+  const searchCloseHandler = () => {
+    setParams({
+      ...params,
+      search: null
+    })
+    searchRef.current.value = null
+  }
+
+  const searchSubmitHandler = async (e) => {
+    if (e.key === "Enter") {
+      setParams({
+        ...params,
+        search: e.target.value
+      })
     }
-  }
-
-  const formClearHandler = () => {
-    setIsUpdating({
-      status: false,
-      data: ""
-    })
-    setError({
-      status: false,
-      message: ""
-    })
-    setCategory({
-      name: String()
-    })
-  }
-
-  const formSubmitHandler = (e) => {
-    e.preventDefault()
-
-    setConfirm({
-      show: true,
-      loading: false,
-      onConfirm: async () => {
-        setConfirm({
-          show: false,
-          loading: false,
-          onConfirm: () => {}
-        })
-        setIsSaving(true)
-
-        let response
-        try {
-          if (isUpdating.status) {
-            response = await axios.put(`/api/categories/${isUpdating.data}/`, {
-              name: category.name
-            })
-            .then(res => res.data)
-          }
-          else {
-            response = await axios.post(`/api/categories/`, {
-              name: category.name
-            })
-            .then(res => res.data)
-          }
-
-          setToast({
-            show: true,
-            title: "Success",
-            message: response.message
-          })
-          setIsUpdating({
-            status: false,
-            data: ""
-          })
-          setCategory({
-            name: String()
-          })
-
-          fetchCategories(true)
-        }
-        catch (error) {
-          const { status } = error.request
-
-          if (status === 409) {
-            const { data } = error.response
-
-            setError({
-              status: true,
-              message: data.message
-            })
-          }
-          else
-            setToast({
-              show: true,
-              title: "Error",
-              message: "Something went wrong whilst creating Category.",
-              severity: "error"
-            })
-        }
-        
-        setIsSaving(false)
-      }
-    })
   }
 
   const pageChangeHandler = async (e, page) => {
-    setIsFetching(true)
-
-    let response
-    try {
-      if (mode && isSearching.status) {
-        response = await axios.post(`/api/categories/search/1/${pagination ? pagination.per_page : 10}?page=${++page}`, {
-          value: isSearching.keyword
-        })
-        .then(res => res.data)
-      }
-      else if (!mode && isSearching.status) {
-        response = await axios.post(`/api/categories/search/0/${pagination ? pagination.per_page : 10}?page=${++page}`, {
-          value: isSearching.keyword
-        })
-        .then(res => res.data)
-      }
-      else if (mode) {
-        response = await axios.get(`api/categories/1/${pagination ? pagination.per_page : 10}?page=${++page}`).then(res => res.data)
-      }
-      else if (!mode) {
-        response = await axios.get(`api/categories/0/${pagination ? pagination.per_page : 10}?page=${++page}`).then(res => res.data)
-      }
-
-      const { data, ...paginate } = response.result
-
-      setCategories(data)
-      setPagination(paginate)
-    }
-    catch (error) {
-      if (error.request.status !== 404) {
-        setToast({
-          show: true,
-          title: "Error",
-          message: "Something went wrong whilst fetching Categories.",
-          severity: "error"
-        })
-      }
-
-      setCategories(null)
-      setPagination(null)
-
-      console.log("Fisto Error Details: ", error.request)
-    }
-
-    setIsFetching(false)
+    setParams({
+      ...params,
+      page: page + 1
+    })
   }
 
   const rowChangeHandler = async (e) => {
-    setIsFetching(true)
-
-    let response
-    try {
-      if (mode && isSearching.status) {
-        response = await axios.post(`/api/categories/search/1/${e.target.value}/`, {
-          value: isSearching.keyword
-        })
-        .then(res => res.data)
-      }
-      else if (!mode && isSearching.status) {
-        response = await axios.post(`/api/categories/search/0/${e.target.value}/`, {
-          value: isSearching.keyword
-        })
-        .then(res => res.data)
-      }
-      else if (mode) {
-        response = await axios.get(`/api/categories/1/${e.target.value}/`).then(res => res.data)
-      }
-      else if (!mode)  {
-        response = await axios.get(`/api/categories/0/${e.target.value}/`).then(res => res.data)
-      }
-
-      const { data, ...paginate } = response.result
-      
-      setCategories(data)
-      setPagination(paginate)
-    }
-    catch (error) {
-      if (error.request.status !== 404) {
-        setToast({
-          show: true,
-          title: "Error",
-          message: "Something went wrong whilst fetching Categories.",
-          severity: "error"
-        })
-      }
-
-      setCategories(null)
-      setPagination(null)
-
-      console.log("Fisto Error Details: ", error.request)
-    }
-
-    setIsFetching(false)
+    setParams({
+      ...params,
+      rows: e.target.value
+    })
   }
 
-  const actionArchiveHandler = ({ id }) => {
+  const actionStatusHandler = (props) => {
+    const { id, deleted_at } = props
+
     setConfirm({
       show: true,
       loading: false,
@@ -372,10 +154,13 @@ const Categories = () => {
           loading: true
         })
 
+
         let response
         try {
-          response = await axios.post(`/api/categories/archive/${id}/`).then(res => res.data)
-    
+          response = await axios.patch(`/api/admin/categories/${id}`, {
+            status: Boolean(deleted_at) ? 0 : 1
+          })
+
           setConfirm({
             ...confirm,
             loading: false,
@@ -383,42 +168,12 @@ const Categories = () => {
           setToast({
             show: true,
             title: "Success",
-            message: response.message
+            message: response.data.message
           })
-          fetchCategories(true)
-        }
-        catch (error) {
-          console.log("Fisto Error Details: ", error.request)
-        }
-      }
-    })
-  }
-
-  const actionRestoreHandler = ({ id }) => {
-    setConfirm({
-      show: true,
-      loading: false,
-      onConfirm: async () => {
-        setConfirm({
-          ...confirm,
-          show: true,
-          loading: true
-        })
-
-        let response
-        try {
-          response = await axios.post(`/api/categories/restore/${id}/`).then(res => res.data)
-    
-          setConfirm({
-            ...confirm,
-            loading: false
+          setParams({
+            ...params,
+            status: Boolean(deleted_at) ? 0 : 1
           })
-          setToast({
-            show: true,
-            title: "Success",
-            message: response.message
-          })
-          fetchCategories(false)
         }
         catch (error) {
           console.log("Fisto Error Details: ", error.request)
@@ -428,114 +183,15 @@ const Categories = () => {
   }
 
   const actionUpdateHandler = (data) => {
-    const { id, name } = data
-
-    setIsUpdating({
-      status: true,
-      data: id
-    })
-    setCategory({
-      name
-    })
+    setForUpdate(data)
 
     window.scrollTo(0, 0)
   }
-  
-  const TableData = ({ data }) => {
-    return (
-      <TableRow>
-        <TableCell className="FstoTableData-root" align="center">
-          {data.id}
-        </TableCell>
 
-        <TableCell className="FstoTableData-root" sx={{ textTransform: "capitalize" }}>
-          {data.name}
-        </TableCell>
-
-        <TableCell className="FstoTableData-root">
-          {Boolean(data.deleted_at) ? "Inactive" : "Active"}
-        </TableCell>
-
-        <TableCell className="FstoTableData-root">
-          {
-            new Date(data.updated_at).toLocaleString("default", {
-              month: "long",
-              day: "numeric",
-              year: "numeric"
-            })
-          }
-        </TableCell>
-
-        <TableCell align="center">
-          <ActionMenu 
-            data={data} 
-            view={mode}
-            onEdit={actionUpdateHandler} 
-            onArchive={actionArchiveHandler} 
-            onRestore={actionRestoreHandler}
-          />
-        </TableCell>
-      </TableRow>
-    )
-  }
-  
   return (
     <Box className="FstoBox-root">
       <Paper className="FstoPaperForm-root" elevation={1}>
-        <form onSubmit={formSubmitHandler}>
-          <TextField
-            className="FstoTextfieldForm-root"
-            label="Category Name"
-            variant="outlined"
-            autoComplete="off"
-            size="small"
-            value={category.name}
-            helperText={error.status && error.message}
-            error={error.status}
-            onBlur={() => setError({
-              status: false,
-              message: ""
-            })}
-            onChange={(e) => setCategory({
-              name: e.target.value
-            })}
-            InputLabelProps={{
-              className: "FstoLabelForm-root"
-            }}
-            fullWidth
-          />
-
-          <LoadingButton
-            className="FstoButtonForm-root"
-            type="submit"
-            variant="contained"
-            loadingPosition="start"
-            loading={isSaving}
-            startIcon={<></>}
-            disabled={!Boolean(category.name.trim())}
-            disableElevation
-          >
-          {
-            isUpdating.status
-            ? "Update"
-            : "Save"
-          }
-          </LoadingButton>
-
-          <Button
-            className="FstoButtonForm-root"
-            variant="outlined"
-            color="error"
-            onClick={formClearHandler}
-            disableElevation
-          >
-            {
-              isUpdating.status
-              ? "Cancel"
-              : "Clear"
-            }
-          </Button>
-        </form>
+        <FormComponent forUpdate={forUpdate} setForUpdate={setForUpdate} setParams={setParams} setConfirm={setConfirm} setToast={setToast} />
       </Paper>
 
       <Paper className="FstoPaperTable-root" elevation={1}>
@@ -552,13 +208,13 @@ const Categories = () => {
               onClick={modeChangeHandler}
               sx={{
                 color:
-                  mode
-                  ? "#ef5350"
-                  : "#4caf50"
+                  params.status
+                    ? "#ef5350"
+                    : "#4caf50"
               }}
             >
               {
-                mode
+                params.status
                   ? "View Archived"
                   : "View Active"
               }
@@ -569,7 +225,7 @@ const Categories = () => {
               size="small"
               autoComplete="off"
               placeholder="Search"
-              value={isSearching.keyword}
+              inputRef={searchRef}
               InputProps={{
                 className: "FstoTextfieldSearch-root",
                 startAdornment: (
@@ -582,18 +238,14 @@ const Categories = () => {
                     <IconButton
                       edge="end"
                       size="small"
-                      disabled={!isSearching.status}
                       onClick={searchCloseHandler}
+                      disabled={!Boolean(params.search)}
                     >
                       <Close fontSize="small" />
                     </IconButton>
                   </InputAdornment>
                 )
               }}
-              onChange={(e) => setIsSearching({
-                status: true,
-                keyword: e.target.value
-              })}
               onKeyPress={searchSubmitHandler}
             />
           </Box>
@@ -604,17 +256,17 @@ const Categories = () => {
             <TableHead>
               <TableRow>
                 <TableCell className="FstoTableHead-root" align="center">
-                  <TableSortLabel active={true}>ID NO.</TableSortLabel>
+                  <TableSortLabel active={false}>ID NO.</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>NAME</TableSortLabel>
+                  <TableSortLabel active={false}>NAME</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root">STATUS</TableCell>
 
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>LAST MODIFIED</TableSortLabel>
+                  <TableSortLabel active={false}>LAST MODIFIED</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root" align="center">ACTIONS</TableCell>
@@ -622,12 +274,12 @@ const Categories = () => {
             </TableHead>
 
             <TableBody>
-            {
+              {
                 isFetching
-                ? <Preloader row={5} col={5} />
-                : categories
-                  ? categories.map((data, index) => <TableData key={index} data={data} />)
-                  : (
+                  ? <Preloader row={5} col={5} />
+                  : categories
+                    ? categories.map((data, index) => <TableData key={index} data={data} onStatusChange={actionStatusHandler} onUpdateChange={actionUpdateHandler} />)
+                    : (
                       <TableRow>
                         <TableCell align="center" colSpan={5}>NO RECORDS FOUND</TableCell>
                       </TableRow>
@@ -644,7 +296,7 @@ const Categories = () => {
           rowsPerPage={pagination ? pagination.per_page : 10}
           onPageChange={pageChangeHandler}
           onRowsPerPageChange={rowChangeHandler}
-          rowsPerPageOptions={[10,20,50,100]}
+          rowsPerPageOptions={[10, 20, 50, 100]}
         />
 
         <Toast
@@ -670,11 +322,195 @@ const Categories = () => {
           onClose={() => setConfirm({
             show: false,
             loading: false,
-            onConfirm: () => {}
+            onConfirm: () => { }
           })}
         />
       </Paper>
     </Box>
+  )
+}
+
+const FormComponent = ({ forUpdate, setParams, setConfirm, setToast }) => {
+
+  const [isSaving, setIsSaving] = React.useState(false)
+  const [isUpdating, setIsUpdating] = React.useState(false)
+
+  const [error, setError] = React.useState({
+    status: false,
+    message: ""
+  })
+
+  const [category, setCategory] = React.useState({
+    name: ""
+  })
+
+  React.useEffect(() => {
+    if (forUpdate) {
+      setIsUpdating(true)
+      setCategory({
+        name: forUpdate.name
+      })
+    }
+  }, [forUpdate])
+
+  const formClearHandler = () => {
+    setIsUpdating(false)
+    setError({
+      status: false,
+      message: ""
+    })
+    setCategory({
+      name: String()
+    })
+  }
+
+  const formSubmitHandler = (e) => {
+    e.preventDefault()
+
+    setConfirm({
+      show: true,
+      loading: false,
+      onConfirm: async () => {
+        setConfirm({
+          show: false,
+          loading: false,
+          onConfirm: () => { }
+        })
+        setIsSaving(true)
+
+        let response
+        try {
+          if (forUpdate) response = await axios.put(`/api/admin/categories/${forUpdate.id}`, category)
+          else response = await axios.post(`/api/admin/categories/`, category)
+
+          setToast({
+            show: true,
+            title: "Success",
+            message: response.data.message
+          })
+          setParams(prev => ({
+            ...prev,
+            status: 1
+          }))
+          formClearHandler()
+        }
+        catch (error) {
+          const { status } = error.request
+
+          if (status === 409) {
+            const { data } = error.response
+
+            setError({
+              status: true,
+              message: data.message
+            })
+          }
+          else {
+            setToast({
+              show: true,
+              title: "Error",
+              message: "Something went wrong whilst creating Category.",
+              severity: "error"
+            })
+          }
+        }
+
+        setIsSaving(false)
+      }
+    })
+  }
+
+  return (
+    <form onSubmit={formSubmitHandler}>
+      <TextField
+        className="FstoTextfieldForm-root"
+        label="Category Name"
+        variant="outlined"
+        autoComplete="off"
+        size="small"
+        value={category.name}
+        helperText={error.status && error.message}
+        error={error.status}
+        onBlur={() => setError({
+          status: false,
+          message: ""
+        })}
+        onChange={(e) => setCategory({
+          name: e.target.value
+        })}
+        InputLabelProps={{
+          className: "FstoLabelForm-root"
+        }}
+        fullWidth
+      />
+
+      <LoadingButton
+        className="FstoButtonForm-root"
+        type="submit"
+        variant="contained"
+        loadingPosition="start"
+        loading={isSaving}
+        startIcon={<></>}
+        disabled={!Boolean(category.name.trim())}
+        disableElevation
+      >
+        {
+          isUpdating
+            ? "Update"
+            : "Save"
+        }
+      </LoadingButton>
+
+      <Button
+        className="FstoButtonForm-root"
+        variant="outlined"
+        color="error"
+        onClick={formClearHandler}
+        disableElevation
+      >
+        {
+          isUpdating
+            ? "Cancel"
+            : "Clear"
+        }
+      </Button>
+    </form>
+  )
+}
+
+const TableData = ({ data, onUpdateChange, onStatusChange }) => {
+  return (
+    <TableRow>
+      <TableCell className="FstoTableData-root" align="center">
+        {data.id}
+      </TableCell>
+
+      <TableCell className="FstoTableData-root" sx={{ textTransform: "capitalize" }}>
+        {data.name}
+      </TableCell>
+
+      <TableCell className="FstoTableData-root">
+        {Boolean(data.deleted_at) ? "Inactive" : "Active"}
+      </TableCell>
+
+      <TableCell className="FstoTableData-root">
+        {
+          new Date(data.updated_at).toLocaleString("default", {
+            month: "long",
+            day: "numeric",
+            year: "numeric"
+          })
+        }
+      </TableCell>
+
+      <TableCell align="center">
+        <ActionMenu
+          data={data}
+          onUpdateChange={onUpdateChange}
+          onStatusChange={onStatusChange}
+        />
+      </TableCell>
+    </TableRow>
   )
 }
 

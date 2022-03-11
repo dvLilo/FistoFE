@@ -4,29 +4,29 @@ import axios from 'axios'
 
 import * as XLSX from 'xlsx'
 
-import { 
-  Box, 
-  Paper, 
-  Typography, 
-  TextField, 
-  InputAdornment, 
-  Button, 
-  IconButton, 
-  TableContainer, 
-  Table, 
-  TableHead, 
-  TableBody, 
-  TableRow, 
-  TableCell, 
-  TableSortLabel, 
-  TablePagination, 
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  InputAdornment,
+  Button,
+  IconButton,
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableSortLabel,
+  TablePagination,
   Autocomplete,
   Dialog
 } from '@mui/material'
 
-import { 
-  Search, 
-  Close, 
+import {
+  Search,
+  Close,
   Error,
   UploadFile
 } from '@mui/icons-material'
@@ -43,7 +43,7 @@ const AccountTitles = () => {
   const [isSaving, setIsSaving] = React.useState(false)
   const [isFetching, setIsFetching] = React.useState(false)
   const [isImporting, setIsImporting] = React.useState(false)
-  
+
   const [isSearching, setIsSearching] = React.useState({
     status: false,
     keyword: ""
@@ -64,7 +64,7 @@ const AccountTitles = () => {
     show: false,
     data: []
   })
-  
+
   const [toast, setToast] = React.useState({
     show: false,
     title: null,
@@ -74,12 +74,12 @@ const AccountTitles = () => {
   const [confirm, setConfirm] = React.useState({
     show: false,
     loading: false,
-    onConfirm: () => {}
+    onConfirm: () => { }
   })
 
   // true = active, false = inactive
   const [mode, setMode] = React.useState(true)
-  
+
   const [accountTitles, setAccountTitles] = React.useState(null)
   // Pagination Object
   const [pagination, setPagination] = React.useState(null)
@@ -115,7 +115,7 @@ const AccountTitles = () => {
   React.useEffect(() => {
 
     if (mode) fetchAccountTitles(true)
-    else  fetchAccountTitles(false)
+    else fetchAccountTitles(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -130,7 +130,7 @@ const AccountTitles = () => {
       setAccountTitles(data)
       setPagination(paginate)
     }
-    catch(error) {
+    catch (error) {
       if (error.request.status !== 404) {
         setToast({
           show: true,
@@ -181,12 +181,12 @@ const AccountTitles = () => {
           const sheetname = workbook.SheetNames[0]
           const worksheet = workbook.Sheets[sheetname]
 
-          const data = XLSX.utils.sheet_to_json(worksheet, {raw: true, defval: ""})
+          const data = XLSX.utils.sheet_to_json(worksheet, { raw: true, defval: "" })
 
           if (Boolean(data.length)) {
             data.forEach((row) => {
               Object.keys(row).forEach((key) => {
-                let newKey = key.trim().toLowerCase().replace(/ /g,"_")
+                let newKey = key.trim().toLowerCase().replace(/ /g, "_")
                 if (key !== newKey) {
                   row[newKey] = row[key]
                   delete row[key]
@@ -215,7 +215,7 @@ const AccountTitles = () => {
                   data: data
                 })
               }
-              else if(status === 406) {
+              else if (status === 406) {
                 setToast({
                   show: true,
                   title: "Error",
@@ -270,8 +270,7 @@ const AccountTitles = () => {
   }
 
   const searchSubmitHandler = async (e) => {
-    if (e.key === "Enter")
-    {
+    if (e.key === "Enter") {
       setIsFetching(true)
 
       let response
@@ -280,13 +279,13 @@ const AccountTitles = () => {
           response = await axios.post(`/api/account-title/search/1/${pagination ? pagination.per_page : 10}/`, {
             value: isSearching.keyword
           })
-          .then(res => res.data)
+            .then(res => res.data)
         }
         else {
           response = await axios.post(`/api/account-title/search/0/${pagination ? pagination.per_page : 10}/`, {
             value: isSearching.keyword
           })
-          .then(res => res.data)
+            .then(res => res.data)
         }
 
         const { data, ...paginate } = response.result
@@ -303,13 +302,13 @@ const AccountTitles = () => {
             severity: "error"
           })
         }
-  
+
         setAccountTitles(null)
         setPagination(null)
-  
+
         console.log("Fisto Error Details: ", error.request)
       }
-      
+
       setIsFetching(false)
     }
   }
@@ -340,7 +339,7 @@ const AccountTitles = () => {
         setConfirm({
           show: false,
           loading: false,
-          onConfirm: () => {}
+          onConfirm: () => { }
         })
         setIsSaving(true)
 
@@ -352,7 +351,7 @@ const AccountTitles = () => {
               title: accountTitle.title,
               category: accountTitle.category
             })
-            .then(res => res.data)
+              .then(res => res.data)
           }
           else {
             response = await axios.post(`/api/account-title/`, {
@@ -360,7 +359,7 @@ const AccountTitles = () => {
               title: accountTitle.title,
               category: accountTitle.category
             })
-            .then(res => res.data)
+              .then(res => res.data)
           }
 
           setToast({
@@ -399,7 +398,7 @@ const AccountTitles = () => {
               severity: "error"
             })
         }
-        
+
         setIsSaving(false)
       }
     })
@@ -414,13 +413,13 @@ const AccountTitles = () => {
         response = await axios.post(`/api/account-title/search/1/${pagination ? pagination.per_page : 10}?page=${++page}`, {
           value: isSearching.keyword
         })
-        .then(res => res.data)
+          .then(res => res.data)
       }
       else if (!mode && isSearching.status) {
         response = await axios.post(`/api/account-title/search/0/${pagination ? pagination.per_page : 10}?page=${++page}`, {
           value: isSearching.keyword
         })
-        .then(res => res.data)
+          .then(res => res.data)
       }
       else if (mode) {
         response = await axios.get(`api/account-title/1/${pagination ? pagination.per_page : 10}?page=${++page}`).then(res => res.data)
@@ -462,23 +461,23 @@ const AccountTitles = () => {
         response = await axios.post(`/api/account-title/search/1/${e.target.value}/`, {
           value: isSearching.keyword
         })
-        .then(res => res.data)
+          .then(res => res.data)
       }
       else if (!mode && isSearching.status) {
         response = await axios.post(`/api/account-title/search/0/${e.target.value}/`, {
           value: isSearching.keyword
         })
-        .then(res => res.data)
+          .then(res => res.data)
       }
       else if (mode) {
         response = await axios.get(`/api/account-title/1/${e.target.value}/`).then(res => res.data)
       }
-      else if (!mode)  {
+      else if (!mode) {
         response = await axios.get(`/api/account-title/0/${e.target.value}/`).then(res => res.data)
       }
 
       const { data, ...paginate } = response.result
-      
+
       setAccountTitles(data)
       setPagination(paginate)
     }
@@ -515,7 +514,7 @@ const AccountTitles = () => {
         let response
         try {
           response = await axios.post(`/api/account-title/archive/${id}/`).then(res => res.data)
-    
+
           setConfirm({
             ...confirm,
             loading: false,
@@ -548,7 +547,7 @@ const AccountTitles = () => {
         let response
         try {
           response = await axios.post(`/api/account-title/restore/${id}/`).then(res => res.data)
-    
+
           setConfirm({
             ...confirm,
             loading: false,
@@ -568,7 +567,7 @@ const AccountTitles = () => {
   }
 
   const actionUpdateHandler = (data) => {
-    const { id, code, title, category} = data
+    const { id, code, title, category } = data
 
     setIsUpdating({
       status: true,
@@ -589,27 +588,27 @@ const AccountTitles = () => {
         <TableCell className="FstoTableData-root" align="center">
           {data.id}
         </TableCell>
-        
+
         <TableCell className="FstoTableData-root">
           {data.code}
         </TableCell>
-        
+
         <TableCell className="FstoTableData-root">
           {data.title}
         </TableCell>
-        
-        <TableCell className="FstoTableData-root">
+
+        <TableCell className="FstoTableData-root" sx={{ textTransform: "capitalize" }}>
           {data.category}
         </TableCell>
-        
+
         <TableCell className="FstoTableData-root">
           {
             Boolean(data.deleted_at)
-            ? "Inactive"
-            : "Active"
+              ? "Inactive"
+              : "Active"
           }
         </TableCell>
-        
+
         <TableCell className="FstoTableData-root">
           {
             new Date(data.updated_at).toLocaleString("default", {
@@ -619,7 +618,7 @@ const AccountTitles = () => {
             })
           }
         </TableCell>
-        
+
         <TableCell align="center">
           <ActionMenu
             data={data}
@@ -654,7 +653,7 @@ const AccountTitles = () => {
                 <TableCell>Description</TableCell>
               </TableRow>
             </TableHead>
-            
+
             <TableBody>
               {
                 data.result?.map((error, index) => (
@@ -685,7 +684,6 @@ const AccountTitles = () => {
       </Dialog>
     )
   }
-
 
   return (
     <Box className="FstoBox-root">
@@ -792,8 +790,8 @@ const AccountTitles = () => {
           >
             {
               isUpdating.status
-              ? "Update"
-              : "Save"
+                ? "Update"
+                : "Save"
             }
           </LoadingButton>
 
@@ -806,8 +804,8 @@ const AccountTitles = () => {
           >
             {
               isUpdating.status
-              ? "Cancel"
-              : "Clear"
+                ? "Cancel"
+                : "Clear"
             }
           </Button>
         </form>
@@ -817,7 +815,7 @@ const AccountTitles = () => {
         <Box className="FstoBoxToolbar-root">
           <Box className="FstoBoxToolbar-left">
             <Typography variant="heading">Account Titles</Typography>
-            
+
             <LoadingButton
               className="FstoButtonImport-root"
               variant="contained"
@@ -831,7 +829,7 @@ const AccountTitles = () => {
               <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onChange={importChangeHandler} hidden />
             </LoadingButton>
           </Box>
-            
+
           <Box className="FstoBoxToolbar-right">
             <Button
               className="FstoButtonMode-root"
@@ -841,14 +839,14 @@ const AccountTitles = () => {
               sx={{
                 color:
                   mode
-                  ? "#ef5350"
-                  : "#4caf50"
+                    ? "#ef5350"
+                    : "#4caf50"
               }}
             >
               {
                 mode
-                ? "View Archived"
-                : "View Active"
+                  ? "View Archived"
+                  : "View Active"
               }
             </Button>
 
@@ -892,25 +890,25 @@ const AccountTitles = () => {
             <TableHead>
               <TableRow>
                 <TableCell className="FstoTableHead-root" align="center">
-                  <TableSortLabel active={true}>ID NO.</TableSortLabel>
+                  <TableSortLabel active={false}>ID NO.</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>CODE</TableSortLabel>
+                  <TableSortLabel active={false}>CODE</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>TITLE</TableSortLabel>
+                  <TableSortLabel active={false}>TITLE</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>CATEGORY</TableSortLabel>
+                  <TableSortLabel active={false}>CATEGORY</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root">STATUS</TableCell>
 
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>LAST MODIFIED</TableSortLabel>
+                  <TableSortLabel active={false}>LAST MODIFIED</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root" align="center">ACTIONS</TableCell>
@@ -920,10 +918,10 @@ const AccountTitles = () => {
             <TableBody>
               {
                 isFetching
-                ? <Preloader row={5} col={7} />
-                : accountTitles
-                  ? accountTitles.map((data, index) => <TableData key={index} data={data} />)
-                  : (
+                  ? <Preloader row={5} col={7} />
+                  : accountTitles
+                    ? accountTitles.map((data, index) => <TableData key={index} data={data} />)
+                    : (
                       <TableRow>
                         <TableCell align="center" colSpan={7}>NO RECORDS FOUND</TableCell>
                       </TableRow>
@@ -940,7 +938,7 @@ const AccountTitles = () => {
           rowsPerPage={pagination ? pagination.per_page : 10}
           onPageChange={pageChangeHandler}
           onRowsPerPageChange={rowChangeHandler}
-          rowsPerPageOptions={[10,20,50,100]}
+          rowsPerPageOptions={[10, 20, 50, 100]}
         />
 
         <Toast
@@ -966,7 +964,7 @@ const AccountTitles = () => {
           onClose={() => setConfirm({
             show: false,
             loading: false,
-            onConfirm: () => {}
+            onConfirm: () => { }
           })}
         />
 
@@ -975,7 +973,7 @@ const AccountTitles = () => {
           data={dialog.data}
         />
       </Paper>
-    </Box>
+    </Box >
   )
 }
 

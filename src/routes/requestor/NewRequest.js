@@ -213,12 +213,20 @@ const NewRequest = () => {
     },
 
     po_group: [
-      {
-        no: 10001,
-        amount: 20000.00,
-        rr_no: []
-      }
+      // {
+      //   no: 10001,
+      //   balance: 20000.00,
+      //   amount: 20000.00,
+      //   rr_no: ["12345", "12346"]
+      // }
     ]
+  })
+
+  const [PO, setPO] = React.useState({
+    no: "",
+    balance: null,
+    amount: null,
+    rr_no: []
   })
 
   // React.useEffect(() => {
@@ -243,6 +251,47 @@ const NewRequest = () => {
   //     }
   //   })()
   // }, [])
+
+  const addPurchaseOrderHandler = () => {
+    const check = data.po_group.some((data) => data.no === PO.no)
+    if (check) return
+
+    // ask if posible bang marepeat ang rr no to diff po no
+
+
+    setData({
+      ...data,
+      po_group: [
+        ...data.po_group, PO
+      ]
+    })
+    setPO({
+      no: "",
+      balance: NaN,
+      amount: NaN,
+      rr_no: []
+    })
+  }
+
+  const updatePurchaseOrderHandler = (props) => {
+    const { no, amount, balance, rr_no } = props
+
+    setPO({
+      no,
+      amount,
+      balance,
+      rr_no
+    })
+  }
+
+  const removePurchaseOrderHandler = (props) => {
+    const { no } = props
+
+    setData({
+      ...data,
+      po_group: data.po_group.filter((data) => data.no !== no)
+    })
+  }
 
   return (
     <Box className="FstoBox-root">
@@ -673,14 +722,11 @@ const NewRequest = () => {
             variant="outlined"
             autoComplete="off"
             size="small"
-            // value={data.document.no}
-            // onChange={(e) => setData({
-            //   ...data,
-            //   document: {
-            //     ...data.document,
-            //     no: e.target.value
-            //   }
-            // })}
+            value={PO.no}
+            onChange={(e) => setPO({
+              ...PO,
+              no: e.target.value
+            })}
             InputLabelProps={{
               className: "FstoLabelForm-attachment"
             }}
@@ -695,14 +741,15 @@ const NewRequest = () => {
             variant="outlined"
             autoComplete="off"
             size="small"
-            // value={data.document.no}
-            // onChange={(e) => setData({
-            //   ...data,
-            //   document: {
-            //     ...data.document,
-            //     no: e.target.value
-            //   }
-            // })}
+            value={PO.amount}
+            onChange={(e) => setPO({
+              ...PO,
+              amount: parseFloat(e.target.value),
+              balance: parseFloat(e.target.value)
+            })}
+            InputProps={{
+              inputComponent: NumberField,
+            }}
             InputLabelProps={{
               className: "FstoLabelForm-attachment"
             }}
@@ -720,11 +767,7 @@ const NewRequest = () => {
             className="FstoSelectForm-attachment"
             size="small"
             options={[]}
-            // value={
-            //   Boolean(data.document.supplier.id) && Boolean(data.document.supplier.name)
-            //     ? SUPPLIER_LIST.find(row => row.id === data.document.supplier.id)
-            //     : null
-            // }
+            value={PO.rr_no}
             renderTags={
               (value, getTagProps) => value.map(
                 (option, index) =>
@@ -743,25 +786,15 @@ const NewRequest = () => {
                   className="FstoTextfieldForm-attachment"
                   variant="outlined"
                   label="R.R. Numbers"
-                  // inputProps={{
-                  //   className: "FstoTextfieldForm-attachment"
-                  // }}
                   InputLabelProps={{
                     className: "FstoLabelForm-attachment"
                   }}
                 />
             }
-            // onChange={(e, value) => setData({
-            //   ...data,
-            //   document: {
-            //     ...data.document,
-            //     supplier: {
-            //       id: value.id,
-            //       name: value.name
-            //     }
-            //   }
-            // })}
-            onChange={(e, value) => console.log(value)}
+            onChange={(e, value) => setPO({
+              ...PO,
+              rr_no: value
+            })}
           />
 
           <Button
@@ -769,166 +802,77 @@ const NewRequest = () => {
             variant="contained"
             color="secondary"
             startIcon={<Add />}
+            onClick={addPurchaseOrderHandler}
+            disabled={
+              !Boolean(PO.no) ||
+              !Boolean(PO.amount) ||
+              !Boolean(PO.balance) ||
+              !Boolean(PO.rr_no.length)
+            }
             disableElevation
           >
             Add
           </Button>
         </Box>
 
-        <Box sx={{ display: "flex", flexDirection: "column", width: "100%" }}>
-          <div className="FstoPurchaseOrder-root">
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">P.O. Number</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>1001</Typography>
-            </Stack>
+        {
+          Boolean(data.po_group.length) &&
+          (
+            <React.Fragment>
+              <Box className="FstoPurchaseOrderBox-root">
+                {
+                  data.po_group?.map(
+                    (data, index) =>
+                      <div className="FstoPurchaseOrder-root" key={index}>
+                        <Stack direction="column" sx={{ flex: "1 1 100%" }}>
+                          <Typography variant="subtitle2">P.O. Number</Typography>
+                          <Typography variant="h6" sx={{ fontWeight: 700 }}>{data.no}</Typography>
+                        </Stack>
 
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">P.O. Amount</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>P20,000</Typography>
-            </Stack>
+                        <Stack direction="column" sx={{ flex: "1 1 100%" }}>
+                          <Typography variant="subtitle2">P.O. Amount</Typography>
+                          <Typography variant="h6" sx={{ fontWeight: 700 }}>&#8369;{data.amount.toLocaleString()}</Typography>
+                        </Stack>
 
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">P.O. Balance</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>P20,000</Typography>
-            </Stack>
+                        <Stack direction="column" sx={{ flex: "1 1 100%" }}>
+                          <Typography variant="subtitle2">P.O. Balance</Typography>
+                          <Typography variant="h6" sx={{ fontWeight: 700 }}>&#8369;{data.balance.toLocaleString()}</Typography>
+                        </Stack>
 
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">R.R. Number</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>101, 102</Typography>
-            </Stack>
+                        <Stack direction="column" sx={{ flex: "1 1 100%" }}>
+                          <Typography variant="subtitle2">R.R. Number</Typography>
+                          <Typography variant="h6" sx={{ fontWeight: 700 }}>{data.rr_no.join(", ")}</Typography>
+                        </Stack>
 
-            <Stack direction="row" spacing={1}>
-              <IconButton>
-                <Edit />
-              </IconButton>
-              <IconButton>
-                <Delete />
-              </IconButton>
-            </Stack>
-          </div>
+                        <Stack direction="row" spacing={1}>
+                          <IconButton onClick={() => updatePurchaseOrderHandler(data)}>
+                            <Edit />
+                          </IconButton>
+                          <IconButton onClick={() => removePurchaseOrderHandler(data)}>
+                            <Delete />
+                          </IconButton>
+                        </Stack>
+                      </div>
+                  )
+                }
+              </Box>
 
-          <div className="FstoPurchaseOrder-root">
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">P.O. Number</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>1001</Typography>
-            </Stack>
+              <Divider variant="middle" sx={{ marginTop: 4, marginBottom: 4 }} />
 
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">P.O. Amount</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>P20,000</Typography>
-            </Stack>
+              <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
+                <Typography variant="h6">Total P.O. Amount</Typography>
+                <Typography variant="h6">&#8369;{data.po_group.map((data) => data.amount).reduce((a, b) => a + b).toLocaleString()}</Typography>
+              </Box>
 
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">P.O. Balance</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>P20,000</Typography>
-            </Stack>
+              <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
+                <Typography variant="heading">Total P.O. Balance</Typography>
+                <Typography variant="heading">&#8369;{data.po_group.map((data) => data.balance).reduce((a, b) => a + b).toLocaleString()}</Typography>
+              </Box>
+            </React.Fragment>
+          )
+        }
 
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">R.R. Number</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>101, 102</Typography>
-            </Stack>
-
-            <Stack direction="row" spacing={1}>
-              <IconButton>
-                <Edit />
-              </IconButton>
-              <IconButton>
-                <Delete />
-              </IconButton>
-            </Stack>
-          </div>
-          <div className="FstoPurchaseOrder-root">
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">P.O. Number</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>1001</Typography>
-            </Stack>
-
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">P.O. Amount</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>P20,000</Typography>
-            </Stack>
-
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">P.O. Balance</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>P20,000</Typography>
-            </Stack>
-
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">R.R. Number</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>101, 102</Typography>
-            </Stack>
-
-            <Stack direction="row" spacing={1}>
-              <IconButton>
-                <Edit />
-              </IconButton>
-              <IconButton>
-                <Delete />
-              </IconButton>
-            </Stack>
-          </div>
-          <div className="FstoPurchaseOrder-root">
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">P.O. Number</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>1001</Typography>
-            </Stack>
-
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">P.O. Amount</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>P20,000</Typography>
-            </Stack>
-
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">P.O. Balance</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>P20,000</Typography>
-            </Stack>
-
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">R.R. Number</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>101, 102</Typography>
-            </Stack>
-
-            <Stack direction="row" spacing={1}>
-              <IconButton>
-                <Edit />
-              </IconButton>
-              <IconButton>
-                <Delete />
-              </IconButton>
-            </Stack>
-          </div>
-
-          <div className="FstoPurchaseOrder-root">
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">P.O. Number</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>1001</Typography>
-            </Stack>
-
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">P.O. Amount</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>P20,000</Typography>
-            </Stack>
-
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">P.O. Balance</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>P20,000</Typography>
-            </Stack>
-
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">R.R. Number</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>101, 102</Typography>
-            </Stack>
-
-            <Stack direction="row" spacing={1}>
-              <IconButton>
-                <Edit />
-              </IconButton>
-              <IconButton>
-                <Delete />
-              </IconButton>
-            </Stack>
-          </div>
-
+        {/* <Box className="FstoPurchaseOrderBox-root">
           <div className="FstoPurchaseOrder-root">
             <Stack direction="column" sx={{ flexGrow: 1 }}>
               <Typography variant="subtitle2">P.O. Number</Typography>
@@ -964,9 +908,14 @@ const NewRequest = () => {
         <Divider variant="middle" sx={{ marginTop: 4, marginBottom: 4 }} />
 
         <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
-          <Typography variant="heading">Total P.O. Amount</Typography>
-          <Typography variant="heading">P20,000.00</Typography>
+          <Typography variant="h6">Total P.O. Amount</Typography>
+          <Typography variant="h6">P20,000.00</Typography>
         </Box>
+
+        <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
+          <Typography variant="heading">Total P.O. Balance</Typography>
+          <Typography variant="heading">P20,000.00</Typography>
+        </Box> */}
       </Paper>
 
       <Toast

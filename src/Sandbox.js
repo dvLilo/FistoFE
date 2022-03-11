@@ -15,13 +15,39 @@ const Sandbox = () => {
     error,
     data,
     paginate,
+    refetchData,
     searchData,
     statusChange,
     pageChange,
-    rowChange,
-    switchDataStatus,
-    state: { toast, setToast }
-  } = useFistoHook("/api/categories/")
+    rowChange
+  } = useFistoHook("/api/admin/categories")
+
+  const [toast, setToast] = React.useState({
+    show: false,
+    title: null,
+    message: null
+  })
+
+  const [status, setStatus] = React.useState(true)
+
+  React.useEffect(() => {
+    if (error) {
+      if (error.status !== 404) setToast({
+        show: true,
+        title: "Success",
+        message: "Something went wrong... Please try again."
+      })
+    }
+  }, [error])
+
+  const toggleStatus = () => {
+    if (fetching) return
+
+    setStatus(currentValue => (
+      !currentValue
+    ))
+    statusChange()
+  }
 
   return ReactDOM.createPortal(
     <React.Fragment>
@@ -46,13 +72,22 @@ const Sandbox = () => {
 
         <Mui.TextField label="Search" size="small" onKeyPress={searchData} />
 
-        <Mui.Button onClick={statusChange}>Toogle Status</Mui.Button>
+        <Mui.Button
+          sx={{
+            color: status ? "RED" : "BLUE"
+          }}
+          onClick={toggleStatus}
+        >
+          Toogle Status
+        </Mui.Button>
 
-        <Mui.Button onClick={() => setToast({
+        <Mui.Button onClick={refetchData}>Refetch</Mui.Button>
+
+        {/* <Mui.Button onClick={() => setToast({
           show: true,
           title: "Success",
           message: "You've used the toast right."
-        })}>Use Toast</Mui.Button>
+        })}>Use Toast</Mui.Button> */}
 
         <Mui.FormControl variant="outlined">
           <Mui.InputLabel>Rows</Mui.InputLabel>
@@ -65,6 +100,7 @@ const Sandbox = () => {
             <Mui.MenuItem value={10}>10</Mui.MenuItem>
             <Mui.MenuItem value={20}>20</Mui.MenuItem>
             <Mui.MenuItem value={50}>50</Mui.MenuItem>
+            <Mui.MenuItem value={100}>100</Mui.MenuItem>
           </Mui.Select>
         </Mui.FormControl>
 
@@ -73,8 +109,8 @@ const Sandbox = () => {
           <Mui.Button onClick={() => pageChange(null, 1)}>Page 2</Mui.Button>
         </Mui.Stack>
 
-        <Mui.Button onClick={() => switchDataStatus({ ID: 1, status: 1 })}>Archive</Mui.Button>
-        <Mui.Button>Restore</Mui.Button>
+        {/* <Mui.Button onClick={() => switchDataStatus({ ID: 1, status: 1 })}>Archive</Mui.Button>
+        <Mui.Button>Restore</Mui.Button> */}
 
         <Mui.Typography variant="body1" sx={{ textTransform: "capitalize" }}>
           {data?.map(row => row.name).join(", ")}
@@ -89,7 +125,7 @@ const Sandbox = () => {
         </Mui.Typography>
 
 
-        <Mui.Typography variant="h1" title="h1">Fisto cutie.</Mui.Typography>
+        {/* <Mui.Typography variant="h1" title="h1">Fisto cutie.</Mui.Typography>
         <Mui.Typography variant="h2" title="h2">Fisto cutie.</Mui.Typography>
         <Mui.Typography variant="h3" title="h3">Fisto cutie.</Mui.Typography>
         <Mui.Typography variant="h4" title="h4">Fisto cutie.</Mui.Typography>
@@ -105,6 +141,7 @@ const Sandbox = () => {
         <Mui.Divider variant="middle" flexItem />
         <Mui.Typography variant="heading" title="heading">Fisto cutie.</Mui.Typography>
         <Mui.Typography variant="permission" title="permission">Fisto cutie.</Mui.Typography>
+        <Mui.Divider variant="middle" flexItem /> */}
 
       </Mui.Box>
 
