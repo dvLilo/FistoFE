@@ -26,17 +26,17 @@ const PayrollCategoriesTable = (props) => {
       <TableHead>
         <TableRow>
           <TableCell className="FstoTableHead-root" align="center">
-            <TableSortLabel active={true}>ID NO.</TableSortLabel>
+            <TableSortLabel active={false}>ID NO.</TableSortLabel>
           </TableCell>
 
           <TableCell className="FstoTableHead-root">
-            <TableSortLabel active={true}>CATEGORY</TableSortLabel>
+            <TableSortLabel active={false}>CATEGORY</TableSortLabel>
           </TableCell>
 
           <TableCell className="FstoTableHead-root">STATUS</TableCell>
 
           <TableCell className="FstoTableHead-root">
-            <TableSortLabel active={true}>LAST MODIFIED</TableSortLabel>
+            <TableSortLabel active={false}>LAST MODIFIED</TableSortLabel>
           </TableCell>
 
           <TableCell className="FstoTableHead-root" align="center">ACTIONS</TableCell>
@@ -53,7 +53,7 @@ const PayrollCategoriesTable = (props) => {
                     {data.id}
                   </TableCell>
 
-                  <TableCell className="FstoTableData-root">
+                  <TableCell className="FstoTableData-root" sx={{ textTransform: "capitalize" }}>
                     {data.category}
                   </TableCell>
 

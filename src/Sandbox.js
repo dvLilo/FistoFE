@@ -4,11 +4,15 @@ import ReactDOM from 'react-dom'
 
 import * as Mui from '@mui/material'
 
+import useToast from './hooks/useToast'
+import useConfirm from './hooks/useConfirm'
+
 import useFistoHook from './hooks/useFistoHook'
 
-import Toast from './components/Toast'
-
 const Sandbox = () => {
+
+  const toast = useToast()
+  const confirm = useConfirm()
 
   const {
     fetching,
@@ -22,22 +26,18 @@ const Sandbox = () => {
     rowChange
   } = useFistoHook("/api/admin/categories")
 
-  const [toast, setToast] = React.useState({
-    show: false,
-    title: null,
-    message: null
-  })
-
   const [status, setStatus] = React.useState(true)
 
   React.useEffect(() => {
     if (error) {
-      if (error.status !== 404) setToast({
-        show: true,
-        title: "Success",
+      if (error.status !== 404) toast({
+        open: true,
+        severity: "error",
+        title: "Error!",
         message: "Something went wrong... Please try again."
       })
     }
+    // eslint-disable-next-line
   }, [error])
 
   const toggleStatus = () => {
@@ -83,11 +83,17 @@ const Sandbox = () => {
 
         <Mui.Button onClick={refetchData}>Refetch</Mui.Button>
 
-        {/* <Mui.Button onClick={() => setToast({
-          show: true,
-          title: "Success",
+        <Mui.Button onClick={() => toast({
+          open: true,
+          severity: "success",
+          title: "Success!",
           message: "You've used the toast right."
-        })}>Use Toast</Mui.Button> */}
+        })}>Use Toast</Mui.Button>
+
+        <Mui.Button onClick={() => confirm({
+          open: true,
+          onConfirm: () => console.log("Hello world")
+        })}>Use Confirm</Mui.Button>
 
         <Mui.FormControl variant="outlined">
           <Mui.InputLabel>Rows</Mui.InputLabel>
@@ -144,30 +150,6 @@ const Sandbox = () => {
         <Mui.Divider variant="middle" flexItem /> */}
 
       </Mui.Box>
-
-      <Toast
-        open={toast.show}
-        title={toast.title}
-        message={toast.message}
-        severity={toast.severity}
-        onClose={(event, reason) => {
-          if (reason === 'clickaway') return
-
-          setToast({
-            show: false,
-            title: null,
-            message: null
-          })
-        }}
-      />
-
-      {/* <Toast
-        open={true}
-        title="Success"
-        message="This is a sample success message."
-        severity="success"
-        onClose={() => {}}
-      /> */}
     </React.Fragment>,
     document.getElementById("sandbox")
   )

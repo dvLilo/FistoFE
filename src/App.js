@@ -11,30 +11,33 @@ import { ProtectedRoute } from './components/ProtectedRoute'
 
 import { ThemeProvider, createTheme, useMediaQuery, CssBaseline } from '@mui/material';
 
+import ToastProvider from './contexts/ToastContext'
+import ConfirmProvider from './contexts/ConfirmContext'
+
 
 
 import Landing from './Landing'
 import Dashboard from './Dashboard'
 
 // Masterlist
-import UserAccounts from './routes/masterlist/UserAccounts'
+import UserAccounts from './routes/masterlist/UserAccounts/'
 import NewUser from './routes/masterlist/NewUser'
 import UpdateUser from './routes/masterlist/UpdateUser'
 import ChangePassword from './routes/masterlist/ChangePassword'
-import DocumentTypes from './routes/masterlist/DocumentTypes'
-import Categories from './routes/masterlist/Categories'
-import References from './routes/masterlist/References'
-import SupplierTypes from './routes/masterlist/SupplierTypes'
-import Suppliers from './routes/masterlist/Suppliers'
-import UtilityCategories from './routes/masterlist/UtilityCategories'
-import UtilityLocations from './routes/masterlist/UtilityLocations'
-import AccountNumbers from './routes/masterlist/AccountNumbers'
-import CreditCards from './routes/masterlist/CreditCards'
-import AccountTitles from './routes/masterlist/AccountTitles'
+import DocumentTypes from './routes/masterlist/DocumentTypes/'
+import Categories from './routes/masterlist/Categories/'
+import References from './routes/masterlist/References/'
+import SupplierTypes from './routes/masterlist/SupplierTypes/'
+import Suppliers from './routes/masterlist/Suppliers/'
+import UtilityCategories from './routes/masterlist/UtilityCategories/'
+import UtilityLocations from './routes/masterlist/UtilityLocations/'
+import AccountNumbers from './routes/masterlist/AccountNumbers/'
+import CreditCards from './routes/masterlist/CreditCards/'
+import AccountTitles from './routes/masterlist/AccountTitles/'
 import PayrollClients from './routes/masterlist/PayrollClients/'
 import PayrollCategories from './routes/masterlist/PayrollCategories/'
-import Banks from './routes/masterlist/Banks'
-import Reasons from './routes/masterlist/Reasons'
+import Banks from './routes/masterlist/Banks/'
+import Reasons from './routes/masterlist/Reasons/'
 
 // Requestor
 import TaggingRequest from './routes/requestor/TaggingRequest'
@@ -128,7 +131,11 @@ const App = () => {
             exact
             path="/sandbox"
             element={
-              <Sandbox />
+              <ConfirmProvider>
+                <ToastProvider>
+                  <Sandbox />
+                </ToastProvider>
+              </ConfirmProvider>
             }
           />
           <Route

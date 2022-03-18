@@ -11,20 +11,20 @@ import FistoLogo from './assets/img/logo_s.png'
 import './assets/css/styles.login.scss'
 
 import { LoadingButton } from '@mui/lab'
-import { 
-  Box, 
-  Snackbar, 
-  Alert, 
-  AlertTitle, 
-  TextField, 
-  IconButton, 
-  InputAdornment 
+import {
+  Box,
+  Snackbar,
+  Alert,
+  AlertTitle,
+  TextField,
+  IconButton,
+  InputAdornment
 } from '@mui/material'
 
-import { 
-  Person, 
-  Lock, 
-  VisibilityOutlined as VisibilityOn, 
+import {
+  Person,
+  Lock,
+  VisibilityOutlined as VisibilityOn,
   VisibilityOffOutlined as VisibilityOff
 } from '@mui/icons-material'
 
@@ -53,7 +53,7 @@ const Landing = () => {
   }, [navigate])
 
   const handleVisibility = () => {
-    setVisibility( !visibility )
+    setVisibility(!visibility)
   }
 
   const handleSubmit = async event => {
@@ -62,24 +62,26 @@ const Landing = () => {
 
     try {
       const response = await axios.post('/api/login', credential)
-      const data = response.data
+      const { token, ...user } = response.data.result
 
-      const encryptedUser = CryptoJS.AES.encrypt(JSON.stringify(data.user), "Fistocutie.").toString();
+      const encryptedUser = CryptoJS.AES.encrypt(JSON.stringify(user), "Fistocutie.").toString();
 
-      window.localStorage.setItem('token', JSON.stringify(data.token))
+      window.localStorage.setItem('token', JSON.stringify(token))
       window.localStorage.setItem('user', encryptedUser)
 
       dispatch(SET_AUTH())
-      dispatch(SET_USER(data.user))
-      
+      dispatch(SET_USER(user))
+
       // Redirect to Dashboard
-      navigate('/dashboard', { state: {
-        default_password: credential.username === credential.password ? true : false
-      }})
+      navigate('/dashboard', {
+        state: {
+          default_password: credential.username === credential.password ? true : false
+        }
+      })
 
     }
     catch (error) {
-      if (error.request.status === 401)  {
+      if (error.request.status === 401) {
         setToast({
           show: true,
           message: "Invalid username or password."
@@ -91,7 +93,7 @@ const Landing = () => {
           message: "Something went wrong whilst trying to login. Please try again."
         })
       }
-      
+
       setLoading(false)
     }
   }
@@ -111,7 +113,7 @@ const Landing = () => {
               size="small"
               label="Username"
               value={credential.username}
-              onChange={$event => setCredential({...credential, username: $event.target.value})}
+              onChange={$event => setCredential({ ...credential, username: $event.target.value })}
               InputProps={{
                 sx: { paddingLeft: 1 }
               }}
@@ -129,9 +131,9 @@ const Landing = () => {
               variant="standard"
               size="small"
               label="Password"
-              type={ visibility ? "text" : "password" }
+              type={visibility ? "text" : "password"}
               value={credential.password}
-              onChange={$event => setCredential({...credential, password: $event.target.value})}
+              onChange={$event => setCredential({ ...credential, password: $event.target.value })}
               InputProps={{
                 sx: { paddingLeft: 1 },
                 endAdornment: (
@@ -145,7 +147,7 @@ const Landing = () => {
                         }
                       }}
                     >
-                      { visibility ? <VisibilityOff /> : <VisibilityOn /> }
+                      {visibility ? <VisibilityOff /> : <VisibilityOn />}
                     </IconButton>
                   </InputAdornment>
                 )
@@ -183,10 +185,11 @@ const Landing = () => {
         open={toast.show}
         autoHideDuration={5000}
       >
-        <Alert 
-          severity="error" 
+        <Alert
+          severity="error"
           onClose={() => setToast({
-            ...toast, show: false }
+            ...toast, show: false
+          }
           )}
         >
           <AlertTitle>Error</AlertTitle>

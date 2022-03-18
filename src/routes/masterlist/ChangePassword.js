@@ -2,8 +2,8 @@ import React from 'react'
 
 import axios from 'axios'
 
-import { 
-  Box, 
+import {
+  Box,
   Paper,
   Typography,
   TextField,
@@ -24,7 +24,7 @@ const ChangePassword = () => {
     field: "",
     message: ""
   })
-  
+
   const [toast, setToast] = React.useState({
     show: false,
     title: null,
@@ -34,7 +34,7 @@ const ChangePassword = () => {
   const [confirm, setConfirm] = React.useState({
     show: false,
     loading: false,
-    onConfirm: () => {}
+    onConfirm: () => { }
   })
 
   const [password, setPassword] = React.useState({
@@ -53,18 +53,18 @@ const ChangePassword = () => {
         setConfirm({
           show: false,
           loading: false,
-          onConfirm: () => {}
+          onConfirm: () => { }
         })
         setIsSaving(true)
 
         let response
         try {
-          response = await axios.post(`/api/users/change-password/`, {
+          response = await axios.put(`/api/users/change-password/`, {
             current: password.current_password,
             password: password.new_password,
             password_confirmation: password.confirm_password
           })
-          .then(JSON => JSON.data)
+            .then(JSON => JSON.data)
 
           setToast({
             show: true,
@@ -125,19 +125,19 @@ const ChangePassword = () => {
         })
       else
         if (error.field === "confirm_password")
+          setError({
+            status: false,
+            field: "",
+            message: ""
+          })
+    }
+    else
+      if (error.field === "confirm_password")
         setError({
           status: false,
           field: "",
           message: ""
         })
-    }
-    else
-      if (error.field === "confirm_password")
-      setError({
-        status: false,
-        field: "",
-        message: ""
-      })
   }
 
 
@@ -174,7 +174,7 @@ const ChangePassword = () => {
             }}
             fullWidth
           />
-          
+
           <TextField
             className="FstoTextfieldForm-root"
             label="New Password"
@@ -193,7 +193,7 @@ const ChangePassword = () => {
             }}
             fullWidth
           />
-          
+
           <TextField
             className="FstoTextfieldForm-root"
             label="Confirm Password"
@@ -268,7 +268,7 @@ const ChangePassword = () => {
         onClose={() => setConfirm({
           show: false,
           loading: false,
-          onConfirm: () => {}
+          onConfirm: () => { }
         })}
       />
     </Box>

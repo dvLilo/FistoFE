@@ -76,7 +76,7 @@ const PayrollCategoriesToolbar = (props) => {
                   edge="end"
                   size="small"
                   onClick={() => {
-                    if (fetching) return
+                    if (fetching || !searchRef.current.value) return
 
                     searchRef.current.value = null
                     searchClear()

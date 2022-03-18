@@ -38,7 +38,6 @@ const PayrollCategoriesForm = (props) => {
         category: data.category
       })
     }
-    console.log("Hello")
   }, [data])
 
   const formClearHandler = () => {
@@ -69,11 +68,11 @@ const PayrollCategoriesForm = (props) => {
         let response
         try {
           if (isUpdating)
-            response = await axios.put(`/api/admin/payroll-client/${data.id}/`, {
+            response = await axios.put(`/api/admin/payroll-category/${data.id}/`, {
               category: payrollCategory.category
             })
           else
-            response = await axios.post(`/api/admin/payroll-client/`, {
+            response = await axios.post(`/api/admin/payroll-category/`, {
               category: payrollCategory.category
             })
 

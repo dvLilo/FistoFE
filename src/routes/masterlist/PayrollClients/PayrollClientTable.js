@@ -53,7 +53,7 @@ const PayrollClientTable = (props) => {
                     {data.id}
                   </TableCell>
 
-                  <TableCell className="FstoTableData-root">
+                  <TableCell className="FstoTableData-root" sx={{ textTransform: "capitalize" }}>
                     {data.client}
                   </TableCell>
 

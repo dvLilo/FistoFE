@@ -61,6 +61,7 @@ const useFistoHook = (URL) => {
 
       setParams({
         ...params,
+        page: 1,
         search: e.target.value
       })
     }
@@ -71,6 +72,7 @@ const useFistoHook = (URL) => {
 
     setParams({
       ...params,
+      page: 1,
       search: null
     })
   }
@@ -80,6 +82,7 @@ const useFistoHook = (URL) => {
 
     setParams({
       ...params,
+      page: 1,
       status: params.status ? 0 : 1
     })
   }

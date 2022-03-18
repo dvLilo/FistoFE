@@ -157,6 +157,10 @@ body {
   .MuiOutlinedInput-input {
     text-transform: capitalize;
   }
+
+  .MuiFormHelperText-root {
+    text-transform: none;
+  }
 }
 
 .FstoPaperImport-root {

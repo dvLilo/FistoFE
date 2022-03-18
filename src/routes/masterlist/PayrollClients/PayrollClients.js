@@ -1,6 +1,6 @@
 import React from 'react'
 
-import axios from 'axios';
+import axios from 'axios'
 
 import useFistoHook from '../../../hooks/useFistoHook'
 
@@ -15,8 +15,8 @@ import Toast from '../../../components/Toast'
 import Confirm from '../../../components/Confirm'
 
 import PayrollClientsForm from './PayrollClientsForm'
-import PayrollClientTable from './PayrollClientTable';
-import PayrollClientsToolbar from './PayrollClientsToolbar';
+import PayrollClientTable from './PayrollClientTable'
+import PayrollClientsToolbar from './PayrollClientsToolbar'
 
 const PayrollClients = () => {
 
