@@ -1,7 +1,5 @@
 import React from 'react'
 
-import { Link } from 'react-router-dom'
-
 import {
   Box,
   Typography,
@@ -11,11 +9,10 @@ import {
   InputAdornment
 } from '@mui/material'
 
-import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search'
 import CloseIcon from '@mui/icons-material/Close'
 
-const UserAccountsToolbar = (props) => {
+const CompaniesToolbar = (props) => {
 
   const {
     fetching,
@@ -31,18 +28,7 @@ const UserAccountsToolbar = (props) => {
   return (
     <React.Fragment>
       <Box className="FstoBoxToolbar-left">
-        <Typography variant="heading">User Accounts</Typography>
-
-        <Button
-          className="FstoButtonNew-root"
-          variant="contained"
-          component={Link}
-          startIcon={<AddIcon />}
-          to="new-user"
-          disableElevation
-        >
-          New
-        </Button>
+        <Typography variant="heading">Companies</Typography>
       </Box>
 
       <Box className="FstoBoxToolbar-right">
@@ -109,4 +95,4 @@ const UserAccountsToolbar = (props) => {
   )
 }
 
-export default UserAccountsToolbar
+export default CompaniesToolbar

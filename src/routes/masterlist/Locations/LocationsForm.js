@@ -11,7 +11,7 @@ import {
 
 import { LoadingButton } from '@mui/lab'
 
-const AccountTitlesForm = (props) => {
+const LocationsForm = (props) => {
 
   const {
     data,
@@ -30,41 +30,70 @@ const AccountTitlesForm = (props) => {
     message: ""
   })
 
-  // Account Title Categories *fixed
-  const dropdown = {
-    categories: [
-      {
-        label: "asset"
-      },
-      {
-        label: "capital"
-      },
-      {
-        label: "expense"
-      },
-      {
-        label: "income"
-      },
-      {
-        label: "payable"
-      }
-    ]
-  }
+  // Dropdown Array
+  const [dropdown, setDropdown] = React.useState({
+    isFetching: false,
+    companies: []
+  })
 
   // Form Data State
-  const [accountTitle, setAccountTitle] = React.useState({
+  const [location, setLocation] = React.useState({
     code: "",
-    title: "",
-    category: null
+    location: "",
+    company: null
   })
+
+  React.useEffect(() => {
+    (async () => {
+      setDropdown(currentValue => ({
+        ...currentValue,
+        isFetching: true
+      }))
+
+      let response
+      try {
+        response = await axios.get(`/api/admin/dropdown/company`)
+
+        const {
+          companies
+        } = response.data.result
+
+        setDropdown(currentValue => ({
+          isFetching: false,
+          companies
+        }))
+      }
+      catch (error) {
+        if (error.request.status !== 404) {
+          toast({
+            show: true,
+            title: "Error",
+            message: "Something went wrong whilst fetching locations dropdown list.",
+            severity: "error"
+          })
+        }
+
+        setDropdown(currentValue => ({
+          isFetching: false,
+          companies: []
+        }))
+
+        console.log("Fisto Error Details: ", error.request)
+      }
+    })()
+    // eslint-disable-next-line
+  }, [])
 
   React.useEffect(() => {
     if (data) {
       setIsUpdating(true)
-      setAccountTitle({
+      setLocation({
         code: data.code,
-        title: data.title,
-        category: data.category
+        location: data.location,
+        company: {
+          id: data.company.id,
+          company: data.company.name
+        }
       })
     }
   }, [data])
@@ -73,13 +102,13 @@ const AccountTitlesForm = (props) => {
     setIsUpdating(false)
     setError({
       status: false,
-      field: "",
-      message: ""
+      field: null,
+      message: null
     })
-    setAccountTitle({
+    setLocation({
       code: "",
-      title: "",
-      category: null
+      location: "",
+      company: null
     })
   }
 
@@ -100,16 +129,16 @@ const AccountTitlesForm = (props) => {
         let response
         try {
           if (isUpdating)
-            response = await axios.put(`/api/admin/account-title/${data.id}/`, {
-              code: accountTitle.code,
-              title: accountTitle.title,
-              category: accountTitle.category
+            response = await axios.put(`/api/admin/locations/${data.id}/`, {
+              code: location.code,
+              location: location.location,
+              company: location.company.id
             })
           else
-            response = await axios.post(`/api/admin/account-title/`, {
-              code: accountTitle.code,
-              title: accountTitle.title,
-              category: accountTitle.category
+            response = await axios.post(`/api/admin/locations/`, {
+              code: location.code,
+              location: location.location,
+              company: location.company.id
             })
 
           toast({
@@ -137,7 +166,7 @@ const AccountTitlesForm = (props) => {
             toast({
               show: true,
               title: "Error",
-              message: "Something went wrong whilst saving account title.",
+              message: "Something went wrong whilst saving location.",
               severity: "error"
             })
         }
@@ -147,16 +176,15 @@ const AccountTitlesForm = (props) => {
     })
   }
 
-
   return (
     <form onSubmit={formSubmitHandler}>
       <TextField
         className="FstoTextfieldForm-root"
-        label="Account Code"
+        label="Location Code"
         variant="outlined"
         autoComplete="off"
         size="small"
-        value={accountTitle.code}
+        value={location.code}
         helperText={error.status && error.field === "code" && error.message}
         error={error.status && error.field === "code"}
         onBlur={() => setError({
@@ -164,8 +192,8 @@ const AccountTitlesForm = (props) => {
           field: "",
           message: ""
         })}
-        onChange={(e) => setAccountTitle({
-          ...accountTitle,
+        onChange={(e) => setLocation({
+          ...location,
           code: e.target.value
         })}
         InputLabelProps={{
@@ -176,21 +204,21 @@ const AccountTitlesForm = (props) => {
 
       <TextField
         className="FstoTextfieldForm-root"
-        label="Account Title"
+        label="Location Name"
         variant="outlined"
         autoComplete="off"
         size="small"
-        value={accountTitle.title}
-        helperText={error.status && error.field === "title" && error.message}
-        error={error.status && error.field === "title"}
+        value={location.location}
+        helperText={error.status && error.field === "name" && error.message}
+        error={error.status && error.field === "name"}
         onBlur={() => setError({
           status: false,
           field: "",
           message: ""
         })}
-        onChange={(e) => setAccountTitle({
-          ...accountTitle,
-          title: e.target.value
+        onChange={(e) => setLocation({
+          ...location,
+          location: e.target.value
         })}
         InputLabelProps={{
           className: "FstoLabelForm-root"
@@ -201,14 +229,16 @@ const AccountTitlesForm = (props) => {
       <Autocomplete
         className="FstoSelectForm-root"
         size="small"
-        options={dropdown.categories}
-        value={accountTitle.category}
+        options={dropdown.companies}
+        value={location.company}
         renderInput={
           props =>
             <TextField
               {...props}
               variant="outlined"
-              label="Category"
+              label="Company"
+              error={!Boolean(dropdown.companies.length) && !dropdown.isFetching}
+              helperText={!Boolean(dropdown.companies.length) && !dropdown.isFetching && "No companies found."}
             />
         }
         PaperComponent={
@@ -218,14 +248,17 @@ const AccountTitlesForm = (props) => {
               sx={{ textTransform: 'capitalize' }}
             />
         }
+        getOptionLabel={
+          option => option.company
+        }
         isOptionEqualToValue={
-          (option, value) => option.label === value
+          (option, value) => option.id === value.id
         }
         onChange={
           (e, value) => {
-            setAccountTitle({
-              ...accountTitle,
-              category: value.label
+            setLocation({
+              ...location,
+              company: value
             })
           }
         }
@@ -242,14 +275,14 @@ const AccountTitlesForm = (props) => {
         loading={isSaving}
         startIcon={<></>}
         disabled={
-          !Boolean(accountTitle.code.trim()) ||
-          !Boolean(accountTitle.title.trim()) ||
-          !Boolean(accountTitle.category)
+          !Boolean(location.code.trim()) ||
+          !Boolean(location.location.trim()) ||
+          !Boolean(location.company)
         }
         disableElevation
       >
         {
-          isUpdating.status
+          isUpdating
             ? "Update"
             : "Save"
         }
@@ -263,7 +296,7 @@ const AccountTitlesForm = (props) => {
         disableElevation
       >
         {
-          isUpdating.status
+          isUpdating
             ? "Cancel"
             : "Clear"
         }
@@ -272,4 +305,4 @@ const AccountTitlesForm = (props) => {
   )
 }
 
-export default AccountTitlesForm
+export default LocationsForm

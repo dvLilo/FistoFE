@@ -11,20 +11,20 @@ import { ProtectedRoute } from './components/ProtectedRoute'
 
 import { ThemeProvider, createTheme, useMediaQuery, CssBaseline } from '@mui/material';
 
-import ToastProvider from './contexts/ToastContext'
-import ConfirmProvider from './contexts/ConfirmContext'
-
-
+import FistoProvider from './contexts/FistoContext'
 
 import Landing from './Landing'
 import Dashboard from './Dashboard'
 
 // Masterlist
 import UserAccounts from './routes/masterlist/UserAccounts/'
-import NewUser from './routes/masterlist/NewUser'
-import UpdateUser from './routes/masterlist/UpdateUser'
+import NewUser from './routes/masterlist/UserAccounts/NewUser'
+import UpdateUser from './routes/masterlist/UserAccounts/UpdateUser'
 import ChangePassword from './routes/masterlist/ChangePassword'
 import DocumentTypes from './routes/masterlist/DocumentTypes/'
+import Companies from './routes/masterlist/Companies/'
+import Departments from './routes/masterlist/Departments/'
+import Locations from './routes/masterlist/Locations/'
 import Categories from './routes/masterlist/Categories/'
 import References from './routes/masterlist/References/'
 import SupplierTypes from './routes/masterlist/SupplierTypes/'
@@ -118,6 +118,10 @@ const App = () => {
             }
           )
         },
+        zIndex: {
+          modal: 1400,
+          snackbar: 1300
+        }
       }),
     [colorScheme, prefersDarkMode],
   );
@@ -131,11 +135,9 @@ const App = () => {
             exact
             path="/sandbox"
             element={
-              <ConfirmProvider>
-                <ToastProvider>
-                  <Sandbox />
-                </ToastProvider>
-              </ConfirmProvider>
+              <FistoProvider>
+                <Sandbox />
+              </FistoProvider>
             }
           />
           <Route
@@ -165,6 +167,9 @@ const App = () => {
               <Route exact strict path="change-password" element={<ChangePassword />} />
               <Route exact strict path="categories" element={<Categories />} />
               <Route exact strict path="document-types" element={<DocumentTypes />} />
+              <Route exact strict path="companies" element={<Companies />} />
+              <Route exact strict path="departments" element={<Departments />} />
+              <Route exact strict path="locations" element={<Locations />} />
               <Route exact strict path="references" element={<References />} />
               <Route exact strict path="supplier-types" element={<SupplierTypes />} />
               <Route exact strict path="suppliers" element={<Suppliers />} />

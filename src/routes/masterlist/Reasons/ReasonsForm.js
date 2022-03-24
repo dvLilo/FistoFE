@@ -166,8 +166,7 @@ const ReasonsForm = (props) => {
         loading={isSaving}
         startIcon={<></>}
         disabled={
-          !Boolean(reason.reason.trim()) ||
-          !Boolean(reason.remarks.trim())
+          !Boolean(reason.reason.trim())
         }
         disableElevation
       >

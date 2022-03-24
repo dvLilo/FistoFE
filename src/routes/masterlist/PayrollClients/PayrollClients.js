@@ -22,7 +22,6 @@ const PayrollClients = () => {
 
   const {
     fetching,
-    error,
     data,
     paginate,
     refetchData,
@@ -46,16 +45,6 @@ const PayrollClients = () => {
   })
 
   const [update, setUpdate] = React.useState(null)
-
-  React.useEffect(() => {
-    if (error) {
-      if (error.status !== 404) setToast({
-        show: true,
-        title: "Success",
-        message: "Something went wrong whilst fetching payroll clients."
-      })
-    }
-  }, [error])
 
   const dataStatusHandler = (data) => {
     const { id, deleted_at } = data

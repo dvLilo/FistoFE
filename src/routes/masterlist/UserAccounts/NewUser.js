@@ -2,12 +2,14 @@ import React from 'react'
 
 import axios from 'axios'
 
-import { 
-  Box, 
-  Paper, 
-  Typography, 
-  TextField, 
-  Button, 
+import { Link } from 'react-router-dom'
+
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Button,
   Autocomplete,
 
   FormControlLabel,
@@ -21,8 +23,8 @@ import { LoadingButton } from '@mui/lab'
 
 import { createFilterOptions } from '@mui/material/Autocomplete';
 
-import Toast from '../../components/Toast'
-import Confirm from '../../components/Confirm'
+import Toast from '../../../components/Toast'
+import Confirm from '../../../components/Confirm'
 
 const NewUser = () => {
 
@@ -36,7 +38,7 @@ const NewUser = () => {
     field: "",
     message: ""
   })
-  
+
   const [toast, setToast] = React.useState({
     show: false,
     title: null,
@@ -46,7 +48,7 @@ const NewUser = () => {
   const [confirm, setConfirm] = React.useState({
     show: false,
     loading: false,
-    onConfirm: () => {}
+    onConfirm: () => { }
   })
 
   // Permissions Array *Fixed
@@ -171,30 +173,22 @@ const NewUser = () => {
       },
       {
         id: 3,
-        name: "GAS AP Associate"
+        name: "AP Associate"
       },
       {
         id: 4,
-        name: "Filing Clerk"
+        name: "AP Specialist"
       },
       {
         id: 5,
-        name: "Finance AP Associate"
+        name: "Treasury Custodian"
       },
       {
         id: 6,
-        name: "Finance AP Specialist"
-      },
-      {
-        id: 7,
-        name: "Treasury"
-      },
-      {
-        id: 8,
         name: "Approver"
       },
       {
-        id: 9,
+        id: 7,
         name: "Administrator"
       }
     ]
@@ -248,7 +242,7 @@ const NewUser = () => {
         employees: response.length ? response : null
       })
     }
-    catch(error) {
+    catch (error) {
       if (error.request.status !== 404) {
         setToast({
           show: true,
@@ -272,11 +266,11 @@ const NewUser = () => {
   const fetchDocumentTypes = async () => {
     let response
     try {
-      response = await axios.get(`/api/users/dropdown/1`).then(JSON => JSON.data)
-      const { documents } = response.result
+      response = await axios.get(`/api/admin/dropdown/document`)
+      const { documents } = response.data.result
 
       setCheckbox({
-        documents: documents.length ? documents : null
+        documents: documents
       })
     }
     catch (error) {
@@ -330,13 +324,13 @@ const NewUser = () => {
         setConfirm({
           show: false,
           loading: false,
-          onConfirm: () => {}
+          onConfirm: () => { }
         })
         setIsSaving(true)
 
         let response
         try {
-          response = await axios.post(`/api/users/`, {
+          response = await axios.post(`/api/admin/users/`, {
             id_prefix: user.id_prefix,
             id_no: user.id_no,
             role: user.role.name,
@@ -348,14 +342,13 @@ const NewUser = () => {
             position: user.position,
             username: user.username,
             permissions: user.permissions,
-            documents: user.documents
+            document_types: user.documents
           })
-          .then(JSON => JSON.data)
 
           setToast({
             show: true,
             title: "Success",
-            message: response.message
+            message: response.data.message
           })
           formClearHandler()
         }
@@ -363,7 +356,7 @@ const NewUser = () => {
           setToast({
             show: true,
             title: "Error",
-            message: "Something went wrong whilst creating User Account.",
+            message: "Something went wrong whilst creating user account.",
             severity: "error"
           })
 
@@ -393,23 +386,23 @@ const NewUser = () => {
     try {
       await axios.post(`/api/users/id-validation`, {
         id_prefix: prefix_id,
-        id_no: id_number
+        id_no: id_number.toString()
       })
 
-      
+
       setIsValidating(false)
       setUser({
         ...user,
-        full_id_no:full_id_number,
+        full_id_no: full_id_number,
         id_prefix: prefix_id,
-        id_no: String(id_number),
+        id_no: id_number.toString(),
         last_name,
         first_name,
         middle_name,
         suffix_name: suffix,
         department: department_name,
         position: position_name,
-        username: first_name.charAt(0).toLowerCase()+last_name.toLowerCase()
+        username: first_name.charAt(0).toLowerCase() + last_name.toLowerCase()
       })
 
       window.setTimeout(() => {
@@ -420,7 +413,7 @@ const NewUser = () => {
       setIsValidating(false)
 
       if (error.request.status === 409) {
-        const { 
+        const {
           message,
           result: { error_field }
         } = error.response.data
@@ -436,7 +429,7 @@ const NewUser = () => {
         setToast({
           show: true,
           title: "Error",
-          message: "Something went wrong whilst validating Employee ID.",
+          message: "Something went wrong whilst validating employee ID.",
           severity: "error"
         })
       }
@@ -457,7 +450,7 @@ const NewUser = () => {
     }
     catch (error) {
       if (error.request.status === 409) {
-        const { 
+        const {
           message,
           result: { error_field }
         } = error.response.data
@@ -473,7 +466,7 @@ const NewUser = () => {
         setToast({
           show: true,
           title: "Error",
-          message: "Something went wrong whilst validating Username.",
+          message: "Something went wrong whilst validating username.",
           severity: "error"
         })
       }
@@ -483,7 +476,7 @@ const NewUser = () => {
   const permissionsCheckboxHandler = (e) => {
     const check = e.target.checked
 
-    if (check) 
+    if (check)
       setUser({
         ...user,
         permissions: [
@@ -504,21 +497,21 @@ const NewUser = () => {
     const check = e.target.checked
 
     if (check) {
-      const found = user.documents.some(document => document.document_id === parseInt(e.target.value))
+      const found = user.documents.some(document => document.id === parseInt(e.target.value))
 
       if (!found) setUser({
         ...user,
         documents: [
           ...user.documents,
           {
-            document_id: parseInt(e.target.value),
+            id: parseInt(e.target.value),
             categories: []
           }
         ]
       })
     }
     else {
-      const documents = user.documents.filter(document => document.document_id !== parseInt(e.target.value))
+      const documents = user.documents.filter(document => document.id !== parseInt(e.target.value))
       setUser({
         ...user,
         documents: documents
@@ -532,8 +525,8 @@ const NewUser = () => {
     if (check) {
       const documents = user.documents.map(
         (document, index) => document.document_id === parseInt(e.target.getAttribute('data-document'))
-        ? { ...document, categories: [ ...document.categories, parseInt(e.target.value) ] }
-        : document
+          ? { ...document, categories: [...document.categories, parseInt(e.target.value)] }
+          : document
       )
       setUser({
         ...user,
@@ -543,8 +536,8 @@ const NewUser = () => {
     else {
       const documents = user.documents.map(
         (document, index) => document.document_id === parseInt(e.target.getAttribute('data-document'))
-        ? { ...document, categories: document.categories.filter((category, index) => category !== parseInt(e.target.value)) }
-        : document
+          ? { ...document, categories: document.categories.filter((category, index) => category !== parseInt(e.target.value)) }
+          : document
       )
       setUser({
         ...user,
@@ -558,11 +551,9 @@ const NewUser = () => {
     <Box className="FstoBox-root">
       <Paper className="FstoPaperForm-root" elevation={1}>
         <Typography variant="heading" sx={{ display: 'block', marginBottom: 3 }}>New User Account</Typography>
-        
+
         <form onSubmit={formSubmitHandler}>
           <Autocomplete
-            fullWidth
-            disablePortal
             className="FstoSelectForm-root"
             size="small"
             options={dropdown.employees}
@@ -602,6 +593,8 @@ const NewUser = () => {
               (option, value) => option.general_info.full_id_number === value.general_info.full_id_number
             }
             onChange={userSelectHandler}
+            fullWidth
+            disablePortal
           />
 
           <TextField
@@ -708,9 +701,6 @@ const NewUser = () => {
           />
 
           <Autocomplete
-            fullWidth
-            disablePortal
-            disableClearable
             className="FstoSelectForm-root"
             size="small"
             options={dropdown.roles}
@@ -745,6 +735,9 @@ const NewUser = () => {
                 })
               }
             }
+            fullWidth
+            disablePortal
+            disableClearable
           />
 
           <LoadingButton
@@ -773,15 +766,30 @@ const NewUser = () => {
             Save
           </LoadingButton>
 
-          <Button
-            className="FstoButtonForm-root"
-            variant="outlined"
-            color="error"
-            onClick={formClearHandler}
-            disableElevation
-          >
-            Clear
-          </Button>
+          {
+            userRaw
+              ? <Button
+                className="FstoButtonForm-root"
+                variant="outlined"
+                color="error"
+                onClick={formClearHandler}
+                disableElevation
+              >
+                Clear
+              </Button>
+              : <Button
+                className="FstoButtonForm-root"
+                variant="outlined"
+                color="error"
+                to="/dashboard"
+                component={Link}
+                disableElevation
+              >
+                Back
+              </Button>
+          }
+
+
         </form>
       </Paper>
 
@@ -811,7 +819,7 @@ const NewUser = () => {
                   }
                 </FormGroup>
               </FormControl>
-              
+
               <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
                 <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>General Accounting Services</FormLabel>
                 <FormGroup row={true} sx={{ padding: '10px 35px' }}>
@@ -831,7 +839,7 @@ const NewUser = () => {
                   }
                 </FormGroup>
               </FormControl>
-              
+
               <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
                 <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Approver</FormLabel>
                 <FormGroup row={true} sx={{ padding: '10px 35px' }}>
@@ -851,7 +859,7 @@ const NewUser = () => {
                   }
                 </FormGroup>
               </FormControl>
-              
+
               <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
                 <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Treasury</FormLabel>
                 <FormGroup row={true} sx={{ padding: '10px 35px' }}>
@@ -871,7 +879,7 @@ const NewUser = () => {
                   }
                 </FormGroup>
               </FormControl>
-              
+
               <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
                 <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Confidential</FormLabel>
                 <FormGroup row={true} sx={{ padding: '10px 35px' }}>
@@ -891,7 +899,7 @@ const NewUser = () => {
                   }
                 </FormGroup>
               </FormControl>
-              
+
               <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
                 <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Administrator</FormLabel>
                 <FormGroup row={true} sx={{ padding: '10px 35px' }}>
@@ -926,7 +934,7 @@ const NewUser = () => {
                         <FormControlLabel
                           className="FstoCheckboxLabel-root"
                           key={index}
-                          label={document.document_type}
+                          label={document.type}
                           sx={{ width: '50%', margin: 0 }}
                           control={
                             <Checkbox size="small" sx={{ padding: '7px' }} value={document.id} onChange={documentsCheckboxHandler} />
@@ -941,32 +949,32 @@ const NewUser = () => {
                     checkbox.documents?.map((document, index) => (
                       Boolean(document.categories.length)
                       && (
-                          user.documents.some(check => check.document_id === document.id )
-                          && (
-                            <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }} key={index}>
-                              <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>{ document.document_type }</FormLabel>
+                        user.documents.some(check => check.id === document.id)
+                        && (
+                          <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px', textTransform: 'capitalize' }} key={index}>
+                            <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>{document.type}</FormLabel>
 
-                              <FormGroup row={true} sx={{ padding: '10px 35px' }}>
+                            <FormGroup row={true} sx={{ padding: '10px 35px' }}>
                               {
                                 document.categories.map((category, key) => (
                                   <FormControlLabel
                                     className="FstoCheckboxLabel-root"
                                     key={key}
-                                    label={category.category_name}
+                                    label={category.name}
                                     sx={{ width: '50%', margin: 0 }}
                                     control={
-                                      <Checkbox size="small" sx={{ padding: '7px' }} value={category.category_id} inputProps={{ 'data-document': document.id }} onChange={categoriesCheckboxHandler} />
+                                      <Checkbox size="small" sx={{ padding: '7px' }} value={category.id} inputProps={{ 'data-document': document.id }} onChange={categoriesCheckboxHandler} />
                                     }
                                     disableTypography
                                   />
                                 ))
                               }
-                              </FormGroup>
-                            </FormControl>
-                          )
-                        
+                            </FormGroup>
+                          </FormControl>
+                        )
+
                       )
-                    )) 
+                    ))
                   }
                 </Paper>
               )
@@ -998,7 +1006,7 @@ const NewUser = () => {
         onClose={() => setConfirm({
           show: false,
           loading: false,
-          onConfirm: () => {}
+          onConfirm: () => { }
         })}
       />
     </Box>

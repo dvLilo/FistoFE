@@ -2,14 +2,18 @@ import React from 'react'
 
 import axios from 'axios'
 
+import useToast from './useToast'
+import useConfirm from './useConfirm'
+
 const useFistoHook = (URL) => {
+
+  const toast = useToast()
+  const confirm = useConfirm()
 
   const [fetching, setIsFetching] = React.useState(true)
 
   const [data, setData] = React.useState(null)
   const [paginate, setPaginate] = React.useState(null)
-
-  const [error, setError] = React.useState(null)
 
   const [params, setParams] = React.useState({
     status: 1,
@@ -36,24 +40,68 @@ const useFistoHook = (URL) => {
 
         setData(data)
         setPaginate(pagination)
-
-        setError(null)
       }
       catch (error) {
-        setError(error.request)
         setData(null)
         setPaginate(null)
+
+        if (error.request.status !== 404)
+          toast({
+            open: true,
+            severity: "error",
+            title: "Error",
+            message: "Something went wrong whilst fetching the list of data."
+          })
       }
 
       setIsFetching(false)
     })()
-  }, [URL, params])
+  }, [URL, params, toast])
 
   const refetchData = () => setParams(
     currentValue => ({
       ...currentValue
     })
   )
+
+  const switchData = (data) => {
+    const {
+      id: ID,
+      deleted_at: STATUS
+    } = data
+
+    confirm({
+      open: true,
+      wait: true,
+      onConfirm: async () => {
+        let response
+        try {
+          response = await axios.patch(`${URL}/${ID}`, {
+            status: Boolean(STATUS) ? 0 : 1
+          })
+
+          toast({
+            open: true,
+            severity: "success",
+            title: "Success",
+            message: response.data.message
+          })
+
+          refetchData()
+        }
+        catch (error) {
+          toast({
+            open: true,
+            severity: "error",
+            title: "Error",
+            message: "An unexpected error occurred. Please try again later."
+          })
+
+          console.log(error.request)
+        }
+      }
+    })
+  }
 
   const searchData = (e) => {
     if (e.key === "Enter") {
@@ -105,7 +153,7 @@ const useFistoHook = (URL) => {
     })
   }
 
-  return { fetching, error, data, paginate, refetchData, searchData, searchClear, statusChange, pageChange, rowChange }
+  return { fetching, data, paginate, refetchData, switchData, searchData, searchClear, statusChange, pageChange, rowChange }
 }
 
 export default useFistoHook

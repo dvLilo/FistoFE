@@ -22,7 +22,6 @@ const UtilityCategories = () => {
 
   const {
     fetching,
-    error,
     data,
     paginate,
     refetchData,
@@ -46,16 +45,6 @@ const UtilityCategories = () => {
     loading: false,
     onConfirm: () => { }
   })
-
-  React.useEffect(() => {
-    if (error) {
-      if (error.status !== 404) setToast({
-        show: true,
-        title: "Success",
-        message: "Something went wrong whilst fetching references."
-      })
-    }
-  }, [error])
 
   const dataStatusHandler = (data) => {
     const { id, deleted_at } = data

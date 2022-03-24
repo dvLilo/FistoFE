@@ -34,8 +34,9 @@ import DateAdapter from '@mui/lab/AdapterDateFns'
 // eslint-disable-next-line
 import { createFilterOptions } from '@mui/material/Autocomplete';
 
-import Toast from '../../components/Toast'
 import Confirm from '../../components/Confirm'
+
+// import useToast from '../../hooks/useToast'
 
 
 const DOCUMENT_TYPES = [
@@ -162,14 +163,10 @@ const NumberField = React.forwardRef(function NumberField(props, ref) {
 
 const NewRequest = () => {
 
+  // const toast = useToast()
+
   // eslint-disable-next-line
   const [isSaving, setIsSaving] = React.useState(false)
-
-  const [toast, setToast] = React.useState({
-    show: false,
-    title: null,
-    message: null
-  })
 
   const [confirm, setConfirm] = React.useState({
     show: false,
@@ -239,8 +236,8 @@ const NewRequest = () => {
   //     }
   //     catch (error) {
   //       if (error.request.status !== 404) {
-  //         setToast({
-  //           show: true,
+  //         toast({
+  //           open: true,
   //           title: "Error",
   //           message: "Something went wrong whilst fetching list of companies, departments and locations from Sedar.",
   //           severity: "error"
@@ -917,22 +914,6 @@ const NewRequest = () => {
           <Typography variant="heading">P20,000.00</Typography>
         </Box> */}
       </Paper>
-
-      <Toast
-        open={toast.show}
-        title={toast.title}
-        message={toast.message}
-        severity={toast.severity}
-        onClose={(event, reason) => {
-          if (reason === 'clickaway') return
-
-          setToast({
-            show: false,
-            title: null,
-            message: null
-          })
-        }}
-      />
 
       <Confirm
         open={confirm.show}

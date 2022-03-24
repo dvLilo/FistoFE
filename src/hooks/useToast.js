@@ -1,12 +1,12 @@
 import React from 'react'
 
-import { ToastContext } from '../contexts/ToastContext'
+import { FistoContext } from '../contexts/FistoContext'
 
 const useToast = () => {
 
-  const { setToast } = React.useContext(ToastContext)
+  const { toast } = React.useContext(FistoContext)
 
-  return setToast
+  return toast
 }
 
 export default useToast

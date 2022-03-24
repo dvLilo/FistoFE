@@ -2,6 +2,8 @@ import React from 'react'
 
 import axios from 'axios'
 
+import { Link } from 'react-router-dom'
+
 import {
   Box,
   Paper,
@@ -233,15 +235,28 @@ const ChangePassword = () => {
             Update
           </LoadingButton>
 
-          <Button
-            className="FstoButtonForm-root"
-            variant="outlined"
-            color="error"
-            onClick={formClearHandler}
-            disableElevation
-          >
-            Clear
-          </Button>
+          {
+            Boolean(password.current_password) || Boolean(password.new_password) || Boolean(password.confirm_password)
+              ? <Button
+                className="FstoButtonForm-root"
+                variant="outlined"
+                color="error"
+                onClick={formClearHandler}
+                disableElevation
+              >
+                Clear
+              </Button>
+              : <Button
+                className="FstoButtonForm-root"
+                variant="outlined"
+                color="error"
+                to="/dashboard"
+                component={Link}
+                disableElevation
+              >
+                Back
+              </Button>
+          }
         </form>
       </Paper>
 

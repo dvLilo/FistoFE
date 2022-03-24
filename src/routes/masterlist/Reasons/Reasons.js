@@ -1,6 +1,6 @@
 import React from 'react'
 
-import axios from 'axios'
+// import axios from 'axios'
 
 import useFistoHook from '../../../hooks/useFistoHook'
 
@@ -22,10 +22,10 @@ const Reasons = () => {
 
   const {
     fetching,
-    error,
     data,
     paginate,
     refetchData,
+    switchData,
     searchData,
     searchClear,
     statusChange,
@@ -47,53 +47,43 @@ const Reasons = () => {
     onConfirm: () => { }
   })
 
-  React.useEffect(() => {
-    if (error) {
-      if (error.status !== 404) setToast({
-        show: true,
-        title: "Success",
-        message: "Something went wrong whilst fetching references."
-      })
-    }
-  }, [error])
+  // const dataStatusHandler = (data) => {
+  //   const { id, deleted_at } = data
 
-  const dataStatusHandler = (data) => {
-    const { id, deleted_at } = data
+  //   setConfirm({
+  //     show: true,
+  //     loading: false,
+  //     onConfirm: async () => {
+  //       setConfirm({
+  //         ...confirm,
+  //         show: true,
+  //         loading: true
+  //       })
 
-    setConfirm({
-      show: true,
-      loading: false,
-      onConfirm: async () => {
-        setConfirm({
-          ...confirm,
-          show: true,
-          loading: true
-        })
+  //       let response
+  //       try {
+  //         response = await axios.patch(`/api/admin/reasons/${id}`, {
+  //           status: Boolean(deleted_at) ? 0 : 1
+  //         })
 
-        let response
-        try {
-          response = await axios.patch(`/api/admin/reasons/${id}`, {
-            status: Boolean(deleted_at) ? 0 : 1
-          })
+  //         setConfirm({
+  //           ...confirm,
+  //           loading: false,
+  //         })
+  //         setToast({
+  //           show: true,
+  //           title: "Success",
+  //           message: response.data.message
+  //         })
 
-          setConfirm({
-            ...confirm,
-            loading: false,
-          })
-          setToast({
-            show: true,
-            title: "Success",
-            message: response.data.message
-          })
-
-          refetchData() // refresh the table data
-        }
-        catch (error) {
-          console.log("Fisto Error Details: ", error.request)
-        }
-      }
-    })
-  }
+  //         refetchData() // refresh the table data
+  //       }
+  //       catch (error) {
+  //         console.log("Fisto Error Details: ", error.request)
+  //       }
+  //     }
+  //   })
+  // }
 
   const dataUpdateHandler = (data) => {
     const { id, reason, remarks } = data
@@ -130,7 +120,7 @@ const Reasons = () => {
           <ReasonsTable
             fetching={fetching}
             data={data}
-            onStatusChange={dataStatusHandler}
+            onStatusChange={switchData}
             onUpdateChange={dataUpdateHandler}
           />
         </TableContainer>

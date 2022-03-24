@@ -4,12 +4,12 @@ import axios from 'axios'
 
 import { Link, useParams } from 'react-router-dom'
 
-import { 
-  Box, 
-  Paper, 
-  Typography, 
-  TextField, 
-  Button, 
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Button,
   Autocomplete,
 
   FormControlLabel,
@@ -21,8 +21,8 @@ import {
 
 import { LoadingButton } from '@mui/lab'
 
-import Toast from '../../components/Toast'
-import Confirm from '../../components/Confirm'
+import Toast from '../../../components/Toast'
+import Confirm from '../../../components/Confirm'
 
 const UpdateUser = () => {
 
@@ -33,7 +33,7 @@ const UpdateUser = () => {
   const [isFetching, setIsFetching] = React.useState(false)
   // eslint-disable-next-line
   const [isValidating, setIsValidating] = React.useState(false)
-  
+
   const [toast, setToast] = React.useState({
     show: false,
     title: null,
@@ -43,7 +43,7 @@ const UpdateUser = () => {
   const [confirm, setConfirm] = React.useState({
     show: false,
     loading: false,
-    onConfirm: () => {}
+    onConfirm: () => { }
   })
 
   // Permissions Array *Fixed
@@ -148,7 +148,7 @@ const UpdateUser = () => {
     ],
     administrator: [
       {
-        id: 0,
+        id: 101,
         name: "Activity Logs"
       }
     ]
@@ -169,30 +169,22 @@ const UpdateUser = () => {
       },
       {
         id: 3,
-        name: "GAS AP Associate"
+        name: "AP Associate"
       },
       {
         id: 4,
-        name: "Filing Clerk"
+        name: "AP Specialist"
       },
       {
         id: 5,
-        name: "Finance AP Associate"
+        name: "Treasury Custodian"
       },
       {
         id: 6,
-        name: "Finance AP Specialist"
-      },
-      {
-        id: 7,
-        name: "Treasury"
-      },
-      {
-        id: 8,
         name: "Approver"
       },
       {
-        id: 9,
+        id: 7,
         name: "Administrator"
       }
     ]
@@ -217,7 +209,7 @@ const UpdateUser = () => {
     username: "",
     role: null,
     permissions: [],
-    documents: []
+    document_types: []
   })
 
   React.useEffect(() => {
@@ -232,7 +224,7 @@ const UpdateUser = () => {
 
     let response
     try {
-      response = await axios.get(`/api/users/${id}`).then(JSON => JSON.data)
+      response = await axios.get(`/api/admin/users/${id}`)
 
       const {
         id_prefix,
@@ -246,8 +238,8 @@ const UpdateUser = () => {
         username,
         role,
         permissions,
-        documents
-      } = response.result
+        document_types
+      } = response.data.result
 
       setUser({
         full_id_no: `${id_prefix}-${id_no}`,
@@ -262,24 +254,41 @@ const UpdateUser = () => {
         username,
         role: dropdown.roles.find(check => check.name === role),
         permissions,
-        documents
+        document_types
       })
     }
-    catch(error) {
+    catch (error) {
+      if (error.request.status === 404) {
+        setToast({
+          show: true,
+          title: "Error",
+          message: "The user you're trying to update doesn't exist.",
+          severity: "error"
+        })
+      }
+      else {
+        setToast({
+          show: true,
+          title: "Error",
+          message: "Something went wrong whilst fetching user data.",
+          severity: "error"
+        })
+      }
 
+      return
     }
-    
+
     setIsFetching(false)
   }
 
   const fetchDocumentTypes = async () => {
     let response
     try {
-      response = await axios.get(`/api/users/dropdown/1`).then(JSON => JSON.data)
-      const { documents } = response.result
+      response = await axios.get(`/api/admin/dropdown/document`)
+      const { documents } = response.data.result
 
       setCheckbox({
-        documents: documents.length ? documents : null
+        documents: documents
       })
     }
     catch (error) {
@@ -287,7 +296,7 @@ const UpdateUser = () => {
         setToast({
           show: true,
           title: "Error",
-          message: "Something went wrong whilst fetching Document Types.",
+          message: "Something went wrong whilst fetching document types.",
           severity: "error"
         })
       }
@@ -308,39 +317,29 @@ const UpdateUser = () => {
         setConfirm({
           show: false,
           loading: false,
-          onConfirm: () => {}
+          onConfirm: () => { }
         })
         setIsSaving(true)
 
         let response
         try {
-          response = await axios.put(`/api/users/${id}`, {
-            id_prefix: user.id_prefix,
-            id_no: user.id_no,
-            username: user.username,
+          response = await axios.put(`/api/admin/users/${id}`, {
             role: user.role.name,
-            first_name: user.first_name,
-            middle_name: user.middle_name,
-            last_name: user.last_name,
-            suffix: user.suffix_name,
-            department: user.department,
-            position: user.position,
             permissions: user.permissions,
-            documents: user.documents
+            document_types: user.document_types
           })
-          .then(JSON => JSON.data)
 
           setToast({
             show: true,
             title: "Success",
-            message: response.message
+            message: response.data.message
           })
         }
         catch (error) {
           setToast({
             show: true,
             title: "Error",
-            message: "Something went wrong whilst creating User Account.",
+            message: "Something went wrong whilst creating user account.",
             severity: "error"
           })
 
@@ -355,7 +354,7 @@ const UpdateUser = () => {
   const permissionsCheckboxHandler = (e) => {
     const check = e.target.checked
 
-    if (check) 
+    if (check)
       setUser({
         ...user,
         permissions: [
@@ -376,24 +375,24 @@ const UpdateUser = () => {
     const check = e.target.checked
 
     if (check) {
-      const found = user.documents.some(document => document.document_id === parseInt(e.target.value))
+      const found = user.document_types.some(document => document.id === parseInt(e.target.value))
 
       if (!found) setUser({
         ...user,
-        documents: [
-          ...user.documents,
+        document_types: [
+          ...user.document_types,
           {
-            document_id: parseInt(e.target.value),
+            id: parseInt(e.target.value),
             categories: []
           }
         ]
       })
     }
     else {
-      const documents = user.documents.filter(document => document.document_id !== parseInt(e.target.value))
+      const document_types = user.document_types.filter(document => document.id !== parseInt(e.target.value))
       setUser({
         ...user,
-        documents: documents
+        document_types: document_types
       })
     }
   }
@@ -402,25 +401,25 @@ const UpdateUser = () => {
     const check = e.target.checked
 
     if (check) {
-      const documents = user.documents.map(
-        (document, index) => document.document_id === parseInt(e.target.getAttribute('data-document'))
-        ? { ...document, categories: [ ...document.categories, parseInt(e.target.value) ] }
-        : document
+      const document_types = user.document_types.map(
+        (document, index) => document.id === parseInt(e.target.getAttribute('data-document'))
+          ? { ...document, categories: [...document.categories, parseInt(e.target.value)] }
+          : document
       )
       setUser({
         ...user,
-        documents: documents
+        document_types: document_types
       })
     }
     else {
-      const documents = user.documents.map(
-        (document, index) => document.document_id === parseInt(e.target.getAttribute('data-document'))
-        ? { ...document, categories: document.categories.filter((category, index) => category !== parseInt(e.target.value)) }
-        : document
+      const document_types = user.document_types.map(
+        (document, index) => document.id === parseInt(e.target.getAttribute('data-document'))
+          ? { ...document, categories: document.categories.filter((category, index) => category !== parseInt(e.target.value)) }
+          : document
       )
       setUser({
         ...user,
-        documents: documents
+        document_types: document_types
       })
     }
   }
@@ -429,12 +428,9 @@ const UpdateUser = () => {
     <Box className="FstoBox-root">
       <Paper className="FstoPaperForm-root" elevation={1}>
         <Typography variant="heading" sx={{ display: 'block', marginBottom: 3 }}>Update User Account</Typography>
-        
+
         <form onSubmit={formSubmitHandler}>
           <Autocomplete
-            fullWidth
-            disabled
-            disablePortal
             className="FstoSelectForm-root"
             size="small"
             options={[]}
@@ -459,6 +455,9 @@ const UpdateUser = () => {
                   sx={{ textTransform: 'capitalize' }}
                 />
             }
+            fullWidth
+            disabled
+            disablePortal
           />
 
           <TextField
@@ -541,9 +540,6 @@ const UpdateUser = () => {
           />
 
           <Autocomplete
-            fullWidth
-            disablePortal
-            disableClearable
             className="FstoSelectForm-root"
             size="small"
             disabled={isFetching}
@@ -578,6 +574,9 @@ const UpdateUser = () => {
                 })
               }
             }
+            fullWidth
+            disablePortal
+            disableClearable
           />
 
           <LoadingButton
@@ -597,7 +596,7 @@ const UpdateUser = () => {
               !Boolean(user.username) ||
               !Boolean(user.role) ||
               !Boolean(user.permissions.length) ||
-              ((user.permissions.includes(1) || user.permissions.includes(2)) && !Boolean(user.documents.length))
+              ((user.permissions.includes(1) || user.permissions.includes(2)) && !Boolean(user.document_types.length))
             }
             disableElevation
           >
@@ -612,11 +611,15 @@ const UpdateUser = () => {
             component={Link}
             disableElevation
           >
-            Cancel
+            {
+              user.full_id_no
+                ? "Cancel"
+                : "Back"
+            }
           </Button>
         </form>
       </Paper>
-      
+
       <Box className="FstoBoxWrapper-root">
         <Paper className="FstoPaperGroup-root" elevation={1}>
           <Typography variant="permission" sx={{ marginLeft: 4, marginBottom: 4, marginTop: 2 }}>Permissions</Typography>
@@ -640,7 +643,7 @@ const UpdateUser = () => {
               }
             </FormGroup>
           </FormControl>
-          
+
           <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }} disabled={isFetching}>
             <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>General Accounting Services</FormLabel>
             <FormGroup row={true} sx={{ padding: '10px 35px' }}>
@@ -660,7 +663,7 @@ const UpdateUser = () => {
               }
             </FormGroup>
           </FormControl>
-          
+
           <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }} disabled={isFetching}>
             <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Approver</FormLabel>
             <FormGroup row={true} sx={{ padding: '10px 35px' }}>
@@ -680,7 +683,7 @@ const UpdateUser = () => {
               }
             </FormGroup>
           </FormControl>
-          
+
           <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }} disabled={isFetching}>
             <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Treasury</FormLabel>
             <FormGroup row={true} sx={{ padding: '10px 35px' }}>
@@ -700,7 +703,7 @@ const UpdateUser = () => {
               }
             </FormGroup>
           </FormControl>
-          
+
           <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }} disabled={isFetching}>
             <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Confidential</FormLabel>
             <FormGroup row={true} sx={{ padding: '10px 35px' }}>
@@ -720,7 +723,7 @@ const UpdateUser = () => {
               }
             </FormGroup>
           </FormControl>
-          
+
           <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }} disabled={isFetching}>
             <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Administrator</FormLabel>
             <FormGroup row={true} sx={{ padding: '10px 35px' }}>
@@ -756,10 +759,10 @@ const UpdateUser = () => {
                     <FormControlLabel
                       className="FstoCheckboxLabel-root"
                       key={index}
-                      label={document.document_type}
+                      label={document.type}
                       sx={{ width: '50%', margin: 0 }}
                       control={
-                        <Checkbox size="small" sx={{ padding: '7px' }} value={document.id} onChange={documentsCheckboxHandler} checked={user.documents.some(check => check.document_id === document.id)} />
+                        <Checkbox size="small" sx={{ padding: '7px' }} value={document.id} onChange={documentsCheckboxHandler} checked={user.document_types.some(check => check.id === document.id)} />
                       }
                       disableTypography
                     />
@@ -771,28 +774,28 @@ const UpdateUser = () => {
                 checkbox.documents.map((document, index) => (
                   Boolean(document.categories.length)
                   && (
-                      user.documents.some(check => check.document_id === document.id )
-                      && (
-                        <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }} key={index}>
-                          <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>{ document.document_type }</FormLabel>
+                    user.document_types.some(check => check.id === document.id)
+                    && (
+                      <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }} key={index}>
+                        <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>{document.type}</FormLabel>
 
-                          <FormGroup row={true} sx={{ padding: '10px 35px' }}>
+                        <FormGroup row={true} sx={{ padding: '10px 35px' }}>
                           {
                             document.categories.map((category, key) => (
                               <FormControlLabel
                                 className="FstoCheckboxLabel-root"
                                 key={key}
-                                label={category.category_name}
+                                label={category.name}
                                 sx={{ width: '50%', margin: 0 }}
                                 control={
                                   <Checkbox
                                     size="small"
                                     sx={{ padding: '7px' }}
-                                    value={category.category_id}
+                                    value={category.id}
                                     inputProps={{ 'data-document': document.id }}
                                     onChange={categoriesCheckboxHandler}
                                     checked={
-                                      user.documents.find(check => check.document_id === document.id).categories.includes(category.category_id)
+                                      user.document_types.find(check => check.id === document.id).categories.includes(category.id)
                                     }
                                   />
                                 }
@@ -800,12 +803,12 @@ const UpdateUser = () => {
                               />
                             ))
                           }
-                          </FormGroup>
-                        </FormControl>
-                      )
-                    
+                        </FormGroup>
+                      </FormControl>
+                    )
+
                   )
-                )) 
+                ))
               }
             </Paper>
           )
@@ -835,7 +838,7 @@ const UpdateUser = () => {
         onClose={() => setConfirm({
           show: false,
           loading: false,
-          onConfirm: () => {}
+          onConfirm: () => { }
         })}
       />
     </Box>

@@ -11,7 +11,9 @@ import {
 
 import { LoadingButton } from '@mui/lab'
 
-const AccountTitlesForm = (props) => {
+import { createFilterOptions } from '@mui/material/Autocomplete'
+
+const CompaniesForm = (props) => {
 
   const {
     data,
@@ -30,41 +32,72 @@ const AccountTitlesForm = (props) => {
     message: ""
   })
 
-  // Account Title Categories *fixed
-  const dropdown = {
-    categories: [
-      {
-        label: "asset"
-      },
-      {
-        label: "capital"
-      },
-      {
-        label: "expense"
-      },
-      {
-        label: "income"
-      },
-      {
-        label: "payable"
-      }
-    ]
-  }
+  // Dropdown Array
+  const [dropdown, setDropdown] = React.useState({
+    isFetching: false,
+    associates: []
+  })
 
   // Form Data State
-  const [accountTitle, setAccountTitle] = React.useState({
+  const [company, setCompany] = React.useState({
     code: "",
-    title: "",
-    category: null
+    company: "",
+    associates: []
   })
+
+  const filterOptions = createFilterOptions({
+    matchFrom: 'any',
+    limit: 100
+  });
+
+  React.useEffect(() => {
+    (async () => {
+      setDropdown(currentValue => ({
+        ...currentValue,
+        isFetching: true
+      }))
+
+      let response
+      try {
+        response = await axios.get(`/api/admin/dropdown/associate`)
+
+        const {
+          associates
+        } = response.data.result
+
+        setDropdown(currentValue => ({
+          isFetching: false,
+          associates
+        }))
+      }
+      catch (error) {
+        if (error.request.status !== 404) {
+          toast({
+            show: true,
+            title: "Error",
+            message: "Something went wrong whilst fetching companies dropdown list.",
+            severity: "error"
+          })
+        }
+
+        setDropdown(currentValue => ({
+          isFetching: false,
+          associates: []
+        }))
+
+        console.log("Fisto Error Details: ", error.request)
+      }
+    })()
+    // eslint-disable-next-line
+  }, [])
 
   React.useEffect(() => {
     if (data) {
       setIsUpdating(true)
-      setAccountTitle({
+      setCompany({
         code: data.code,
-        title: data.title,
-        category: data.category
+        company: data.company,
+        associates: data.associates
       })
     }
   }, [data])
@@ -73,13 +106,13 @@ const AccountTitlesForm = (props) => {
     setIsUpdating(false)
     setError({
       status: false,
-      field: "",
-      message: ""
+      field: null,
+      message: null
     })
-    setAccountTitle({
+    setCompany({
       code: "",
-      title: "",
-      category: null
+      company: "",
+      associates: []
     })
   }
 
@@ -100,16 +133,16 @@ const AccountTitlesForm = (props) => {
         let response
         try {
           if (isUpdating)
-            response = await axios.put(`/api/admin/account-title/${data.id}/`, {
-              code: accountTitle.code,
-              title: accountTitle.title,
-              category: accountTitle.category
+            response = await axios.put(`/api/admin/companies/${data.id}/`, {
+              code: company.code,
+              company: company.company,
+              associates: company.associates.map(assoc => assoc.id)
             })
           else
-            response = await axios.post(`/api/admin/account-title/`, {
-              code: accountTitle.code,
-              title: accountTitle.title,
-              category: accountTitle.category
+            response = await axios.post(`/api/admin/companies/`, {
+              code: company.code,
+              company: company.company,
+              associates: company.associates.map(assoc => assoc.id)
             })
 
           toast({
@@ -137,7 +170,7 @@ const AccountTitlesForm = (props) => {
             toast({
               show: true,
               title: "Error",
-              message: "Something went wrong whilst saving account title.",
+              message: "Something went wrong whilst saving company.",
               severity: "error"
             })
         }
@@ -147,16 +180,15 @@ const AccountTitlesForm = (props) => {
     })
   }
 
-
   return (
     <form onSubmit={formSubmitHandler}>
       <TextField
         className="FstoTextfieldForm-root"
-        label="Account Code"
+        label="Company Code"
         variant="outlined"
         autoComplete="off"
         size="small"
-        value={accountTitle.code}
+        value={company.code}
         helperText={error.status && error.field === "code" && error.message}
         error={error.status && error.field === "code"}
         onBlur={() => setError({
@@ -164,8 +196,8 @@ const AccountTitlesForm = (props) => {
           field: "",
           message: ""
         })}
-        onChange={(e) => setAccountTitle({
-          ...accountTitle,
+        onChange={(e) => setCompany({
+          ...company,
           code: e.target.value
         })}
         InputLabelProps={{
@@ -176,21 +208,21 @@ const AccountTitlesForm = (props) => {
 
       <TextField
         className="FstoTextfieldForm-root"
-        label="Account Title"
+        label="Company Name"
         variant="outlined"
         autoComplete="off"
         size="small"
-        value={accountTitle.title}
-        helperText={error.status && error.field === "title" && error.message}
-        error={error.status && error.field === "title"}
+        value={company.company}
+        helperText={error.status && error.field === "company" && error.message}
+        error={error.status && error.field === "company"}
         onBlur={() => setError({
           status: false,
           field: "",
           message: ""
         })}
-        onChange={(e) => setAccountTitle({
-          ...accountTitle,
-          title: e.target.value
+        onChange={(e) => setCompany({
+          ...company,
+          company: e.target.value
         })}
         InputLabelProps={{
           className: "FstoLabelForm-root"
@@ -201,14 +233,17 @@ const AccountTitlesForm = (props) => {
       <Autocomplete
         className="FstoSelectForm-root"
         size="small"
-        options={dropdown.categories}
-        value={accountTitle.category}
+        options={dropdown.associates}
+        value={company.associates}
+        filterOptions={filterOptions}
         renderInput={
           props =>
             <TextField
               {...props}
               variant="outlined"
-              label="Category"
+              label="Assign AP Associate"
+              error={!Boolean(dropdown.associates.length) && !dropdown.isFetching}
+              helperText={!Boolean(dropdown.associates.length) && !dropdown.isFetching && "No AP associate found."}
             />
         }
         PaperComponent={
@@ -218,20 +253,24 @@ const AccountTitlesForm = (props) => {
               sx={{ textTransform: 'capitalize' }}
             />
         }
+        getOptionLabel={
+          option => option.name
+        }
         isOptionEqualToValue={
-          (option, value) => option.label === value
+          (option, value) => option.id === value.id
         }
         onChange={
           (e, value) => {
-            setAccountTitle({
-              ...accountTitle,
-              category: value.label
+            setCompany({
+              ...company,
+              associates: value
             })
           }
         }
         fullWidth
+        multiple
         disablePortal
-        disableClearable
+        disableCloseOnSelect
       />
 
       <LoadingButton
@@ -242,14 +281,14 @@ const AccountTitlesForm = (props) => {
         loading={isSaving}
         startIcon={<></>}
         disabled={
-          !Boolean(accountTitle.code.trim()) ||
-          !Boolean(accountTitle.title.trim()) ||
-          !Boolean(accountTitle.category)
+          !Boolean(company.code.trim()) ||
+          !Boolean(company.company.trim()) ||
+          !Boolean(company.associates.length)
         }
         disableElevation
       >
         {
-          isUpdating.status
+          isUpdating
             ? "Update"
             : "Save"
         }
@@ -263,7 +302,7 @@ const AccountTitlesForm = (props) => {
         disableElevation
       >
         {
-          isUpdating.status
+          isUpdating
             ? "Cancel"
             : "Clear"
         }
@@ -272,4 +311,4 @@ const AccountTitlesForm = (props) => {
   )
 }
 
-export default AccountTitlesForm
+export default CompaniesForm

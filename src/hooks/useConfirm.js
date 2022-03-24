@@ -1,11 +1,11 @@
 import React from 'react'
 
-import { ConfirmContext } from '../contexts/ConfirmContext'
+import { FistoContext } from '../contexts/FistoContext'
 
 const useConfirm = () => {
-  const { setConfirm } = React.useContext(ConfirmContext)
+  const { confirm } = React.useContext(FistoContext)
 
-  return setConfirm
+  return confirm
 }
 
 export default useConfirm

@@ -16,10 +16,10 @@ const Sandbox = () => {
 
   const {
     fetching,
-    error,
     data,
     paginate,
     refetchData,
+    switchData,
     searchData,
     statusChange,
     pageChange,
@@ -27,18 +27,6 @@ const Sandbox = () => {
   } = useFistoHook("/api/admin/categories")
 
   const [status, setStatus] = React.useState(true)
-
-  React.useEffect(() => {
-    if (error) {
-      if (error.status !== 404) toast({
-        open: true,
-        severity: "error",
-        title: "Error!",
-        message: "Something went wrong... Please try again."
-      })
-    }
-    // eslint-disable-next-line
-  }, [error])
 
   const toggleStatus = () => {
     if (fetching) return
@@ -65,11 +53,6 @@ const Sandbox = () => {
           && <Mui.Typography variant="h1">Fetching... Please wait.</Mui.Typography>
         }
 
-        {
-          Boolean(error)
-          && <Mui.Typography variant="body2">{error.status}</Mui.Typography>
-        }
-
         <Mui.TextField label="Search" size="small" onKeyPress={searchData} />
 
         <Mui.Button
@@ -83,17 +66,10 @@ const Sandbox = () => {
 
         <Mui.Button onClick={refetchData}>Refetch</Mui.Button>
 
-        <Mui.Button onClick={() => toast({
-          open: true,
-          severity: "success",
-          title: "Success!",
-          message: "You've used the toast right."
-        })}>Use Toast</Mui.Button>
-
-        <Mui.Button onClick={() => confirm({
-          open: true,
-          onConfirm: () => console.log("Hello world")
-        })}>Use Confirm</Mui.Button>
+        <Mui.Stack direction="row" spacing={2}>
+          <Mui.Button onClick={() => switchData({ id: 1, deleted_at: null })}>Archive</Mui.Button>
+          <Mui.Button onClick={() => switchData({ id: 1, deleted_at: "2022-22-22 00:00" })}>Restore</Mui.Button>
+        </Mui.Stack>
 
         <Mui.FormControl variant="outlined">
           <Mui.InputLabel>Rows</Mui.InputLabel>
@@ -115,9 +91,6 @@ const Sandbox = () => {
           <Mui.Button onClick={() => pageChange(null, 1)}>Page 2</Mui.Button>
         </Mui.Stack>
 
-        {/* <Mui.Button onClick={() => switchDataStatus({ ID: 1, status: 1 })}>Archive</Mui.Button>
-        <Mui.Button>Restore</Mui.Button> */}
-
         <Mui.Typography variant="body1" sx={{ textTransform: "capitalize" }}>
           {data?.map(row => row.name).join(", ")}
         </Mui.Typography>
@@ -129,6 +102,20 @@ const Sandbox = () => {
         <Mui.Typography variant="body2">
           Row Per Page: {paginate?.per_page}
         </Mui.Typography>
+
+        <Mui.Divider flexItem variant="middle" sx={{ marginY: 2 }} />
+
+        <Mui.Button onClick={() => toast({
+          open: true,
+          severity: "success",
+          title: "Success!",
+          message: "You've used the toast right."
+        })}>Use Toast</Mui.Button>
+
+        <Mui.Button onClick={() => confirm({
+          open: true,
+          onConfirm: () => console.log("Hello world")
+        })}>Use Confirm</Mui.Button>
 
 
         {/* <Mui.Typography variant="h1" title="h1">Fisto cutie.</Mui.Typography>

@@ -13,29 +13,29 @@ import {
   Backdrop
 } from '@mui/material'
 
-import { 
-  Accordion as MuiAccordion, 
-  AccordionSummary as MuiAccordionSummary, 
-  AccordionDetails 
+import {
+  Accordion as MuiAccordion,
+  AccordionSummary as MuiAccordionSummary,
+  AccordionDetails
 } from '@mui/material'
 
 import {
   CircleOutlined as Bullet,
   // Circle as BulletFilled,
 
-  SettingsOutlined as Masterlist, 
-  FeedOutlined as Document, 
-  ConfirmationNumberOutlined as Voucher, 
-  LocalAtmOutlined as Cheque, 
-  FactCheckOutlined as Approval, 
-  SecurityOutlined as Confidential, 
-  AssessmentOutlined as Reports, 
+  SettingsOutlined as Masterlist,
+  FeedOutlined as Document,
+  ConfirmationNumberOutlined as Voucher,
+  LocalAtmOutlined as Cheque,
+  FactCheckOutlined as Approval,
+  SecurityOutlined as Confidential,
+  AssessmentOutlined as Reports,
 
-  ExpandMoreSharp, 
+  ExpandMoreSharp,
   Close
 } from '@mui/icons-material'
 
-import '../assets/css/styles.sidebar.scss' 
+import '../assets/css/styles.sidebar.scss'
 
 import FistoLogo from '../assets/img/logo_s.png'
 
@@ -44,7 +44,7 @@ const Accordion = styled(props => (
     elevation={0}
     square
     disableGutters
-    { ...props}
+    {...props}
   />
 ))(({ theme }) => ({
   backgroundColor: 'rgba(0,0,0,0)',
@@ -59,7 +59,7 @@ const AccordionSummary = styled((props) => (
     expandIcon={
       <ExpandMoreSharp sx={{ color: 'rgba(255,255,255,0.85)' }} />
     }
-    { ...props}
+    {...props}
   />
 ))(({ theme }) => ({
   display: 'flex',
@@ -91,7 +91,7 @@ const Sidebar = () => {
         fullWidth
         disableElevation
       >
-        <NavLink end { ...rest}>
+        <NavLink end {...rest}>
           <Bullet
             sx={{
               fontSize: '0.8125rem',
@@ -99,7 +99,7 @@ const Sidebar = () => {
               mr: 2
             }}
           />
-          { children }
+          {children}
         </NavLink>
       </Button>
     )
@@ -125,6 +125,9 @@ const Sidebar = () => {
               <RouterLink className="FstoLink-root" to="">User Accounts</RouterLink>
               <RouterLink className="FstoLink-root" to="categories">Categories</RouterLink>
               <RouterLink className="FstoLink-root" to="document-types">Document Types</RouterLink>
+              <RouterLink className="FstoLink-root" to="companies">Comapnies</RouterLink>
+              <RouterLink className="FstoLink-root" to="departments">Departments</RouterLink>
+              <RouterLink className="FstoLink-root" to="locations">Locations</RouterLink>
               <RouterLink className="FstoLink-root" to="references">References</RouterLink>
               <RouterLink className="FstoLink-root" to="supplier-types">Supplier Types</RouterLink>
               <RouterLink className="FstoLink-root" to="suppliers">Suppliers</RouterLink>
@@ -140,17 +143,17 @@ const Sidebar = () => {
 
             </AccordionDetails>
           </Accordion>
-          
+
           <Accordion>
             <AccordionSummary>
               <Document sx={{ mr: 2.5 }} />Documents
             </AccordionSummary>
             <AccordionDetails>
               <RouterLink className="FstoLink-root" to="tagging-request">Tagging of Request</RouterLink>
-              
+
             </AccordionDetails>
           </Accordion>
-          
+
           <Accordion>
             <AccordionSummary>
               <Voucher sx={{ mr: 2.5 }} />Voucher
@@ -160,7 +163,7 @@ const Sidebar = () => {
 
             </AccordionDetails>
           </Accordion>
-          
+
           <Accordion>
             <AccordionSummary>
               <Cheque sx={{ mr: 2.5 }} />Cheque
@@ -170,7 +173,7 @@ const Sidebar = () => {
 
             </AccordionDetails>
           </Accordion>
-          
+
           <Accordion>
             <AccordionSummary>
               <Approval sx={{ mr: 2.5 }} />Approval
@@ -180,7 +183,7 @@ const Sidebar = () => {
 
             </AccordionDetails>
           </Accordion>
-          
+
           <Accordion>
             <AccordionSummary>
               <Confidential sx={{ mr: 2.5 }} />Confidential
@@ -190,7 +193,7 @@ const Sidebar = () => {
 
             </AccordionDetails>
           </Accordion>
-          
+
           <Accordion>
             <AccordionSummary>
               <Reports sx={{ mr: 2.5 }} />Reports

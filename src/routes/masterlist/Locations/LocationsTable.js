@@ -9,19 +9,16 @@ import {
   TableSortLabel
 } from '@mui/material'
 
+import ActionMenu from '../../../components/ActionMenu'
 import Preloader from '../../../components/Preloader'
 
-import UserAccountsActions from './UserAccountsActions'
-
-const UserAccountsTable = (props) => {
+const LocationsTable = (props) => {
 
   const {
     fetching,
     data,
-    onUpdate,
-    onStatus,
-    onReset,
-    onView
+    onStatusChange,
+    onUpdateChange
   } = props
 
   return (
@@ -33,20 +30,14 @@ const UserAccountsTable = (props) => {
           </TableCell>
 
           <TableCell className="FstoTableHead-root">
-            <TableSortLabel active={false}>USERNAME</TableSortLabel>
+            <TableSortLabel active={false}>CODE</TableSortLabel>
           </TableCell>
 
           <TableCell className="FstoTableHead-root">
-            <TableSortLabel active={false}>FULLNAME</TableSortLabel>
+            <TableSortLabel active={false}>LOCATION</TableSortLabel>
           </TableCell>
 
-          <TableCell className="FstoTableHead-root">
-            <TableSortLabel active={false}>ROLE</TableSortLabel>
-          </TableCell>
-
-          <TableCell className="FstoTableHead-root">
-            <TableSortLabel active={false}>DEPARTMENT</TableSortLabel>
-          </TableCell>
+          <TableCell className="FstoTableHead-root">COMPANY</TableCell>
 
           <TableCell className="FstoTableHead-root">STATUS</TableCell>
 
@@ -60,7 +51,7 @@ const UserAccountsTable = (props) => {
       <TableBody>
         {
           fetching
-            ? <Preloader row={5} col={8} />
+            ? <Preloader row={5} col={7} />
             : data
               ? data.map((data, index) => (
                 <TableRow key={index}>
@@ -69,19 +60,15 @@ const UserAccountsTable = (props) => {
                   </TableCell>
 
                   <TableCell className="FstoTableData-root">
-                    {data.username}
+                    {data.code}
                   </TableCell>
 
-                  <TableCell className="FstoTableData-root" sx={{ textTransform: "uppercase" }}>
-                    {data.last_name}, {data.first_name} {data.middle_name.charAt(0)}.
+                  <TableCell className="FstoTableData-root">
+                    {data.location}
                   </TableCell>
 
-                  <TableCell className="FstoTableData-root" sx={{ textTransform: "capitalize" }}>
-                    {data.role}
-                  </TableCell>
-
-                  <TableCell className="FstoTableData-root" sx={{ textTransform: "capitalize" }}>
-                    {data.department}
+                  <TableCell className="FstoTableData-root">
+                    {data.company.name}
                   </TableCell>
 
                   <TableCell className="FstoTableData-root">
@@ -103,19 +90,17 @@ const UserAccountsTable = (props) => {
                   </TableCell>
 
                   <TableCell align="center">
-                    <UserAccountsActions
+                    <ActionMenu
                       data={data}
-                      onUpdate={onUpdate}
-                      onStatus={onStatus}
-                      onReset={onReset}
-                      onView={onView}
+                      onStatusChange={onStatusChange}
+                      onUpdateChange={onUpdateChange}
                     />
                   </TableCell>
                 </TableRow>
               ))
               : (
                 <TableRow>
-                  <TableCell align="center" colSpan={8}>NO RECORDS FOUND</TableCell>
+                  <TableCell align="center" colSpan={7}>NO RECORDS FOUND</TableCell>
                 </TableRow>
               )
         }
@@ -124,4 +109,4 @@ const UserAccountsTable = (props) => {
   )
 }
 
-export default UserAccountsTable
+export default LocationsTable

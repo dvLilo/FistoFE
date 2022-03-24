@@ -3,8 +3,11 @@ import React from 'react'
 import { Outlet } from 'react-router-dom'
 import { Box } from '@mui/material'
 
+import FistoProvider from './contexts/FistoContext'
+
 import Navbar from './components/Navbar'
 import Sidebar from './components/Sidebar'
+
 
 const Dashboard = () => {
   return (
@@ -12,7 +15,9 @@ const Dashboard = () => {
       <Sidebar />
       <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, minHeight: '100vh' }}>
         <Navbar />
-        <Outlet />
+        <FistoProvider>
+          <Outlet />
+        </FistoProvider>
       </Box>
     </>
   )
