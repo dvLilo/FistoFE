@@ -4,21 +4,21 @@ import React from 'react'
 // eslint-disable-next-line
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 
-import { 
-  Box, 
-  Paper, 
-  Typography, 
-  TextField, 
-  InputAdornment, 
-  Button, 
-  IconButton, 
-  TableContainer, 
-  Table, 
-  TableHead, 
-  TableBody, 
-  TableRow, 
-  TableCell, 
-  TableSortLabel, 
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  InputAdornment,
+  Button,
+  IconButton,
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  TableSortLabel,
   TablePagination,
 
   // Menu,
@@ -34,10 +34,13 @@ import {
   // List,
   // ListItem,
   // ListItemText,
+
+  Tabs,
+  Tab
 } from '@mui/material'
 
 import {
-  Search, 
+  Search,
   Close,
   Add,
 
@@ -55,14 +58,14 @@ import Confirm from '../../components/Confirm'
 import Preloader from '../../components/Preloader'
 
 const TaggingRequest = () => {
-	// eslint-disable-next-line
-	const [isFetching, setIsFetching] = React.useState(false)
-  
+  // eslint-disable-next-line
+  const [isFetching, setIsFetching] = React.useState(false)
+
   const [isSearching, setIsSearching] = React.useState({
     status: false,
     keyword: ""
   })
-  
+
   const [toast, setToast] = React.useState({
     show: false,
     title: null,
@@ -72,28 +75,30 @@ const TaggingRequest = () => {
   const [confirm, setConfirm] = React.useState({
     show: false,
     loading: false,
-    onConfirm: () => {}
+    onConfirm: () => { }
   })
 
   // Transaction Array
-	// eslint-disable-next-line
+  // eslint-disable-next-line
   const [transactions, setTransactions] = React.useState(null)
-	
+
   // Pagination Object
-	// eslint-disable-next-line
+  // eslint-disable-next-line
   const [pagination, setPagination] = React.useState(null)
 
+  const [value, setValue] = React.useState("request")
 
-	const searchCloseHandler = () => {}
-	const searchSubmitHandler = () => {}
-	const pageChangeHandler = () => {}
-	const rowChangeHandler = () => {}
+
+  const searchCloseHandler = () => { }
+  const searchSubmitHandler = () => { }
+  const pageChangeHandler = () => { }
+  const rowChangeHandler = () => { }
 
 
   return (
     <Box className="FstoBox-root">
-			<Paper className="FstoPaperTable-root" elevation={1}>
-				<Box className="FstoBoxToolbar-root">
+      <Paper className="FstoPaperTable-root" elevation={1}>
+        <Box className="FstoBoxToolbar-root">
           <Box className="FstoBoxToolbar-left">
             <Typography variant="heading">Tagging of Request</Typography>
 
@@ -110,7 +115,19 @@ const TaggingRequest = () => {
           </Box>
 
           <Box className="FstoBoxToolbar-right">
-            {/* Tabs here... */}
+            <Tabs
+              className="FstoTabs-root"
+              value={value}
+              onChange={(e, value) => setValue(value)}
+              TabIndicatorProps={{
+                className: "FstoTabsIndicator-root",
+                children: <span className="FstoTabsIndicator-root" />
+              }}
+            >
+              <Tab className="FstoTab-root" label="Requested" value="request" disableRipple />
+              <Tab className="FstoTab-root" label="Hold" value="hold" disableRipple />
+              <Tab className="FstoTab-root" label="Voided" value="void" disableRipple />
+            </Tabs>
 
             <TextField
               variant="outlined"
@@ -147,58 +164,58 @@ const TaggingRequest = () => {
           </Box>
         </Box>
 
-				<TableContainer className="FstoTableContainer-root">
+        <TableContainer className="FstoTableContainer-root">
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell className="FstoTableHead-root" align="center">
-                  <TableSortLabel active={true}>DATE REQUESTED</TableSortLabel>
-                </TableCell>
-                
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>TRANSACTION NO.</TableSortLabel>
+                  <TableSortLabel active={false}>DATE REQUESTED</TableSortLabel>
                 </TableCell>
-                
+
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>DOCUMENT</TableSortLabel>
+                  <TableSortLabel active={false}>TRANSACTION NO.</TableSortLabel>
                 </TableCell>
-                
+
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>COMPANY</TableSortLabel>
+                  <TableSortLabel active={false}>DOCUMENT</TableSortLabel>
                 </TableCell>
-                
+
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>SUPPLIER</TableSortLabel>
+                  <TableSortLabel active={false}>COMPANY</TableSortLabel>
                 </TableCell>
-                
+
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>PO AMOUNT</TableSortLabel>
+                  <TableSortLabel active={false}>SUPPLIER</TableSortLabel>
                 </TableCell>
-                
+
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>PO BALANCE</TableSortLabel>
+                  <TableSortLabel active={false}>PO AMOUNT</TableSortLabel>
                 </TableCell>
-                
+
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>REF AMOUNT</TableSortLabel>
+                  <TableSortLabel active={false}>PO BALANCE</TableSortLabel>
                 </TableCell>
-                
+
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>AMOUNT</TableSortLabel>
+                  <TableSortLabel active={false}>REF AMOUNT</TableSortLabel>
                 </TableCell>
-                
+
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>PAYMENT</TableSortLabel>
+                  <TableSortLabel active={false}>AMOUNT</TableSortLabel>
                 </TableCell>
-                
+
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={true}>STATUS</TableSortLabel>
+                  <TableSortLabel active={false}>PAYMENT</TableSortLabel>
+                </TableCell>
+
+                <TableCell className="FstoTableHead-root">
+                  <TableSortLabel active={false}>STATUS</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root" align="center">ACTIONS</TableCell>
               </TableRow>
             </TableHead>
-            
+
             <TableBody>
               {/*
                 isFetching
@@ -211,7 +228,7 @@ const TaggingRequest = () => {
                       </TableRow>
                     )
               */}
-							<Preloader row={5} col={12} />
+              <Preloader row={5} col={12} />
             </TableBody>
           </Table>
         </TableContainer>
@@ -223,7 +240,7 @@ const TaggingRequest = () => {
           rowsPerPage={pagination ? pagination.per_page : 10}
           onPageChange={pageChangeHandler}
           onRowsPerPageChange={rowChangeHandler}
-          rowsPerPageOptions={[10,20,50,100]}
+          rowsPerPageOptions={[10, 20, 50, 100]}
         />
 
         <Toast
@@ -249,10 +266,10 @@ const TaggingRequest = () => {
           onClose={() => setConfirm({
             show: false,
             loading: false,
-            onConfirm: () => {}
+            onConfirm: () => { }
           })}
         />
-			</Paper>
+      </Paper>
     </Box>
   )
 }

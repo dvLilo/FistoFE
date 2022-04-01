@@ -42,19 +42,35 @@ import Confirm from '../../components/Confirm'
 const DOCUMENT_TYPES = [
   {
     id: 1,
-    name: "PAD"
+    type: "PAD"
   },
   {
     id: 2,
-    name: "PRM Common"
+    type: "PRM Common"
   },
   {
     id: 3,
-    name: "PRM Multiple"
+    type: "PRM Multiple"
   },
   {
     id: 4,
-    name: "Receipt"
+    type: "Receipt"
+  },
+  {
+    id: 5,
+    type: "Contractor's Billing"
+  },
+  {
+    id: 6,
+    type: "Utilities"
+  },
+  {
+    id: 7,
+    type: "Payroll"
+  },
+  {
+    id: 8,
+    type: "PCF"
   },
 ]
 
@@ -69,52 +85,85 @@ const PAYMENT_TYPES = [
   },
 ]
 
-const COMPANY_CHARGING = [
+// const COMPANY_CHARGING = [
+//   {
+//     "department_name": "Management Information System",
+//     "company_name": "RDF Corporate Services",
+//     "location_name": "Head Office"
+//   },
+//   {
+//     "department_name": "Management Information System",
+//     "company_name": "RDF Corporate Services",
+//     "location_name": "Common"
+//   },
+//   {
+//     "department_name": "Human Resources Common",
+//     "company_name": "RDF Corporate Services",
+//     "location_name": "Head Office"
+//   },
+//   {
+//     "department_name": "Treasury",
+//     "company_name": "RDF Corporate Services",
+//     "location_name": "Common"
+//   },
+//   {
+//     "department_name": "Audit",
+//     "company_name": "RDF Corporate Services",
+//     "location_name": "Common"
+//   },
+//   {
+//     "department_name": "Finance Common",
+//     "company_name": "RDF Corporate Services",
+//     "location_name": "Head Office"
+//   },
+//   {
+//     "department_name": "Boiler Farms",
+//     "company_name": "Red Dragon Farm",
+//     "location_name": "BrFarm - Lara 1"
+//   },
+//   {
+//     "department_name": "Boiler Farms - Area 2",
+//     "company_name": "Red Dragon Farm",
+//     "location_name": "BrFarm - Nueva Ecija 1"
+//   },
+//   {
+//     "department_name": "Boiler Farms - Area 2",
+//     "company_name": "Red Dragon Farm",
+//     "location_name": "BrFarm - Nueva Ecija 2"
+//   }
+// ]
+
+const COMPANY_LIST = [
   {
-    "department_name": "Management Information System",
-    "company_name": "RDF Corporate Services",
-    "location_name": "Head Office"
+    id: 1,
+    name: "RDF Corporate Services"
   },
   {
-    "department_name": "Management Information System",
-    "company_name": "RDF Corporate Services",
-    "location_name": "Common"
+    id: 2,
+    name: "Fresh Option"
+  },
+]
+
+const DEPARTMENT_LIST = [
+  {
+    id: 1,
+    name: "Management Information System Common"
   },
   {
-    "department_name": "Human Resources Common",
-    "company_name": "RDF Corporate Services",
-    "location_name": "Head Office"
-  },
-  {
-    "department_name": "Treasury",
-    "company_name": "RDF Corporate Services",
-    "location_name": "Common"
-  },
-  {
-    "department_name": "Audit",
-    "company_name": "RDF Corporate Services",
-    "location_name": "Common"
-  },
-  {
-    "department_name": "Finance Common",
-    "company_name": "RDF Corporate Services",
-    "location_name": "Head Office"
-  },
-  {
-    "department_name": "Boiler Farms",
-    "company_name": "Red Dragon Farm",
-    "location_name": "BrFarm - Lara 1"
-  },
-  {
-    "department_name": "Boiler Farms - Area 2",
-    "company_name": "Red Dragon Farm",
-    "location_name": "BrFarm - Nueva Ecija 1"
-  },
-  {
-    "department_name": "Boiler Farms - Area 2",
-    "company_name": "Red Dragon Farm",
-    "location_name": "BrFarm - Nueva Ecija 2"
+    id: 2,
+    name: "Human Resources Common"
   }
+]
+
+const LOCATION_LIST = [
+  {
+    id: 1,
+    name: "Common"
+  },
+  {
+    id: 2,
+    name: "Head Office"
+  },
 ]
 
 const SUPPLIER_LIST = [
@@ -133,6 +182,53 @@ const SUPPLIER_LIST = [
   {
     id: 4,
     name: "PELCO III"
+  },
+]
+
+const CATEGORY_LIST = [
+  {
+    id: 1,
+    name: "general"
+  },
+  {
+    id: 2,
+    name: "rentals"
+  },
+  {
+    id: 3,
+    name: "loans"
+  },
+  {
+    id: 4,
+    name: "leasings"
+  },
+]
+
+const COVERAGE_MONTH = [
+  {
+    id: 1,
+    label: "3 Months",
+    value: 3.0
+  },
+  {
+    id: 2,
+    label: "6 Months",
+    value: 6.0
+  },
+  {
+    id: 3,
+    label: "12 Months",
+    value: 12.0
+  },
+  {
+    id: 4,
+    label: "24 Months",
+    value: 24.0
+  },
+  {
+    id: 5,
+    label: "36 Months",
+    value: 36.0
   },
 ]
 
@@ -176,6 +272,62 @@ const NewRequest = () => {
 
   // const [charging, setCharging] = React.useState([])
 
+
+
+  const isDisabled = () => {
+    switch (data.document.id) {
+      case 1:
+        return data.document.payment_type
+          && data.document.no
+          && data.document.date
+          && data.document.amount
+          && data.document.company
+          && data.document.department
+          && data.document.location
+          && data.document.supplier
+          && data.document.category
+          // && data.po_group.length
+          && data.document.amount === data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
+          ? false : true
+
+      case 2:
+        return data.document.payment_type
+          && data.document.no
+          && data.document.date
+          && data.document.amount
+          && data.document.company
+          && data.document.department
+          && data.document.location
+          && data.document.supplier
+          && data.document.category
+          ? false : true
+
+      case 3:
+        return data.document.payment_type
+          && data.document.no
+          && data.document.date
+          && data.document.amount
+          && data.document.company
+          && data.document.department
+          && data.document.location
+          && data.document.supplier
+          && data.document.category
+          ? false : true
+
+      default:
+        return true
+    }
+  }
+  // eslint-disable-next-line
+  const [error, setError] = React.useState({
+    status: true,
+    data: {
+      "po_group.no": [
+        "PO number already exist."
+      ]
+    }
+  })
+
   const [data, setData] = React.useState({
     requestor: {
       id: 1,
@@ -191,32 +343,28 @@ const NewRequest = () => {
     },
 
     document: {
-      id: 1,
-      payment_type: "full",
-      no: "pad#00-0001",
-      date: "2022-03-03",
-      amount: 20000.00,
+      id: null,
+      name: "",
+      payment_type: "",
+      no: "",
+      date: null,
+      amount: null,
 
-      supplier: {
-        id: 1,
-        name: "1ST ADVENUE ADVERTISING"
-      },
+      payment_date: null,
+      coverage: null,
 
-      company: "RDF Corporate Services",
-      department: "Management Information System",
-      location: "Head Office",
+      category: null,
+
+      company: null,
+      department: null,
+      location: null,
+
+      supplier: null,
 
       remarks: undefined
     },
 
-    po_group: [
-      // {
-      //   no: 10001,
-      //   balance: 20000.00,
-      //   amount: 20000.00,
-      //   rr_no: ["12345", "12346"]
-      // }
-    ]
+    po_group: []
   })
 
   const [PO, setPO] = React.useState({
@@ -297,13 +445,10 @@ const NewRequest = () => {
 
         <form>
           <Autocomplete
-            fullWidth
-            disablePortal
-            disableClearable
             className="FstoSelectForm-root"
             size="small"
             options={DOCUMENT_TYPES}
-            value={DOCUMENT_TYPES.find(row => row.id === data.document.id)}
+            value={DOCUMENT_TYPES.find(row => row.id === data.document.id) || null}
             renderInput={
               props =>
                 <TextField
@@ -320,7 +465,7 @@ const NewRequest = () => {
                 />
             }
             getOptionLabel={
-              option => option.name
+              option => option.type
             }
             isOptionEqualToValue={
               (option, value) => option.id === value.id
@@ -329,347 +474,839 @@ const NewRequest = () => {
               ...data,
               document: {
                 ...data.document,
-                id: value.id
+                id: value.id,
+                name: value.type,
+                payment_type: ""
               }
             })}
-          />
-
-          <Autocomplete
             fullWidth
             disablePortal
             disableClearable
-            className="FstoSelectForm-root"
-            size="small"
-            options={PAYMENT_TYPES}
-            value={PAYMENT_TYPES.find(row => row.label.toLowerCase() === data.document.payment_type.toLowerCase())}
-            renderInput={
-              props =>
-                <TextField
-                  {...props}
-                  variant="outlined"
-                  label="Payment Type"
-                />
-            }
-            PaperComponent={
-              props =>
-                <Paper
-                  {...props}
-                  sx={{ textTransform: 'capitalize' }}
-                />
-            }
-            // getOptionLabel={
-            //   option => option.general_info.full_id_number
-            // }
-            getOptionDisabled={
-              option => {
-                if (option.label === "Partial") return true
-              }
-            }
-            isOptionEqualToValue={
-              (option, value) => option.label === value.label
-            }
-          // onChange={userSelectHandler}
           />
 
-          <TextField
-            className="FstoTextfieldForm-root"
-            label="Document Number"
-            variant="outlined"
-            autoComplete="off"
-            size="small"
-            value={data.document.no}
-            onChange={(e) => setData({
-              ...data,
-              document: {
-                ...data.document,
-                no: e.target.value
-              }
-            })}
-            InputLabelProps={{
-              className: "FstoLabelForm-root"
-            }}
-            fullWidth
-          />
+          {
+            data.document.id &&
+            (
+              <React.Fragment>
+                { // Batch Name, Batch Letter, Batch Date
+                  (data.document.id === 8) &&
+                  (
+                    <React.Fragment>
+                      <Autocomplete
+                        className="FstoSelectForm-root"
+                        size="small"
+                        options={[]}
+                        value={null}
+                        renderInput={
+                          props =>
+                            <TextField
+                              {...props}
+                              variant="outlined"
+                              label="Batch Name"
+                            />
+                        }
+                        PaperComponent={
+                          props =>
+                            <Paper
+                              {...props}
+                              sx={{ textTransform: 'capitalize' }}
+                            />
+                        }
+                        fullWidth
+                        disablePortal
+                        disableClearable
+                      />
 
-          <LocalizationProvider dateAdapter={DateAdapter}>
-            <DatePicker
-              value={data.document.date}
-              onChange={(value) => setData({
-                ...data,
-                document: {
-                  ...data.document,
-                  date: value
+                      <Autocomplete
+                        className="FstoSelectForm-root"
+                        size="small"
+                        options={[]}
+                        value={null}
+                        renderInput={
+                          props =>
+                            <TextField
+                              {...props}
+                              variant="outlined"
+                              label="Batch Letter"
+                            />
+                        }
+                        PaperComponent={
+                          props =>
+                            <Paper
+                              {...props}
+                              sx={{ textTransform: 'capitalize' }}
+                            />
+                        }
+                        fullWidth
+                        disablePortal
+                        disableClearable
+                      />
+
+                      <LocalizationProvider dateAdapter={DateAdapter}>
+                        <DatePicker
+                          value={null}
+                          onChange={(value) => { }}
+                          renderInput={
+                            props =>
+                              <TextField
+                                {...props}
+                                className="FstoTextfieldForm-root"
+                                variant="outlined"
+                                size="small"
+                                label="Batch Date"
+                                fullWidth
+                              />
+                          }
+                        />
+                      </LocalizationProvider>
+                    </React.Fragment>
+                  )}
+
+                <Autocomplete
+                  className="FstoSelectForm-root"
+                  size="small"
+                  options={PAYMENT_TYPES}
+                  value={PAYMENT_TYPES.find(row => row.label === data.document.payment_type) || null}
+                  renderInput={
+                    props =>
+                      <TextField
+                        {...props}
+                        variant="outlined"
+                        label="Payment Type"
+                      />
+                  }
+                  PaperComponent={
+                    props =>
+                      <Paper
+                        {...props}
+                        sx={{ textTransform: 'capitalize' }}
+                      />
+                  }
+                  getOptionDisabled={
+                    option => {
+                      if (data.document.id !== 4 && option.label === "Partial") return true
+                    }
+                  }
+                  isOptionEqualToValue={
+                    (option, value) => option.label === value.label
+                  }
+                  onChange={(e, value) => setData({
+                    ...data,
+                    document: {
+                      ...data.document,
+                      payment_type: value.label
+                    }
+                  })}
+                  fullWidth
+                  disablePortal
+                  disableClearable
+                />
+
+                { // From Date, To Date
+                  (data.document.id === 7 || data.document.id === 6) &&
+                  (
+                    <React.Fragment>
+                      <LocalizationProvider dateAdapter={DateAdapter}>
+                        <DatePicker
+                          value={data.document.date}
+                          onChange={(value) => setData({
+                            ...data,
+                            document: {
+                              ...data.document,
+                              date: new Date(value).toISOString().slice(0, 10)
+                            }
+                          })}
+                          renderInput={
+                            props =>
+                              <TextField
+                                {...props}
+                                className="FstoTextfieldForm-root"
+                                variant="outlined"
+                                size="small"
+                                label="From Date"
+                                fullWidth
+                              />
+                          }
+                        />
+                      </LocalizationProvider>
+
+                      <LocalizationProvider dateAdapter={DateAdapter}>
+                        <DatePicker
+                          value={data.document.date}
+                          onChange={(value) => setData({
+                            ...data,
+                            document: {
+                              ...data.document,
+                              date: new Date(value).toISOString().slice(0, 10)
+                            }
+                          })}
+                          renderInput={
+                            props =>
+                              <TextField
+                                {...props}
+                                className="FstoTextfieldForm-root"
+                                variant="outlined"
+                                size="small"
+                                label="To Date"
+                                fullWidth
+                              />
+                          }
+                        />
+                      </LocalizationProvider>
+                    </React.Fragment>
+                  )}
+
+                { // Document Number
+                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 5) &&
+                  (
+                    <TextField
+                      className="FstoTextfieldForm-root"
+                      label="Document Number"
+                      variant="outlined"
+                      autoComplete="off"
+                      size="small"
+                      value={data.document.no}
+                      error={
+                        error.status
+                        && Boolean(error.data["document.no"])
+                      }
+                      helperText={
+                        error.status
+                        && error.data["document.no"]
+                        && error.data["document.no"][0]
+                      }
+                      onChange={(e) => setData({
+                        ...data,
+                        document: {
+                          ...data.document,
+                          no: e.target.value
+                        }
+                      })}
+                      InputLabelProps={{
+                        className: "FstoLabelForm-root"
+                      }}
+                      fullWidth
+                    />
+                  )}
+
+                { //Document Date
+                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4 || data.document.id === 5 || data.document.id === 8) &&
+                  (
+                    <LocalizationProvider dateAdapter={DateAdapter}>
+                      <DatePicker
+                        value={data.document.date}
+                        onChange={(value) => setData({
+                          ...data,
+                          document: {
+                            ...data.document,
+                            date: new Date(value).toISOString().slice(0, 10)
+                          }
+                        })}
+                        renderInput={
+                          props =>
+                            <TextField
+                              {...props}
+                              className="FstoTextfieldForm-root"
+                              variant="outlined"
+                              size="small"
+                              label="Document Date"
+                              fullWidth
+                            />
+                        }
+                      />
+                    </LocalizationProvider>
+                  )}
+
+                { //Document Amount
+                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 5 || data.document.id === 6 || data.document.id === 7 || data.document.id === 8) &&
+                  (
+                    <TextField
+                      className="FstoTextfieldForm-root"
+                      label="Document Amount"
+                      variant="outlined"
+                      autoComplete="off"
+                      size="small"
+                      value={data.document.amount}
+                      error={
+                        Boolean(data.po_group.length) &&
+                        Boolean(data.document.amount)
+                        && data.document.amount !== data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
+                      }
+                      helperText={
+                        Boolean(data.po_group.length) &&
+                        Boolean(data.document.amount)
+                        && data.document.amount !== data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
+                        && "Document amount and PO balance amount is not equal."
+                      }
+                      onChange={(e) => setData({
+                        ...data,
+                        document: {
+                          ...data.document,
+                          amount: parseFloat(e.target.value)
+                        }
+                      })}
+                      InputProps={{
+                        inputComponent: NumberField,
+                      }}
+                      InputLabelProps={{
+                        className: "FstoLabelForm-root"
+                      }}
+                      fullWidth
+                    />
+                  )}
+
+                <Autocomplete
+                  className="FstoSelectForm-root"
+                  size="small"
+                  options={COMPANY_LIST}
+                  value={data.document.company}
+                  renderInput={
+                    props =>
+                      <TextField
+                        {...props}
+                        variant="outlined"
+                        label="Company"
+                      />
+                  }
+                  PaperComponent={
+                    props =>
+                      <Paper
+                        {...props}
+                        sx={{ textTransform: 'capitalize' }}
+                      />
+                  }
+                  getOptionLabel={
+                    option => option.name
+                  }
+                  isOptionEqualToValue={
+                    (option, value) => option.id === value.id
+                  }
+                  onChange={(e, value) => setData({
+                    ...data,
+                    document: {
+                      ...data.document,
+                      company: value
+                    }
+                  })}
+                  fullWidth
+                  disablePortal
+                  disableClearable
+                />
+
+                <Autocomplete
+                  className="FstoSelectForm-root"
+                  size="small"
+                  options={DEPARTMENT_LIST}
+                  value={data.document.department}
+                  renderInput={
+                    props =>
+                      <TextField
+                        {...props}
+                        variant="outlined"
+                        label="Department"
+                      />
+                  }
+                  PaperComponent={
+                    props =>
+                      <Paper
+                        {...props}
+                        sx={{ textTransform: 'capitalize' }}
+                      />
+                  }
+                  getOptionLabel={
+                    option => option.name
+                  }
+                  isOptionEqualToValue={
+                    (option, value) => option.id === value.id
+                  }
+                  onChange={(e, value) => setData({
+                    ...data,
+                    document: {
+                      ...data.document,
+                      department: value
+                    }
+                  })}
+                  fullWidth
+                  disablePortal
+                  disableClearable
+                />
+
+                <Autocomplete
+                  className="FstoSelectForm-root"
+                  size="small"
+                  options={LOCATION_LIST}
+                  value={data.document.location}
+                  renderInput={
+                    props =>
+                      <TextField
+                        {...props}
+                        variant="outlined"
+                        label="Location"
+                      />
+                  }
+                  PaperComponent={
+                    props =>
+                      <Paper
+                        {...props}
+                        sx={{ textTransform: 'capitalize' }}
+                      />
+                  }
+                  getOptionLabel={
+                    option => option.name
+                  }
+                  isOptionEqualToValue={
+                    (option, value) => option.id === value.id
+                  }
+                  onChange={(e, value) => setData({
+                    ...data,
+                    document: {
+                      ...data.document,
+                      location: value
+                    }
+                  })}
+                  fullWidth
+                  disablePortal
+                  disableClearable
+                />
+
+                <Autocomplete
+                  className="FstoSelectForm-root"
+                  size="small"
+                  options={SUPPLIER_LIST}
+                  value={data.document.supplier}
+                  renderInput={
+                    props =>
+                      <TextField
+                        {...props}
+                        variant="outlined"
+                        label="Supplier"
+                      />
+                  }
+                  PaperComponent={
+                    props =>
+                      <Paper
+                        {...props}
+                        sx={{ textTransform: 'capitalize' }}
+                      />
+                  }
+                  getOptionLabel={
+                    option => option.name
+                  }
+                  isOptionEqualToValue={
+                    (option, value) => option.id === value.id
+                  }
+                  onChange={(e, value) => setData({
+                    ...data,
+                    document: {
+                      ...data.document,
+                      supplier: value
+                    }
+                  })}
+                  fullWidth
+                  disablePortal
+                  disableClearable
+                />
+
+                { // Reference Type, Reference Number, Reference Amount
+                  (data.document.id === 4) &&
+                  (
+                    <React.Fragment>
+                      <Autocomplete
+                        className="FstoSelectForm-root"
+                        size="small"
+                        options={[]}
+                        value={null}
+                        renderInput={
+                          props =>
+                            <TextField
+                              {...props}
+                              variant="outlined"
+                              label="Reference Type"
+                            />
+                        }
+                        PaperComponent={
+                          props =>
+                            <Paper
+                              {...props}
+                              sx={{ textTransform: 'capitalize' }}
+                            />
+                        }
+                        fullWidth
+                        disablePortal
+                        disableClearable
+                      />
+
+                      <TextField
+                        className="FstoTextfieldForm-root"
+                        label="Reference Number"
+                        variant="outlined"
+                        autoComplete="off"
+                        size="small"
+                        value={data.document.no}
+                        onChange={(e) => setData({
+                          ...data,
+                          document: {
+                            ...data.document,
+                            no: e.target.value
+                          }
+                        })}
+                        InputLabelProps={{
+                          className: "FstoLabelForm-root"
+                        }}
+                        fullWidth
+                      />
+
+                      <TextField
+                        className="FstoTextfieldForm-root"
+                        label="Reference Amount"
+                        variant="outlined"
+                        autoComplete="off"
+                        size="small"
+                        value={data.document.amount}
+                        onChange={(e) => setData({
+                          ...data,
+                          document: {
+                            ...data.document,
+                            amount: parseFloat(e.target.value)
+                          }
+                        })}
+                        InputProps={{
+                          inputComponent: NumberField,
+                        }}
+                        InputLabelProps={{
+                          className: "FstoLabelForm-root"
+                        }}
+                        fullWidth
+                      />
+                    </React.Fragment>
+                  )
                 }
-              })}
-              renderInput={
-                props =>
-                  <TextField
-                    {...props}
-                    className="FstoTextfieldForm-root"
-                    variant="outlined"
-                    size="small"
-                    label="Document Date"
-                    fullWidth
-                  />
-              }
-            />
-          </LocalizationProvider>
 
-          <TextField
-            className="FstoTextfieldForm-root"
-            label="Document Amount"
-            variant="outlined"
-            autoComplete="off"
-            size="small"
-            value={data.document.amount}
-            onChange={(e) => setData({
-              ...data,
-              document: {
-                ...data.document,
-                amount: parseFloat(e.target.value)
-              }
-            })}
-            InputProps={{
-              inputComponent: NumberField,
-            }}
-            InputLabelProps={{
-              className: "FstoLabelForm-root"
-            }}
-            fullWidth
-          />
+                { // Category
+                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4) &&
+                  (
+                    <Autocomplete
+                      className="FstoSelectForm-root"
+                      size="small"
+                      options={CATEGORY_LIST}
+                      value={data.document.category}
+                      renderInput={
+                        props =>
+                          <TextField
+                            {...props}
+                            variant="outlined"
+                            label="Category"
+                          />
+                      }
+                      PaperComponent={
+                        props =>
+                          <Paper
+                            {...props}
+                            sx={{ textTransform: 'capitalize' }}
+                          />
+                      }
+                      getOptionLabel={
+                        option => option.name
+                      }
+                      isOptionEqualToValue={
+                        (option, value) => option.id === value.id
+                      }
+                      onChange={(e, value) => setData({
+                        ...data,
+                        document: {
+                          ...data.document,
+                          category: value
+                        }
+                      })}
+                      fullWidth
+                      disablePortal
+                      disableClearable
+                    />
+                  )}
 
-          <Autocomplete
-            fullWidth
-            disablePortal
-            disableClearable
-            className="FstoSelectForm-root"
-            size="small"
-            options={
-              COMPANY_CHARGING
-                .reduce((unique, o) => {
-                  if (!unique.some(obj => obj.company_name === o.company_name)) unique.push(o)
-                  return unique
-                }, [])
-            }
-            value={
-              Boolean(data.document.company)
-                ? COMPANY_CHARGING
-                  .reduce((unique, o) => {
-                    if (!unique.some(obj => obj.company_name === o.company_name)) unique.push(o)
-                    return unique
-                  }, [])
-                  .find(row => row.company_name === data.document.company)
-                : null
-            }
-            renderInput={
-              props =>
+                { // Payment Date, Coverage Month
+                  (data.document.id === 3) &&
+                  (
+                    <React.Fragment>
+                      <LocalizationProvider dateAdapter={DateAdapter}>
+                        <DatePicker
+                          value={data.document.payment_date}
+                          onChange={(value) => setData({
+                            ...data,
+                            document: {
+                              ...data.document,
+                              payment_date: value
+                            }
+                          })}
+                          renderInput={
+                            props =>
+                              <TextField
+                                {...props}
+                                className="FstoTextfieldForm-root"
+                                variant="outlined"
+                                size="small"
+                                label="Payment Date"
+                                fullWidth
+                              />
+                          }
+                        />
+                      </LocalizationProvider>
+
+                      <Autocomplete
+                        className="FstoSelectForm-root"
+                        size="small"
+                        options={COVERAGE_MONTH}
+                        value={COVERAGE_MONTH.find(row => row.value === data.document.coverage) || null}
+                        renderInput={
+                          props =>
+                            <TextField
+                              {...props}
+                              variant="outlined"
+                              label="Coverage Month"
+                            />
+                        }
+                        PaperComponent={
+                          props =>
+                            <Paper
+                              {...props}
+                              sx={{ textTransform: 'capitalize' }}
+                            />
+                        }
+                        isOptionEqualToValue={
+                          (option, value) => option.id === value.id
+                        }
+                        onChange={(e, value) => setData({
+                          ...data,
+                          document: {
+                            ...data.document,
+                            coverage: value.value
+                          }
+                        })}
+                        fullWidth
+                        disablePortal
+                        disableClearable
+                      />
+                    </React.Fragment>
+                  )}
+
+                { // Utility Category, Utility Location, Account Number, Consumption, SOA Number
+                  (data.document.id === 6) &&
+                  (
+                    <React.Fragment>
+                      <Autocomplete
+                        className="FstoSelectForm-root"
+                        size="small"
+                        options={[]}
+                        value={null}
+                        renderInput={
+                          props =>
+                            <TextField
+                              {...props}
+                              variant="outlined"
+                              label="Utility Category"
+                            />
+                        }
+                        PaperComponent={
+                          props =>
+                            <Paper
+                              {...props}
+                              sx={{ textTransform: 'capitalize' }}
+                            />
+                        }
+                        fullWidth
+                        disablePortal
+                        disableClearable
+                      />
+
+                      <Autocomplete
+                        className="FstoSelectForm-root"
+                        size="small"
+                        options={[]}
+                        value={null}
+                        renderInput={
+                          props =>
+                            <TextField
+                              {...props}
+                              variant="outlined"
+                              label="Utility Location"
+                            />
+                        }
+                        PaperComponent={
+                          props =>
+                            <Paper
+                              {...props}
+                              sx={{ textTransform: 'capitalize' }}
+                            />
+                        }
+                        fullWidth
+                        disablePortal
+                        disableClearable
+                      />
+
+                      <Autocomplete
+                        className="FstoSelectForm-root"
+                        size="small"
+                        options={[]}
+                        value={null}
+                        renderInput={
+                          props =>
+                            <TextField
+                              {...props}
+                              variant="outlined"
+                              label="Account Number"
+                            />
+                        }
+                        PaperComponent={
+                          props =>
+                            <Paper
+                              {...props}
+                              sx={{ textTransform: 'capitalize' }}
+                            />
+                        }
+                        fullWidth
+                        disablePortal
+                        disableClearable
+                      />
+
+                      <TextField
+                        className="FstoTextfieldForm-root"
+                        label="Consumption"
+                        variant="outlined"
+                        autoComplete="off"
+                        size="small"
+                        value={null}
+                        InputProps={{
+                          inputComponent: NumberField,
+                        }}
+                        InputLabelProps={{
+                          className: "FstoLabelForm-root"
+                        }}
+                        fullWidth
+                      />
+
+                      <TextField
+                        className="FstoTextfieldForm-root"
+                        label="SOA Number"
+                        variant="outlined"
+                        autoComplete="off"
+                        size="small"
+                        value={null}
+                        InputProps={{
+                          inputComponent: NumberField,
+                        }}
+                        InputLabelProps={{
+                          className: "FstoLabelForm-root"
+                        }}
+                        fullWidth
+                      />
+                    </React.Fragment>
+                  )}
+
+                { // Payroll Client, Payroll Category, Payroll Type
+                  (data.document.id === 7) &&
+                  (
+                    <React.Fragment>
+                      <Autocomplete
+                        className="FstoSelectForm-root"
+                        size="small"
+                        options={[]}
+                        value={null}
+                        renderInput={
+                          props =>
+                            <TextField
+                              {...props}
+                              variant="outlined"
+                              label="Payroll Client"
+                            />
+                        }
+                        PaperComponent={
+                          props =>
+                            <Paper
+                              {...props}
+                              sx={{ textTransform: 'capitalize' }}
+                            />
+                        }
+                        fullWidth
+                        disablePortal
+                        disableClearable
+                      />
+
+                      <Autocomplete
+                        className="FstoSelectForm-root"
+                        size="small"
+                        options={[]}
+                        value={null}
+                        renderInput={
+                          props =>
+                            <TextField
+                              {...props}
+                              variant="outlined"
+                              label="Payroll Category"
+                            />
+                        }
+                        PaperComponent={
+                          props =>
+                            <Paper
+                              {...props}
+                              sx={{ textTransform: 'capitalize' }}
+                            />
+                        }
+                        fullWidth
+                        disablePortal
+                        disableClearable
+                      />
+
+                      <Autocomplete
+                        className="FstoSelectForm-root"
+                        size="small"
+                        options={[]}
+                        value={null}
+                        renderInput={
+                          props =>
+                            <TextField
+                              {...props}
+                              variant="outlined"
+                              label="Payroll Type"
+                            />
+                        }
+                        PaperComponent={
+                          props =>
+                            <Paper
+                              {...props}
+                              sx={{ textTransform: 'capitalize' }}
+                            />
+                        }
+                        fullWidth
+                        disablePortal
+                        disableClearable
+                      />
+                    </React.Fragment>
+                  )}
+
                 <TextField
-                  {...props}
+                  className="FstoTextfieldForm-root"
+                  label="Remarks (Optional)"
                   variant="outlined"
-                  label="Company"
+                  autoComplete="off"
+                  size="small"
+                  rows={3}
+                  value={data.document.remarks}
+                  onChange={(e) => setData({
+                    ...data,
+                    document: {
+                      ...data.document,
+                      remarks: e.target.value
+                    }
+                  })}
+                  InputLabelProps={{
+                    className: "FstoLabelForm-root"
+                  }}
+                  fullWidth
+                  multiline
                 />
-            }
-            PaperComponent={
-              props =>
-                <Paper
-                  {...props}
-                  sx={{ textTransform: 'capitalize' }}
-                />
-            }
-            getOptionLabel={
-              option => option.company_name
-            }
-            isOptionEqualToValue={
-              (option, value) => option.company_name === value.company_name
-            }
-            onChange={(e, value) => setData({
-              ...data,
-              document: {
-                ...data.document,
-                company: value.company_name,
-                department: "",
-                location: ""
-              }
-            })}
-          />
-
-          <Autocomplete
-            fullWidth
-            disablePortal
-            disableClearable
-            className="FstoSelectForm-root"
-            size="small"
-            options={
-              COMPANY_CHARGING
-                .filter(row => row.company_name === data.document.company)
-                .reduce((unique, o) => {
-                  if (!unique.some(obj => obj.department_name === o.department_name)) unique.push(o)
-                  return unique
-                }, [])
-            }
-            value={
-              Boolean(data.document.department)
-                ? COMPANY_CHARGING
-                  .filter(row => row.company_name === data.document.company)
-                  .reduce((unique, o) => {
-                    if (!unique.some(obj => obj.department_name === o.department_name)) unique.push(o)
-                    return unique
-                  }, [])
-                  .find(row => row.department_name === data.document.department)
-                : null
-            }
-            renderInput={
-              props =>
-                <TextField
-                  {...props}
-                  variant="outlined"
-                  label="Department"
-                />
-            }
-            PaperComponent={
-              props =>
-                <Paper
-                  {...props}
-                  sx={{ textTransform: 'capitalize' }}
-                />
-            }
-            getOptionLabel={
-              option => option.department_name
-            }
-            isOptionEqualToValue={
-              (option, value) => option.department_name === value.department_name
-            }
-            onChange={(e, value) => setData({
-              ...data,
-              document: {
-                ...data.document,
-                department: value.department_name,
-                location: ""
-              }
-            })}
-          />
-
-          <Autocomplete
-            fullWidth
-            disablePortal
-            disableClearable
-            className="FstoSelectForm-root"
-            size="small"
-            options={
-              COMPANY_CHARGING
-                .filter(row => row.company_name === data.document.company && row.department_name === data.document.department)
-                .reduce((unique, o) => {
-                  if (!unique.some(obj => obj.location_name === o.location_name)) unique.push(o)
-                  return unique
-                }, [])
-            }
-            value={
-              Boolean(data.document.location)
-                ? COMPANY_CHARGING
-                  .filter(row => row.company_name === data.document.company && row.department_name === data.document.department)
-                  .reduce((unique, o) => {
-                    if (!unique.some(obj => obj.location_name === o.location_name)) unique.push(o)
-                    return unique
-                  }, [])
-                  .find(row => row.location_name === data.document.location)
-                : null
-            }
-            renderInput={
-              props =>
-                <TextField
-                  {...props}
-                  variant="outlined"
-                  label="Location"
-                />
-            }
-            PaperComponent={
-              props =>
-                <Paper
-                  {...props}
-                  sx={{ textTransform: 'capitalize' }}
-                />
-            }
-            getOptionLabel={
-              option => option.location_name
-            }
-            isOptionEqualToValue={
-              (option, value) => option.location_name === value.location_name
-            }
-            onChange={(e, value) => setData({
-              ...data,
-              document: {
-                ...data.document,
-                location: value.location_name
-              }
-            })}
-          />
-
-          <Autocomplete
-            fullWidth
-            disablePortal
-            disableClearable
-            className="FstoSelectForm-root"
-            size="small"
-            options={SUPPLIER_LIST}
-            value={
-              Boolean(data.document.supplier.id) && Boolean(data.document.supplier.name)
-                ? SUPPLIER_LIST.find(row => row.id === data.document.supplier.id)
-                : null
-            }
-            renderInput={
-              props =>
-                <TextField
-                  {...props}
-                  variant="outlined"
-                  label="Supplier"
-                />
-            }
-            PaperComponent={
-              props =>
-                <Paper
-                  {...props}
-                  sx={{ textTransform: 'capitalize' }}
-                />
-            }
-            getOptionLabel={
-              option => option.name
-            }
-            isOptionEqualToValue={
-              (option, value) => option.name === value.name
-            }
-            onChange={(e, value) => setData({
-              ...data,
-              document: {
-                ...data.document,
-                supplier: {
-                  id: value.id,
-                  name: value.name
-                }
-              }
-            })}
-          />
-
-          <TextField
-            className="FstoTextfieldForm-root"
-            label="Remarks (Optional)"
-            variant="outlined"
-            autoComplete="off"
-            size="small"
-            rows={3}
-            value={data.document.remarks}
-            onChange={(e) => setData({
-              ...data,
-              document: {
-                ...data.document,
-                remarks: e.target.value
-              }
-            })}
-            InputLabelProps={{
-              className: "FstoLabelForm-root"
-            }}
-            fullWidth
-            multiline
-          />
+              </React.Fragment>
+            )
+          }
 
           <LoadingButton
             className="FstoButtonForm-root"
@@ -678,20 +1315,7 @@ const NewRequest = () => {
             loadingPosition="start"
             loading={isSaving}
             startIcon={<></>}
-            // disabled={
-            //   error.status ||
-            //   !Boolean(user.full_id_no) ||
-            //   !Boolean(user.id_no) ||
-            //   !Boolean(user.last_name) ||
-            //   !Boolean(user.first_name) ||
-            //   !Boolean(user.middle_name) ||
-            //   !Boolean(user.department) ||
-            //   !Boolean(user.position) ||
-            //   !Boolean(user.username) ||
-            //   !Boolean(user.role) ||
-            //   !Boolean(user.permissions.length) ||
-            //   ((user.permissions.includes(1) || user.permissions.includes(2)) && !Boolean(user.documents.length))
-            // }
+            disabled={isDisabled()}
             disableElevation
           >
             Save
@@ -709,211 +1333,183 @@ const NewRequest = () => {
         </form>
       </Paper>
 
-      <Paper className="FstoPaperAttachment-root" elevation={1}>
-        <Typography variant="heading" sx={{ display: 'block', marginBottom: 3 }}>Attachment</Typography>
+      {
+        (data.document.id === 1 || data.document.id === 4 || data.document.id === 5) &&
+        (
+          <Paper className="FstoPaperAttachment-root" elevation={1}>
+            <Typography variant="heading" sx={{ display: 'block', marginBottom: 3 }}>Attachment</Typography>
 
-        <Box sx={{ width: "100%", display: "flex", flexDirection: "row", gap: 1, marginBottom: 2 }}>
-          <TextField
-            className="FstoTextfieldForm-attachment"
-            label="P.O. Number"
-            variant="outlined"
-            autoComplete="off"
-            size="small"
-            value={PO.no}
-            onChange={(e) => setPO({
-              ...PO,
-              no: e.target.value
-            })}
-            InputLabelProps={{
-              className: "FstoLabelForm-attachment"
-            }}
-            sx={{
-              minWidth: 230
-            }}
-          />
+            <Box sx={{ width: "100%", display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 1, marginBottom: 2 }}>
+              <TextField
+                className="FstoTextfieldForm-attachment"
+                label="P.O. Number"
+                variant="outlined"
+                autoComplete="off"
+                size="small"
+                value={PO.no}
+                error={
+                  error.status
+                  && Boolean(error.data["po_group.no"])
+                }
+                helperText={
+                  error.status
+                  && error.data["po_group.no"]
+                  && error.data["po_group.no"][0]
+                }
+                onChange={(e) => setPO({
+                  ...PO,
+                  no: e.target.value
+                })}
+                InputLabelProps={{
+                  className: "FstoLabelForm-attachment"
+                }}
+                sx={{
+                  minWidth: 230
+                }}
+              />
 
-          <TextField
-            className="FstoTextfieldForm-attachment"
-            label="P.O. Amount"
-            variant="outlined"
-            autoComplete="off"
-            size="small"
-            value={PO.amount}
-            onChange={(e) => setPO({
-              ...PO,
-              amount: parseFloat(e.target.value),
-              balance: parseFloat(e.target.value)
-            })}
-            InputProps={{
-              inputComponent: NumberField,
-            }}
-            InputLabelProps={{
-              className: "FstoLabelForm-attachment"
-            }}
-            sx={{
-              minWidth: 230
-            }}
-          />
+              <TextField
+                className="FstoTextfieldForm-attachment"
+                label="P.O. Amount"
+                variant="outlined"
+                autoComplete="off"
+                size="small"
+                value={PO.amount}
+                onChange={(e) => setPO({
+                  ...PO,
+                  amount: parseFloat(e.target.value),
+                  balance: parseFloat(e.target.value)
+                })}
+                InputProps={{
+                  inputComponent: NumberField,
+                }}
+                InputLabelProps={{
+                  className: "FstoLabelForm-attachment"
+                }}
+                sx={{
+                  minWidth: 230
+                }}
+              />
 
-          <Autocomplete
-            freeSolo
-            multiple
-            fullWidth
-            disablePortal
-            disableClearable
-            className="FstoSelectForm-attachment"
-            size="small"
-            options={[]}
-            value={PO.rr_no}
-            renderTags={
-              (value, getTagProps) => value.map(
-                (option, index) =>
-                  <Chip
-                    label={option}
-                    variant="outlined"
-                    size="small"
-                    {...getTagProps({ index })}
-                  />
-              )
-            }
-            renderInput={
-              props =>
-                <TextField
-                  {...props}
-                  className="FstoTextfieldForm-attachment"
-                  variant="outlined"
-                  label="R.R. Numbers"
-                  InputLabelProps={{
-                    className: "FstoLabelForm-attachment"
-                  }}
-                />
-            }
-            onChange={(e, value) => setPO({
-              ...PO,
-              rr_no: value
-            })}
-          />
-
-          <Button
-            className="FstoButtonForm-attachment"
-            variant="contained"
-            color="secondary"
-            startIcon={<Add />}
-            onClick={addPurchaseOrderHandler}
-            disabled={
-              !Boolean(PO.no) ||
-              !Boolean(PO.amount) ||
-              !Boolean(PO.balance) ||
-              !Boolean(PO.rr_no.length)
-            }
-            disableElevation
-          >
-            Add
-          </Button>
-        </Box>
-
-        {
-          Boolean(data.po_group.length) &&
-          (
-            <React.Fragment>
-              <Box className="FstoPurchaseOrderBox-root">
-                {
-                  data.po_group?.map(
-                    (data, index) =>
-                      <div className="FstoPurchaseOrder-root" key={index}>
-                        <Stack direction="column" sx={{ flex: "1 1 100%" }}>
-                          <Typography variant="subtitle2">P.O. Number</Typography>
-                          <Typography variant="h6" sx={{ fontWeight: 700 }}>{data.no}</Typography>
-                        </Stack>
-
-                        <Stack direction="column" sx={{ flex: "1 1 100%" }}>
-                          <Typography variant="subtitle2">P.O. Amount</Typography>
-                          <Typography variant="h6" sx={{ fontWeight: 700 }}>&#8369;{data.amount.toLocaleString()}</Typography>
-                        </Stack>
-
-                        <Stack direction="column" sx={{ flex: "1 1 100%" }}>
-                          <Typography variant="subtitle2">P.O. Balance</Typography>
-                          <Typography variant="h6" sx={{ fontWeight: 700 }}>&#8369;{data.balance.toLocaleString()}</Typography>
-                        </Stack>
-
-                        <Stack direction="column" sx={{ flex: "1 1 100%" }}>
-                          <Typography variant="subtitle2">R.R. Number</Typography>
-                          <Typography variant="h6" sx={{ fontWeight: 700 }}>{data.rr_no.join(", ")}</Typography>
-                        </Stack>
-
-                        <Stack direction="row" spacing={1}>
-                          <IconButton onClick={() => updatePurchaseOrderHandler(data)}>
-                            <Edit />
-                          </IconButton>
-                          <IconButton onClick={() => removePurchaseOrderHandler(data)}>
-                            <Delete />
-                          </IconButton>
-                        </Stack>
-                      </div>
+              <Autocomplete
+                className="FstoSelectForm-attachment"
+                size="small"
+                options={[]}
+                value={PO.rr_no}
+                renderTags={
+                  (value, getTagProps) => value.map(
+                    (option, index) =>
+                      <Chip
+                        {...getTagProps({ index })}
+                        className="FstoChipForm-attachment"
+                        label={option}
+                        variant="outlined"
+                        size="small"
+                      />
                   )
                 }
-              </Box>
+                renderInput={
+                  props =>
+                    <TextField
+                      {...props}
+                      className="FstoTextfieldForm-attachment"
+                      variant="outlined"
+                      label="R.R. Numbers"
+                      InputLabelProps={{
+                        className: "FstoLabelForm-attachment"
+                      }}
+                    />
+                }
+                onChange={(e, value) => setPO({
+                  ...PO,
+                  rr_no: value
+                })}
+                freeSolo
+                multiple
+                fullWidth
+                disablePortal
+                disableClearable
+              />
 
-              <Divider variant="middle" sx={{ marginTop: 4, marginBottom: 4 }} />
+              <Button
+                className="FstoButtonForm-attachment"
+                variant="contained"
+                color="secondary"
+                size="large"
+                startIcon={<Add />}
+                onClick={addPurchaseOrderHandler}
+                disabled={
+                  !Boolean(PO.no) ||
+                  !Boolean(PO.amount) ||
+                  !Boolean(PO.balance) ||
+                  !Boolean(PO.rr_no.length)
+                }
+                disableElevation
+              >
+                Add
+              </Button>
+            </Box>
 
-              <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
-                <Typography variant="h6">Total P.O. Amount</Typography>
-                <Typography variant="h6">&#8369;{data.po_group.map((data) => data.amount).reduce((a, b) => a + b).toLocaleString()}</Typography>
-              </Box>
+            {
+              Boolean(data.po_group.length) &&
+              (
+                <React.Fragment>
+                  <Box className="FstoPurchaseOrderBox-root">
+                    {
+                      data.po_group?.map(
+                        (data, index) =>
+                          <div className="FstoPurchaseOrder-root" key={index}>
+                            <Stack direction="column" sx={{ flex: "1 1 100%" }}>
+                              <Typography variant="subtitle2">P.O. Number</Typography>
+                              <Typography variant="h6" sx={{ fontWeight: 700 }}>{data.no}</Typography>
+                            </Stack>
 
-              <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
-                <Typography variant="heading">Total P.O. Balance</Typography>
-                <Typography variant="heading">&#8369;{data.po_group.map((data) => data.balance).reduce((a, b) => a + b).toLocaleString()}</Typography>
-              </Box>
-            </React.Fragment>
-          )
-        }
+                            <Stack direction="column" sx={{ flex: "1 1 100%" }}>
+                              <Typography variant="subtitle2">P.O. Amount</Typography>
+                              <Typography variant="h6" sx={{ fontWeight: 700 }}>&#8369;{data.amount.toLocaleString()}</Typography>
+                            </Stack>
 
-        {/* <Box className="FstoPurchaseOrderBox-root">
-          <div className="FstoPurchaseOrder-root">
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">P.O. Number</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>1001</Typography>
-            </Stack>
+                            <Stack direction="column" sx={{ flex: "1 1 100%" }}>
+                              <Typography variant="subtitle2">P.O. Balance</Typography>
+                              <Typography variant="h6" sx={{ fontWeight: 700 }}>&#8369;{data.balance.toLocaleString()}</Typography>
+                            </Stack>
 
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">P.O. Amount</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>P20,000</Typography>
-            </Stack>
+                            <Stack direction="column" sx={{ flex: "1 1 100%" }}>
+                              <Typography variant="subtitle2">R.R. Number</Typography>
+                              <Typography variant="h6" sx={{ fontWeight: 700 }}>{data.rr_no.join(", ")}</Typography>
+                            </Stack>
 
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">P.O. Balance</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>P20,000</Typography>
-            </Stack>
+                            <Stack direction="row" spacing={1}>
+                              <IconButton onClick={() => updatePurchaseOrderHandler(data)}>
+                                <Edit />
+                              </IconButton>
+                              <IconButton onClick={() => removePurchaseOrderHandler(data)}>
+                                <Delete />
+                              </IconButton>
+                            </Stack>
+                          </div>
+                      )
+                    }
+                  </Box>
 
-            <Stack direction="column" sx={{ flexGrow: 1 }}>
-              <Typography variant="subtitle2">R.R. Number</Typography>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>101, 102</Typography>
-            </Stack>
+                  <Divider variant="middle" sx={{ marginTop: 4, marginBottom: 4 }} />
 
-            <Stack direction="row" spacing={1}>
-              <IconButton>
-                <Edit />
-              </IconButton>
-              <IconButton>
-                <Delete />
-              </IconButton>
-            </Stack>
-          </div>
-        </Box>
+                  <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
+                    <Typography variant="h6">Total P.O. Amount</Typography>
+                    <Typography variant="h6">&#8369;{data.po_group.map((data) => data.amount).reduce((a, b) => a + b).toLocaleString()}</Typography>
+                  </Box>
 
-        <Divider variant="middle" sx={{ marginTop: 4, marginBottom: 4 }} />
+                  <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
+                    <Typography variant="heading">Total P.O. Balance</Typography>
+                    <Typography variant="heading">&#8369;{data.po_group.map((data) => data.balance).reduce((a, b) => a + b).toLocaleString()}</Typography>
+                  </Box>
+                </React.Fragment>
+              )
+            }
+          </Paper>
+        )
+      }
 
-        <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
-          <Typography variant="h6">Total P.O. Amount</Typography>
-          <Typography variant="h6">P20,000.00</Typography>
-        </Box>
-
-        <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
-          <Typography variant="heading">Total P.O. Balance</Typography>
-          <Typography variant="heading">P20,000.00</Typography>
-        </Box> */}
-      </Paper>
 
       <Confirm
         open={confirm.show}

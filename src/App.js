@@ -44,7 +44,12 @@ import TaggingRequest from './routes/requestor/TaggingRequest'
 import NewRequest from './routes/requestor/NewRequest'
 
 
+import { QueryClient, QueryClientProvider } from 'react-query'
+
 import Sandbox from './Sandbox'
+
+// Create a client
+const queryClient = new QueryClient()
 
 
 const App = () => {
@@ -135,9 +140,11 @@ const App = () => {
             exact
             path="/sandbox"
             element={
-              <FistoProvider>
-                <Sandbox />
-              </FistoProvider>
+              <QueryClientProvider client={queryClient}>
+                <FistoProvider>
+                  <Sandbox />
+                </FistoProvider>
+              </QueryClientProvider>
             }
           />
           <Route

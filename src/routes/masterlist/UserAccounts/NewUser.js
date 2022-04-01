@@ -79,14 +79,6 @@ const NewUser = () => {
         name: "Creation of Voucher"
       },
       {
-        id: 14,
-        name: "Checking of Voucher"
-      },
-      {
-        id: 19,
-        name: "Distributing of Document"
-      },
-      {
         id: 20,
         name: "Tagging of Document"
       },
@@ -371,6 +363,11 @@ const NewUser = () => {
   const userSelectHandler = async (e, value) => {
     setUserRaw(value)
     setIsValidating(true)
+    setError({
+      status: false,
+      field: null,
+      message: null
+    })
 
     if (value === null) {
       formClearHandler()
@@ -443,32 +440,34 @@ const NewUser = () => {
       message: ""
     })
 
-    try {
-      await axios.post(`/api/users/username-validation`, {
-        username: e.target.value
-      })
-    }
-    catch (error) {
-      if (error.request.status === 409) {
-        const {
-          message,
-          result: { error_field }
-        } = error.response.data
-
-        setError({
-          status: true,
-          field: error_field,
-          message: message
+    if (e.target.value) {
+      try {
+        await axios.post(`/api/users/username-validation`, {
+          username: e.target.value
         })
       }
+      catch (error) {
+        if (error.request.status === 409) {
+          const {
+            message,
+            result: { error_field }
+          } = error.response.data
 
-      if (error.request.status !== 409) {
-        setToast({
-          show: true,
-          title: "Error",
-          message: "Something went wrong whilst validating username.",
-          severity: "error"
-        })
+          setError({
+            status: true,
+            field: error_field,
+            message: message
+          })
+        }
+
+        if (error.request.status !== 409) {
+          setToast({
+            show: true,
+            title: "Error",
+            message: "Something went wrong whilst validating username.",
+            severity: "error"
+          })
+        }
       }
     }
   }
@@ -805,26 +804,6 @@ const NewUser = () => {
                 <FormGroup row={true} sx={{ padding: '10px 35px' }}>
                   {
                     permissions.AP.map((perm, index) => (
-                      <FormControlLabel
-                        className="FstoCheckboxLabel-root"
-                        key={index}
-                        label={perm.name}
-                        sx={{ width: '50%', margin: 0 }}
-                        control={
-                          <Checkbox size="small" sx={{ padding: '7px' }} value={perm.id} onChange={permissionsCheckboxHandler} />
-                        }
-                        disableTypography
-                      />
-                    ))
-                  }
-                </FormGroup>
-              </FormControl>
-
-              <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
-                <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>General Accounting Services</FormLabel>
-                <FormGroup row={true} sx={{ padding: '10px 35px' }}>
-                  {
-                    permissions.GAS.map((perm, index) => (
                       <FormControlLabel
                         className="FstoCheckboxLabel-root"
                         key={index}

@@ -125,7 +125,7 @@ const Sidebar = () => {
               <RouterLink className="FstoLink-root" to="">User Accounts</RouterLink>
               <RouterLink className="FstoLink-root" to="categories">Categories</RouterLink>
               <RouterLink className="FstoLink-root" to="document-types">Document Types</RouterLink>
-              <RouterLink className="FstoLink-root" to="companies">Comapnies</RouterLink>
+              <RouterLink className="FstoLink-root" to="companies">Companies</RouterLink>
               <RouterLink className="FstoLink-root" to="departments">Departments</RouterLink>
               <RouterLink className="FstoLink-root" to="locations">Locations</RouterLink>
               <RouterLink className="FstoLink-root" to="references">References</RouterLink>

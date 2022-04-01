@@ -74,14 +74,6 @@ const UpdateUser = () => {
         name: "Creation of Voucher"
       },
       {
-        id: 14,
-        name: "Checking of Voucher"
-      },
-      {
-        id: 19,
-        name: "Distributing of Document"
-      },
-      {
         id: 20,
         name: "Tagging of Document"
       },
@@ -629,26 +621,6 @@ const UpdateUser = () => {
             <FormGroup row={true} sx={{ padding: '10px 35px' }}>
               {
                 permissions.AP.map((perm, index) => (
-                  <FormControlLabel
-                    className="FstoCheckboxLabel-root"
-                    key={index}
-                    label={perm.name}
-                    sx={{ width: '50%', margin: 0 }}
-                    control={
-                      <Checkbox size="small" sx={{ padding: '7px' }} value={perm.id} onChange={permissionsCheckboxHandler} checked={user.permissions.includes(perm.id)} />
-                    }
-                    disableTypography
-                  />
-                ))
-              }
-            </FormGroup>
-          </FormControl>
-
-          <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }} disabled={isFetching}>
-            <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>General Accounting Services</FormLabel>
-            <FormGroup row={true} sx={{ padding: '10px 35px' }}>
-              {
-                permissions.GAS.map((perm, index) => (
                   <FormControlLabel
                     className="FstoCheckboxLabel-root"
                     key={index}
