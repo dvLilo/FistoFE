@@ -1,6 +1,8 @@
 import React from 'react'
-// eslint-disable-next-line
+
 import axios from 'axios'
+
+import { Link } from 'react-router-dom'
 
 import NumberFormat from 'react-number-format'
 
@@ -14,13 +16,7 @@ import {
   Chip,
   Stack,
   IconButton,
-  Divider,
-
-  // FormControlLabel,
-  // FormControl,
-  // FormLabel,
-  // FormGroup,
-  // Checkbox
+  Divider
 } from '@mui/material'
 
 import {
@@ -34,56 +30,43 @@ import DateAdapter from '@mui/lab/AdapterDateFns'
 // eslint-disable-next-line
 import { createFilterOptions } from '@mui/material/Autocomplete';
 
-import Confirm from '../../components/Confirm'
+import useToast from '../../hooks/useToast'
+import useConfirm from '../../hooks/useConfirm'
 
-// import useToast from '../../hooks/useToast'
-
-
-const DOCUMENT_TYPES = [
-  {
-    id: 1,
-    type: "PAD"
-  },
-  {
-    id: 2,
-    type: "PRM Common"
-  },
-  {
-    id: 3,
-    type: "PRM Multiple"
-  },
-  {
-    id: 4,
-    type: "Receipt"
-  },
-  {
-    id: 5,
-    type: "Contractor's Billing"
-  },
-  {
-    id: 6,
-    type: "Utilities"
-  },
-  {
-    id: 7,
-    type: "Payroll"
-  },
-  {
-    id: 8,
-    type: "PCF"
-  },
-]
-
-const PAYMENT_TYPES = [
-  {
-    id: 1,
-    label: "Full"
-  },
-  {
-    id: 2,
-    label: "Partial"
-  },
-]
+// const DOCUMENT_TYPES = [
+//   {
+//     id: 1,
+//     type: "PAD"
+//   },
+//   {
+//     id: 2,
+//     type: "PRM Common"
+//   },
+//   {
+//     id: 3,
+//     type: "PRM Multiple"
+//   },
+//   {
+//     id: 4,
+//     type: "Receipt"
+//   },
+//   {
+//     id: 5,
+//     type: "Contractor's Billing"
+//   },
+//   {
+//     id: 6,
+//     type: "Utilities"
+//   },
+//   {
+//     id: 7,
+//     type: "Payroll"
+//   },
+//   {
+//     id: 8,
+//     type: "PCF"
+//   },
+// ]
 
 // const COMPANY_CHARGING = [
 //   {
@@ -133,74 +116,85 @@ const PAYMENT_TYPES = [
 //   }
 // ]
 
-const COMPANY_LIST = [
-  {
-    id: 1,
-    name: "RDF Corporate Services"
-  },
-  {
-    id: 2,
-    name: "Fresh Option"
-  },
-]
+// const COMPANY_LIST = [
+//   {
+//     id: 1,
+//     name: "RDF Corporate Services"
+//   },
+//   {
+//     id: 2,
+//     name: "Fresh Option"
+//   },
+// ]
 
-const DEPARTMENT_LIST = [
-  {
-    id: 1,
-    name: "Management Information System Common"
-  },
-  {
-    id: 2,
-    name: "Human Resources Common"
-  }
-]
+// const DEPARTMENT_LIST = [
+//   {
+//     id: 1,
+//     name: "Management Information System Common"
+//   },
+//   {
+//     id: 2,
+//     name: "Human Resources Common"
+//   }
+// ]
 
-const LOCATION_LIST = [
-  {
-    id: 1,
-    name: "Common"
-  },
-  {
-    id: 2,
-    name: "Head Office"
-  },
-]
+// const LOCATION_LIST = [
+//   {
+//     id: 1,
+//     name: "Common"
+//   },
+//   {
+//     id: 2,
+//     name: "Head Office"
+//   },
+// ]
 
-const SUPPLIER_LIST = [
-  {
-    id: 1,
-    name: "1ST ADVENUE ADVERTISING"
-  },
-  {
-    id: 2,
-    name: "PELCO I"
-  },
-  {
-    id: 3,
-    name: "PELCO II"
-  },
-  {
-    id: 4,
-    name: "PELCO III"
-  },
-]
+// const SUPPLIER_LIST = [
+//   {
+//     id: 1,
+//     name: "1ST ADVENUE ADVERTISING"
+//   },
+//   {
+//     id: 2,
+//     name: "PELCO I"
+//   },
+//   {
+//     id: 3,
+//     name: "PELCO II"
+//   },
+//   {
+//     id: 4,
+//     name: "PELCO III"
+//   },
+// ]
 
-const CATEGORY_LIST = [
+// const CATEGORY_LIST = [
+//   {
+//     id: 1,
+//     name: "general"
+//   },
+//   {
+//     id: 2,
+//     name: "rentals"
+//   },
+//   {
+//     id: 3,
+//     name: "loans"
+//   },
+//   {
+//     id: 4,
+//     name: "leasings"
+//   },
+// ]
+
+const PAYMENT_TYPES = [
   {
     id: 1,
-    name: "general"
+    label: "Full"
   },
   {
     id: 2,
-    name: "rentals"
-  },
-  {
-    id: 3,
-    name: "loans"
-  },
-  {
-    id: 4,
-    name: "leasings"
+    label: "Partial"
   },
 ]
 
@@ -259,87 +253,28 @@ const NumberField = React.forwardRef(function NumberField(props, ref) {
 
 const NewRequest = () => {
 
-  // const toast = useToast()
+  const toast = useToast()
+  const confirm = useConfirm()
 
-  // eslint-disable-next-line
   const [isSaving, setIsSaving] = React.useState(false)
 
-  const [confirm, setConfirm] = React.useState({
-    show: false,
-    loading: false,
-    onConfirm: () => { }
-  })
-
-  // const [charging, setCharging] = React.useState([])
-
-
-
-  const isDisabled = () => {
-    switch (data.document.id) {
-      case 1:
-        return data.document.payment_type
-          && data.document.no
-          && data.document.date
-          && data.document.amount
-          && data.document.company
-          && data.document.department
-          && data.document.location
-          && data.document.supplier
-          && data.document.category
-          // && data.po_group.length
-          && data.document.amount === data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
-          ? false : true
-
-      case 2:
-        return data.document.payment_type
-          && data.document.no
-          && data.document.date
-          && data.document.amount
-          && data.document.company
-          && data.document.department
-          && data.document.location
-          && data.document.supplier
-          && data.document.category
-          ? false : true
-
-      case 3:
-        return data.document.payment_type
-          && data.document.no
-          && data.document.date
-          && data.document.amount
-          && data.document.company
-          && data.document.department
-          && data.document.location
-          && data.document.supplier
-          && data.document.category
-          ? false : true
-
-      default:
-        return true
-    }
-  }
-  // eslint-disable-next-line
   const [error, setError] = React.useState({
-    status: true,
-    data: {
-      "po_group.no": [
-        "PO number already exist."
-      ]
-    }
+    status: false,
+    data: []
   })
 
   const [data, setData] = React.useState({
     requestor: {
-      id: 1,
-      id_prefix: "RDFFLFI",
-      id_no: 10791,
-      first_name: "Limay Louie",
-      middle_name: "Ocampo",
-      last_name: "Ducut",
+      id: null,
+      id_prefix: null,
+      id_no: null,
+      first_name: null,
+      middle_name: null,
+      last_name: null,
       suffix: null,
-      role: "Administrator",
-      position: "System Developer",
-      department: "Management Information System",
+      role: null,
+      position: null,
+      department: null,
     },
 
     document: {
@@ -361,6 +296,16 @@ const NewRequest = () => {
 
       supplier: null,
 
+      utility_category: null,
+      utility_location: null,
+
+      from: null,
+      to: null,
+
+      receipt_no: "",
+      account_no: null,
+      consumption: "",
+
       remarks: undefined
     },
 
@@ -368,49 +313,194 @@ const NewRequest = () => {
   })
 
   const [PO, setPO] = React.useState({
+    update: false,
+    index: null,
+
     no: "",
     balance: null,
     amount: null,
     rr_no: []
   })
 
-  // React.useEffect(() => {
-  //   (async () => {
-  //     let response
-  //     try {
-  //       response = await axios.get(`http://localhost:5000/charging`).then(JSON => JSON.data)
+  const [DOCUMENT_TYPES, setDocumentTypes] = React.useState([])
+  React.useEffect(() => {
+    (async () => {
+      let response
+      try {
+        response = await axios.get(`/api/dropdown/current-user`)
 
-  //       setCharging(response.length ? response : [])
-  //     }
-  //     catch (error) {
-  //       if (error.request.status !== 404) {
-  //         toast({
-  //           open: true,
-  //           title: "Error",
-  //           message: "Something went wrong whilst fetching list of companies, departments and locations from Sedar.",
-  //           severity: "error"
-  //         })
-  //       }
+        const { id, id_prefix, id_no, first_name, middle_name, last_name, suffix, role, position, department, document_types } = response.data.result
 
-  //       console.log("Fisto Error Status", error.request)
-  //     }
-  //   })()
-  // }, [])
+        setDocumentTypes(document_types)
+        setData(currentValue => ({
+          ...currentValue,
+          requestor: {
+            id,
+            id_prefix,
+            id_no,
+            first_name,
+            middle_name,
+            last_name,
+            suffix,
+            role,
+            position,
+            department
+          }
+        }))
+      }
+      catch (error) {
+        console.log("Fisto Error Status", error.request)
+      }
+    })()
+  }, [])
+
+  const [COMPANY_CHARGING, setCompanyCharging] = React.useState([])
+  React.useEffect(() => {
+    (async () => {
+      let response
+      try {
+        response = await axios.get(`/api/dropdown/charging`)
+
+        const { companies } = response.data.result
+
+        setCompanyCharging(companies)
+      }
+      catch (error) {
+        console.log("Fisto Error Status", error.request)
+      }
+    })()
+  }, [])
+
+  const [SUPPLIER_LIST, setSupplierList] = React.useState([])
+  React.useEffect(() => {
+    (async () => {
+      let response
+      try {
+        response = await axios.get(`/api/dropdown/supplier?status=1&paginate=0`)
+
+        const { suppliers } = response.data.result
+
+        setSupplierList(suppliers)
+      }
+      catch (error) {
+        console.log("Fisto Error Status", error.request)
+      }
+    })()
+  }, [])
+
+
+  React.useEffect(() => {
+    checkPurchaseOrderHandler()
+
+    // eslint-disable-next-line
+  }, [data.document.payment_type, data.document.company])
+
+  const isDisabled = () => {
+    switch (data.document.id) {
+      case 1:
+      case 5:
+        return data.document.payment_type
+          && data.document.no
+          && data.document.date
+          && data.document.amount
+          && data.document.company
+          && data.document.department
+          && data.document.location
+          && data.document.supplier
+          && data.document.category
+          && data.po_group.length
+          && (data.document.amount === data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0))
+          && (!error.status || !Boolean(error.data.document_no))
+          ? false : true
+
+      case 2: // PRM Common - Payment Request Memo Common
+        return data.document.payment_type
+          && data.document.no
+          && data.document.date
+          && data.document.amount
+          && data.document.company
+          && data.document.department
+          && data.document.location
+          && data.document.supplier
+          && data.document.category
+          && (!error.status || !Boolean(error.data.document_no))
+          ? false : true
+
+      case 3:
+        return data.document.payment_type
+          && data.document.no
+          && data.document.date
+          && data.document.amount
+          && data.document.company
+          && data.document.department
+          && data.document.location
+          && data.document.supplier
+          && data.document.category
+          ? false : true
+
+      default:
+        return true
+    }
+  }
+
+  const checkDocumentNumberHandler = async (e) => {
+    if (error.status && error.data.document_no) {
+      delete error.data.document_no
+      setError(currentValue => ({
+        ...currentValue,
+        data: error.data
+      }))
+    }
+
+    if (!data.document.no) return
+
+    try {
+      await axios.post(`/api/transactions/validate-document-no`, {
+        document_no: data.document.no
+      })
+    }
+    catch (error) {
+      if (error.request.status === 422) {
+        const { errors } = error.response.data
+
+        setError(currentValue => ({
+          status: true,
+          data: {
+            ...currentValue.data,
+            document_no: errors["document.no"]
+          }
+        }))
+      }
+    }
+  }
 
   const addPurchaseOrderHandler = () => {
     const check = data.po_group.some((data) => data.no === PO.no)
-    if (check) return
+    if (check && !PO.update) return
 
-    // ask if posible bang marepeat ang rr no to diff po no
-
-
-    setData({
+    if (PO.update) data.po_group.splice(PO.index, 1, {
+      no: PO.no,
+      balance: PO.balance,
+      amount: PO.amount,
+      rr_no: PO.rr_no
+    })
+    else setData({
       ...data,
       po_group: [
-        ...data.po_group, PO
+        ...data.po_group,
+        {
+          no: PO.no,
+          balance: PO.balance,
+          amount: PO.amount,
+          rr_no: PO.rr_no
+        }
       ]
     })
+
     setPO({
+      index: null,
+      update: false,
+
       no: "",
       balance: NaN,
       amount: NaN,
@@ -418,10 +508,78 @@ const NewRequest = () => {
     })
   }
 
-  const updatePurchaseOrderHandler = (props) => {
+  const checkPurchaseOrderHandler = async (e) => {
+    if (error.status && error.data.po_no) {
+      delete error.data.po_no
+      setError(currentValue => ({
+        ...currentValue,
+        data: error.data
+      }))
+    }
+
+    if (PO.no && (!data.document.payment_type || !data.document.company))
+      setError({
+        status: true,
+        data: {
+          ...error.data,
+          "po_no": [
+            "Payment type and company is required."
+          ]
+        }
+      })
+
+    if (!PO.no || !data.document.payment_type || !data.document.company) return
+
+    let response
+    try {
+      response = await axios.post(`/api/transactions/validate-po-no`, {
+        payment_type: data.document.payment_type,
+        company_id: data.document.company.id,
+        po_no: PO.no
+      })
+
+      if (response.status === 204) {
+        const check = data.po_group.some((data) => data.no === PO.no)
+        if (check && !PO.update)
+          setError({
+            status: true,
+            data: {
+              ...error.data,
+              "po_no": [
+                "PO number already in the list."
+              ]
+            }
+          })
+      }
+    }
+    catch (error) {
+      if (error.request.status === 422) {
+        const { errors } = error.response.data
+
+        setError(currentValue => ({
+          status: true,
+          data: {
+            ...currentValue.data,
+            po_no: errors["po_group.no"]
+          }
+        }))
+      }
+    }
+  }
+
+  const updatePurchaseOrderHandler = (index, props) => {
     const { no, amount, balance, rr_no } = props
 
+    delete error.data.po_no
+    setError({
+      ...error,
+      data: error.data
+    })
+
     setPO({
+      update: true,
+      index,
+
       no,
       amount,
       balance,
@@ -438,12 +596,227 @@ const NewRequest = () => {
     })
   }
 
+  const filterOptions = createFilterOptions({
+    matchFrom: 'any',
+    limit: 100
+  })
+
+  const transformData = (ID) => {
+    switch (ID) {
+      case 1: // PAD - Post Acquisition Delivery
+        return {
+          requestor: data.requestor,
+          document: {
+            id: data.document.id,
+            no: data.document.no,
+            name: data.document.name,
+            payment_type: data.document.payment_type,
+            amount: data.document.amount,
+            date: data.document.date,
+
+            company: data.document.company,
+            department: data.document.department,
+            location: data.document.location,
+            supplier: data.document.supplier,
+            category: data.document.category,
+
+            remarks: data.document.remarks
+          },
+          po_group: data.po_group
+        }
+
+      case 2: // PRM Common - Payment Request Memo Common
+        return {
+          requestor: data.requestor,
+          document: {
+            id: data.document.id,
+            no: data.document.no,
+            name: data.document.name,
+            payment_type: data.document.payment_type,
+            amount: data.document.amount,
+            date: data.document.date,
+
+            company: data.document.company,
+            department: data.document.department,
+            location: data.document.location,
+            supplier: data.document.supplier,
+            category: data.document.category,
+
+            remarks: data.document.remarks
+          }
+        }
+
+      case 3: // PRM Multiple - Payment Request Memo Multiple
+        return {}
+
+      case 4: // Receipt
+        return {}
+
+      case 5: // Contractor's Billing
+        return {
+          requestor: data.requestor,
+          document: {
+            id: data.document.id,
+            no: data.document.no,
+            name: data.document.name,
+            payment_type: data.document.payment_type,
+            amount: data.document.amount,
+            date: data.document.date,
+
+            company: data.document.company,
+            department: data.document.department,
+            location: data.document.location,
+            supplier: data.document.supplier,
+            category: data.document.category,
+
+            remarks: data.document.remarks
+          },
+          po_group: data.po_group
+        }
+
+      case 6: // Utilities
+        return {
+          requestor: data.requestor,
+          document: {
+            id: data.document.id,
+            name: data.document.name,
+            payment_type: data.document.payment_type,
+            amount: data.document.amount,
+
+            company: data.document.company,
+            department: data.document.department,
+            location: data.document.location,
+
+            supplier: data.document.supplier,
+
+            from: data.document.from,
+            to: data.document.to,
+
+            utility_category: data.document.utility_category,
+            utility_location: data.document.utility_location,
+            account_no: data.document.account_no,
+
+            receipt_no: data.document.receipt_no,
+            consumption: data.document.consumption,
+
+            remarks: data.document.remarks
+          }
+        }
+
+      default:
+        return {}
+    }
+  }
+
+  const truncateData = () => {
+    setError({
+      status: false,
+      data: []
+    })
+
+    setPO({
+      update: false,
+      index: null,
+
+      no: "",
+      balance: null,
+      amount: null,
+      rr_no: []
+    })
+
+    setData(currentValue => ({
+      ...currentValue,
+
+      document: {
+        id: null,
+        name: "",
+        payment_type: "",
+        no: "",
+        date: null,
+        amount: null,
+
+        payment_date: null,
+        coverage: null,
+
+        category: null,
+
+        company: null,
+        department: null,
+        location: null,
+
+        supplier: null,
+
+        utility_category: null,
+        utility_location: null,
+
+        from: null,
+        to: null,
+
+        receipt_no: "",
+        account_no: null,
+        consumption: "",
+
+        remarks: undefined
+      },
+
+      po_group: []
+    }))
+  }
+
+  const submitTransactionHandler = (e) => {
+    e.preventDefault()
+
+    confirm({
+      open: true,
+      onConfirm: async () => {
+        setIsSaving(true)
+
+        let response
+        try {
+          response = await axios.post(`/api/transactions`, transformData(data.document.id))
+
+          const { message } = response.data
+
+          truncateData()
+          toast({
+            message,
+            open: true,
+            severity: "success",
+            title: "Success!"
+          })
+        }
+        catch (error) {
+          if (error.request.status === 422) {
+            const { errors } = error.response.data
+
+            setError(currentValue => ({
+              status: true,
+              data: {
+                ...currentValue.data,
+                document_no: errors["document.no"]
+              }
+            }))
+
+            toast({
+              open: true,
+              severity: "error",
+              title: "Error!",
+              message: "Transaction failed. Please try again."
+            })
+          }
+        }
+
+        setIsSaving(false)
+      }
+    })
+  }
+
   return (
     <Box className="FstoBox-root">
       <Paper className="FstoPaperForm-root" elevation={1}>
         <Typography variant="heading" sx={{ display: 'block', marginBottom: 3 }}>Request for Tagging</Typography>
 
-        <form>
+        <form onSubmit={submitTransactionHandler}>
           <Autocomplete
             className="FstoSelectForm-root"
             size="small"
@@ -608,12 +981,12 @@ const NewRequest = () => {
                     <React.Fragment>
                       <LocalizationProvider dateAdapter={DateAdapter}>
                         <DatePicker
-                          value={data.document.date}
+                          value={data.document.from}
                           onChange={(value) => setData({
                             ...data,
                             document: {
                               ...data.document,
-                              date: new Date(value).toISOString().slice(0, 10)
+                              from: new Date(value).toISOString().slice(0, 10)
                             }
                           })}
                           renderInput={
@@ -632,12 +1005,12 @@ const NewRequest = () => {
 
                       <LocalizationProvider dateAdapter={DateAdapter}>
                         <DatePicker
-                          value={data.document.date}
+                          value={data.document.to}
                           onChange={(value) => setData({
                             ...data,
                             document: {
                               ...data.document,
-                              date: new Date(value).toISOString().slice(0, 10)
+                              to: new Date(value).toISOString().slice(0, 10)
                             }
                           })}
                           renderInput={
@@ -668,12 +1041,12 @@ const NewRequest = () => {
                       value={data.document.no}
                       error={
                         error.status
-                        && Boolean(error.data["document.no"])
+                        && Boolean(error.data.document_no)
                       }
                       helperText={
                         error.status
-                        && error.data["document.no"]
-                        && error.data["document.no"][0]
+                        && error.data.document_no
+                        && error.data.document_no[0]
                       }
                       onChange={(e) => setData({
                         ...data,
@@ -682,6 +1055,7 @@ const NewRequest = () => {
                           no: e.target.value
                         }
                       })}
+                      onBlur={checkDocumentNumberHandler}
                       InputLabelProps={{
                         className: "FstoLabelForm-root"
                       }}
@@ -710,6 +1084,7 @@ const NewRequest = () => {
                               variant="outlined"
                               size="small"
                               label="Document Date"
+                              autoComplete="off"
                               fullWidth
                             />
                         }
@@ -758,7 +1133,7 @@ const NewRequest = () => {
                 <Autocomplete
                   className="FstoSelectForm-root"
                   size="small"
-                  options={COMPANY_LIST}
+                  options={COMPANY_CHARGING}
                   value={data.document.company}
                   renderInput={
                     props =>
@@ -785,7 +1160,9 @@ const NewRequest = () => {
                     ...data,
                     document: {
                       ...data.document,
-                      company: value
+                      company: { id: value.id, name: value.name },
+                      department: null,
+                      location: null
                     }
                   })}
                   fullWidth
@@ -796,7 +1173,8 @@ const NewRequest = () => {
                 <Autocomplete
                   className="FstoSelectForm-root"
                   size="small"
-                  options={DEPARTMENT_LIST}
+                  filterOptions={filterOptions}
+                  options={data.document.company ? COMPANY_CHARGING.find(row => row.id === data.document.company.id).departments : []}
                   value={data.document.department}
                   renderInput={
                     props =>
@@ -834,7 +1212,8 @@ const NewRequest = () => {
                 <Autocomplete
                   className="FstoSelectForm-root"
                   size="small"
-                  options={LOCATION_LIST}
+                  filterOptions={filterOptions}
+                  options={data.document.company ? COMPANY_CHARGING.find(row => row.id === data.document.company.id).locations : []}
                   value={data.document.location}
                   renderInput={
                     props =>
@@ -872,6 +1251,7 @@ const NewRequest = () => {
                 <Autocomplete
                   className="FstoSelectForm-root"
                   size="small"
+                  filterOptions={filterOptions}
                   options={SUPPLIER_LIST}
                   value={data.document.supplier}
                   renderInput={
@@ -983,12 +1363,13 @@ const NewRequest = () => {
                 }
 
                 { // Category
-                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4) &&
+                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4 || data.document.id === 5) &&
                   (
                     <Autocomplete
                       className="FstoSelectForm-root"
                       size="small"
-                      options={CATEGORY_LIST}
+                      filterOptions={filterOptions}
+                      options={DOCUMENT_TYPES.find(type => type.id === data.document.id).categories}
                       value={data.document.category}
                       renderInput={
                         props =>
@@ -1097,7 +1478,7 @@ const NewRequest = () => {
                         className="FstoSelectForm-root"
                         size="small"
                         options={[]}
-                        value={null}
+                        value={data.document.utility_category}
                         renderInput={
                           props =>
                             <TextField
@@ -1174,10 +1555,14 @@ const NewRequest = () => {
                         variant="outlined"
                         autoComplete="off"
                         size="small"
-                        value={null}
-                        InputProps={{
-                          inputComponent: NumberField,
-                        }}
+                        value={data.document.consumption}
+                        onChange={(e) => setData({
+                          ...data,
+                          document: {
+                            ...data.document,
+                            consumption: e.target.value
+                          }
+                        })}
                         InputLabelProps={{
                           className: "FstoLabelForm-root"
                         }}
@@ -1190,10 +1575,14 @@ const NewRequest = () => {
                         variant="outlined"
                         autoComplete="off"
                         size="small"
-                        value={null}
-                        InputProps={{
-                          inputComponent: NumberField,
-                        }}
+                        value={data.document.receipt_no}
+                        onChange={(e) => setData({
+                          ...data,
+                          document: {
+                            ...data.document,
+                            receipt_no: e.target.value
+                          }
+                        })}
                         InputLabelProps={{
                           className: "FstoLabelForm-root"
                         }}
@@ -1321,15 +1710,28 @@ const NewRequest = () => {
             Save
           </LoadingButton>
 
-          <Button
-            className="FstoButtonForm-root"
-            variant="outlined"
-            color="error"
-            // onClick={formClearHandler}
-            disableElevation
-          >
-            Clear
-          </Button>
+          {
+            data.document.id
+              ? <Button
+                className="FstoButtonForm-root"
+                variant="outlined"
+                color="error"
+                onClick={truncateData}
+                disableElevation
+              >
+                Clear
+              </Button>
+              : <Button
+                className="FstoButtonForm-root"
+                variant="outlined"
+                color="error"
+                to="/requestor"
+                component={Link}
+                disableElevation
+              >
+                Back
+              </Button>
+          }
         </form>
       </Paper>
 
@@ -1349,13 +1751,14 @@ const NewRequest = () => {
                 value={PO.no}
                 error={
                   error.status
-                  && Boolean(error.data["po_group.no"])
+                  && Boolean(error.data.po_no)
                 }
                 helperText={
                   error.status
-                  && error.data["po_group.no"]
-                  && error.data["po_group.no"][0]
+                  && error.data.po_no
+                  && error.data.po_no[0]
                 }
+                onBlur={checkPurchaseOrderHandler}
                 onChange={(e) => setPO({
                   ...PO,
                   no: e.target.value
@@ -1439,6 +1842,7 @@ const NewRequest = () => {
                 startIcon={<Add />}
                 onClick={addPurchaseOrderHandler}
                 disabled={
+                  (error.status && Boolean(error.data.po_no)) ||
                   !Boolean(PO.no) ||
                   !Boolean(PO.amount) ||
                   !Boolean(PO.balance) ||
@@ -1480,7 +1884,7 @@ const NewRequest = () => {
                             </Stack>
 
                             <Stack direction="row" spacing={1}>
-                              <IconButton onClick={() => updatePurchaseOrderHandler(data)}>
+                              <IconButton onClick={() => updatePurchaseOrderHandler(index, data)}>
                                 <Edit />
                               </IconButton>
                               <IconButton onClick={() => removePurchaseOrderHandler(data)}>
@@ -1509,18 +1913,6 @@ const NewRequest = () => {
           </Paper>
         )
       }
-
-
-      <Confirm
-        open={confirm.show}
-        isLoading={confirm.loading}
-        onConfirm={confirm.onConfirm}
-        onClose={() => setConfirm({
-          show: false,
-          loading: false,
-          onConfirm: () => { }
-        })}
-      />
     </Box>
   )
 }

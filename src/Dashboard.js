@@ -11,7 +11,7 @@ import Sidebar from './components/Sidebar'
 
 const Dashboard = () => {
   return (
-    <>
+    <React.Fragment>
       <Sidebar />
       <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, minHeight: '100vh' }}>
         <Navbar />
@@ -19,7 +19,7 @@ const Dashboard = () => {
           <Outlet />
         </FistoProvider>
       </Box>
-    </>
+    </React.Fragment>
   )
 }
 

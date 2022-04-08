@@ -42,58 +42,20 @@ import {
 import {
   Search,
   Close,
-  Add,
-
-  // MoreHoriz as More,
-  // VisibilityOutlined as Visibility,
-  // EditOutlined as Edit,
-  // ArchiveOutlined as Archive,
-  // RestoreOutlined as Restore,
-
-  // WarningAmberRounded as Caution
+  Add
 } from '@mui/icons-material'
 
-import Toast from '../../components/Toast'
-import Confirm from '../../components/Confirm'
 import Preloader from '../../components/Preloader'
+import TaggingRequestActions from './TaggingRequestActions'
+
+import useTransaction from '../../hooks/useTransaction'
 
 const TaggingRequest = () => {
-  // eslint-disable-next-line
-  const [isFetching, setIsFetching] = React.useState(false)
 
-  const [isSearching, setIsSearching] = React.useState({
-    status: false,
-    keyword: ""
-  })
+  const { status, data, searchData, changeStatus, changePage, changeRows } = useTransaction("/api/transactions")
 
-  const [toast, setToast] = React.useState({
-    show: false,
-    title: null,
-    message: null
-  })
-
-  const [confirm, setConfirm] = React.useState({
-    show: false,
-    loading: false,
-    onConfirm: () => { }
-  })
-
-  // Transaction Array
-  // eslint-disable-next-line
-  const [transactions, setTransactions] = React.useState(null)
-
-  // Pagination Object
-  // eslint-disable-next-line
-  const [pagination, setPagination] = React.useState(null)
-
-  const [value, setValue] = React.useState("request")
-
-
-  const searchCloseHandler = () => { }
-  const searchSubmitHandler = () => { }
-  const pageChangeHandler = () => { }
-  const rowChangeHandler = () => { }
-
+  const [state, setState] = React.useState("request")
+  const [search, setSearch] = React.useState("")
 
   return (
     <Box className="FstoBox-root">
@@ -117,15 +79,18 @@ const TaggingRequest = () => {
           <Box className="FstoBoxToolbar-right">
             <Tabs
               className="FstoTabs-root"
-              value={value}
-              onChange={(e, value) => setValue(value)}
+              value={state}
+              onChange={(e, value) => {
+                setState(value)
+                changeStatus(value)
+              }}
               TabIndicatorProps={{
                 className: "FstoTabsIndicator-root",
                 children: <span className="FstoTabsIndicator-root" />
               }}
             >
               <Tab className="FstoTab-root" label="Requested" value="request" disableRipple />
-              <Tab className="FstoTab-root" label="Hold" value="hold" disableRipple />
+              <Tab className="FstoTab-root" label="Held" value="hold" disableRipple />
               <Tab className="FstoTab-root" label="Voided" value="void" disableRipple />
             </Tabs>
 
@@ -134,7 +99,7 @@ const TaggingRequest = () => {
               size="small"
               autoComplete="off"
               placeholder="Search"
-              value={isSearching.keyword}
+              value={search}
               InputProps={{
                 className: "FstoTextfieldSearch-root",
                 startAdornment: (
@@ -147,19 +112,21 @@ const TaggingRequest = () => {
                     <IconButton
                       edge="end"
                       size="small"
-                      disabled={!isSearching.status}
-                      onClick={searchCloseHandler}
+                      disabled={!Boolean(search)}
+                      onClick={() => {
+                        setSearch("")
+                        searchData(null)
+                      }}
                     >
                       <Close fontSize="small" />
                     </IconButton>
                   </InputAdornment>
                 )
               }}
-              onChange={(e) => setIsSearching({
-                status: true,
-                keyword: e.target.value
-              })}
-              onKeyPress={searchSubmitHandler}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") searchData(e.target.value)
+              }}
             />
           </Box>
         </Box>
@@ -193,10 +160,6 @@ const TaggingRequest = () => {
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={false}>PO BALANCE</TableSortLabel>
-                </TableCell>
-
-                <TableCell className="FstoTableHead-root">
                   <TableSortLabel active={false}>REF AMOUNT</TableSortLabel>
                 </TableCell>
 
@@ -217,57 +180,87 @@ const TaggingRequest = () => {
             </TableHead>
 
             <TableBody>
-              {/*
-                isFetching
-                ? <Preloader row={5} col={8} />
-                : users
-                  ? users.map((data, index) => <TableData key={index} data={data} />)
-                  : (
+              {
+                status === 'loading'
+                  ? <Preloader row={5} col={11} />
+                  : data
+                    ? data.data.map((data, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="FstoTableData-root">
+                          {data.date_requested}
+                        </TableCell>
+
+                        <TableCell className="FstoTableData-root">
+                          {data.transaction_id}
+                        </TableCell>
+
+                        <TableCell className="FstoTableData-root">
+                          {data.document_type}
+                        </TableCell>
+
+                        <TableCell className="FstoTableData-root">
+                          {data.company}
+                        </TableCell>
+
+                        <TableCell className="FstoTableData-root">
+                          {data.supplier}
+                        </TableCell>
+
+                        <TableCell className="FstoTableData-root">
+                          {
+                            data.po_total_amount
+                              ? <>&#8369;{data.po_total_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</>
+                              : <>&mdash;</>
+                          }
+                        </TableCell>
+
+                        <TableCell className="FstoTableData-root">
+                          {
+                            data.referrence_total_amount
+                              ? <>&#8369;{data.referrence_total_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</>
+                              : <>&mdash;</>
+                          }
+                        </TableCell>
+
+                        <TableCell className="FstoTableData-root">
+                          {
+                            data.document_amount
+                              ? <>&#8369;{data.document_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</>
+                              : <>&mdash;</>
+                          }
+                        </TableCell>
+
+                        <TableCell className="FstoTableData-root" sx={{ textTransform: "capitalize" }}>
+                          {data.payment_type}
+                        </TableCell>
+
+                        <TableCell className="FstoTableData-root">
+                          {data.status}
+                        </TableCell>
+
+                        <TableCell className="FstoTableData-root" align="center">
+                          <TaggingRequestActions />
+                        </TableCell>
+                      </TableRow>
+                    ))
+                    : (
                       <TableRow>
-                        <TableCell align="center" colSpan={8}>NO RECORDS FOUND</TableCell>
+                        <TableCell align="center" colSpan={11}>NO RECORDS FOUND</TableCell>
                       </TableRow>
                     )
-              */}
-              <Preloader row={5} col={12} />
+              }
             </TableBody>
           </Table>
         </TableContainer>
 
         <TablePagination
           component="div"
-          count={pagination ? pagination.total : 0}
-          page={pagination ? pagination.current_page - 1 : 0}
-          rowsPerPage={pagination ? pagination.per_page : 10}
-          onPageChange={pageChangeHandler}
-          onRowsPerPageChange={rowChangeHandler}
+          count={data ? data.total : 0}
+          page={data ? data.current_page - 1 : 0}
+          rowsPerPage={data ? data.per_page : 10}
+          onPageChange={(e, page) => changePage(page)}
+          onRowsPerPageChange={(e) => changeRows(e.target.value)}
           rowsPerPageOptions={[10, 20, 50, 100]}
-        />
-
-        <Toast
-          open={toast.show}
-          title={toast.title}
-          message={toast.message}
-          severity={toast.severity}
-          onClose={(event, reason) => {
-            if (reason === 'clickaway') return
-
-            setToast({
-              show: false,
-              title: null,
-              message: null
-            })
-          }}
-        />
-
-        <Confirm
-          open={confirm.show}
-          isLoading={confirm.loading}
-          onConfirm={confirm.onConfirm}
-          onClose={() => setConfirm({
-            show: false,
-            loading: false,
-            onConfirm: () => { }
-          })}
         />
       </Paper>
     </Box>

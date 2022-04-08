@@ -9,9 +9,12 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { ProtectedRoute } from './components/ProtectedRoute'
 
 
-import { ThemeProvider, createTheme, useMediaQuery, CssBaseline } from '@mui/material';
-
-import FistoProvider from './contexts/FistoContext'
+import {
+  CssBaseline,
+  ThemeProvider,
+  createTheme,
+  useMediaQuery
+} from '@mui/material'
 
 import Landing from './Landing'
 import Dashboard from './Dashboard'
@@ -43,14 +46,16 @@ import Reasons from './routes/masterlist/Reasons/'
 import TaggingRequest from './routes/requestor/TaggingRequest'
 import NewRequest from './routes/requestor/NewRequest'
 
+import NotFound from './exceptions/NotFound'
+// import AccessDenied from './exceptions/AccessDenied'
+import Sandbox from './Sandbox'
+
+import FistoProvider from './contexts/FistoContext'
 
 import { QueryClient, QueryClientProvider } from 'react-query'
 
-import Sandbox from './Sandbox'
-
 // Create a client
 const queryClient = new QueryClient()
-
 
 const App = () => {
 
@@ -60,7 +65,7 @@ const App = () => {
     const data = window.localStorage.getItem("user")
 
     if (data) {
-      const decryptedUser = CryptoJS.AES.decrypt(data, "Fistocutie.");
+      const decryptedUser = CryptoJS.AES.decrypt(data, "Fistocutie.")
       dispatch(SET_USER(JSON.parse(decryptedUser.toString(CryptoJS.enc.Utf8))))
     }
 
@@ -76,74 +81,72 @@ const App = () => {
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
 
   React.useEffect(() => {
-    document.body.className = colorScheme;
-    return () => { document.body.className = ''; }
+    document.body.className = colorScheme
+    return () => { document.body.className = '' }
   });
 
-  const theme = React.useMemo(
-    () =>
-      createTheme({
-        typography: {
-          fontFamily: "'Open Sans', sans-serif",
-          fontSize: 12,
-          heading: {
-            margin: 0,
-            fontFamily: "'Open Sans', sans-serif",
-            fontSize: "1.35em",
-            fontWeight: 700
+  const theme = React.useMemo(() => createTheme({
+    typography: {
+      fontFamily: "'Open Sans', sans-serif",
+      fontSize: 12,
+      heading: {
+        margin: 0,
+        fontFamily: "'Open Sans', sans-serif",
+        fontSize: "1.35em",
+        fontWeight: 700
+      },
+      permission: {
+        margin: 0,
+        fontFamily: "'Open Sans', sans-serif",
+        fontSize: "0.95em",
+        fontWeight: 500
+      }
+    },
+    components: {
+      MuiInputLabel: {
+        styleOverrides: {
+          root: {
+            fontSize: '0.75em',
+            transform: 'translate(14px, 10px) scale(1)'
           },
-          permission: {
-            margin: 0,
-            fontFamily: "'Open Sans', sans-serif",
-            fontSize: "0.95em",
-            fontWeight: 500
+          shrink: {
+            transform: 'translate(18px, -6px) scale(0.85)'
           }
-        },
-        components: {
-          MuiInputLabel: {
-            styleOverrides: {
-              root: {
-                fontSize: '0.75em',
-                transform: 'translate(14px, 10px) scale(1)'
-              },
-              shrink: {
-                transform: 'translate(18px, -6px) scale(0.85)'
-              }
-            }
-          }
-        },
-        palette: {
-          mode: colorScheme === "system" ? (prefersDarkMode ? "dark" : "light") : colorScheme,
-          ...(
-            colorScheme === "dark"
-            && {
-              background: {
-                default: "#181818"
-              }
-            }
-          )
-        },
-        zIndex: {
-          modal: 1400,
-          snackbar: 1300
         }
-      }),
-    [colorScheme, prefersDarkMode],
-  );
+      }
+    },
+    palette: {
+      mode: colorScheme === "system" ? (prefersDarkMode ? "dark" : "light") : colorScheme,
+      ...(
+        colorScheme === "dark"
+        && {
+          background: {
+            default: "#181818"
+          }
+        }
+      )
+    },
+    zIndex: {
+      modal: 1400,
+      snackbar: 1300
+    }
+  }), [colorScheme, prefersDarkMode]);
+
+
+  // const currentUser = useSelector(state => state.user)
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
         <Routes>
+          <Route exact strict path="*" element={<NotFound />} />
           <Route
             exact
             path="/sandbox"
             element={
               <QueryClientProvider client={queryClient}>
-                <FistoProvider>
-                  <Sandbox />
-                </FistoProvider>
+                <FistoProvider><Sandbox /></FistoProvider>
               </QueryClientProvider>
             }
           />
@@ -190,10 +193,27 @@ const App = () => {
               <Route exact strict path="banks" element={<Banks />} />
               <Route exact strict path="reasons" element={<Reasons />} />
 
-              <Route exact strict path="tagging-request" element={<TaggingRequest />} />
-              <Route exact strict path="tagging-request/new-request" element={<NewRequest />} />
+              {/* <Route exact strict path="tagging-request" element={currentUser?.permissions.includes(1) || currentUser?.permissions.includes(2) ? <TaggingRequest /> : <AccessDenied />} />
+              <Route exact strict path="tagging-request/new-request" element={<NewRequest />} /> */}
+            </Route>
+          </Route>
 
-              <Route exact strict path="*" element={<UserAccounts />} />
+          <Route
+            exact
+            path="/requestor"
+            element={
+              <ProtectedRoute />
+            }
+          >
+            <Route
+              exact
+              path="/requestor"
+              element={
+                <Dashboard />
+              }
+            >
+              <Route index exact strict element={<QueryClientProvider client={queryClient}><TaggingRequest /></QueryClientProvider>} />
+              <Route exact strict path="new-request" element={<NewRequest />} />
             </Route>
           </Route>
         </Routes>

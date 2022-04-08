@@ -122,24 +122,24 @@ const Sidebar = () => {
               <Masterlist sx={{ mr: 2.5 }} />Master List
             </AccordionSummary>
             <AccordionDetails>
-              <RouterLink className="FstoLink-root" to="">User Accounts</RouterLink>
-              <RouterLink className="FstoLink-root" to="categories">Categories</RouterLink>
-              <RouterLink className="FstoLink-root" to="document-types">Document Types</RouterLink>
-              <RouterLink className="FstoLink-root" to="companies">Companies</RouterLink>
-              <RouterLink className="FstoLink-root" to="departments">Departments</RouterLink>
-              <RouterLink className="FstoLink-root" to="locations">Locations</RouterLink>
-              <RouterLink className="FstoLink-root" to="references">References</RouterLink>
-              <RouterLink className="FstoLink-root" to="supplier-types">Supplier Types</RouterLink>
-              <RouterLink className="FstoLink-root" to="suppliers">Suppliers</RouterLink>
-              <RouterLink className="FstoLink-root" to="utility-categories">Utility Categories</RouterLink>
-              <RouterLink className="FstoLink-root" to="utility-locations">Utility Locations</RouterLink>
-              <RouterLink className="FstoLink-root" to="account-numbers">Account Numbers</RouterLink>
-              <RouterLink className="FstoLink-root" to="credit-cards">Credit Card</RouterLink>
-              <RouterLink className="FstoLink-root" to="account-titles">Account Titles</RouterLink>
-              <RouterLink className="FstoLink-root" to="payroll-clients">Payroll Clients</RouterLink>
-              <RouterLink className="FstoLink-root" to="payroll-categories">Payroll Categories</RouterLink>
-              <RouterLink className="FstoLink-root" to="banks">Banks</RouterLink>
-              <RouterLink className="FstoLink-root" to="reasons">Reasons</RouterLink>
+              <RouterLink className="FstoLink-root" to="/dashboard">User Accounts</RouterLink>
+              <RouterLink className="FstoLink-root" to="/dashboard/categories">Categories</RouterLink>
+              <RouterLink className="FstoLink-root" to="/dashboard/document-types">Document Types</RouterLink>
+              <RouterLink className="FstoLink-root" to="/dashboard/companies">Companies</RouterLink>
+              <RouterLink className="FstoLink-root" to="/dashboard/departments">Departments</RouterLink>
+              <RouterLink className="FstoLink-root" to="/dashboard/locations">Locations</RouterLink>
+              <RouterLink className="FstoLink-root" to="/dashboard/references">References</RouterLink>
+              <RouterLink className="FstoLink-root" to="/dashboard/supplier-types">Supplier Types</RouterLink>
+              <RouterLink className="FstoLink-root" to="/dashboard/suppliers">Suppliers</RouterLink>
+              <RouterLink className="FstoLink-root" to="/dashboard/utility-categories">Utility Categories</RouterLink>
+              <RouterLink className="FstoLink-root" to="/dashboard/utility-locations">Utility Locations</RouterLink>
+              <RouterLink className="FstoLink-root" to="/dashboard/account-numbers">Account Numbers</RouterLink>
+              <RouterLink className="FstoLink-root" to="/dashboard/credit-cards">Credit Card</RouterLink>
+              <RouterLink className="FstoLink-root" to="/dashboard/account-titles">Account Titles</RouterLink>
+              <RouterLink className="FstoLink-root" to="/dashboard/payroll-clients">Payroll Clients</RouterLink>
+              <RouterLink className="FstoLink-root" to="/dashboard/payroll-categories">Payroll Categories</RouterLink>
+              <RouterLink className="FstoLink-root" to="/dashboard/banks">Banks</RouterLink>
+              <RouterLink className="FstoLink-root" to="/dashboard/reasons">Reasons</RouterLink>
 
             </AccordionDetails>
           </Accordion>
@@ -149,7 +149,7 @@ const Sidebar = () => {
               <Document sx={{ mr: 2.5 }} />Documents
             </AccordionSummary>
             <AccordionDetails>
-              <RouterLink className="FstoLink-root" to="tagging-request">Tagging of Request</RouterLink>
+              <RouterLink className="FstoLink-root" to="/requestor">Tagging of Request</RouterLink>
 
             </AccordionDetails>
           </Accordion>

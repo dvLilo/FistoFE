@@ -99,11 +99,11 @@ const Navbar = () => {
       </Box>
 
       <Box className="FstoNavbar-user">
-        <h5>Hi, { user.first_name?.split(" ")[0] }</h5>
+        <h5>Hi, {user?.first_name.split(" ")[0]}</h5>
 
-        <IconButton 
-          sx={{ backgroundColor: "#E0E0E0", ml: 1 }} 
-          onClick={showMenuHandler} 
+        <IconButton
+          sx={{ backgroundColor: "#E0E0E0", ml: 1 }}
+          onClick={showMenuHandler}
         >
           <Person />
         </IconButton>
@@ -132,7 +132,7 @@ const Navbar = () => {
             lineHeight: 1
           }}
         >
-          { user.last_name }, { user.first_name } { user.middle_name?.charAt(0) }.
+          {user?.last_name}, {user?.first_name} {user?.middle_name.charAt(0)}.
         </Typography>
 
         <Typography
@@ -143,7 +143,7 @@ const Navbar = () => {
             lineHeight: 1
           }}
         >
-          { user.role }
+          {user?.role}
         </Typography>
 
         <Divider sx={{ my: 2 }} />
@@ -209,13 +209,13 @@ const Navbar = () => {
         >
           {
             color === "system"
-            ? (prefersDarkMode ? <LightMode /> : <DarkMode />)
-            : (color === "dark" ? <LightMode /> : <DarkMode />)
+              ? (prefersDarkMode ? <LightMode /> : <DarkMode />)
+              : (color === "dark" ? <LightMode /> : <DarkMode />)
           }
         </IconButton>
-        
+
         <Divider sx={{ my: 2 }} />
-        
+
         <Typography
           variant="subtitle1"
           sx={{
