@@ -39,8 +39,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "frontend": "react-scripts start",
     "backend": "npm start --prefix ../fisto-laravel",
-    "sedar": "json-server --watch db.json --port 5000",
+    "others": "json-server --watch db.json --port 5000",
     "all": "concurrently --kill-others \"react-scripts start\" \"npm start --prefix ../fisto-laravel\" \"json-server --watch db.json --port 5000\""
   },
   "eslintConfig": {

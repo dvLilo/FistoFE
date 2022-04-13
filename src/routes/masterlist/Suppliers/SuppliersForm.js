@@ -104,7 +104,7 @@ const SuppliersForm = (props) => {
         name: data.name,
         terms: data.terms,
         type: data.supplier_type,
-        references: data.referrences
+        references: data.references
       })
     }
   }, [data])

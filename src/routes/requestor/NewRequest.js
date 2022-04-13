@@ -25,167 +25,19 @@ import {
   Delete
 } from '@mui/icons-material'
 
-import { LoadingButton, DatePicker, LocalizationProvider } from '@mui/lab'
+import {
+  LoadingButton,
+  DatePicker,
+  LocalizationProvider
+} from '@mui/lab'
+
 import DateAdapter from '@mui/lab/AdapterDateFns'
-// eslint-disable-next-line
+
 import { createFilterOptions } from '@mui/material/Autocomplete';
 
 import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
 
-// const DOCUMENT_TYPES = [
-//   {
-//     id: 1,
-//     type: "PAD"
-//   },
-//   {
-//     id: 2,
-//     type: "PRM Common"
-//   },
-//   {
-//     id: 3,
-//     type: "PRM Multiple"
-//   },
-//   {
-//     id: 4,
-//     type: "Receipt"
-//   },
-//   {
-//     id: 5,
-//     type: "Contractor's Billing"
-//   },
-//   {
-//     id: 6,
-//     type: "Utilities"
-//   },
-//   {
-//     id: 7,
-//     type: "Payroll"
-//   },
-//   {
-//     id: 8,
-//     type: "PCF"
-//   },
-// ]
-
-// const COMPANY_CHARGING = [
-//   {
-//     "department_name": "Management Information System",
-//     "company_name": "RDF Corporate Services",
-//     "location_name": "Head Office"
-//   },
-//   {
-//     "department_name": "Management Information System",
-//     "company_name": "RDF Corporate Services",
-//     "location_name": "Common"
-//   },
-//   {
-//     "department_name": "Human Resources Common",
-//     "company_name": "RDF Corporate Services",
-//     "location_name": "Head Office"
-//   },
-//   {
-//     "department_name": "Treasury",
-//     "company_name": "RDF Corporate Services",
-//     "location_name": "Common"
-//   },
-//   {
-//     "department_name": "Audit",
-//     "company_name": "RDF Corporate Services",
-//     "location_name": "Common"
-//   },
-//   {
-//     "department_name": "Finance Common",
-//     "company_name": "RDF Corporate Services",
-//     "location_name": "Head Office"
-//   },
-//   {
-//     "department_name": "Boiler Farms",
-//     "company_name": "Red Dragon Farm",
-//     "location_name": "BrFarm - Lara 1"
-//   },
-//   {
-//     "department_name": "Boiler Farms - Area 2",
-//     "company_name": "Red Dragon Farm",
-//     "location_name": "BrFarm - Nueva Ecija 1"
-//   },
-//   {
-//     "department_name": "Boiler Farms - Area 2",
-//     "company_name": "Red Dragon Farm",
-//     "location_name": "BrFarm - Nueva Ecija 2"
-//   }
-// ]
-
-// const COMPANY_LIST = [
-//   {
-//     id: 1,
-//     name: "RDF Corporate Services"
-//   },
-//   {
-//     id: 2,
-//     name: "Fresh Option"
-//   },
-// ]
-
-// const DEPARTMENT_LIST = [
-//   {
-//     id: 1,
-//     name: "Management Information System Common"
-//   },
-//   {
-//     id: 2,
-//     name: "Human Resources Common"
-//   }
-// ]
-
-// const LOCATION_LIST = [
-//   {
-//     id: 1,
-//     name: "Common"
-//   },
-//   {
-//     id: 2,
-//     name: "Head Office"
-//   },
-// ]
-
-// const SUPPLIER_LIST = [
-//   {
-//     id: 1,
-//     name: "1ST ADVENUE ADVERTISING"
-//   },
-//   {
-//     id: 2,
-//     name: "PELCO I"
-//   },
-//   {
-//     id: 3,
-//     name: "PELCO II"
-//   },
-//   {
-//     id: 4,
-//     name: "PELCO III"
-//   },
-// ]
-
-// const CATEGORY_LIST = [
-//   {
-//     id: 1,
-//     name: "general"
-//   },
-//   {
-//     id: 2,
-//     name: "rentals"
-//   },
-//   {
-//     id: 3,
-//     name: "loans"
-//   },
-//   {
-//     id: 4,
-//     name: "leasings"
-//   },
-// ]
 
 const PAYMENT_TYPES = [
   {
@@ -224,6 +76,44 @@ const COVERAGE_MONTH = [
     label: "36 Months",
     value: 36.0
   },
+]
+
+const BATCH_LETTERS = [
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z"
+]
+
+const PAYROLL_TYPES = [
+  "Regular",
+  "Farm",
+  "Paid Leave",
+  "Farm Paid Leave",
+  "Cash Advance",
+  "Confidential"
 ]
 
 const NumberField = React.forwardRef(function NumberField(props, ref) {
@@ -282,6 +172,8 @@ const NewRequest = () => {
       name: "",
       payment_type: "",
       no: "",
+      from: null,
+      to: null,
       date: null,
       amount: null,
 
@@ -296,17 +188,29 @@ const NewRequest = () => {
 
       supplier: null,
 
-      utility_category: null,
-      utility_location: null,
+      reference: null,
 
-      from: null,
-      to: null,
+      pcf_batch: {
+        name: null,
+        letter: null,
+        date: null
+      },
 
-      receipt_no: "",
-      account_no: null,
-      consumption: "",
+      utility: {
+        receipt_no: "",
+        location: null,
+        category: null,
+        account_no: null,
+        consumption: ""
+      },
 
-      remarks: undefined
+      payroll: {
+        type: null,
+        category: null,
+        clients: []
+      },
+
+      remarks: ""
     },
 
     po_group: []
@@ -350,8 +254,17 @@ const NewRequest = () => {
       }
       catch (error) {
         console.log("Fisto Error Status", error.request)
+
+        toast({
+          open: true,
+          severity: "error",
+          title: "Error!",
+          message: "Something went wrong whilst trying to connect to the server. Please try again later."
+        })
       }
     })()
+
+    // eslint-disable-next-line
   }, [])
 
   const [COMPANY_CHARGING, setCompanyCharging] = React.useState([])
@@ -367,8 +280,17 @@ const NewRequest = () => {
       }
       catch (error) {
         console.log("Fisto Error Status", error.request)
+
+        toast({
+          open: true,
+          severity: "error",
+          title: "Error!",
+          message: "Something went wrong whilst trying to connect to the server. Please try again later."
+        })
       }
     })()
+
+    // eslint-disable-next-line
   }, [])
 
   const [SUPPLIER_LIST, setSupplierList] = React.useState([])
@@ -376,7 +298,12 @@ const NewRequest = () => {
     (async () => {
       let response
       try {
-        response = await axios.get(`/api/dropdown/supplier?status=1&paginate=0`)
+        response = await axios.get(`/api/dropdown/suppliers`, {
+          params: {
+            status: 1,
+            paginate: 0
+          }
+        })
 
         const { suppliers } = response.data.result
 
@@ -384,16 +311,326 @@ const NewRequest = () => {
       }
       catch (error) {
         console.log("Fisto Error Status", error.request)
+
+        toast({
+          open: true,
+          severity: "error",
+          title: "Error!",
+          message: "Something went wrong whilst trying to connect to the server. Please try again later."
+        })
       }
     })()
+
+    // eslint-disable-next-line
   }, [])
 
-
+  const [PETTYCASHFUND_LIST, setPettyCashFundList] = React.useState([])
   React.useEffect(() => {
-    checkPurchaseOrderHandler()
+    (async () => {
+      if (data.document.id === 8) {
+        let response
+        try {
+          response = await axios.get(`http://localhost:5000/stalwart`)
+
+          const { data } = response
+
+          setPettyCashFundList(data)
+        }
+        catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            open: true,
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to connect to the server. Please try again later."
+          })
+        }
+      }
+    })()
+
+    // eslint-disable-next-line
+  }, [data.document.id])
+
+  const [PAYROLL_CLIENTS, setPayrollClients] = React.useState([])
+  React.useEffect(() => {
+    (async () => {
+      if (data.document.id === 7) {
+        let response
+        try {
+          response = await axios.get(`/api/dropdown/payroll-clients`, {
+            params: {
+              status: 1,
+              paginate: 0
+            }
+          })
+
+          const { payroll_clients } = response.data.result
+
+          setPayrollClients(payroll_clients)
+        }
+        catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            open: true,
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to connect to the server. Please try again later."
+          })
+        }
+      }
+    })()
+
+    // eslint-disable-next-line
+  }, [data.document.id])
+
+  const [PAYROLL_CATEGORIES, setPayrollCategories] = React.useState([])
+  React.useEffect(() => {
+    (async () => {
+      if (data.document.id === 7) {
+        let response
+        try {
+          response = await axios.get(`/api/dropdown/payroll-categories`, {
+            params: {
+              status: 1,
+              paginate: 0
+            }
+          })
+
+          const { payroll_categories } = response.data.result
+
+          setPayrollCategories(payroll_categories)
+        }
+        catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            open: true,
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to connect to the server. Please try again later."
+          })
+        }
+      }
+    })()
+
+    // eslint-disable-next-line
+  }, [data.document.id])
+
+  const [ACCOUNT_NUMBERS, setAccountNumbers] = React.useState([])
+  React.useEffect(() => {
+    (async () => {
+      if (data.document.id === 6) {
+        let response
+        try {
+          response = await axios.get(`/api/dropdown/account-numbers`, {
+            params: {
+              status: 1,
+              paginate: 0
+            }
+          })
+
+          const { account_numbers } = response.data.result
+
+          setAccountNumbers(account_numbers)
+        }
+        catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            open: true,
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to connect to the server. Please try again later."
+          })
+        }
+      }
+    })()
+
+    // eslint-disable-next-line
+  }, [data.document.id])
+
+  const [UTILITY_CATEGORIES, setUtilityCategories] = React.useState([])
+  React.useEffect(() => {
+    (async () => {
+      if (data.document.id === 6) {
+        let response
+        try {
+          response = await axios.get(`/api/dropdown/utility-categories`, {
+            params: {
+              status: 1,
+              paginate: 0
+            }
+          })
+
+          const { utility_categories } = response.data.result
+
+          setUtilityCategories(utility_categories)
+        }
+        catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            open: true,
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to connect to the server. Please try again later."
+          })
+        }
+      }
+    })()
+
+    // eslint-disable-next-line
+  }, [data.document.id])
+
+  const [UTILITY_LOCATIONS, setUtilityLocations] = React.useState([])
+  React.useEffect(() => {
+    (async () => {
+      if (data.document.id === 6) {
+        let response
+        try {
+          response = await axios.get(`/api/dropdown/utility-locations`, {
+            params: {
+              status: 1,
+              paginate: 0
+            }
+          })
+
+          const { utility_locations } = response.data.result
+
+          setUtilityLocations(utility_locations)
+        }
+        catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            open: true,
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to connect to the server. Please try again later."
+          })
+        }
+      }
+    })()
+
+    // eslint-disable-next-line
+  }, [data.document.id])
+
+  const [REFERENCE_TYPES, setReferenceTypes] = React.useState([])
+  React.useEffect(() => {
+    (async () => {
+      if (data.document.id === 4) {
+        let response
+        try {
+          response = await axios.get(`/api/dropdown/references`, {
+            params: {
+              status: 1,
+              paginate: 0
+            }
+          })
+
+          const { referrences } = response.data.result
+
+          setReferenceTypes(referrences)
+        }
+        catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            open: true,
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to connect to the server. Please try again later."
+          })
+        }
+      }
+    })()
+
+    // eslint-disable-next-line
+  }, [data.document.id])
+
+
+
+
+  React.useEffect(() => { // Reference Number Validation
+    if (data.document.id === 4
+      && data.document.company
+    ) checkreferenceNumberHandler()
+
+    // eslint-disable-next-line
+  }, [data.document.company])
+
+  React.useEffect(() => { // PO Number Validation
+    if ((data.document.id === 1 || data.document.id === 4 || data.document.id === 5)
+      && data.document.payment_type
+      && data.document.company
+    ) checkPurchaseOrderHandler()
 
     // eslint-disable-next-line
   }, [data.document.payment_type, data.document.company])
+
+
+  React.useEffect(() => { // Utility Account Number Auto Select
+    if (data.document.utility.category && data.document.utility.location) {
+      const account_numbers = ACCOUNT_NUMBERS.filter(row => row.category.id === data.document.utility.category.id && row.location.id === data.document.utility.location.id)
+
+      if (account_numbers.length === 1)
+        setData(currentValue => ({
+          ...currentValue,
+          document: {
+            ...currentValue.document,
+            utility: {
+              ...currentValue.document.utility,
+              account_no: {
+                id: account_numbers[0].id,
+                no: account_numbers[0].no
+              }
+            }
+          }
+        }))
+    }
+
+    // eslint-disable-next-line
+  }, [data.document.utility.category, data.document.utility.location])
+
+
+  // Clear Error
+  React.useEffect(() => { // For Payroll Error
+    if (data.document.id === 7 && error.status)
+      setError(currentValue => ({
+        ...currentValue,
+        data: {
+          ...currentValue.data,
+          from_date: undefined,
+          to_date: undefined,
+          payroll_type: undefined,
+          payroll_clients: undefined,
+          payroll_category: undefined,
+        }
+      }))
+
+    // eslint-disable-next-line
+  }, [data.document.from, data.document.to, data.document.payroll.type, data.document.payroll.category, data.document.payroll.clients])
+
+  React.useEffect(() => { // For Utility Error
+    if (data.document.id === 6 && error.status)
+      setError(currentValue => ({
+        ...currentValue,
+        data: {
+          ...currentValue.data,
+          from_date: undefined,
+          to_date: undefined,
+          document_company: undefined,
+          document_department: undefined,
+          utility_category: undefined,
+          utility_location: undefined
+        }
+      }))
+
+    // eslint-disable-next-line
+  }, [data.document.from, data.document.to, data.document.company, data.document.department, data.document.utility.category, data.document.utility.location])
+
 
   const isDisabled = () => {
     switch (data.document.id) {
@@ -411,6 +648,7 @@ const NewRequest = () => {
           && data.po_group.length
           && (data.document.amount === data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0))
           && (!error.status || !Boolean(error.data.document_no))
+          && (!error.status || !Boolean(error.data.po_no))
           ? false : true
 
       case 2: // PRM Common - Payment Request Memo Common
@@ -436,6 +674,67 @@ const NewRequest = () => {
           && data.document.location
           && data.document.supplier
           && data.document.category
+          ? false : true
+
+      case 4: // Receipt
+        return data.document.payment_type
+          && data.document.no
+          && data.document.date
+          && data.document.company
+          && data.document.department
+          && data.document.location
+          && data.document.supplier
+          && data.document.reference
+          && data.document.amount
+          && data.document.category
+          && data.po_group.length
+          && (data.document.amount === data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0))
+          && (!error.status || !Boolean(error.data.reference_no))
+          && (!error.status || !Boolean(error.data.po_no))
+          ? false : true
+
+      case 6:
+        return data.document.payment_type
+          && data.document.from
+          && data.document.to
+          && data.document.amount
+          && data.document.company
+          && data.document.department
+          && data.document.location
+          && data.document.supplier
+          && data.document.utility.category
+          && data.document.utility.location
+          && data.document.utility.account_no
+          && data.document.utility.consumption
+          && data.document.utility.receipt_no
+          ? false : true
+
+      case 7:
+        return data.document.payment_type
+          && data.document.from
+          && data.document.to
+          && data.document.amount
+          && data.document.company
+          && data.document.department
+          && data.document.location
+          && data.document.supplier
+          && data.document.payroll.clients.length
+          && data.document.payroll.category
+          && data.document.payroll.type
+          ? false : true
+
+      case 8:
+        return data.document.payment_type
+          && data.document.date
+          && data.document.amount
+          && data.document.company
+          && data.document.department
+          && data.document.location
+          && data.document.supplier
+          && data.document.pcf_batch.name
+          && data.document.pcf_batch.letter
+          && data.document.pcf_batch.date
+          && (!error.status || !Boolean(error.data.pcf_name))
           ? false : true
 
       default:
@@ -468,6 +767,67 @@ const NewRequest = () => {
           data: {
             ...currentValue.data,
             document_no: errors["document.no"]
+          }
+        }))
+      }
+    }
+  }
+
+  const checkreferenceNumberHandler = async (e) => {
+    if (error.status && error.data.reference_no) {
+      delete error.data.reference_no
+      setError(currentValue => ({
+        ...currentValue,
+        data: error.data
+      }))
+    }
+
+    if (!data.document.no || !data.document.company) return
+
+    try {
+      await axios.post(`/api/transactions/validate-reference-no`, {
+        reference_no: data.document.no,
+        company_id: data.document.company.id
+      })
+    }
+    catch (error) {
+      if (error.request.status === 422) {
+        const { errors } = error.response.data
+
+        setError(currentValue => ({
+          status: true,
+          data: {
+            ...currentValue.data,
+            reference_no: errors["reference.no"]
+          }
+        }))
+      }
+    }
+  }
+
+  const checkPettyCashFundNameHandler = async (name) => {
+    if (error.status && error.data.pcf_name) {
+      delete error.data.pcf_name
+      setError(currentValue => ({
+        ...currentValue,
+        data: error.data
+      }))
+    }
+
+    try {
+      await axios.post(`/api/transactions/validate-pcf-name`, {
+        pcf_name: name
+      })
+    }
+    catch (error) {
+      if (error.request.status === 422) {
+        const { errors } = error.response.data
+
+        setError(currentValue => ({
+          status: true,
+          data: {
+            ...currentValue.data,
+            pcf_name: errors["pcf_batch.name"]
           }
         }))
       }
@@ -647,10 +1007,32 @@ const NewRequest = () => {
         }
 
       case 3: // PRM Multiple - Payment Request Memo Multiple
-        return {}
+        return {
+
+        }
 
       case 4: // Receipt
-        return {}
+        return {
+          requestor: data.requestor,
+          document: {
+            id: data.document.id,
+            no: data.document.no,
+            name: data.document.name,
+            payment_type: data.document.payment_type,
+            amount: data.document.amount,
+            date: data.document.date,
+
+            company: data.document.company,
+            department: data.document.department,
+            location: data.document.location,
+            supplier: data.document.supplier,
+            reference: data.document.reference,
+            category: data.document.category,
+
+            remarks: data.document.remarks
+          },
+          po_group: data.po_group
+        }
 
       case 5: // Contractor's Billing
         return {
@@ -682,6 +1064,30 @@ const NewRequest = () => {
             name: data.document.name,
             payment_type: data.document.payment_type,
             amount: data.document.amount,
+            from: data.document.from,
+            to: data.document.to,
+
+            company: data.document.company,
+            department: data.document.department,
+            location: data.document.location,
+            supplier: data.document.supplier,
+
+            utility: data.document.utility,
+
+            remarks: data.document.remarks
+          }
+        }
+
+      case 7: // Payroll
+        return {
+          requestor: data.requestor,
+          document: {
+            id: data.document.id,
+            name: data.document.name,
+            payment_type: data.document.payment_type,
+            from: data.document.from,
+            to: data.document.to,
+            amount: data.document.amount,
 
             company: data.document.company,
             department: data.document.department,
@@ -689,15 +1095,29 @@ const NewRequest = () => {
 
             supplier: data.document.supplier,
 
-            from: data.document.from,
-            to: data.document.to,
+            payroll: data.document.payroll,
 
-            utility_category: data.document.utility_category,
-            utility_location: data.document.utility_location,
-            account_no: data.document.account_no,
+            remarks: data.document.remarks
+          }
+        }
 
-            receipt_no: data.document.receipt_no,
-            consumption: data.document.consumption,
+      case 8: // PCF - Petty Cash Fund
+        return {
+          requestor: data.requestor,
+          document: {
+            id: data.document.id,
+            name: data.document.name,
+            payment_type: data.document.payment_type,
+            amount: data.document.amount,
+            date: data.document.date,
+
+            company: data.document.company,
+            department: data.document.department,
+            location: data.document.location,
+
+            supplier: data.document.supplier,
+
+            pcf_batch: data.document.pcf_batch,
 
             remarks: data.document.remarks
           }
@@ -732,6 +1152,8 @@ const NewRequest = () => {
         name: "",
         payment_type: "",
         no: "",
+        from: null,
+        to: null,
         date: null,
         amount: null,
 
@@ -746,17 +1168,29 @@ const NewRequest = () => {
 
         supplier: null,
 
-        utility_category: null,
-        utility_location: null,
+        reference: null,
 
-        from: null,
-        to: null,
+        pcf_batch: {
+          name: null,
+          letter: null,
+          date: null
+        },
 
-        receipt_no: "",
-        account_no: null,
-        consumption: "",
+        utility: {
+          receipt_no: "",
+          location: null,
+          category: null,
+          account_no: null,
+          consumption: ""
+        },
 
-        remarks: undefined
+        payroll: {
+          type: null,
+          category: null,
+          clients: []
+        },
+
+        remarks: ""
       },
 
       po_group: []
@@ -793,7 +1227,25 @@ const NewRequest = () => {
               status: true,
               data: {
                 ...currentValue.data,
-                document_no: errors["document.no"]
+
+                po_no: errors["po_group.no"],
+
+                from_date: errors["document.from"],
+                to_date: errors["document.to"],
+
+                document_no: errors["document.no"],
+                document_company: errors["document.company.id"],
+                document_department: errors["document.department.id"],
+
+                pcf_date: errors["document.pcf_batch.date"],
+                pcf_letter: errors["document.pcf_batch.letter"],
+
+                payroll_type: errors["document.payroll.type"],
+                payroll_clients: errors["document.payroll.clients"],
+                payroll_category: errors["document.payroll.category"],
+
+                utility_location: errors["document.utility.location.id"],
+                utility_category: errors["document.utility.category.id"]
               }
             }))
 
@@ -868,14 +1320,24 @@ const NewRequest = () => {
                       <Autocomplete
                         className="FstoSelectForm-root"
                         size="small"
-                        options={[]}
-                        value={null}
+                        filterOptions={filterOptions}
+                        options={PETTYCASHFUND_LIST}
+                        value={PETTYCASHFUND_LIST.find(row => row.name === data.document.pcf_batch.name) || null}
                         renderInput={
                           props =>
                             <TextField
                               {...props}
                               variant="outlined"
                               label="Batch Name"
+                              error={
+                                error.status
+                                && Boolean(error.data.pcf_name)
+                              }
+                              helperText={
+                                error.status
+                                && error.data.pcf_name
+                                && error.data.pcf_name[0]
+                              }
                             />
                         }
                         PaperComponent={
@@ -885,6 +1347,28 @@ const NewRequest = () => {
                               sx={{ textTransform: 'capitalize' }}
                             />
                         }
+                        getOptionLabel={
+                          option => option.name
+                        }
+                        isOptionEqualToValue={
+                          (option, value) => option.name === value.name
+                        }
+                        onChange={(e, value) => {
+                          setData({
+                            ...data,
+                            document: {
+                              ...data.document,
+                              pcf_batch: {
+                                name: value.name,
+                                letter: value.letter,
+                                date: value.date
+                              },
+                              payment_type: "Full",
+                              amount: value.amount,
+                            }
+                          })
+                          checkPettyCashFundNameHandler(value.name)
+                        }}
                         fullWidth
                         disablePortal
                         disableClearable
@@ -893,14 +1377,23 @@ const NewRequest = () => {
                       <Autocomplete
                         className="FstoSelectForm-root"
                         size="small"
-                        options={[]}
-                        value={null}
+                        options={BATCH_LETTERS}
+                        value={data.document.pcf_batch.letter}
                         renderInput={
                           props =>
                             <TextField
                               {...props}
                               variant="outlined"
                               label="Batch Letter"
+                              error={
+                                error.status
+                                && Boolean(error.data.pcf_letter)
+                              }
+                              helperText={
+                                error.status
+                                && error.data.pcf_letter
+                                && error.data.pcf_letter[0]
+                              }
                             />
                         }
                         PaperComponent={
@@ -910,6 +1403,22 @@ const NewRequest = () => {
                               sx={{ textTransform: 'capitalize' }}
                             />
                         }
+                        getOptionLabel={
+                          option => option
+                        }
+                        isOptionEqualToValue={
+                          (option, value) => option === value
+                        }
+                        onChange={(e, value) => setData({
+                          ...data,
+                          document: {
+                            ...data.document,
+                            pcf_batch: {
+                              ...data.document.pcf_batch,
+                              letter: value
+                            }
+                          }
+                        })}
                         fullWidth
                         disablePortal
                         disableClearable
@@ -917,8 +1426,18 @@ const NewRequest = () => {
 
                       <LocalizationProvider dateAdapter={DateAdapter}>
                         <DatePicker
-                          value={null}
-                          onChange={(value) => { }}
+                          views={['year', 'month']}
+                          value={data.document.pcf_batch.date}
+                          onChange={(value) => setData({
+                            ...data,
+                            document: {
+                              ...data.document,
+                              pcf_batch: {
+                                ...data.document.pcf_batch,
+                                date: new Date(value).toISOString().slice(0, 7)
+                              }
+                            }
+                          })}
                           renderInput={
                             props =>
                               <TextField
@@ -927,9 +1446,19 @@ const NewRequest = () => {
                                 variant="outlined"
                                 size="small"
                                 label="Batch Date"
+                                error={
+                                  error.status
+                                  && Boolean(error.data.pcf_date)
+                                }
+                                helperText={
+                                  error.status
+                                  && error.data.pcf_date
+                                  && error.data.pcf_date[0]
+                                }
                                 fullWidth
                               />
                           }
+                          showToolbar
                         />
                       </LocalizationProvider>
                     </React.Fragment>
@@ -997,9 +1526,19 @@ const NewRequest = () => {
                                 variant="outlined"
                                 size="small"
                                 label="From Date"
+                                error={
+                                  error.status
+                                  && Boolean(error.data.from_date)
+                                }
+                                helperText={
+                                  error.status
+                                  && error.data.from_date
+                                  && error.data.from_date[0]
+                                }
                                 fullWidth
                               />
                           }
+                          showToolbar
                         />
                       </LocalizationProvider>
 
@@ -1021,9 +1560,19 @@ const NewRequest = () => {
                                 variant="outlined"
                                 size="small"
                                 label="To Date"
+                                error={
+                                  error.status
+                                  && Boolean(error.data.to_date)
+                                }
+                                helperText={
+                                  error.status
+                                  && error.data.to_date
+                                  && error.data.to_date[0]
+                                }
                                 fullWidth
                               />
                           }
+                          showToolbar
                         />
                       </LocalizationProvider>
                     </React.Fragment>
@@ -1088,6 +1637,7 @@ const NewRequest = () => {
                               fullWidth
                             />
                         }
+                        showToolbar
                       />
                     </LocalizationProvider>
                   )}
@@ -1102,6 +1652,7 @@ const NewRequest = () => {
                       autoComplete="off"
                       size="small"
                       value={data.document.amount}
+                      disabled={data.document.id === 8}
                       error={
                         Boolean(data.po_group.length) &&
                         Boolean(data.document.amount)
@@ -1141,6 +1692,15 @@ const NewRequest = () => {
                         {...props}
                         variant="outlined"
                         label="Company"
+                        error={
+                          error.status
+                          && Boolean(error.data.document_company)
+                        }
+                        helperText={
+                          error.status
+                          && error.data.document_company
+                          && error.data.document_company[0]
+                        }
                       />
                   }
                   PaperComponent={
@@ -1182,6 +1742,15 @@ const NewRequest = () => {
                         {...props}
                         variant="outlined"
                         label="Department"
+                        error={
+                          error.status
+                          && Boolean(error.data.document_department)
+                        }
+                        helperText={
+                          error.status
+                          && error.data.document_department
+                          && error.data.document_department[0]
+                        }
                       />
                   }
                   PaperComponent={
@@ -1248,11 +1817,124 @@ const NewRequest = () => {
                   disableClearable
                 />
 
+                { // Reference Type, Reference Number, Reference Amount
+                  (data.document.id === 4) &&
+                  (
+                    <React.Fragment>
+                      <Autocomplete
+                        className="FstoSelectForm-root"
+                        size="small"
+                        options={REFERENCE_TYPES}
+                        value={data.document.reference}
+                        renderInput={
+                          props =>
+                            <TextField
+                              {...props}
+                              variant="outlined"
+                              label="Reference Type"
+                            />
+                        }
+                        PaperComponent={
+                          props =>
+                            <Paper
+                              {...props}
+                              sx={{ textTransform: 'capitalize' }}
+                            />
+                        }
+                        getOptionLabel={
+                          option => option.type
+                        }
+                        isOptionEqualToValue={
+                          (option, value) => option.id === value.id
+                        }
+                        onChange={(e, value) => setData({
+                          ...data,
+                          document: {
+                            ...data.document,
+                            reference: value
+                          }
+                        })}
+                        fullWidth
+                        disablePortal
+                        disableClearable
+                      />
+
+                      <TextField
+                        className="FstoTextfieldForm-root"
+                        label="Reference Number"
+                        variant="outlined"
+                        autoComplete="off"
+                        size="small"
+                        value={data.document.no}
+                        error={
+                          error.status
+                          && Boolean(error.data.reference_no)
+                        }
+                        helperText={
+                          error.status
+                          && error.data.reference_no
+                          && error.data.reference_no[0]
+                        }
+                        onChange={(e) => setData({
+                          ...data,
+                          document: {
+                            ...data.document,
+                            no: e.target.value
+                          }
+                        })}
+                        onBlur={checkreferenceNumberHandler}
+                        InputLabelProps={{
+                          className: "FstoLabelForm-root"
+                        }}
+                        fullWidth
+                      />
+
+                      <TextField
+                        className="FstoTextfieldForm-root"
+                        label="Reference Amount"
+                        variant="outlined"
+                        autoComplete="off"
+                        size="small"
+                        value={data.document.amount}
+                        error={
+                          Boolean(data.po_group.length) &&
+                          Boolean(data.document.amount)
+                          && data.document.amount !== data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
+                        }
+                        helperText={
+                          Boolean(data.po_group.length) &&
+                          Boolean(data.document.amount)
+                          && data.document.amount !== data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
+                          && "Document amount and PO balance amount is not equal."
+                        }
+                        onChange={(e) => setData({
+                          ...data,
+                          document: {
+                            ...data.document,
+                            amount: parseFloat(e.target.value)
+                          }
+                        })}
+                        InputProps={{
+                          inputComponent: NumberField,
+                        }}
+                        InputLabelProps={{
+                          className: "FstoLabelForm-root"
+                        }}
+                        fullWidth
+                      />
+                    </React.Fragment>
+                  )
+                }
+
                 <Autocomplete
                   className="FstoSelectForm-root"
                   size="small"
                   filterOptions={filterOptions}
-                  options={SUPPLIER_LIST}
+                  options={
+                    data.document.id === 4
+                      ? data.document.reference ? SUPPLIER_LIST.filter(row => row.references.some(ref => ref.id === data.document.reference.id)) : SUPPLIER_LIST
+                      : SUPPLIER_LIST
+                  }
                   value={data.document.supplier}
                   renderInput={
                     props =>
@@ -1286,81 +1968,6 @@ const NewRequest = () => {
                   disablePortal
                   disableClearable
                 />
-
-                { // Reference Type, Reference Number, Reference Amount
-                  (data.document.id === 4) &&
-                  (
-                    <React.Fragment>
-                      <Autocomplete
-                        className="FstoSelectForm-root"
-                        size="small"
-                        options={[]}
-                        value={null}
-                        renderInput={
-                          props =>
-                            <TextField
-                              {...props}
-                              variant="outlined"
-                              label="Reference Type"
-                            />
-                        }
-                        PaperComponent={
-                          props =>
-                            <Paper
-                              {...props}
-                              sx={{ textTransform: 'capitalize' }}
-                            />
-                        }
-                        fullWidth
-                        disablePortal
-                        disableClearable
-                      />
-
-                      <TextField
-                        className="FstoTextfieldForm-root"
-                        label="Reference Number"
-                        variant="outlined"
-                        autoComplete="off"
-                        size="small"
-                        value={data.document.no}
-                        onChange={(e) => setData({
-                          ...data,
-                          document: {
-                            ...data.document,
-                            no: e.target.value
-                          }
-                        })}
-                        InputLabelProps={{
-                          className: "FstoLabelForm-root"
-                        }}
-                        fullWidth
-                      />
-
-                      <TextField
-                        className="FstoTextfieldForm-root"
-                        label="Reference Amount"
-                        variant="outlined"
-                        autoComplete="off"
-                        size="small"
-                        value={data.document.amount}
-                        onChange={(e) => setData({
-                          ...data,
-                          document: {
-                            ...data.document,
-                            amount: parseFloat(e.target.value)
-                          }
-                        })}
-                        InputProps={{
-                          inputComponent: NumberField,
-                        }}
-                        InputLabelProps={{
-                          className: "FstoLabelForm-root"
-                        }}
-                        fullWidth
-                      />
-                    </React.Fragment>
-                  )
-                }
 
                 { // Category
                   (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4 || data.document.id === 5) &&
@@ -1477,14 +2084,24 @@ const NewRequest = () => {
                       <Autocomplete
                         className="FstoSelectForm-root"
                         size="small"
-                        options={[]}
-                        value={data.document.utility_category}
+                        filterOptions={filterOptions}
+                        options={UTILITY_CATEGORIES}
+                        value={data.document.utility.category}
                         renderInput={
                           props =>
                             <TextField
                               {...props}
                               variant="outlined"
                               label="Utility Category"
+                              error={
+                                error.status
+                                && Boolean(error.data.utility_category)
+                              }
+                              helperText={
+                                error.status
+                                && error.data.utility_category
+                                && error.data.utility_category[0]
+                              }
                             />
                         }
                         PaperComponent={
@@ -1494,6 +2111,23 @@ const NewRequest = () => {
                               sx={{ textTransform: 'capitalize' }}
                             />
                         }
+                        getOptionLabel={
+                          option => option.name
+                        }
+                        isOptionEqualToValue={
+                          (option, value) => option.id === value.id
+                        }
+                        onChange={(e, value) => setData({
+                          ...data,
+                          document: {
+                            ...data.document,
+                            utility: {
+                              ...data.document.utility,
+                              category: value,
+                              account_no: null
+                            }
+                          }
+                        })}
                         fullWidth
                         disablePortal
                         disableClearable
@@ -1502,14 +2136,24 @@ const NewRequest = () => {
                       <Autocomplete
                         className="FstoSelectForm-root"
                         size="small"
-                        options={[]}
-                        value={null}
+                        filterOptions={filterOptions}
+                        options={UTILITY_LOCATIONS}
+                        value={data.document.utility.location}
                         renderInput={
                           props =>
                             <TextField
                               {...props}
                               variant="outlined"
                               label="Utility Location"
+                              error={
+                                error.status
+                                && Boolean(error.data.utility_location)
+                              }
+                              helperText={
+                                error.status
+                                && error.data.utility_location
+                                && error.data.utility_location[0]
+                              }
                             />
                         }
                         PaperComponent={
@@ -1519,6 +2163,23 @@ const NewRequest = () => {
                               sx={{ textTransform: 'capitalize' }}
                             />
                         }
+                        getOptionLabel={
+                          option => option.name
+                        }
+                        isOptionEqualToValue={
+                          (option, value) => option.id === value.id
+                        }
+                        onChange={(e, value) => setData({
+                          ...data,
+                          document: {
+                            ...data.document,
+                            utility: {
+                              ...data.document.utility,
+                              location: value,
+                              account_no: null
+                            }
+                          }
+                        })}
                         fullWidth
                         disablePortal
                         disableClearable
@@ -1527,8 +2188,15 @@ const NewRequest = () => {
                       <Autocomplete
                         className="FstoSelectForm-root"
                         size="small"
-                        options={[]}
-                        value={null}
+                        filterOptions={filterOptions}
+                        options={
+                          data.document.utility.category && data.document.utility.location
+                            ? ACCOUNT_NUMBERS.filter(row => row.category.id === data.document.utility.category.id && row.location.id === data.document.utility.location.id)
+                            : data.document.utility.category || data.document.utility.location
+                              ? ACCOUNT_NUMBERS.filter(row => row.category.id === data.document.utility.category?.id || row.location.id === data.document.utility.location?.id)
+                              : ACCOUNT_NUMBERS
+                        }
+                        value={data.document.utility.account_no}
                         renderInput={
                           props =>
                             <TextField
@@ -1544,6 +2212,25 @@ const NewRequest = () => {
                               sx={{ textTransform: 'capitalize' }}
                             />
                         }
+                        getOptionLabel={
+                          option => option.no
+                        }
+                        isOptionEqualToValue={
+                          (option, value) => option.id === value.id
+                        }
+                        onChange={(e, value) => setData({
+                          ...data,
+                          document: {
+                            ...data.document,
+                            utility: {
+                              ...data.document.utility,
+                              account_no: {
+                                id: value.id,
+                                no: value.no
+                              }
+                            }
+                          }
+                        })}
                         fullWidth
                         disablePortal
                         disableClearable
@@ -1555,12 +2242,15 @@ const NewRequest = () => {
                         variant="outlined"
                         autoComplete="off"
                         size="small"
-                        value={data.document.consumption}
+                        value={data.document.utility.consumption}
                         onChange={(e) => setData({
                           ...data,
                           document: {
                             ...data.document,
-                            consumption: e.target.value
+                            utility: {
+                              ...data.document.utility,
+                              consumption: e.target.value
+                            }
                           }
                         })}
                         InputLabelProps={{
@@ -1575,12 +2265,15 @@ const NewRequest = () => {
                         variant="outlined"
                         autoComplete="off"
                         size="small"
-                        value={data.document.receipt_no}
+                        value={data.document.utility.receipt_no}
                         onChange={(e) => setData({
                           ...data,
                           document: {
                             ...data.document,
-                            receipt_no: e.target.value
+                            utility: {
+                              ...data.document.utility,
+                              receipt_no: e.target.value
+                            }
                           }
                         })}
                         InputLabelProps={{
@@ -1598,14 +2291,24 @@ const NewRequest = () => {
                       <Autocomplete
                         className="FstoSelectForm-root"
                         size="small"
-                        options={[]}
-                        value={null}
+                        filterOptions={filterOptions}
+                        options={PAYROLL_CLIENTS}
+                        value={data.document.payroll.clients}
                         renderInput={
                           props =>
                             <TextField
                               {...props}
                               variant="outlined"
                               label="Payroll Client"
+                              error={
+                                error.status
+                                && Boolean(error.data.payroll_clients)
+                              }
+                              helperText={
+                                error.status
+                                && error.data.payroll_clients
+                                && error.data.payroll_clients[0]
+                              }
                             />
                         }
                         PaperComponent={
@@ -1615,22 +2318,50 @@ const NewRequest = () => {
                               sx={{ textTransform: 'capitalize' }}
                             />
                         }
+                        getOptionLabel={
+                          option => option.name
+                        }
+                        isOptionEqualToValue={
+                          (option, value) => option.id === value.id
+                        }
+                        onChange={(e, value) => setData({
+                          ...data,
+                          document: {
+                            ...data.document,
+                            payroll: {
+                              ...data.document.payroll,
+                              clients: value
+                            }
+                          }
+                        })}
                         fullWidth
+                        multiple
                         disablePortal
                         disableClearable
+                        disableCloseOnSelect
                       />
 
                       <Autocomplete
                         className="FstoSelectForm-root"
                         size="small"
-                        options={[]}
-                        value={null}
+                        filterOptions={filterOptions}
+                        options={PAYROLL_CATEGORIES}
+                        value={data.document.payroll.category}
                         renderInput={
                           props =>
                             <TextField
                               {...props}
                               variant="outlined"
                               label="Payroll Category"
+                              error={
+                                error.status
+                                && Boolean(error.data.payroll_category)
+                              }
+                              helperText={
+                                error.status
+                                && error.data.payroll_category
+                                && error.data.payroll_category[0]
+                              }
                             />
                         }
                         PaperComponent={
@@ -1640,6 +2371,22 @@ const NewRequest = () => {
                               sx={{ textTransform: 'capitalize' }}
                             />
                         }
+                        getOptionLabel={
+                          option => option.name
+                        }
+                        isOptionEqualToValue={
+                          (option, value) => option.id === value.id
+                        }
+                        onChange={(e, value) => setData({
+                          ...data,
+                          document: {
+                            ...data.document,
+                            payroll: {
+                              ...data.document.payroll,
+                              category: value
+                            }
+                          }
+                        })}
                         fullWidth
                         disablePortal
                         disableClearable
@@ -1648,14 +2395,23 @@ const NewRequest = () => {
                       <Autocomplete
                         className="FstoSelectForm-root"
                         size="small"
-                        options={[]}
-                        value={null}
+                        options={PAYROLL_TYPES}
+                        value={data.document.payroll.type}
                         renderInput={
                           props =>
                             <TextField
                               {...props}
                               variant="outlined"
                               label="Payroll Type"
+                              error={
+                                error.status
+                                && Boolean(error.data.payroll_type)
+                              }
+                              helperText={
+                                error.status
+                                && error.data.payroll_type
+                                && error.data.payroll_type[0]
+                              }
                             />
                         }
                         PaperComponent={
@@ -1665,6 +2421,22 @@ const NewRequest = () => {
                               sx={{ textTransform: 'capitalize' }}
                             />
                         }
+                        getOptionLabel={
+                          option => option
+                        }
+                        isOptionEqualToValue={
+                          (option, value) => option === value
+                        }
+                        onChange={(e, value) => setData({
+                          ...data,
+                          document: {
+                            ...data.document,
+                            payroll: {
+                              ...data.document.payroll,
+                              type: value
+                            }
+                          }
+                        })}
                         fullWidth
                         disablePortal
                         disableClearable

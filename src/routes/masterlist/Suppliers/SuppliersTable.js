@@ -84,7 +84,7 @@ const SuppliersTable = (props) => {
                   </TableCell>
 
                   <TableCell className="FstoTableData-root" sx={{ textTransform: "uppercase" }}>
-                    {data.referrences.map(r => r.type).join(', ')}
+                    {data.references.map(r => r.type).join(', ')}
                   </TableCell>
 
                   <TableCell className="FstoTableData-root">

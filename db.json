@@ -85,5 +85,39 @@
         "department_name": "Management Information System"
       }
     }
+  ],
+  "stalwart": [
+    {
+      "id": 1,
+      "name": "RF2106 - A PCF FINANCE",
+      "letter": "A",
+      "branch": "PCF FINANCE",
+      "date": "2021-06",
+      "amount": 79738.93
+    },
+    {
+      "id": 2,
+      "name": "RF2112 - B PCF DEPOT",
+      "letter": "B",
+      "branch": "PCF DEPOT",
+      "date": "2021-12",
+      "amount": 88111.97
+    },
+    {
+      "id": 3,
+      "name": "RF2112 - B PCF PURCHASING",
+      "letter": "B",
+      "branch": "PCF PURCHASING",
+      "date": "2021-12",
+      "amount": 69337.50
+    },
+    {
+      "id": 4,
+      "name": "RF2204 - A PCF PURCHASING",
+      "letter": "A",
+      "branch": "PCF PURCHASING",
+      "date": "2022-04",
+      "amount": 39999.95
+    }
   ]
 }
