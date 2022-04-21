@@ -2,23 +2,53 @@
   padding: 1em;
 }
 
-.FstoBoxTable-root {}
+.FstoBoxTable-root {
+  margin-bottom: 5em;
+}
 
 .FstoBoxRow-root {
   display: flex;
   flex-direction: row;
 
-  &.last {
-    border-bottom: 3px solid #707070;
-  }
-
-  & .FstoBoxCell-root:first-of-type {
+  & .FstoBoxRow-half:first-of-type {
     border-left: 0;
   }
 
-  & .FstoBoxCell-root:last-of-type {
+  & .FstoBoxRow-half:last-of-type {
     border-right: 0;
   }
+
+  & .FstoBoxRow-half:nth-of-type(1) {
+    border-right: 0;
+  }
+
+  & .FstoBoxRow-half .FstoBoxCell-root:first-child {
+    border-left: 0;
+  }
+
+  & .FstoBoxRow-half .FstoBoxCell-root:last-child {
+    border-right: 0;
+  }
+
+  & .FstoBoxRow-half .FstoBoxCell-root:nth-of-type(1) {
+    border-right: 0;
+  }
+
+  & .FstoBoxRow-half .FstoBoxCell-root:nth-of-type(2) {
+    border-right: 0;
+  }
+
+  &.last {
+    border-bottom: 3px solid #707070;
+  }
+}
+
+.FstoBoxRow-half {
+  display: flex;
+  flex: 1;
+  border: 1px solid #707070;
+  border-top: 0;
+  border-bottom: 0;
 }
 
 .FstoBoxCell-root {
@@ -28,4 +58,17 @@
   margin-bottom: -1px;
   padding: 10px;
   border: 1px solid #707070;
+}
+
+.FstoBoxCell-head {
+  background: #CED4D9;
+  justify-content: center;
+  align-items: center;
+  border-left: 0;
+  border-right: 0;
+}
+
+.FstoTypographyTransaction-root {
+  display: flex;
+  justify-content: center;
 }

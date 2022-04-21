@@ -157,9 +157,9 @@ const TaggingRequest = () => {
                   <TableSortLabel active={false}>SUPPLIER</TableSortLabel>
                 </TableCell>
 
-                <TableCell className="FstoTableHead-root">
+                {/* <TableCell className="FstoTableHead-root">
                   <TableSortLabel active={false}>PO AMOUNT</TableSortLabel>
-                </TableCell>
+                </TableCell> */}
 
                 <TableCell className="FstoTableHead-root">
                   <TableSortLabel active={false}>REF AMOUNT</TableSortLabel>
@@ -208,18 +208,18 @@ const TaggingRequest = () => {
                           {data.supplier}
                         </TableCell>
 
-                        <TableCell className="FstoTableData-root">
+                        {/* <TableCell className="FstoTableData-root">
                           {
                             data.po_total_amount
                               ? <>&#8369;{data.po_total_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</>
                               : <>&mdash;</>
                           }
-                        </TableCell>
+                        </TableCell> */}
 
                         <TableCell className="FstoTableData-root">
                           {
-                            data.referrence_total_amount
-                              ? <>&#8369;{data.referrence_total_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</>
+                            data.referrence_amount
+                              ? <>&#8369;{data.referrence_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</>
                               : <>&mdash;</>
                           }
                         </TableCell>
