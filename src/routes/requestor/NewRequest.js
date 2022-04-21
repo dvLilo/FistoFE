@@ -1963,7 +1963,7 @@ const NewRequest = () => {
                           && (
                             data.document.payment_type === "Partial"
                               ? (data.document.reference.amount > data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0))
-                              : (data.document.reference.amount === data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0))
+                              : (data.document.reference.amount !== data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0))
                           )
                         }
                         helperText={
@@ -1972,7 +1972,7 @@ const NewRequest = () => {
                           && (
                             data.document.payment_type === "Partial"
                               ? (data.document.reference.amount > data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0))
-                              : (data.document.reference.amount === data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0))
+                              : (data.document.reference.amount !== data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0))
                           )
                           && "Reference amount and PO balance amount is not equal."
                         }
