@@ -29,11 +29,12 @@ const FistoProvider = ({ children }) => {
     onConfirm: undefined
   })
 
-  const [snackbar, toast] = React.useState({
+  const [snackbar, setSnackbar] = React.useState({
     open: false,
+    duration: 5000,
     severity: "success",
     title: "",
-    message: ""
+    message: "",
   })
 
   const onCloseDialog = () => {
@@ -48,7 +49,7 @@ const FistoProvider = ({ children }) => {
   const onCloseSnackbar = (event, reason) => {
     if (reason === 'clickaway') return
 
-    toast(currentValue => ({
+    setSnackbar(currentValue => ({
       ...currentValue,
       open: false
     }))
@@ -69,6 +70,25 @@ const FistoProvider = ({ children }) => {
     }))
   }
 
+  const toast = (params) => {
+    const {
+      open = true,
+      duration = 5000,
+      severity = "success",
+      title = "",
+      message = ""
+    } = params
+
+    setSnackbar(currentValue => ({
+      ...currentValue,
+      open,
+      duration,
+      severity,
+      title,
+      message
+    }))
+  }
+
   return (
     <FistoContext.Provider value={{ confirm, toast }}>
       {/* App content here */}
@@ -76,7 +96,7 @@ const FistoProvider = ({ children }) => {
 
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={6000}
+        autoHideDuration={snackbar.duration}
         onClose={onCloseSnackbar}
         anchorOrigin={{
           vertical: "top",
@@ -111,12 +131,12 @@ const FistoProvider = ({ children }) => {
           </IconButton>
         </DialogTitle>
 
-        <DialogContent sx={{ display: "flex", alignItems: "center", paddingLeft: 4, paddingRight: 4 }}>
-          <WarningAmberRoundedIcon sx={{ marginRight: 1, fontSize: "3em" }} />
+        <DialogContent sx={{ display: "flex", alignItems: "center", paddingLeft: 5, paddingRight: 5 }}>
+          <WarningAmberRoundedIcon sx={{ marginRight: 2, fontSize: "3em" }} />
           Are you sure you want to proceed?
         </DialogContent>
 
-        <DialogActions disableSpacing>
+        <DialogActions sx={{ marginRight: 2 }}>
           <Button
             variant="text"
             sx={{

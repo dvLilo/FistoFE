@@ -1,0 +1,31 @@
+.FstoPaperTransaction-root {
+  padding: 1em;
+}
+
+.FstoBoxTable-root {}
+
+.FstoBoxRow-root {
+  display: flex;
+  flex-direction: row;
+
+  &.last {
+    border-bottom: 3px solid #707070;
+  }
+
+  & .FstoBoxCell-root:first-of-type {
+    border-left: 0;
+  }
+
+  & .FstoBoxCell-root:last-of-type {
+    border-right: 0;
+  }
+}
+
+.FstoBoxCell-root {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin-bottom: -1px;
+  padding: 10px;
+  border: 1px solid #707070;
+}

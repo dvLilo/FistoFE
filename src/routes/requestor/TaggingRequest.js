@@ -45,6 +45,7 @@ import {
   Add
 } from '@mui/icons-material'
 
+import Transaction from '../../components/Transaction'
 import Preloader from '../../components/Preloader'
 import TaggingRequestActions from './TaggingRequestActions'
 
@@ -60,7 +61,7 @@ const TaggingRequest = () => {
   return (
     <Box className="FstoBox-root">
       <Paper className="FstoPaperTable-root" elevation={1}>
-        <Box className="FstoBoxToolbar-root">
+        <Box className="FstoBoxToolbar2-root">
           <Box className="FstoBoxToolbar-left">
             <Typography variant="heading">Tagging of Request</Typography>
 
@@ -78,7 +79,7 @@ const TaggingRequest = () => {
 
           <Box className="FstoBoxToolbar-right">
             <Tabs
-              className="FstoTabs-root"
+              className="FstoTabsToolbar-root"
               value={state}
               onChange={(e, value) => {
                 setState(value)
@@ -95,6 +96,7 @@ const TaggingRequest = () => {
             </Tabs>
 
             <TextField
+              className="FstoTextFieldToolbar-root"
               variant="outlined"
               size="small"
               autoComplete="off"
@@ -262,6 +264,8 @@ const TaggingRequest = () => {
           onRowsPerPageChange={(e) => changeRows(e.target.value)}
           rowsPerPageOptions={[10, 20, 50, 100]}
         />
+
+        <Transaction />
       </Paper>
     </Box>
   )

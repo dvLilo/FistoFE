@@ -118,7 +118,7 @@ const App = () => {
     palette: {
       mode: colorScheme === "system" ? (prefersDarkMode ? "dark" : "light") : colorScheme,
       ...(
-        colorScheme === "dark"
+        (colorScheme === "dark" || (colorScheme === "system" && prefersDarkMode))
         && {
           background: {
             default: "#181818"

@@ -188,7 +188,12 @@ const NewRequest = () => {
 
       supplier: null,
 
-      reference: null,
+      reference: {
+        id: null,
+        type: "",
+        no: "",
+        amount: null
+      },
 
       pcf_batch: {
         name: null,
@@ -219,6 +224,7 @@ const NewRequest = () => {
   const [PO, setPO] = React.useState({
     update: false,
     index: null,
+    batch: false,
 
     no: "",
     balance: null,
@@ -556,7 +562,7 @@ const NewRequest = () => {
   React.useEffect(() => { // Reference Number Validation
     if (data.document.id === 4
       && data.document.company
-    ) checkreferenceNumberHandler()
+    ) checkReferenceNumberHandler()
 
     // eslint-disable-next-line
   }, [data.document.company])
@@ -572,8 +578,8 @@ const NewRequest = () => {
 
 
   React.useEffect(() => { // Utility Account Number Auto Select
-    if (data.document.utility.category && data.document.utility.location) {
-      const account_numbers = ACCOUNT_NUMBERS.filter(row => row.category.id === data.document.utility.category.id && row.location.id === data.document.utility.location.id)
+    if (data.document.supplier && data.document.utility.category && data.document.utility.location) {
+      const account_numbers = ACCOUNT_NUMBERS.filter(row => row.supplier.id === data.document.supplier.id && row.category.id === data.document.utility.category.id && row.location.id === data.document.utility.location.id)
 
       if (account_numbers.length === 1)
         setData(currentValue => ({
@@ -589,10 +595,21 @@ const NewRequest = () => {
             }
           }
         }))
+      else
+        setData(currentValue => ({
+          ...currentValue,
+          document: {
+            ...currentValue.document,
+            utility: {
+              ...currentValue.document.utility,
+              account_no: null
+            }
+          }
+        }))
     }
 
     // eslint-disable-next-line
-  }, [data.document.utility.category, data.document.utility.location])
+  }, [data.document.supplier, data.document.utility.category, data.document.utility.location])
 
 
   // Clear Error
@@ -678,17 +695,22 @@ const NewRequest = () => {
 
       case 4: // Receipt
         return data.document.payment_type
-          && data.document.no
           && data.document.date
           && data.document.company
           && data.document.department
           && data.document.location
           && data.document.supplier
-          && data.document.reference
-          && data.document.amount
           && data.document.category
+          && data.document.reference.id
+          && data.document.reference.type
+          && data.document.reference.no
+          && data.document.reference.amount
           && data.po_group.length
-          && (data.document.amount === data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0))
+          && (
+            data.document.payment_type === "Partial"
+              ? (data.document.reference.amount <= data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0))
+              : (data.document.reference.amount === data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0))
+          )
           && (!error.status || !Boolean(error.data.reference_no))
           && (!error.status || !Boolean(error.data.po_no))
           ? false : true
@@ -773,7 +795,7 @@ const NewRequest = () => {
     }
   }
 
-  const checkreferenceNumberHandler = async (e) => {
+  const checkReferenceNumberHandler = async (e) => {
     if (error.status && error.data.reference_no) {
       delete error.data.reference_no
       setError(currentValue => ({
@@ -782,11 +804,11 @@ const NewRequest = () => {
       }))
     }
 
-    if (!data.document.no || !data.document.company) return
+    if (!data.document.reference.no || !data.document.company) return
 
     try {
       await axios.post(`/api/transactions/validate-reference-no`, {
-        reference_no: data.document.no,
+        reference_no: data.document.reference.no,
         company_id: data.document.company.id
       })
     }
@@ -798,7 +820,7 @@ const NewRequest = () => {
           status: true,
           data: {
             ...currentValue.data,
-            reference_no: errors["reference.no"]
+            reference_no: errors["document.reference.no"]
           }
         }))
       }
@@ -842,24 +864,27 @@ const NewRequest = () => {
       no: PO.no,
       balance: PO.balance,
       amount: PO.amount,
-      rr_no: PO.rr_no
+      rr_no: PO.rr_no,
+      batch: PO.batch
     })
     else setData({
       ...data,
       po_group: [
-        ...data.po_group,
         {
           no: PO.no,
           balance: PO.balance,
           amount: PO.amount,
-          rr_no: PO.rr_no
-        }
+          rr_no: PO.rr_no,
+          batch: PO.batch
+        },
+        ...data.po_group,
       ]
     })
 
     setPO({
-      index: null,
       update: false,
+      index: null,
+      batch: false,
 
       no: "",
       balance: NaN,
@@ -898,18 +923,36 @@ const NewRequest = () => {
         po_no: PO.no
       })
 
-      if (response.status === 204) {
-        const check = data.po_group.some((data) => data.no === PO.no)
-        if (check && !PO.update)
-          setError({
-            status: true,
-            data: {
-              ...error.data,
-              "po_no": [
-                "PO number already in the list."
-              ]
-            }
-          })
+      const check = data.po_group.some((data) => data.no === PO.no)
+      if (check && !PO.update)
+        return setError({
+          status: true,
+          data: {
+            ...error.data,
+            "po_no": [
+              "PO number already in the list."
+            ]
+          }
+        })
+
+      if (response.status === 200 && !PO.update) {
+        const { po_group } = response.data.result
+
+        setData(currentValue => ({
+          ...currentValue,
+          po_group: [
+            ...currentValue.po_group,
+            ...po_group.map((data) => ({ ...data, batch: true })).reverse()
+          ]
+        }))
+
+        const PODetails = po_group.map((data) => ({ ...data, batch: true })).find((data) => data.no === PO.no)
+        const POIndex = [
+          ...data.po_group,
+          ...po_group.reverse()
+        ].findIndex((data) => data.no === PO.no)
+
+        updatePurchaseOrderHandler(POIndex, PODetails)
       }
     }
     catch (error) {
@@ -928,7 +971,7 @@ const NewRequest = () => {
   }
 
   const updatePurchaseOrderHandler = (index, props) => {
-    const { no, amount, balance, rr_no } = props
+    const { no, amount, balance, rr_no, batch } = props
 
     delete error.data.po_no
     setError({
@@ -939,6 +982,7 @@ const NewRequest = () => {
     setPO({
       update: true,
       index,
+      batch,
 
       no,
       amount,
@@ -948,9 +992,13 @@ const NewRequest = () => {
   }
 
   const removePurchaseOrderHandler = (props) => {
-    const { no } = props
+    const { no, batch } = props
 
-    setData({
+    if (batch) setData({
+      ...data,
+      po_group: data.po_group.filter((data) => data.batch !== true)
+    })
+    else setData({
       ...data,
       po_group: data.po_group.filter((data) => data.no !== no)
     })
@@ -1016,10 +1064,8 @@ const NewRequest = () => {
           requestor: data.requestor,
           document: {
             id: data.document.id,
-            no: data.document.no,
             name: data.document.name,
             payment_type: data.document.payment_type,
-            amount: data.document.amount,
             date: data.document.date,
 
             company: data.document.company,
@@ -1137,6 +1183,7 @@ const NewRequest = () => {
     setPO({
       update: false,
       index: null,
+      batch: false,
 
       no: "",
       balance: null,
@@ -1168,7 +1215,12 @@ const NewRequest = () => {
 
         supplier: null,
 
-        reference: null,
+        reference: {
+          id: null,
+          type: "",
+          no: "",
+          amount: null
+        },
 
         pcf_batch: {
           name: null,
@@ -1253,7 +1305,8 @@ const NewRequest = () => {
               open: true,
               severity: "error",
               title: "Error!",
-              message: "Transaction failed. Please try again."
+              message: "Transaction failed. Please try again.",
+              duration: null
             })
           }
         }
@@ -1545,6 +1598,7 @@ const NewRequest = () => {
                       <LocalizationProvider dateAdapter={DateAdapter}>
                         <DatePicker
                           value={data.document.to}
+                          minDate={new Date(data.document.from)}
                           onChange={(value) => setData({
                             ...data,
                             document: {
@@ -1825,7 +1879,7 @@ const NewRequest = () => {
                         className="FstoSelectForm-root"
                         size="small"
                         options={REFERENCE_TYPES}
-                        value={data.document.reference}
+                        value={data.document.reference.id ? data.document.reference : null}
                         renderInput={
                           props =>
                             <TextField
@@ -1851,7 +1905,11 @@ const NewRequest = () => {
                           ...data,
                           document: {
                             ...data.document,
-                            reference: value
+                            reference: {
+                              ...data.document.reference,
+                              id: value.id,
+                              type: value.type
+                            }
                           }
                         })}
                         fullWidth
@@ -1865,7 +1923,7 @@ const NewRequest = () => {
                         variant="outlined"
                         autoComplete="off"
                         size="small"
-                        value={data.document.no}
+                        value={data.document.reference.no}
                         error={
                           error.status
                           && Boolean(error.data.reference_no)
@@ -1879,10 +1937,13 @@ const NewRequest = () => {
                           ...data,
                           document: {
                             ...data.document,
-                            no: e.target.value
+                            reference: {
+                              ...data.document.reference,
+                              no: e.target.value
+                            }
                           }
                         })}
-                        onBlur={checkreferenceNumberHandler}
+                        onBlur={checkReferenceNumberHandler}
                         InputLabelProps={{
                           className: "FstoLabelForm-root"
                         }}
@@ -1895,23 +1956,34 @@ const NewRequest = () => {
                         variant="outlined"
                         autoComplete="off"
                         size="small"
-                        value={data.document.amount}
+                        value={data.document.reference.amount}
                         error={
                           Boolean(data.po_group.length) &&
-                          Boolean(data.document.amount)
-                          && data.document.amount !== data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
+                          Boolean(data.document.reference.amount)
+                          && (
+                            data.document.payment_type === "Partial"
+                              ? (data.document.reference.amount > data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0))
+                              : (data.document.reference.amount === data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0))
+                          )
                         }
                         helperText={
                           Boolean(data.po_group.length) &&
-                          Boolean(data.document.amount)
-                          && data.document.amount !== data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
-                          && "Document amount and PO balance amount is not equal."
+                          Boolean(data.document.reference.amount)
+                          && (
+                            data.document.payment_type === "Partial"
+                              ? (data.document.reference.amount > data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0))
+                              : (data.document.reference.amount === data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0))
+                          )
+                          && "Reference amount and PO balance amount is not equal."
                         }
                         onChange={(e) => setData({
                           ...data,
                           document: {
                             ...data.document,
-                            amount: parseFloat(e.target.value)
+                            reference: {
+                              ...data.document.reference,
+                              amount: parseFloat(e.target.value)
+                            }
                           }
                         })}
                         InputProps={{
@@ -1932,7 +2004,7 @@ const NewRequest = () => {
                   filterOptions={filterOptions}
                   options={
                     data.document.id === 4
-                      ? data.document.reference ? SUPPLIER_LIST.filter(row => row.references.some(ref => ref.id === data.document.reference.id)) : SUPPLIER_LIST
+                      ? data.document.reference.id ? SUPPLIER_LIST.filter(row => row.references.some(ref => ref.id === data.document.reference.id)) : SUPPLIER_LIST
                       : SUPPLIER_LIST
                   }
                   value={data.document.supplier}
@@ -2190,10 +2262,10 @@ const NewRequest = () => {
                         size="small"
                         filterOptions={filterOptions}
                         options={
-                          data.document.utility.category && data.document.utility.location
-                            ? ACCOUNT_NUMBERS.filter(row => row.category.id === data.document.utility.category.id && row.location.id === data.document.utility.location.id)
-                            : data.document.utility.category || data.document.utility.location
-                              ? ACCOUNT_NUMBERS.filter(row => row.category.id === data.document.utility.category?.id || row.location.id === data.document.utility.location?.id)
+                          data.document.supplier && data.document.utility.category && data.document.utility.location
+                            ? ACCOUNT_NUMBERS.filter(row => row.supplier.id === data.document.supplier.id && row.category.id === data.document.utility.category.id && row.location.id === data.document.utility.location.id)
+                            : data.document.supplier || data.document.utility.category || data.document.utility.location
+                              ? ACCOUNT_NUMBERS.filter(row => row.supplier.id === data.document.supplier?.id || row.category.id === data.document.utility.category?.id || row.location.id === data.document.utility.location?.id)
                               : ACCOUNT_NUMBERS
                         }
                         value={data.document.utility.account_no}
@@ -2513,7 +2585,7 @@ const NewRequest = () => {
           <Paper className="FstoPaperAttachment-root" elevation={1}>
             <Typography variant="heading" sx={{ display: 'block', marginBottom: 3 }}>Attachment</Typography>
 
-            <Box sx={{ width: "100%", display: "flex", flexDirection: "row", alignItems: "flex-start", gap: 1, marginBottom: 2 }}>
+            <Box className="FstoBoxForm-attachment">
               <TextField
                 className="FstoTextfieldForm-attachment"
                 label="P.O. Number"
@@ -2538,9 +2610,7 @@ const NewRequest = () => {
                 InputLabelProps={{
                   className: "FstoLabelForm-attachment"
                 }}
-                sx={{
-                  minWidth: 230
-                }}
+                disabled={PO.batch}
               />
 
               <TextField
@@ -2552,8 +2622,11 @@ const NewRequest = () => {
                 value={PO.amount}
                 onChange={(e) => setPO({
                   ...PO,
-                  amount: parseFloat(e.target.value),
-                  balance: parseFloat(e.target.value)
+                  amount: parseFloat(e.target.value)
+                })}
+                onBlur={(e) => setPO({
+                  ...PO,
+                  balance: parseFloat(PO.amount)
                 })}
                 InputProps={{
                   inputComponent: NumberField,
@@ -2561,9 +2634,7 @@ const NewRequest = () => {
                 InputLabelProps={{
                   className: "FstoLabelForm-attachment"
                 }}
-                sx={{
-                  minWidth: 230
-                }}
+                disabled={PO.batch}
               />
 
               <Autocomplete
@@ -2587,7 +2658,7 @@ const NewRequest = () => {
                   props =>
                     <TextField
                       {...props}
-                      className="FstoTextfieldForm-attachment"
+                      // className="FstoTextfieldForm-attachment"
                       variant="outlined"
                       label="R.R. Numbers"
                       InputLabelProps={{
@@ -2611,18 +2682,18 @@ const NewRequest = () => {
                 variant="contained"
                 color="secondary"
                 size="large"
-                startIcon={<Add />}
+                startIcon={PO.update ? <Edit /> : <Add />}
                 onClick={addPurchaseOrderHandler}
                 disabled={
                   (error.status && Boolean(error.data.po_no)) ||
                   !Boolean(PO.no) ||
                   !Boolean(PO.amount) ||
-                  !Boolean(PO.balance) ||
+                  // !Boolean(PO.balance) ||
                   !Boolean(PO.rr_no.length)
                 }
                 disableElevation
               >
-                Add
+                {PO.update ? "Update" : "Add"}
               </Button>
             </Box>
 
@@ -2650,16 +2721,16 @@ const NewRequest = () => {
                               <Typography variant="h6" sx={{ fontWeight: 700 }}>&#8369;{data.balance.toLocaleString()}</Typography>
                             </Stack>
 
-                            <Stack direction="column" sx={{ flex: "1 1 100%" }}>
+                            <Stack direction="column" sx={{ flex: "1 1 100%", minWidth: 0 }}>
                               <Typography variant="subtitle2">R.R. Number</Typography>
-                              <Typography variant="h6" sx={{ fontWeight: 700 }}>{data.rr_no.join(", ")}</Typography>
+                              <Typography variant="h6" sx={{ fontWeight: 700, textOverflow: "ellipsis", whiteSpace: "nowrap", overflow: "hidden" }}>{data.rr_no.join(", ")}</Typography>
                             </Stack>
 
                             <Stack direction="row" spacing={1}>
                               <IconButton onClick={() => updatePurchaseOrderHandler(index, data)}>
                                 <Edit />
                               </IconButton>
-                              <IconButton onClick={() => removePurchaseOrderHandler(data)}>
+                              <IconButton onClick={() => removePurchaseOrderHandler(data)} disabled={PO.update}>
                                 <Delete />
                               </IconButton>
                             </Stack>

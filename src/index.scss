@@ -3,20 +3,36 @@ html {
 }
 
 body {
-  background: url(./assets/img/background.png) 50% 50% / cover no-repeat fixed #ffffff;
   margin: 0;
 
   font-family: 'Open Sans', sans-serif;
   font-size: 1rem;
 
+  &.light {
+    background: url(./assets/img/background.png) 50% 50% / cover no-repeat fixed;
+  }
+
   &.dark {
-      background: #181818;
-      color: #ffffff;
+    background: #181818;
+
+    .FstoPurchaseOrder-root:before,
+    .FstoPurchaseOrder-root:after {
+      background-color: #1e1e1e;
+    }
+  }
+
+  &.system {
+    @media (prefers-color-scheme: dark) {
+
+      .FstoPurchaseOrder-root:before,
+      .FstoPurchaseOrder-root:after {
+        background-color: #1e1e1e;
+      }
+    }
   }
 
   @media (prefers-color-scheme: dark) {
-    background: #181818;
-    color: #ffffff;
+    background-image: none;
   }
 }
 
@@ -57,35 +73,129 @@ body {
   padding-left: 2em;
   padding-right: 2em;
 
+  .FstoBoxToolbar-left,
+  .FstoBoxToolbar-right {
+    display: flex;
+    align-items: center;
+
+    .FstoTextFieldToolbar-root {
+      width: 100%;
+    }
+
+    .FstoTextfieldSearch-root {
+      border-radius: 25px;
+    }
+
+    .FstoButtonMode-root {
+      margin-right: 2em;
+      white-space: nowrap;
+      text-transform: capitalize;
+      text-decoration: underline;
+    }
+
+    .FstoButtonNew-root,
+    .FstoButtonImport-root {
+      margin-left: 2em;
+      font-weight: 400;
+      text-transform: capitalize;
+    }
+  }
+
   @media (min-width: 576px) {
     flex-direction: row;
     align-items: center;
   }
 }
 
-.FstoBoxToolbar-left,
-.FstoBoxToolbar-right {
+.FstoBoxToolbar2-root {
   display: flex;
-  align-items: center;
+  gap: 1em;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2em;
+  padding-left: 2em;
+  padding-right: 2em;
 
-  .FstoTextfieldSearch-root {
-    border-radius: 25px;
+  .FstoBoxToolbar-left,
+  .FstoBoxToolbar-right {
+    display: flex;
+    align-items: center;
+    width: 100%;
+
+    .FstoTextFieldToolbar-root {
+      width: 100%;
+    }
+
+    .FstoTextfieldSearch-root {
+      border-radius: 25px;
+    }
+
+    .FstoButtonNew-root {
+      margin-left: 2em;
+      font-weight: 400;
+      text-transform: capitalize;
+    }
   }
 
-  .FstoButtonMode-root {
-    margin-right: 2em;
-    white-space: nowrap;
-    text-transform: capitalize;
-    text-decoration: underline;
+  .FstoBoxToolbar-left {
+    justify-content: center;
   }
 
-  .FstoButtonNew-root,
-  .FstoButtonImport-root {
-    margin-left: 2em;
-    font-weight: 400;
+  .FstoBoxToolbar-right {
+    flex-direction: column;
+  }
+
+  @media (min-width: 992px) {
+    flex-direction: row;
+    align-items: center;
+
+    .FstoBoxToolbar-left {
+      width: auto;
+      justify-content: initial;
+    }
+
+    .FstoBoxToolbar-right {
+      flex-direction: row;
+      width: auto;
+
+      .FstoTabsToolbar-root {
+        margin-right: 2em;
+        margin-bottom: 0;
+      }
+
+      .FstoTextFieldToolbar-root {
+        width: auto;
+      }
+    }
+  }
+}
+
+.FstoTabsToolbar-root.MuiTabs-root {
+  min-height: 30px;
+  margin-bottom: 5px;
+
+  .FstoTabsIndicator-root.MuiTabs-indicator {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+
+    & .FstoTabsIndicator-root {
+      background-color: #635ee7;
+      width: 100%;
+      max-width: 25%;
+      border-radius: 1px;
+    }
+  }
+
+  .FstoTab-root.MuiTab-root {
+    min-width: auto;
+    min-height: auto;
+    padding: 8px 12px;
     text-transform: capitalize;
   }
 }
+
 
 .FstoTableContainer-root {
   flex-grow: 1;
@@ -207,34 +317,47 @@ body {
   overflow-x: auto;
   overflow-y: hidden;
 
-  // .FstoLabelForm-attachment {
-  //   top: 6px
-  // }
+  .FstoBoxForm-attachment {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25em;
+    margin-bottom: 1.25em;
 
-  // .FstoLabelForm-attachment.MuiInputLabel-shrink {
-  //   transform: translate(18px, -12px) scale(0.85)
-  // }
+    .FstoTextfieldForm-attachment {
+      width: 100%;
+    }
 
-  // .FstoTextfieldForm-attachment input {
-  //   padding: 14px 14px;
-  // }
+    .FstoSelectForm-attachment {
+      width: 100%;
+    }
 
-  // .FstoSelectForm-attachment .FstoTextfieldForm-attachment input.MuiOutlinedInput-input {
-  //   padding: 8px 14px;
-  // }
+    .FstoButtonForm-attachment {
+      text-transform: capitalize;
+    }
+
+    .FstoButtonForm-attachment .MuiButton-startIcon {
+      margin-right: 4px;
+    }
+
+    @media (min-width: 1200px) {
+      flex-direction: row;
+
+      .FstoTextfieldForm-attachment {
+        flex: 1;
+        width: auto;
+      }
+
+      .FstoSelectForm-attachment {
+        flex: 1;
+        width: auto;
+      }
+    }
+  }
 
   .FstoChipForm-attachment {
     margin: 0;
     margin-right: 2px;
-  }
-
-  .FstoButtonForm-attachment {
-    padding: 7px 28px;
-    text-transform: capitalize;
-  }
-
-  .FstoButtonForm-attachment .MuiButton-startIcon {
-    margin-right: 0;
   }
 }
 
@@ -248,9 +371,9 @@ body {
   position: relative;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   justify-content: space-evenly;
   align-items: center;
-  // gap: 2em;
   padding-top: 0.5em;
   padding-left: 1em;
   padding-bottom: 0.5em;
@@ -258,7 +381,6 @@ body {
   border: 1px solid #9A9A9A;
   border-top-style: dashed;
   border-bottom-style: dashed;
-  // border-radius: 5px;
 
   &:first-of-type {
     border-top-style: solid;
@@ -302,6 +424,10 @@ body {
     border: 1px solid #9A9A9A;
     border-left: 0;
     z-index: 1;
+
+    // @media (prefers-color-scheme: dark) {
+    //   background: #1e1e1e;
+    // }
   }
 
   &:last-of-type:before {
@@ -311,30 +437,9 @@ body {
   &:last-of-type:after {
     display: none;
   }
-}
 
-.FstoTabs-root.FstoTabs-root {
-  min-height: 30px;
-  margin-right: 2em;
-
-  .FstoTabsIndicator-root.MuiTabs-indicator {
-    background-color: transparent;
-    display: flex;
-    justify-content: center;
-
-    & .FstoTabsIndicator-root {
-      background-color: #635ee7;
-      width: 100%;
-      max-width: 25%;
-      border-radius: 1px;
-    }
-  }
-
-  .FstoTab-root.MuiTab-root {
-    min-width: auto;
-    min-height: auto;
-    padding: 8px 12px;
-    text-transform: capitalize;
+  @media (min-width: 576px) {
+    flex-wrap: nowrap;
   }
 }
 
@@ -361,11 +466,11 @@ input[type=number] {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0,0,0,0);
+  background: rgba(0, 0, 0, 0);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.25);
+  background: rgba(0, 0, 0, 0.25);
   border-radius: 10px;
 
   // @media (prefers-color-scheme: dark) {
@@ -374,7 +479,7 @@ input[type=number] {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0,0,0,0.75);
+  background: rgba(0, 0, 0, 0.75);
 
   // @media (prefers-color-scheme: dark) {
   //   background: rgba(255, 255, 255, 0.25);
