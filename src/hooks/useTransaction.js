@@ -1,4 +1,4 @@
-import React from 'react'
+// import React from 'react'
 
 import axios from 'axios'
 
@@ -6,57 +6,16 @@ import { useQuery } from 'react-query'
 
 import useToast from './useToast'
 
-const useTransaction = (URL) => {
+const useTransaction = (ID) => {
 
   const toast = useToast()
 
-  const [params, setParams] = React.useState({
-    state: "request",
-    page: 1,
-    rows: 10,
-    search: null
-  })
-
   const fetchData = async () => {
-    return await axios.get(URL, {
-      params: {
-        state: params.state,
-        page: params.page,
-        rows: params.rows,
-        search: params.search
-      }
-    })
+    return await axios.get(`/api/transactions/${ID}`)
   }
 
-  const searchData = (data) => {
-    if (status === 'loading') return
-
-    setParams(currentValue => ({
-      ...currentValue,
-      page: 1,
-      search: data
-    }))
-  }
-
-  const changeStatus = (data) => setParams(currentValue => ({
-    ...currentValue,
-    page: 1,
-    state: data,
-    search: null
-  }))
-
-  const changePage = (data) => setParams(currentValue => ({
-    ...currentValue,
-    page: data + 1
-  }))
-
-  const changeRows = (data) => setParams(currentValue => ({
-    ...currentValue,
-    rows: data
-  }))
-
-  const { status, data, error, refetch: refetchData } = useQuery(
-    ["transactions", params.search, params.state, params.page, params.rows],
+  const { status, data, error } = useQuery(
+    ["transaction", ID],
     fetchData,
     {
       retry: false,
@@ -68,15 +27,13 @@ const useTransaction = (URL) => {
             open: true,
             severity: "error",
             title: "Error",
-            message: "Something went wrong whilst fetching the list of data."
+            message: "Something went wrong whilst fetching the transaction details."
           })
       }
     }
   )
 
-  return {
-    status, data, error, refetchData, searchData, changeStatus, changePage, changeRows
-  }
+  return { status, data, error }
 }
 
 export default useTransaction

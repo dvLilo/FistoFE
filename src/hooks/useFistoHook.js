@@ -56,7 +56,9 @@ const useFistoHook = (URL) => {
 
       setIsFetching(false)
     })()
-  }, [URL, params, toast])
+
+    // eslint-disable-next-line
+  }, [URL, params])
 
   const refetchData = () => setParams(
     currentValue => ({

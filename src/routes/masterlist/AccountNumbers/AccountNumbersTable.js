@@ -70,15 +70,15 @@ const AccountNumbersTable = (props) => {
                   </TableCell>
 
                   <TableCell className="FstoTableData-root" sx={{ textTransform: "capitalize" }}>
-                    {data.category.category}
+                    {data.category?.category}
                   </TableCell>
 
                   <TableCell className="FstoTableData-root">
-                    {data.supplier.name}
+                    {data.supplier?.name}
                   </TableCell>
 
                   <TableCell className="FstoTableData-root">
-                    {data.location.location}
+                    {data.location?.location}
                   </TableCell>
 
                   <TableCell className="FstoTableData-root">

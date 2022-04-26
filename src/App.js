@@ -45,6 +45,7 @@ import Reasons from './routes/masterlist/Reasons/'
 // Requestor
 import TaggingRequest from './routes/requestor/TaggingRequest'
 import NewRequest from './routes/requestor/NewRequest'
+import UpdateRequest from './routes/requestor/UpdateRequest'
 
 import NotFound from './exceptions/NotFound'
 // import AccessDenied from './exceptions/AccessDenied'
@@ -212,8 +213,13 @@ const App = () => {
                 <Dashboard />
               }
             >
-              <Route index exact strict element={<QueryClientProvider client={queryClient}><TaggingRequest /></QueryClientProvider>} />
+              <Route index exact strict element={
+                <QueryClientProvider client={queryClient}>
+                  <TaggingRequest />
+                </QueryClientProvider>}
+              />
               <Route exact strict path="new-request" element={<NewRequest />} />
+              <Route exact strict path="update-request/:id" element={<UpdateRequest />} />
             </Route>
           </Route>
         </Routes>

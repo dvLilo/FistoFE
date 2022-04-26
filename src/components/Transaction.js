@@ -1,10 +1,16 @@
 import React from 'react'
 
-import { Box, Dialog, DialogContent, Typography } from '@mui/material'
+import {
+  Box,
+  Dialog,
+  DialogContent,
+  Typography
+} from '@mui/material'
 
 import '../assets/css/styles.transaction.scss'
 
 const Transaction = (props) => {
+
 
   return (
     <Dialog

@@ -174,6 +174,7 @@ const SuppliersForm = (props) => {
 
             setError({
               status: true,
+              field: data.result.error_field,
               message: data.message
             })
           }

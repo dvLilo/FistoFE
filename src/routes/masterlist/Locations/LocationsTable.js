@@ -68,7 +68,7 @@ const LocationsTable = (props) => {
                   </TableCell>
 
                   <TableCell className="FstoTableData-root">
-                    {data.company.name}
+                    {data.company?.name}
                   </TableCell>
 
                   <TableCell className="FstoTableData-root">

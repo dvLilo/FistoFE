@@ -12,7 +12,13 @@ import {
   Edit as UpdateIcon
 } from '@mui/icons-material'
 
-const TaggingRequestActions = () => {
+const TaggingRequestActions = (props) => {
+
+  const {
+    data,
+    onView,
+    onUpdate
+  } = props
 
   const [anchor, setAnchor] = React.useState(null)
 
@@ -44,11 +50,25 @@ const TaggingRequestActions = () => {
         onClose={actionCloseHandler}
         disablePortal
       >
-        <MenuItem onClick={() => { }} sx={{ fontWeight: 500 }} dense>
+        <MenuItem
+          onClick={() => {
+            onView(data)
+            actionCloseHandler()
+          }}
+          sx={{ fontWeight: 500 }}
+          dense
+        >
           <ViewIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> View
         </MenuItem>
 
-        <MenuItem onClick={() => { }} sx={{ fontWeight: 500 }} dense>
+        <MenuItem
+          onClick={() => {
+            onUpdate(data)
+            actionCloseHandler()
+          }}
+          sx={{ fontWeight: 500 }}
+          dense
+        >
           <UpdateIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Edit
         </MenuItem>
       </Menu>

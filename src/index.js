@@ -1,36 +1,37 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react'
+import ReactDOM from 'react-dom'
 
-import App from './App';
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
 
-import { Provider } from 'react-redux';
+import reducers from './reducers'
 
-import { createStore } from 'redux';
-import reducers from './reducers';
+import axios from 'axios'
 
-import axios from 'axios';
+import App from './App'
 
-import './index.scss';
+import './index.scss'
 
-axios.defaults.withCredentials = true;
-// axios.defaults.baseURL = 'http://localhost:8000';
-axios.defaults.baseURL = 'http://10.10.12.219:8000';
-axios.defaults.headers.post['Content-Type'] = 'application/json';
+axios.defaults.withCredentials = true
+axios.defaults.baseURL = 'https://fisto.ml'
+// axios.defaults.baseURL = 'http://localhost:8000'
+// axios.defaults.baseURL = 'http://10.10.12.219:8000'
+axios.defaults.headers.post['Content-Type'] = 'application/json'
 axios.interceptors.response.use(
   (response) => {
-    return response;
+    return response
   },
   (error) => {
     if (401 === error.request.status) {
-      window.localStorage.removeItem("token");
-      window.localStorage.removeItem("user");
+      window.localStorage.removeItem("token")
+      window.localStorage.removeItem("user")
 
-      return window.location.href = '/';
+      return window.location.href = '/'
     }
 
-    return Promise.reject(error);
+    return Promise.reject(error)
   }
-);
+)
 
 const store = createStore(
   reducers,
@@ -44,4 +45,4 @@ ReactDOM.render(
     </Provider>
   </React.StrictMode>,
   document.getElementById('fsto')
-);
+)

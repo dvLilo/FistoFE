@@ -1,6 +1,5 @@
 import React from 'react'
 
-// import axios from 'axios'
 // eslint-disable-next-line
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 
@@ -20,21 +19,6 @@ import {
   TableCell,
   TableSortLabel,
   TablePagination,
-
-  // Menu,
-  // MenuItem,
-
-  // Dialog,
-  // DialogTitle,
-  // DialogActions,
-  // DialogContent,
-  // Divider,
-  // Chip,
-
-  // List,
-  // ListItem,
-  // ListItemText,
-
   Tabs,
   Tab
 } from '@mui/material'
@@ -49,14 +33,30 @@ import Transaction from '../../components/Transaction'
 import Preloader from '../../components/Preloader'
 import TaggingRequestActions from './TaggingRequestActions'
 
-import useTransaction from '../../hooks/useTransaction'
+import useTransactions from '../../hooks/useTransactions'
 
 const TaggingRequest = () => {
 
-  const { status, data, searchData, changeStatus, changePage, changeRows } = useTransaction("/api/transactions")
+  const {
+    status,
+    data,
+    searchData,
+    changeStatus,
+    changePage,
+    changeRows
+  } = useTransactions("/api/transactions")
+
+  const navigate = useNavigate()
 
   const [state, setState] = React.useState("request")
   const [search, setSearch] = React.useState("")
+
+  const onView = () => { }
+  const onUpdate = (data) => {
+    const { id } = data
+
+    navigate(`update-request/${id}`)
+  }
 
   return (
     <Box className="FstoBox-root">
@@ -157,10 +157,6 @@ const TaggingRequest = () => {
                   <TableSortLabel active={false}>SUPPLIER</TableSortLabel>
                 </TableCell>
 
-                {/* <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={false}>PO AMOUNT</TableSortLabel>
-                </TableCell> */}
-
                 <TableCell className="FstoTableHead-root">
                   <TableSortLabel active={false}>REF AMOUNT</TableSortLabel>
                 </TableCell>
@@ -208,14 +204,6 @@ const TaggingRequest = () => {
                           {data.supplier}
                         </TableCell>
 
-                        {/* <TableCell className="FstoTableData-root">
-                          {
-                            data.po_total_amount
-                              ? <>&#8369;{data.po_total_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</>
-                              : <>&mdash;</>
-                          }
-                        </TableCell> */}
-
                         <TableCell className="FstoTableData-root">
                           {
                             data.referrence_amount
@@ -241,7 +229,11 @@ const TaggingRequest = () => {
                         </TableCell>
 
                         <TableCell className="FstoTableData-root" align="center">
-                          <TaggingRequestActions />
+                          <TaggingRequestActions
+                            data={data}
+                            onView={onView}
+                            onUpdate={onUpdate}
+                          />
                         </TableCell>
                       </TableRow>
                     ))

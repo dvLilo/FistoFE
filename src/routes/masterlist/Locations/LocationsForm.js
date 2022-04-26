@@ -209,8 +209,8 @@ const LocationsForm = (props) => {
         autoComplete="off"
         size="small"
         value={location.location}
-        helperText={error.status && error.field === "name" && error.message}
-        error={error.status && error.field === "name"}
+        helperText={error.status && error.field === "location" && error.message}
+        error={error.status && error.field === "location"}
         onBlur={() => setError({
           status: false,
           field: "",

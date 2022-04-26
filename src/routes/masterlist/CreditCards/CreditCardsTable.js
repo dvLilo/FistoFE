@@ -76,7 +76,7 @@ const CreditCardsTable = (props) => {
                   </TableCell>
 
                   <TableCell className="FstoTableData-root" sx={{ textTransform: "capitalize" }}>
-                    {data.utility_categories.map(cat => cat.category).join(', ')}
+                    {data.utility_categories?.map(cat => cat.category).join(', ')}
                   </TableCell>
 
                   <TableCell className="FstoTableData-root">

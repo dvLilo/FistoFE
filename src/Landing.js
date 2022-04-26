@@ -50,7 +50,9 @@ const Landing = () => {
     const session = window.localStorage.getItem("token")
 
     if (session) navigate('/dashboard', { replace: true })
-  }, [navigate])
+
+    // eslint-disable-next-line
+  }, [])
 
   const handleVisibility = () => {
     setVisibility(!visibility)
@@ -64,7 +66,7 @@ const Landing = () => {
       const response = await axios.post('/api/login', credential)
       const { token, ...user } = response.data.result
 
-      const encryptedUser = CryptoJS.AES.encrypt(JSON.stringify(user), "Fistocutie.").toString();
+      const encryptedUser = CryptoJS.AES.encrypt(JSON.stringify(user), "Fistocutie.").toString()
 
       window.localStorage.setItem('token', JSON.stringify(token))
       window.localStorage.setItem('user', encryptedUser)
@@ -72,8 +74,18 @@ const Landing = () => {
       dispatch(SET_AUTH())
       dispatch(SET_USER(user))
 
+      let REDIRECT
+      switch (user.role) {
+        case 'Requestor':
+          REDIRECT = '/requestor'
+          break
+
+        default:
+          REDIRECT = '/dashboard'
+      }
+
       // Redirect to Dashboard
-      navigate('/dashboard', {
+      navigate(REDIRECT, {
         state: {
           default_password: credential.username === credential.password ? true : false
         }

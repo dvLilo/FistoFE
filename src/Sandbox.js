@@ -148,6 +148,49 @@
 
 
 
+// import React from 'react'
+
+// import ReactDOM from 'react-dom'
+
+// import * as Mui from '@mui/material'
+
+// import useTransactions from './hooks/useTransactions'
+
+// const Sandbox = () => {
+
+//   const {
+//     status, data
+//   } = useTransactions("/api/transactions")
+
+//   return ReactDOM.createPortal(
+//     <React.Fragment>
+//       <Mui.Box sx={{
+//         backgroundColor: '#eee',
+//         display: 'flex',
+//         flexDirection: 'column',
+//         alignItems: 'center',
+//         minHeight: '100vh',
+//         padding: 5
+//       }}>
+//         {
+//           status === 'loading' ? "Please wait..." :
+//             data?.data.map(data => (
+//               <div key={data.id}>
+//                 {data.transaction_id}
+//               </div>
+//             ))
+//         }
+
+//         <Mui.Divider flexItem variant="middle" sx={{ marginY: 2 }} />
+
+//       </Mui.Box>
+//     </React.Fragment>,
+//     document.getElementById("sandbox")
+//   )
+// }
+
+// export default Sandbox
+
 import React from 'react'
 
 import ReactDOM from 'react-dom'
@@ -160,15 +203,7 @@ const Sandbox = () => {
 
   const {
     status, data
-  } = useTransaction("/api/transactions")
-
-  const [textfield, setTextfield] = React.useState({
-    value1: "",
-    value2: ""
-  })
-
-  const [singleValue1, setSingleValue1] = React.useState("")
-  const [singleValue2, setSingleValue2] = React.useState("")
+  } = useTransaction(1)
 
   return ReactDOM.createPortal(
     <React.Fragment>
@@ -182,36 +217,10 @@ const Sandbox = () => {
       }}>
         {
           status === 'loading' ? "Please wait..." :
-            data?.data.map(data => (
-              <div key={data.id}>
-                {data.transaction_id}
-              </div>
-            ))
+            <span>{data.document.no}</span>
         }
 
         <Mui.Divider flexItem variant="middle" sx={{ marginY: 2 }} />
-
-        <Mui.TextField
-          value={textfield.value1}
-          onChange={(e) => setTextfield({ ...textfield, value1: e.target.value })}
-        />
-
-        <Mui.TextField
-          value={textfield.value2}
-          onChange={(e) => setTextfield({ ...textfield, value2: e.target.value })}
-        />
-
-        <Mui.Divider flexItem variant="middle" sx={{ marginY: 2 }} />
-
-        <Mui.TextField
-          value={singleValue1}
-          onChange={(e) => setSingleValue1(e.target.value)}
-        />
-
-        <Mui.TextField
-          value={singleValue2}
-          onChange={(e) => setSingleValue2(e.target.value)}
-        />
 
       </Mui.Box>
     </React.Fragment>,

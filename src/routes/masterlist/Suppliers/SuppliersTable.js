@@ -80,7 +80,7 @@ const SuppliersTable = (props) => {
                   </TableCell>
 
                   <TableCell className="FstoTableData-root" sx={{ textTransform: "capitalize" }}>
-                    {data.supplier_type.type}
+                    {data.supplier_type?.type}
                   </TableCell>
 
                   <TableCell className="FstoTableData-root" sx={{ textTransform: "uppercase" }}>

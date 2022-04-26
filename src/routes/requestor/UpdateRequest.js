@@ -2,7 +2,7 @@ import React from 'react'
 
 import axios from 'axios'
 
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 
 import NumberFormat from 'react-number-format'
 
@@ -132,21 +132,21 @@ const NumberField = React.forwardRef(function NumberField(props, ref) {
         })
       }}
       prefix="₱"
-      // allowNegative={false}
-      // decimalScale={2}
-      // fixedDecimalScale
       thousandSeparator
       isNumericString
     />
   )
 })
 
-const NewRequest = () => {
+const UpdateRequest = () => {
+
+  const { id } = useParams()
 
   const toast = useToast()
   const confirm = useConfirm()
 
   const [isSaving, setIsSaving] = React.useState(false)
+  // const [isFetching, setIsFetching] = React.useState(false)
 
   const [validate, setValidate] = React.useState({
     status: false,
@@ -237,6 +237,33 @@ const NewRequest = () => {
     rr_no: []
   })
 
+  React.useEffect(() => {
+    (async () => {
+      let response
+      try {
+        response = await axios.get(`/api/transactions/${id}`)
+
+        const {
+          requestor,
+          document,
+          po_group
+        } = response.data.result
+
+        setData(currentValue => ({
+          requestor,
+          document: {
+            ...currentValue.document,
+            ...document
+          },
+          po_group
+        }))
+      }
+      catch (error) { }
+    })()
+
+    // eslint-disable-next-line
+  }, [])
+
   const [DOCUMENT_TYPES, setDocumentTypes] = React.useState([])
   React.useEffect(() => {
     (async () => {
@@ -244,24 +271,9 @@ const NewRequest = () => {
       try {
         response = await axios.get(`/api/dropdown/current-user`)
 
-        const { id, id_prefix, id_no, first_name, middle_name, last_name, suffix, role, position, department, document_types } = response.data.result
+        const { document_types } = response.data.result
 
         setDocumentTypes(document_types)
-        setData(currentValue => ({
-          ...currentValue,
-          requestor: {
-            id,
-            id_prefix,
-            id_no,
-            first_name,
-            middle_name,
-            last_name,
-            suffix,
-            role,
-            position,
-            department
-          }
-        }))
       }
       catch (error) {
         console.log("Fisto Error Status", error.request)
@@ -1850,7 +1862,7 @@ const NewRequest = () => {
                   className="FstoSelectForm-root"
                   size="small"
                   filterOptions={filterOptions}
-                  options={data.document.company ? COMPANY_CHARGING.find(row => row.id === data.document.company.id).departments : []}
+                  options={COMPANY_CHARGING.length ? COMPANY_CHARGING.find(row => row.id === data.document.company.id).departments : []}
                   value={data.document.department}
                   renderInput={
                     props =>
@@ -1898,7 +1910,7 @@ const NewRequest = () => {
                   className="FstoSelectForm-root"
                   size="small"
                   filterOptions={filterOptions}
-                  options={data.document.company ? COMPANY_CHARGING.find(row => row.id === data.document.company.id).locations : []}
+                  options={COMPANY_CHARGING.length ? COMPANY_CHARGING.find(row => row.id === data.document.company.id).locations : []}
                   value={data.document.location}
                   renderInput={
                     props =>
@@ -2120,7 +2132,7 @@ const NewRequest = () => {
                       className="FstoSelectForm-root"
                       size="small"
                       filterOptions={filterOptions}
-                      options={DOCUMENT_TYPES.find(type => type.id === data.document.id).categories}
+                      options={DOCUMENT_TYPES.length ? DOCUMENT_TYPES.find(type => type.id === data.document.id).categories : []}
                       value={data.document.category}
                       renderInput={
                         props =>
@@ -2595,7 +2607,7 @@ const NewRequest = () => {
                   autoComplete="off"
                   size="small"
                   rows={3}
-                  value={data.document.remarks}
+                  value={data.document.remarks ? data.document.remarks : undefined}
                   onChange={(e) => setData({
                     ...data,
                     document: {
@@ -2622,26 +2634,16 @@ const NewRequest = () => {
             startIcon={<></>}
             disabled={isDisabled()}
             disableElevation
-          >Save</LoadingButton>
+          >Update</LoadingButton>
 
-          {
-            data.document.id
-              ? <Button
-                className="FstoButtonForm-root"
-                variant="outlined"
-                color="error"
-                onClick={truncateData}
-                disableElevation
-              >Clear</Button>
-              : <Button
-                className="FstoButtonForm-root"
-                variant="outlined"
-                color="error"
-                to="/requestor"
-                component={Link}
-                disableElevation
-              >Back</Button>
-          }
+          <Button
+            className="FstoButtonForm-root"
+            variant="outlined"
+            color="error"
+            to="/requestor"
+            component={Link}
+            disableElevation
+          >Back</Button>
         </form>
       </Paper>
 
@@ -2835,4 +2837,4 @@ const NewRequest = () => {
   )
 }
 
-export default NewRequest
+export default UpdateRequest
