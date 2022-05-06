@@ -222,7 +222,7 @@ const DocumentTypesForm = (props) => {
             <TextField
               {...props}
               variant="outlined"
-              label="Category (Optional)"
+              label="Category"
               error={!Boolean(dropdown.categories.length) && !dropdown.isFetching}
               helperText={!Boolean(dropdown.categories.length) && !dropdown.isFetching && "No categories found."}
             />
@@ -265,7 +265,8 @@ const DocumentTypesForm = (props) => {
         disableElevation
         disabled={
           !Boolean(document.type.trim()) ||
-          !Boolean(document.description.trim())
+          !Boolean(document.description.trim()) ||
+          !Boolean(document.categories.length)
         }
       >
         {

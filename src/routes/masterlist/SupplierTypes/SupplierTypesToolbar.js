@@ -28,7 +28,7 @@ const SupplierTypesToolbar = (props) => {
   return (
     <React.Fragment>
       <Box className="FstoBoxToolbar-left">
-        <Typography variant="heading">Supplier Types</Typography>
+        <Typography variant="heading">Urgency Types</Typography>
       </Box>
 
       <Box className="FstoBoxToolbar-right">

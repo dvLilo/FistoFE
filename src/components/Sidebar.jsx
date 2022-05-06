@@ -129,11 +129,11 @@ const Sidebar = () => {
               <RouterLink className="FstoLink-root" to="/dashboard/departments">Departments</RouterLink>
               <RouterLink className="FstoLink-root" to="/dashboard/locations">Locations</RouterLink>
               <RouterLink className="FstoLink-root" to="/dashboard/references">References</RouterLink>
-              <RouterLink className="FstoLink-root" to="/dashboard/supplier-types">Supplier Types</RouterLink>
+              <RouterLink className="FstoLink-root" to="/dashboard/supplier-types">Urgency Types</RouterLink>
               <RouterLink className="FstoLink-root" to="/dashboard/suppliers">Suppliers</RouterLink>
               <RouterLink className="FstoLink-root" to="/dashboard/utility-categories">Utility Categories</RouterLink>
               <RouterLink className="FstoLink-root" to="/dashboard/utility-locations">Utility Locations</RouterLink>
-              <RouterLink className="FstoLink-root" to="/dashboard/account-numbers">Account Numbers</RouterLink>
+              <RouterLink className="FstoLink-root" to="/dashboard/account-numbers">Utility Account</RouterLink>
               <RouterLink className="FstoLink-root" to="/dashboard/credit-cards">Credit Card</RouterLink>
               <RouterLink className="FstoLink-root" to="/dashboard/account-titles">Account Titles</RouterLink>
               <RouterLink className="FstoLink-root" to="/dashboard/payroll-clients">Payroll Clients</RouterLink>

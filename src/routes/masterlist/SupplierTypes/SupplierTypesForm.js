@@ -120,7 +120,7 @@ const SupplierTypesForm = (props) => {
     <form onSubmit={formSubmitHandler}>
       <TextField
         className="FstoTextfieldForm-root"
-        label="Supplier Type"
+        label="Urgency Type"
         variant="outlined"
         autoComplete="off"
         size="small"

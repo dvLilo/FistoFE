@@ -33,14 +33,16 @@ const LocationsForm = (props) => {
   // Dropdown Array
   const [dropdown, setDropdown] = React.useState({
     isFetching: false,
-    companies: []
+    companies: [],
+    departments: []
   })
 
   // Form Data State
   const [location, setLocation] = React.useState({
     code: "",
     location: "",
-    company: null
+    company: null,
+    department: null
   })
 
   React.useEffect(() => {
@@ -55,12 +57,14 @@ const LocationsForm = (props) => {
         response = await axios.get(`/api/admin/dropdown/company`)
 
         const {
-          companies
+          companies,
+          departments
         } = response.data.result
 
         setDropdown(currentValue => ({
           isFetching: false,
-          companies
+          companies,
+          departments
         }))
       }
       catch (error) {
@@ -75,7 +79,8 @@ const LocationsForm = (props) => {
 
         setDropdown(currentValue => ({
           isFetching: false,
-          companies: []
+          companies: [],
+          departments: []
         }))
 
         console.log("Fisto Error Details: ", error.request)
@@ -93,6 +98,10 @@ const LocationsForm = (props) => {
         company: {
           id: data.company.id,
           company: data.company.name
+        },
+        department: {
+          id: data.department.id,
+          department: data.department.name
         }
       })
     }
@@ -108,7 +117,8 @@ const LocationsForm = (props) => {
     setLocation({
       code: "",
       location: "",
-      company: null
+      company: null,
+      department: null
     })
   }
 
@@ -132,13 +142,15 @@ const LocationsForm = (props) => {
             response = await axios.put(`/api/admin/locations/${data.id}/`, {
               code: location.code,
               location: location.location,
-              company: location.company.id
+              company: location.company.id,
+              department: location.department.id
             })
           else
             response = await axios.post(`/api/admin/locations/`, {
               code: location.code,
               location: location.location,
-              company: location.company.id
+              company: location.company.id,
+              department: location.department.id
             })
 
           toast({
@@ -259,6 +271,47 @@ const LocationsForm = (props) => {
             setLocation({
               ...location,
               company: value
+            })
+          }
+        }
+        fullWidth
+        disablePortal
+        disableClearable
+      />
+
+      <Autocomplete
+        className="FstoSelectForm-root"
+        size="small"
+        options={dropdown.departments}
+        value={location.department}
+        renderInput={
+          props =>
+            <TextField
+              {...props}
+              variant="outlined"
+              label="Department"
+              error={!Boolean(dropdown.department.length) && !dropdown.isFetching}
+              helperText={!Boolean(dropdown.department.length) && !dropdown.isFetching && "No departments found."}
+            />
+        }
+        PaperComponent={
+          props =>
+            <Paper
+              {...props}
+              sx={{ textTransform: 'capitalize' }}
+            />
+        }
+        getOptionLabel={
+          option => option.department
+        }
+        isOptionEqualToValue={
+          (option, value) => option.id === value.id
+        }
+        onChange={
+          (e, value) => {
+            setLocation({
+              ...location,
+              department: value
             })
           }
         }

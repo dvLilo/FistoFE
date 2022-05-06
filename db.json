@@ -93,7 +93,8 @@
       "letter": "A",
       "branch": "PCF FINANCE",
       "date": "2021-06",
-      "amount": 79738.93
+      "amount": 79738.93,
+      "date_created": "2021-06-21"
     },
     {
       "id": 2,
@@ -101,7 +102,8 @@
       "letter": "B",
       "branch": "PCF DEPOT",
       "date": "2021-12",
-      "amount": 88111.97
+      "amount": 88111.97,
+      "date_created": "2021-06-21"
     },
     {
       "id": 3,
@@ -109,7 +111,8 @@
       "letter": "B",
       "branch": "PCF PURCHASING",
       "date": "2021-12",
-      "amount": 69337.50
+      "amount": 69337.50,
+      "date_created": "2021-06-21"
     },
     {
       "id": 4,
@@ -117,7 +120,8 @@
       "letter": "A",
       "branch": "PCF PURCHASING",
       "date": "2022-04",
-      "amount": 39999.95
+      "amount": 39999.95,
+      "date_created": "2021-06-21"
     }
   ]
 }

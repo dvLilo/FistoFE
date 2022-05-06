@@ -595,7 +595,7 @@ const UpdateRequest = () => {
 
 
   React.useEffect(() => { // Utility Account Number Auto Select
-    if (data.document.supplier && data.document.utility.category && data.document.utility.location) {
+    if (data.document.supplier && data.document.utility.category && data.document.utility.location && ACCOUNT_NUMBERS.length) {
       const account_numbers = ACCOUNT_NUMBERS.filter(row => row.supplier.id === data.document.supplier.id && row.category.id === data.document.utility.category.id && row.location.id === data.document.utility.location.id)
 
       if (account_numbers.length === 1)
@@ -1740,6 +1740,7 @@ const UpdateRequest = () => {
                     <LocalizationProvider dateAdapter={DateAdapter}>
                       <DatePicker
                         value={data.document.date}
+                        maxDate={new Date()}
                         onChange={(value) => setData({
                           ...data,
                           document: {
@@ -2273,17 +2274,27 @@ const UpdateRequest = () => {
                         isOptionEqualToValue={
                           (option, value) => option.id === value.id
                         }
-                        onChange={(e, value) => setData({
-                          ...data,
+                        // onBlur={(e) => setData(currentValue => ({
+                        //   ...currentValue,
+                        //   document: {
+                        //     ...currentValue.document,
+                        //     utility: {
+                        //       ...currentValue.document.utility,
+                        //       account_no: null
+                        //     }
+                        //   }
+                        // }))}
+                        onChange={(e, value) => setData(currentValue => ({
+                          ...currentValue,
                           document: {
-                            ...data.document,
+                            ...currentValue.document,
                             utility: {
-                              ...data.document.utility,
+                              ...currentValue.document.utility,
                               category: value,
                               account_no: null
                             }
                           }
-                        })}
+                        }))}
                         fullWidth
                         disablePortal
                         disableClearable
@@ -2325,17 +2336,27 @@ const UpdateRequest = () => {
                         isOptionEqualToValue={
                           (option, value) => option.id === value.id
                         }
-                        onChange={(e, value) => setData({
-                          ...data,
+                        // onBlur={(e) => setData(currentValue => ({
+                        //   ...currentValue,
+                        //   document: {
+                        //     ...currentValue.document,
+                        //     utility: {
+                        //       ...currentValue.document.utility,
+                        //       account_no: null
+                        //     }
+                        //   }
+                        // }))}
+                        onChange={(e, value) => setData(currentValue => ({
+                          ...currentValue,
                           document: {
-                            ...data.document,
+                            ...currentValue.document,
                             utility: {
-                              ...data.document.utility,
+                              ...currentValue.document.utility,
                               location: value,
                               account_no: null
                             }
                           }
-                        })}
+                        }))}
                         fullWidth
                         disablePortal
                         disableClearable
@@ -2374,19 +2395,19 @@ const UpdateRequest = () => {
                         isOptionEqualToValue={
                           (option, value) => option.id === value.id
                         }
-                        onChange={(e, value) => setData({
-                          ...data,
+                        onChange={(e, value) => setData(currentValue => ({
+                          ...currentValue,
                           document: {
-                            ...data.document,
+                            ...currentValue.document,
                             utility: {
-                              ...data.document.utility,
+                              ...currentValue.document.utility,
                               account_no: {
                                 id: value.id,
                                 no: value.no
                               }
                             }
                           }
-                        })}
+                        }))}
                         fullWidth
                         disablePortal
                         disableClearable

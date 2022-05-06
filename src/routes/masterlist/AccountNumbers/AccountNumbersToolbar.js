@@ -150,7 +150,7 @@ const AccountNumbersToolbar = (props) => {
   return (
     <React.Fragment>
       <Box className="FstoBoxToolbar-left">
-        <Typography variant="heading">Account Numbers</Typography>
+        <Typography variant="heading">Utility Account</Typography>
 
         <LoadingButton
           className="FstoButtonImport-root"

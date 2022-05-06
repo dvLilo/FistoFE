@@ -255,6 +255,13 @@ body {
   margin-bottom: 1.25em;
 }
 
+// .FstoLabelForm-root {}
+
+.FstoAdrmentForm-root.MuiInputAdornment-root {
+  margin-right: 0;
+  color: rgba(0, 0, 0, 0.75);
+}
+
 .FstoSelectForm-root.MuiFormControl-root {
   margin-bottom: 1.25em;
   text-transform: capitalize;

@@ -51,7 +51,26 @@ const TaggingRequest = () => {
   const [state, setState] = React.useState("request")
   const [search, setSearch] = React.useState("")
 
-  const onView = () => { }
+  const [view, setView] = React.useState({
+    id: null,
+    open: false,
+    onClose: () => setView(currentValue => ({
+      ...currentValue,
+      id: null,
+      open: false
+    }))
+  })
+
+  const onView = (data) => {
+    const { id } = data
+
+    setView(currentValue => ({
+      ...currentValue,
+      id,
+      open: true
+    }))
+  }
+
   const onUpdate = (data) => {
     const { id } = data
 
@@ -180,7 +199,7 @@ const TaggingRequest = () => {
             <TableBody>
               {
                 status === 'loading'
-                  ? <Preloader row={5} col={11} />
+                  ? <Preloader row={5} col={10} />
                   : data
                     ? data.data.map((data, index) => (
                       <TableRow key={index}>
@@ -257,7 +276,9 @@ const TaggingRequest = () => {
           rowsPerPageOptions={[10, 20, 50, 100]}
         />
 
-        <Transaction />
+        {
+          view.open &&
+          <Transaction id={view.id} open={view.open} onClose={view.onClose} />}
       </Paper>
     </Box>
   )

@@ -48,7 +48,7 @@ import NewRequest from './routes/requestor/NewRequest'
 import UpdateRequest from './routes/requestor/UpdateRequest'
 
 import NotFound from './exceptions/NotFound'
-// import AccessDenied from './exceptions/AccessDenied'
+import AccessDenied from './exceptions/AccessDenied'
 import Sandbox from './Sandbox'
 
 import FistoProvider from './contexts/FistoContext'
@@ -142,6 +142,7 @@ const App = () => {
       <Router>
         <Routes>
           <Route exact strict path="*" element={<NotFound />} />
+          <Route exact strict path="/403" element={<AccessDenied />} />
           <Route
             exact
             path="/sandbox"

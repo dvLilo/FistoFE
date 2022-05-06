@@ -38,7 +38,7 @@
     border-right: 0;
   }
 
-  &.last {
+  &:last-of-type {
     border-bottom: 3px solid #707070;
   }
 }

@@ -58,12 +58,13 @@ const Landing = () => {
     setVisibility(!visibility)
   }
 
-  const handleSubmit = async event => {
-    event.preventDefault()
+  const handleSubmit = async (e) => {
+    e.preventDefault()
     setLoading(true)
 
+    let response
     try {
-      const response = await axios.post('/api/login', credential)
+      response = await axios.post(`/api/login`, credential)
       const { token, ...user } = response.data.result
 
       const encryptedUser = CryptoJS.AES.encrypt(JSON.stringify(user), "Fistocutie.").toString()

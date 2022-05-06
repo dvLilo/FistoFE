@@ -16,7 +16,8 @@ import {
   Chip,
   Stack,
   IconButton,
-  Divider
+  Divider,
+  InputAdornment
 } from '@mui/material'
 
 import {
@@ -132,7 +133,7 @@ const NumberField = React.forwardRef(function NumberField(props, ref) {
         })
       }}
       prefix="₱"
-      // allowNegative={false}
+      allowNegative={false}
       // decimalScale={2}
       // fixedDecimalScale
       thousandSeparator
@@ -175,8 +176,9 @@ const NewRequest = () => {
     document: {
       id: null,
       name: "",
-      payment_type: "",
+      payment_type: "Full",
       no: "",
+      cip: "",
       from: null,
       to: null,
       date: null,
@@ -237,7 +239,7 @@ const NewRequest = () => {
     rr_no: []
   })
 
-  const [DOCUMENT_TYPES, setDocumentTypes] = React.useState([])
+  const [DOCUMENT_TYPES, setDocumentTypes] = React.useState({ fetching: true, data: [] })
   React.useEffect(() => {
     (async () => {
       let response
@@ -246,7 +248,7 @@ const NewRequest = () => {
 
         const { id, id_prefix, id_no, first_name, middle_name, last_name, suffix, role, position, department, document_types } = response.data.result
 
-        setDocumentTypes(document_types)
+        setDocumentTypes({ fetching: false, data: document_types })
         setData(currentValue => ({
           ...currentValue,
           requestor: {
@@ -266,6 +268,7 @@ const NewRequest = () => {
       catch (error) {
         console.log("Fisto Error Status", error.request)
 
+        setDocumentTypes({ fetching: false, data: [] })
         toast({
           open: true,
           severity: "error",
@@ -528,38 +531,38 @@ const NewRequest = () => {
     // eslint-disable-next-line
   }, [data.document.id])
 
-  const [REFERENCE_TYPES, setReferenceTypes] = React.useState([])
-  React.useEffect(() => {
-    (async () => {
-      if (data.document.id === 4) {
-        let response
-        try {
-          response = await axios.get(`/api/dropdown/references`, {
-            params: {
-              status: 1,
-              paginate: 0
-            }
-          })
+  // const [REFERENCE_TYPES, setReferenceTypes] = React.useState([])
+  // React.useEffect(() => {
+  //   (async () => {
+  //     if (data.document.id === 4) {
+  //       let response
+  //       try {
+  //         response = await axios.get(`/api/dropdown/references`, {
+  //           params: {
+  //             status: 1,
+  //             paginate: 0
+  //           }
+  //         })
 
-          const { referrences } = response.data.result
+  //         const { referrences } = response.data.result
 
-          setReferenceTypes(referrences)
-        }
-        catch (error) {
-          console.log("Fisto Error Status", error.request)
+  //         setReferenceTypes(referrences)
+  //       }
+  //       catch (error) {
+  //         console.log("Fisto Error Status", error.request)
 
-          toast({
-            open: true,
-            severity: "error",
-            title: "Error!",
-            message: "Something went wrong whilst trying to connect to the server. Please try again later."
-          })
-        }
-      }
-    })()
+  //         toast({
+  //           open: true,
+  //           severity: "error",
+  //           title: "Error!",
+  //           message: "Something went wrong whilst trying to connect to the server. Please try again later."
+  //         })
+  //       }
+  //     }
+  //   })()
 
-    // eslint-disable-next-line
-  }, [data.document.id])
+  //   // eslint-disable-next-line
+  // }, [data.document.id])
 
 
 
@@ -652,6 +655,18 @@ const NewRequest = () => {
 
     // eslint-disable-next-line
   }, [data.document.from, data.document.to, data.document.company, data.document.department, data.document.utility.category, data.document.utility.location])
+
+  // React.useEffect(() => {
+  //   const unload = (e) => {
+  //     e = e || window.event
+
+  //     if (e) e.returnValue = 'Are you sure you want to proceed?'
+  //     return 'Are you sure you want to proceed?'
+  //   }
+
+  //   window.addEventListener("beforeunload", unload)
+  //   return () => window.removeEventListener("beforeunload", unload)
+  // }, [])
 
 
   const isDisabled = () => {
@@ -1138,6 +1153,7 @@ const NewRequest = () => {
           document: {
             id: data.document.id,
             no: data.document.no,
+            cip: data.document.cip,
             name: data.document.name,
             payment_type: data.document.payment_type,
             amount: data.document.amount,
@@ -1377,8 +1393,9 @@ const NewRequest = () => {
           <Autocomplete
             className="FstoSelectForm-root"
             size="small"
-            options={DOCUMENT_TYPES}
-            value={DOCUMENT_TYPES.find(row => row.id === data.document.id) || null}
+            options={DOCUMENT_TYPES.data}
+            value={DOCUMENT_TYPES.data.find(row => row.id === data.document.id) || null}
+            loading={DOCUMENT_TYPES.fetching}
             renderInput={
               props =>
                 <TextField
@@ -1406,7 +1423,7 @@ const NewRequest = () => {
                 ...data.document,
                 id: value.id,
                 name: value.type,
-                payment_type: ""
+                payment_type: value.id === 4 ? null : "Full"
               }
             })}
             fullWidth
@@ -1463,13 +1480,15 @@ const NewRequest = () => {
                             ...data,
                             document: {
                               ...data.document,
+                              date: new Date(value.date_created).toISOString().slice(0, 7),
+                              payment_type: "Full",
+                              amount: value.amount,
                               pcf_batch: {
                                 name: value.name,
                                 letter: value.letter,
                                 date: value.date
                               },
-                              payment_type: "Full",
-                              amount: value.amount,
+                              supplier: SUPPLIER_LIST.find(row => row.name.replace(/\s|-/g, '').toLowerCase() === value.branch.replace(/\s|-/g, '').toLowerCase()) || null
                             }
                           })
                           checkPettyCashFundNameHandler(value.name)
@@ -1525,6 +1544,7 @@ const NewRequest = () => {
                           }
                         })}
                         fullWidth
+                        disabled
                         disablePortal
                         disableClearable
                       />
@@ -1564,6 +1584,7 @@ const NewRequest = () => {
                               />
                           }
                           showToolbar
+                          disabled
                         />
                       </LocalizationProvider>
                     </React.Fragment>
@@ -1616,6 +1637,7 @@ const NewRequest = () => {
                       <LocalizationProvider dateAdapter={DateAdapter}>
                         <DatePicker
                           value={data.document.from}
+                          maxDate={data.document.to ? new Date(data.document.to) : null}
                           onChange={(value) => setData({
                             ...data,
                             document: {
@@ -1693,6 +1715,7 @@ const NewRequest = () => {
                       variant="outlined"
                       autoComplete="off"
                       size="small"
+                      type="number"
                       value={data.document.no}
                       error={
                         error.status
@@ -1707,6 +1730,7 @@ const NewRequest = () => {
                           && validate.data.includes('document_no')
                           && "Please wait...")
                       }
+                      onKeyDown={(e) => ["E", "e", ".", "+", "-"].includes(e.key) && e.preventDefault()}
                       onChange={(e) => setData({
                         ...data,
                         document: {
@@ -1715,6 +1739,15 @@ const NewRequest = () => {
                         }
                       })}
                       onBlur={checkDocumentNumberHandler}
+                      InputProps={{
+                        startAdornment: data.document.no &&
+                          <InputAdornment className="FstoAdrmentForm-root" position="start">
+                            {data.document.id === 1 && "pad#"}
+                            {data.document.id === 2 && "prmc#"}
+                            {data.document.id === 3 && "prmm#"}
+                            {data.document.id === 5 && "cb#"}
+                          </InputAdornment>
+                      }}
                       InputLabelProps={{
                         className: "FstoLabelForm-root"
                       }}
@@ -1722,34 +1755,58 @@ const NewRequest = () => {
                     />
                   )}
 
-                { //Document Date
+                { // Request Date, Document Date
                   (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4 || data.document.id === 5 || data.document.id === 8) &&
                   (
-                    <LocalizationProvider dateAdapter={DateAdapter}>
-                      <DatePicker
-                        value={data.document.date}
-                        onChange={(value) => setData({
-                          ...data,
-                          document: {
-                            ...data.document,
-                            date: new Date(value).toISOString().slice(0, 10)
+                    <React.Fragment>
+                      <LocalizationProvider dateAdapter={DateAdapter}>
+                        <DatePicker
+                          value={new Date()}
+                          onChange={(value) => { }}
+                          renderInput={
+                            props =>
+                              <TextField
+                                {...props}
+                                className="FstoTextfieldForm-root"
+                                variant="outlined"
+                                size="small"
+                                label="Request Date"
+                                autoComplete="off"
+                                fullWidth
+                              />
                           }
-                        })}
-                        renderInput={
-                          props =>
-                            <TextField
-                              {...props}
-                              className="FstoTextfieldForm-root"
-                              variant="outlined"
-                              size="small"
-                              label="Document Date"
-                              autoComplete="off"
-                              fullWidth
-                            />
-                        }
-                        showToolbar
-                      />
-                    </LocalizationProvider>
+                          disabled
+                        />
+                      </LocalizationProvider>
+
+                      <LocalizationProvider dateAdapter={DateAdapter}>
+                        <DatePicker
+                          value={data.document.date}
+                          disabled={data.document.id === 8}
+                          maxDate={new Date()}
+                          onChange={(value) => setData({
+                            ...data,
+                            document: {
+                              ...data.document,
+                              date: new Date(value).toISOString().slice(0, 10)
+                            }
+                          })}
+                          renderInput={
+                            props =>
+                              <TextField
+                                {...props}
+                                className="FstoTextfieldForm-root"
+                                variant="outlined"
+                                size="small"
+                                label="Document Date"
+                                autoComplete="off"
+                                fullWidth
+                              />
+                          }
+                          showToolbar
+                        />
+                      </LocalizationProvider>
+                    </React.Fragment>
                   )}
 
                 { //Document Amount
@@ -1797,7 +1854,7 @@ const NewRequest = () => {
                     />
                   )}
 
-                <Autocomplete
+                <Autocomplete // Company Charging
                   className="FstoSelectForm-root"
                   size="small"
                   options={COMPANY_CHARGING}
@@ -1846,7 +1903,7 @@ const NewRequest = () => {
                   disableClearable
                 />
 
-                <Autocomplete
+                <Autocomplete // Department Charging
                   className="FstoSelectForm-root"
                   size="small"
                   filterOptions={filterOptions}
@@ -1894,7 +1951,7 @@ const NewRequest = () => {
                   disableClearable
                 />
 
-                <Autocomplete
+                <Autocomplete // Location Charging
                   className="FstoSelectForm-root"
                   size="small"
                   filterOptions={filterOptions}
@@ -1933,6 +1990,68 @@ const NewRequest = () => {
                   disableClearable
                 />
 
+                <Autocomplete // Supplier
+                  className="FstoSelectForm-root"
+                  size="small"
+                  filterOptions={filterOptions}
+                  options={
+                    data.document.id === 8
+                      ? SUPPLIER_LIST.filter(row => row.name.match(/PCF.*/) ? row : null)
+                      : SUPPLIER_LIST
+                  }
+                  value={data.document.supplier}
+                  renderInput={
+                    props =>
+                      <TextField
+                        {...props}
+                        variant="outlined"
+                        label="Supplier"
+                      />
+                  }
+                  PaperComponent={
+                    props =>
+                      <Paper
+                        {...props}
+                        sx={{ textTransform: 'capitalize' }}
+                      />
+                  }
+                  getOptionLabel={
+                    option => option.name
+                  }
+                  isOptionEqualToValue={
+                    (option, value) => option.id === value.id
+                  }
+                  onChange={(e, value) => setData({
+                    ...data,
+                    document: {
+                      ...data.document,
+                      supplier: value,
+                      ...(
+                        value.references.length === 1 ?
+                          {
+                            reference: {
+                              ...data.document.reference,
+                              id: value.references[0].id,
+                              type: value.references[0].type
+                            }
+                          } : {
+                            reference: {
+                              ...data.document.reference,
+                              id: null,
+                              type: ""
+                            }
+                          }
+                      )
+                    }
+                  })}
+                  disabled={
+                    data.document.id === 8 && Boolean(data.document.supplier)
+                  }
+                  fullWidth
+                  disablePortal
+                  disableClearable
+                />
+
                 { // Reference Type, Reference Number, Reference Amount
                   (data.document.id === 4) &&
                   (
@@ -1940,7 +2059,8 @@ const NewRequest = () => {
                       <Autocomplete
                         className="FstoSelectForm-root"
                         size="small"
-                        options={REFERENCE_TYPES}
+                        // options={REFERENCE_TYPES}
+                        options={data.document.supplier?.references || []}
                         value={data.document.reference.id ? data.document.reference : null}
                         renderInput={
                           props =>
@@ -1985,6 +2105,7 @@ const NewRequest = () => {
                         variant="outlined"
                         autoComplete="off"
                         size="small"
+                        type="number"
                         value={data.document.reference.no}
                         error={
                           error.status
@@ -1999,6 +2120,7 @@ const NewRequest = () => {
                             && validate.data.includes('reference_no')
                             && "Please wait...")
                         }
+                        onKeyDown={(e) => ["E", "e", ".", "+", "-"].includes(e.key) && e.preventDefault()}
                         onChange={(e) => setData({
                           ...data,
                           document: {
@@ -2070,49 +2192,6 @@ const NewRequest = () => {
                   )
                 }
 
-                <Autocomplete
-                  className="FstoSelectForm-root"
-                  size="small"
-                  filterOptions={filterOptions}
-                  options={
-                    data.document.id === 4
-                      ? data.document.reference.id ? SUPPLIER_LIST.filter(row => row.references.some(ref => ref.id === data.document.reference.id)) : SUPPLIER_LIST
-                      : SUPPLIER_LIST
-                  }
-                  value={data.document.supplier}
-                  renderInput={
-                    props =>
-                      <TextField
-                        {...props}
-                        variant="outlined"
-                        label="Supplier"
-                      />
-                  }
-                  PaperComponent={
-                    props =>
-                      <Paper
-                        {...props}
-                        sx={{ textTransform: 'capitalize' }}
-                      />
-                  }
-                  getOptionLabel={
-                    option => option.name
-                  }
-                  isOptionEqualToValue={
-                    (option, value) => option.id === value.id
-                  }
-                  onChange={(e, value) => setData({
-                    ...data,
-                    document: {
-                      ...data.document,
-                      supplier: value
-                    }
-                  })}
-                  fullWidth
-                  disablePortal
-                  disableClearable
-                />
-
                 { // Category
                   (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4 || data.document.id === 5) &&
                   (
@@ -2120,7 +2199,7 @@ const NewRequest = () => {
                       className="FstoSelectForm-root"
                       size="small"
                       filterOptions={filterOptions}
-                      options={DOCUMENT_TYPES.find(type => type.id === data.document.id).categories}
+                      options={DOCUMENT_TYPES.data.find(type => type.id === data.document.id).categories}
                       value={data.document.category}
                       renderInput={
                         props =>
@@ -2588,6 +2667,30 @@ const NewRequest = () => {
                     </React.Fragment>
                   )}
 
+                { // CAPEX Number
+                  (data.document.id === 5) &&
+                  (
+                    <TextField
+                      className="FstoTextfieldForm-root"
+                      label="CAPEX"
+                      variant="outlined"
+                      autoComplete="off"
+                      size="small"
+                      value={data.document.cip}
+                      onChange={(e) => setData({
+                        ...data,
+                        document: {
+                          ...data.document,
+                          cip: e.target.value
+                        }
+                      })}
+                      InputLabelProps={{
+                        className: "FstoLabelForm-root"
+                      }}
+                      fullWidth
+                    />
+                  )}
+
                 <TextField
                   className="FstoTextfieldForm-root"
                   label="Remarks (Optional)"
@@ -2658,6 +2761,7 @@ const NewRequest = () => {
                 variant="outlined"
                 autoComplete="off"
                 size="small"
+                type="number"
                 value={PO.no}
                 error={
                   error.status
@@ -2672,8 +2776,9 @@ const NewRequest = () => {
                     && validate.data.includes('po_no')
                     && "Please wait...")
                 }
-                onBlur={checkPurchaseOrderHandler}
                 onKeyPress={(e) => {
+                  ["E", "e", ".", "+", "-"].includes(e.key) && e.preventDefault()
+
                   if (e.key === "Enter")
                     checkPurchaseOrderHandler(e)
                 }}
@@ -2681,6 +2786,11 @@ const NewRequest = () => {
                   ...PO,
                   no: e.target.value
                 })}
+                onBlur={checkPurchaseOrderHandler}
+                InputProps={{
+                  startAdornment: PO.no &&
+                    <InputAdornment className="FstoAdrmentForm-root" position="start">PO#</InputAdornment>
+                }}
                 InputLabelProps={{
                   className: "FstoLabelForm-attachment"
                 }}
@@ -2715,6 +2825,7 @@ const NewRequest = () => {
                 className="FstoSelectForm-attachment"
                 size="small"
                 options={[]}
+                limitTags={3}
                 value={PO.rr_no}
                 renderTags={
                   (value, getTagProps) => value.map(

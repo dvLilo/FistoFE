@@ -48,27 +48,33 @@ const UpdateUser = () => {
 
   // Permissions Array *Fixed
   const permissions = {
-    AP: [
+    requestor: [
       {
         id: 1,
-        name: "Tagging of Request"
+        name: "Creation of Request"
       },
+      {
+        id: 2,
+        name: "Creation of Confidential Request"
+      }
+    ],
+    AP: [
       {
         id: 4,
         name: "Received Receipt Report"
       },
-      {
-        id: 5,
-        name: "Edited Tag Approval"
-      },
+      // {
+      //   id: 5,
+      //   name: "Edited Tag Approval"
+      // },
       {
         id: 6,
         name: "Releasing of Cheque"
       },
-      {
-        id: 9,
-        name: "Tagged Document Reports"
-      },
+      // {
+      //   id: 9,
+      //   name: "Tagged Document Reports"
+      // },
       {
         id: 12,
         name: "Creation of Voucher"
@@ -111,16 +117,12 @@ const UpdateUser = () => {
         id: 8,
         name: "Clearing of Cheque"
       },
-      {
-        id: 10,
-        name: "Cheque Reports"
-      }
+      // {
+      //   id: 10,
+      //   name: "Cheque Reports"
+      // }
     ],
     confidential: [
-      {
-        id: 2,
-        name: "Tagging of Confidential Request"
-      },
       {
         id: 13,
         name: "Creation of Confidential Voucher"
@@ -140,7 +142,7 @@ const UpdateUser = () => {
     ],
     administrator: [
       {
-        id: 101,
+        id: 0,
         name: "Activity Logs"
       }
     ]
@@ -169,7 +171,7 @@ const UpdateUser = () => {
       },
       {
         id: 5,
-        name: "Treasury Custodian"
+        name: "Treasury Associate"
       },
       {
         id: 6,
@@ -340,6 +342,39 @@ const UpdateUser = () => {
 
         setIsSaving(false)
       }
+    })
+  }
+
+  const roleSelectHandler = (e, value) => {
+
+    let permissions = []
+    switch (value.id) {
+      case 1: permissions = [1]
+        break
+
+      case 2: permissions = [6, 4, 20, 22]
+        break
+
+      case 3: permissions = [12, 21]
+        break
+
+      case 4: permissions = [12, 21]
+        break
+
+      case 5: permissions = [7, 8]
+        break
+
+      case 6: permissions = [17]
+        break
+
+      default:
+        permissions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
+    }
+
+    setUser({
+      ...user,
+      role: value,
+      permissions
     })
   }
 
@@ -519,6 +554,20 @@ const UpdateUser = () => {
 
           <TextField
             className="FstoTextfieldForm-root"
+            label="Position"
+            variant="outlined"
+            autoComplete="off"
+            size="small"
+            value={user.position}
+            InputLabelProps={{
+              className: "FstoLabelForm-root"
+            }}
+            disabled
+            fullWidth
+          />
+
+          <TextField
+            className="FstoTextfieldForm-root"
             label="Username"
             variant="outlined"
             autoComplete="off"
@@ -558,14 +607,7 @@ const UpdateUser = () => {
             isOptionEqualToValue={
               (option, value) => option.id === value.id
             }
-            onChange={
-              (e, value) => {
-                setUser({
-                  ...user,
-                  role: value
-                })
-              }
-            }
+            onChange={roleSelectHandler}
             fullWidth
             disablePortal
             disableClearable
@@ -612,180 +654,213 @@ const UpdateUser = () => {
         </form>
       </Paper>
 
-      <Box className="FstoBoxWrapper-root">
-        <Paper className="FstoPaperGroup-root" elevation={1}>
-          <Typography variant="permission" sx={{ marginLeft: 4, marginBottom: 4, marginTop: 2 }}>Permissions</Typography>
+      {
+        user.role &&
+        <Box className="FstoBoxWrapper-root">
+          <Paper className="FstoPaperGroup-root" elevation={1}>
+            <Typography variant="permission" sx={{ marginLeft: 4, marginBottom: 4, marginTop: 2 }}>Permissions</Typography>
 
-          <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }} disabled={isFetching}>
-            <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Accounts Payable</FormLabel>
-            <FormGroup row={true} sx={{ padding: '10px 35px' }}>
-              {
-                permissions.AP.map((perm, index) => (
-                  <FormControlLabel
-                    className="FstoCheckboxLabel-root"
-                    key={index}
-                    label={perm.name}
-                    sx={{ width: '50%', margin: 0 }}
-                    control={
-                      <Checkbox size="small" sx={{ padding: '7px' }} value={perm.id} onChange={permissionsCheckboxHandler} checked={user.permissions.includes(perm.id)} />
-                    }
-                    disableTypography
-                  />
-                ))
-              }
-            </FormGroup>
-          </FormControl>
+            {
+              (user.role?.id === 1 || user.role?.id === 2 || user.role?.id === 3 || user.role?.id === 4 || user.role?.id === 6 || user.role?.id === 7) &&
+              <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
+                <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Requestor</FormLabel>
+                <FormGroup row={true} sx={{ padding: '10px 35px' }}>
+                  {
+                    permissions.requestor.map((perm, index) => (
+                      <FormControlLabel
+                        className="FstoCheckboxLabel-root"
+                        key={index}
+                        label={perm.name}
+                        sx={{ width: '50%', margin: 0 }}
+                        control={
+                          <Checkbox size="small" sx={{ padding: '7px' }} value={perm.id} checked={user.permissions.includes(perm.id)} onChange={permissionsCheckboxHandler} />
+                        }
+                        disableTypography
+                      />
+                    ))}
+                </FormGroup>
+              </FormControl>}
 
-          <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }} disabled={isFetching}>
-            <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Approver</FormLabel>
-            <FormGroup row={true} sx={{ padding: '10px 35px' }}>
-              {
-                permissions.approver.map((perm, index) => (
-                  <FormControlLabel
-                    className="FstoCheckboxLabel-root"
-                    key={index}
-                    label={perm.name}
-                    sx={{ width: '50%', margin: 0 }}
-                    control={
-                      <Checkbox size="small" sx={{ padding: '7px' }} value={perm.id} onChange={permissionsCheckboxHandler} checked={user.permissions.includes(perm.id)} />
-                    }
-                    disableTypography
-                  />
-                ))
-              }
-            </FormGroup>
-          </FormControl>
+            {
+              (user.role?.id === 2 || user.role?.id === 3 || user.role?.id === 4 || user.role?.id === 7) &&
+              <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
+                <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Accounts Payable</FormLabel>
+                <FormGroup row={true} sx={{ padding: '10px 35px' }}>
+                  {
+                    permissions.AP.map((perm, index) => (
+                      <FormControlLabel
+                        className="FstoCheckboxLabel-root"
+                        key={index}
+                        label={perm.name}
+                        sx={{ width: '50%', margin: 0 }}
+                        control={
+                          <Checkbox size="small" sx={{ padding: '7px' }} value={perm.id} checked={user.permissions.includes(perm.id)} onChange={permissionsCheckboxHandler} />
+                        }
+                        disableTypography
+                      />
+                    ))
+                  }
+                </FormGroup>
+              </FormControl>}
 
-          <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }} disabled={isFetching}>
-            <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Treasury</FormLabel>
-            <FormGroup row={true} sx={{ padding: '10px 35px' }}>
-              {
-                permissions.treasury.map((perm, index) => (
-                  <FormControlLabel
-                    className="FstoCheckboxLabel-root"
-                    key={index}
-                    label={perm.name}
-                    sx={{ width: '50%', margin: 0 }}
-                    control={
-                      <Checkbox size="small" sx={{ padding: '7px' }} value={perm.id} onChange={permissionsCheckboxHandler} checked={user.permissions.includes(perm.id)} />
-                    }
-                    disableTypography
-                  />
-                ))
-              }
-            </FormGroup>
-          </FormControl>
+            {
+              (user.role?.id === 6 || user.role?.id === 7) &&
+              <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
+                <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Approver</FormLabel>
+                <FormGroup row={true} sx={{ padding: '10px 35px' }}>
+                  {
+                    permissions.approver.map((perm, index) => (
+                      <FormControlLabel
+                        className="FstoCheckboxLabel-root"
+                        key={index}
+                        label={perm.name}
+                        sx={{ width: '50%', margin: 0 }}
+                        control={
+                          <Checkbox size="small" sx={{ padding: '7px' }} value={perm.id} checked={user.permissions.includes(perm.id)} onChange={permissionsCheckboxHandler} />
+                        }
+                        disableTypography
+                      />
+                    ))
+                  }
+                </FormGroup>
+              </FormControl>}
 
-          <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }} disabled={isFetching}>
-            <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Confidential</FormLabel>
-            <FormGroup row={true} sx={{ padding: '10px 35px' }}>
-              {
-                permissions.confidential.map((perm, index) => (
-                  <FormControlLabel
-                    className="FstoCheckboxLabel-root"
-                    key={index}
-                    label={perm.name}
-                    sx={{ width: '50%', margin: 0 }}
-                    control={
-                      <Checkbox size="small" sx={{ padding: '7px' }} value={perm.id} onChange={permissionsCheckboxHandler} checked={user.permissions.includes(perm.id)} />
-                    }
-                    disableTypography
-                  />
-                ))
-              }
-            </FormGroup>
-          </FormControl>
+            {
+              (user.role?.id === 5 || user.role?.id === 7) &&
+              <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
+                <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Treasury</FormLabel>
+                <FormGroup row={true} sx={{ padding: '10px 35px' }}>
+                  {
+                    permissions.treasury.map((perm, index) => (
+                      <FormControlLabel
+                        className="FstoCheckboxLabel-root"
+                        key={index}
+                        label={perm.name}
+                        sx={{ width: '50%', margin: 0 }}
+                        control={
+                          <Checkbox size="small" sx={{ padding: '7px' }} value={perm.id} checked={user.permissions.includes(perm.id)} onChange={permissionsCheckboxHandler} />
+                        }
+                        disableTypography
+                      />
+                    ))
+                  }
+                </FormGroup>
+              </FormControl>}
 
-          <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }} disabled={isFetching}>
-            <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Administrator</FormLabel>
-            <FormGroup row={true} sx={{ padding: '10px 35px' }}>
-              {
-                permissions.administrator.map((perm, index) => (
-                  <FormControlLabel
-                    className="FstoCheckboxLabel-root"
-                    key={index}
-                    label={perm.name}
-                    sx={{ width: '50%', margin: 0 }}
-                    control={
-                      <Checkbox size="small" sx={{ padding: '7px' }} value={perm.id} onChange={permissionsCheckboxHandler} checked={user.permissions.includes(perm.id)} />
-                    }
-                    disableTypography
-                  />
-                ))
-              }
-            </FormGroup>
-          </FormControl>
-        </Paper>
+            {
+              (user.role?.id === 6 || user.role?.id === 7) &&
+              <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
+                <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Confidential</FormLabel>
+                <FormGroup row={true} sx={{ padding: '10px 35px' }}>
+                  {
+                    permissions.confidential.map((perm, index) => (
+                      <FormControlLabel
+                        className="FstoCheckboxLabel-root"
+                        key={index}
+                        label={perm.name}
+                        sx={{ width: '50%', margin: 0 }}
+                        control={
+                          <Checkbox size="small" sx={{ padding: '7px' }} value={perm.id} checked={user.permissions.includes(perm.id)} onChange={permissionsCheckboxHandler} />
+                        }
+                        disableTypography
+                      />
+                    ))
+                  }
+                </FormGroup>
+              </FormControl>}
 
-        {
-          // hardcoded, 1 is for Tagging of Request and 2 is for Tagging of Confidential Request
-          Boolean(checkbox.documents.length)
-          && (user.permissions.includes(1) || user.permissions.includes(2))
-          && (
-            <Paper className="FstoPaperGroup-root" elevation={1}>
-              <Typography variant="permission" sx={{ marginLeft: 4, marginTop: 2 }}>Document Types</Typography>
+            {
+              (user.role?.id === 7) &&
+              <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
+                <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Administrator</FormLabel>
+                <FormGroup row={true} sx={{ padding: '10px 35px' }}>
+                  {
+                    permissions.administrator.map((perm, index) => (
+                      <FormControlLabel
+                        className="FstoCheckboxLabel-root"
+                        key={index}
+                        label={perm.name}
+                        sx={{ width: '50%', margin: 0 }}
+                        control={
+                          <Checkbox size="small" sx={{ padding: '7px' }} value={perm.id} checked={user.permissions.includes(perm.id)} onChange={permissionsCheckboxHandler} />
+                        }
+                        disableTypography
+                      />
+                    ))
+                  }
+                </FormGroup>
+              </FormControl>}
+          </Paper>
 
-              <FormGroup row={true} sx={{ marginBottom: 2, padding: '10px 35px' }}>
+          {
+            // hardcoded, 1 is for Tagging of Request and 2 is for Tagging of Confidential Request
+            Boolean(checkbox.documents.length)
+            && (user.permissions.includes(1) || user.permissions.includes(2))
+            && (
+              <Paper className="FstoPaperGroup-root" elevation={1}>
+                <Typography variant="permission" sx={{ marginLeft: 4, marginTop: 2 }}>Document Types</Typography>
+
+                <FormGroup row={true} sx={{ marginBottom: 2, padding: '10px 35px' }}>
+                  {
+                    checkbox.documents.map((document, index) => (
+                      <FormControlLabel
+                        className="FstoCheckboxLabel-root"
+                        key={index}
+                        label={document.type}
+                        sx={{ width: '50%', margin: 0 }}
+                        control={
+                          <Checkbox size="small" sx={{ padding: '7px' }} value={document.id} onChange={documentsCheckboxHandler} checked={user.document_types.some(check => check.id === document.id)} />
+                        }
+                        disableTypography
+                      />
+                    ))
+                  }
+                </FormGroup>
+
                 {
                   checkbox.documents.map((document, index) => (
-                    <FormControlLabel
-                      className="FstoCheckboxLabel-root"
-                      key={index}
-                      label={document.type}
-                      sx={{ width: '50%', margin: 0 }}
-                      control={
-                        <Checkbox size="small" sx={{ padding: '7px' }} value={document.id} onChange={documentsCheckboxHandler} checked={user.document_types.some(check => check.id === document.id)} />
-                      }
-                      disableTypography
-                    />
+                    Boolean(document.categories.length)
+                    && (
+                      user.document_types.some(check => check.id === document.id)
+                      && (
+                        <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }} key={index}>
+                          <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>{document.type}</FormLabel>
+
+                          <FormGroup row={true} sx={{ padding: '10px 35px' }}>
+                            {
+                              document.categories.map((category, key) => (
+                                <FormControlLabel
+                                  className="FstoCheckboxLabel-root"
+                                  key={key}
+                                  label={category.name}
+                                  sx={{ width: '50%', margin: 0 }}
+                                  control={
+                                    <Checkbox
+                                      size="small"
+                                      sx={{ padding: '7px' }}
+                                      value={category.id}
+                                      inputProps={{ 'data-document': document.id }}
+                                      onChange={categoriesCheckboxHandler}
+                                      checked={
+                                        user.document_types.find(check => check.id === document.id).categories.includes(category.id)
+                                      }
+                                    />
+                                  }
+                                  disableTypography
+                                />
+                              ))
+                            }
+                          </FormGroup>
+                        </FormControl>
+                      )
+
+                    )
                   ))
                 }
-              </FormGroup>
-
-              {
-                checkbox.documents.map((document, index) => (
-                  Boolean(document.categories.length)
-                  && (
-                    user.document_types.some(check => check.id === document.id)
-                    && (
-                      <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }} key={index}>
-                        <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>{document.type}</FormLabel>
-
-                        <FormGroup row={true} sx={{ padding: '10px 35px' }}>
-                          {
-                            document.categories.map((category, key) => (
-                              <FormControlLabel
-                                className="FstoCheckboxLabel-root"
-                                key={key}
-                                label={category.name}
-                                sx={{ width: '50%', margin: 0 }}
-                                control={
-                                  <Checkbox
-                                    size="small"
-                                    sx={{ padding: '7px' }}
-                                    value={category.id}
-                                    inputProps={{ 'data-document': document.id }}
-                                    onChange={categoriesCheckboxHandler}
-                                    checked={
-                                      user.document_types.find(check => check.id === document.id).categories.includes(category.id)
-                                    }
-                                  />
-                                }
-                                disableTypography
-                              />
-                            ))
-                          }
-                        </FormGroup>
-                      </FormControl>
-                    )
-
-                  )
-                ))
-              }
-            </Paper>
-          )
-        }
-      </Box>
+              </Paper>
+            )
+          }
+        </Box>}
 
       <Toast
         open={toast.show}

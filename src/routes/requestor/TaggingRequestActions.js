@@ -9,7 +9,8 @@ import {
 import {
   MoreHoriz as MoreIcon,
   Visibility as ViewIcon,
-  Edit as UpdateIcon
+  Edit as UpdateIcon,
+  RemoveCircle as VoidIcon
 } from '@mui/icons-material'
 
 const TaggingRequestActions = (props) => {
@@ -17,7 +18,8 @@ const TaggingRequestActions = (props) => {
   const {
     data,
     onView,
-    onUpdate
+    onUpdate,
+    // onVoid
   } = props
 
   const [anchor, setAnchor] = React.useState(null)
@@ -70,6 +72,17 @@ const TaggingRequestActions = (props) => {
           dense
         >
           <UpdateIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Edit
+        </MenuItem>
+
+        <MenuItem
+          onClick={() => {
+            // onVoid(data)
+            actionCloseHandler()
+          }}
+          sx={{ fontWeight: 500 }}
+          dense
+        >
+          <VoidIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Void
         </MenuItem>
       </Menu>
     </React.Fragment>
