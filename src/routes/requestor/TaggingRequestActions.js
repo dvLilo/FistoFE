@@ -19,7 +19,7 @@ const TaggingRequestActions = (props) => {
     data,
     onView,
     onUpdate,
-    // onVoid
+    onVoid
   } = props
 
   const [anchor, setAnchor] = React.useState(null)
@@ -76,7 +76,7 @@ const TaggingRequestActions = (props) => {
 
         <MenuItem
           onClick={() => {
-            // onVoid(data)
+            onVoid(data)
             actionCloseHandler()
           }}
           sx={{ fontWeight: 500 }}

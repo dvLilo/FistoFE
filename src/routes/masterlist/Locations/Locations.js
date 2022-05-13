@@ -85,12 +85,18 @@ const Locations = () => {
   }
 
   const dataUpdateHandler = (data) => {
-    const { id, code, location, company } = data
+    const {
+      id,
+      code,
+      location,
+      departments
+    } = data
+
     setUpdate({
       id,
       code,
       location,
-      company
+      departments
     })
     window.scrollTo(0, 0)
   }

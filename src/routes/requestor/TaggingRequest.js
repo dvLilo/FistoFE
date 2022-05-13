@@ -34,6 +34,8 @@ import Preloader from '../../components/Preloader'
 import TaggingRequestActions from './TaggingRequestActions'
 
 import useTransactions from '../../hooks/useTransactions'
+import TaggingRequestFilter from './TaggingRequestFilter'
+import ReasonDialog from '../../components/ReasonDialog'
 
 const TaggingRequest = () => {
 
@@ -41,6 +43,7 @@ const TaggingRequest = () => {
     status,
     data,
     searchData,
+    filterData,
     changeStatus,
     changePage,
     changeRows
@@ -61,6 +64,11 @@ const TaggingRequest = () => {
     }))
   })
 
+  const [reasonDialog, setReasonDialog] = React.useState({
+    open: false,
+    data: null
+  })
+
   const onView = (data) => {
     const { id } = data
 
@@ -75,6 +83,14 @@ const TaggingRequest = () => {
     const { id } = data
 
     navigate(`update-request/${id}`)
+  }
+
+  const onVoid = (data) => {
+
+    setReasonDialog({
+      open: true,
+      data: data
+    })
   }
 
   return (
@@ -149,6 +165,8 @@ const TaggingRequest = () => {
                 if (e.key === "Enter") searchData(e.target.value)
               }}
             />
+
+            <TaggingRequestFilter filterData={filterData} />
           </Box>
         </Box>
 
@@ -252,6 +270,7 @@ const TaggingRequest = () => {
                             data={data}
                             onView={onView}
                             onUpdate={onUpdate}
+                            onVoid={onVoid}
                           />
                         </TableCell>
                       </TableRow>
@@ -279,6 +298,14 @@ const TaggingRequest = () => {
         {
           view.open &&
           <Transaction id={view.id} open={view.open} onClose={view.onClose} />}
+
+        <ReasonDialog
+          data={reasonDialog.data}
+          open={reasonDialog.open}
+          close={() => setReasonDialog({
+            open: false
+          })}
+        />
       </Paper>
     </Box>
   )

@@ -9,6 +9,7 @@ import {
   Paper,
   Typography,
   TextField,
+  InputAdornment,
   Button,
   Autocomplete,
 
@@ -16,8 +17,10 @@ import {
   FormControl,
   FormLabel,
   FormGroup,
-  Checkbox
+  Checkbox,
 } from '@mui/material'
+
+import SyncIcon from '@mui/icons-material/Sync'
 
 import { LoadingButton } from '@mui/lab'
 
@@ -301,6 +304,69 @@ const UpdateUser = () => {
     }
   }
 
+  const sedarSyncHandler = (ID) => {
+    setConfirm({
+      show: true,
+      loading: false,
+      onConfirm: async () => {
+        setConfirm(currentValue => ({
+          ...currentValue,
+          loading: true,
+          onConfirm: () => { }
+        }))
+
+        let response
+        try {
+          response = await axios.get(`http://localhost:5000/user/${ID}`)
+
+          const {
+            general_info: { first_name, middle_name, last_name, suffix },
+            position_info: { position_name },
+            unit_info: { department_name }
+          } = response.data
+
+          setUser(currentValue => ({
+            ...currentValue,
+            last_name: last_name,
+            first_name: first_name,
+            middle_name: middle_name,
+            suffix_name: suffix,
+            department: department_name,
+            position: position_name
+          }))
+          setToast({
+            show: true,
+            title: "Success",
+            message: "Employee details has been updated from Sedar."
+          })
+          setConfirm(currentValue => ({
+            ...currentValue,
+            show: false,
+            loading: false
+          }))
+        }
+        catch (error) {
+          if (error.request.status !== 404) {
+            setToast({
+              show: true,
+              title: "Error",
+              message: "Something went wrong whilst fetching employee details from Sedar.",
+              severity: "error"
+            })
+          }
+
+          setConfirm({
+            show: false,
+            loading: false,
+            onConfirm: () => { }
+          })
+
+          console.log("Fisto Error Status", error.request)
+        }
+      }
+    })
+  }
+
   const formSubmitHandler = (e) => {
     e.preventDefault()
 
@@ -457,34 +523,30 @@ const UpdateUser = () => {
         <Typography variant="heading" sx={{ display: 'block', marginBottom: 3 }}>Update User Account</Typography>
 
         <form onSubmit={formSubmitHandler}>
-          <Autocomplete
-            className="FstoSelectForm-root"
+          <TextField
+            className="FstoTextfieldForm-root"
+            label="Employee ID No."
+            variant="outlined"
+            autoComplete="off"
             size="small"
-            options={[]}
-            value={{
-              label: user.full_id_no
+            value={user.full_id_no}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Button size="small" startIcon={<SyncIcon fontSize="small" />} onClick={() => sedarSyncHandler(user.id_no)}>
+                    Update with Sedar
+                  </Button>
+                </InputAdornment>
+              )
             }}
-            renderInput={
-              props =>
-                <TextField
-                  {...props}
-                  variant="outlined"
-                  label="Employee ID No."
-                  sx={{
-                    textTransform: "none"
-                  }}
-                />
-            }
-            PaperComponent={
-              props =>
-                <Paper
-                  {...props}
-                  sx={{ textTransform: 'capitalize' }}
-                />
-            }
-            fullWidth
+            InputLabelProps={{
+              className: "FstoLabelForm-root"
+            }}
+            sx={{
+              input: { textTransform: "capitalize" }
+            }}
             disabled
-            disablePortal
+            fullWidth
           />
 
           <TextField

@@ -34,7 +34,7 @@ import {
 
 import DateAdapter from '@mui/lab/AdapterDateFns'
 
-import { createFilterOptions } from '@mui/material/Autocomplete';
+import { createFilterOptions } from '@mui/material/Autocomplete'
 
 import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
@@ -189,9 +189,9 @@ const NewRequest = () => {
 
       category: null,
 
-      company: null,
-      department: null,
-      location: null,
+      company: { id: 1, name: "RDF Corporate Services" },
+      department: { id: 1, name: "Corporate Common" },
+      location: { id: 1, name: "Common" },
 
       supplier: null,
 
@@ -1087,7 +1087,7 @@ const NewRequest = () => {
             name: data.document.name,
             payment_type: data.document.payment_type,
             amount: data.document.amount,
-            date: data.document.date,
+            date: new Date(data.document.date).toISOString().slice(0, 10),
 
             company: data.document.company,
             department: data.document.department,
@@ -1109,7 +1109,7 @@ const NewRequest = () => {
             name: data.document.name,
             payment_type: data.document.payment_type,
             amount: data.document.amount,
-            date: data.document.date,
+            date: new Date(data.document.date).toISOString().slice(0, 10),
 
             company: data.document.company,
             department: data.document.department,
@@ -1133,7 +1133,7 @@ const NewRequest = () => {
             id: data.document.id,
             name: data.document.name,
             payment_type: data.document.payment_type,
-            date: data.document.date,
+            date: new Date(data.document.date).toISOString().slice(0, 10),
 
             company: data.document.company,
             department: data.document.department,
@@ -1157,7 +1157,7 @@ const NewRequest = () => {
             name: data.document.name,
             payment_type: data.document.payment_type,
             amount: data.document.amount,
-            date: data.document.date,
+            date: new Date(data.document.date).toISOString().slice(0, 10),
 
             company: data.document.company,
             department: data.document.department,
@@ -1178,8 +1178,8 @@ const NewRequest = () => {
             name: data.document.name,
             payment_type: data.document.payment_type,
             amount: data.document.amount,
-            from: data.document.from,
-            to: data.document.to,
+            from: new Date(data.document.from).toISOString().slice(0, 10),
+            to: new Date(data.document.to).toISOString().slice(0, 10),
 
             company: data.document.company,
             department: data.document.department,
@@ -1199,8 +1199,8 @@ const NewRequest = () => {
             id: data.document.id,
             name: data.document.name,
             payment_type: data.document.payment_type,
-            from: data.document.from,
-            to: data.document.to,
+            from: new Date(data.document.from).toISOString().slice(0, 10),
+            to: new Date(data.document.to).toISOString().slice(0, 10),
             amount: data.document.amount,
 
             company: data.document.company,
@@ -1223,7 +1223,7 @@ const NewRequest = () => {
             name: data.document.name,
             payment_type: data.document.payment_type,
             amount: data.document.amount,
-            date: data.document.date,
+            date: new Date(data.document.date).toISOString().slice(0, 10),
 
             company: data.document.company,
             department: data.document.department,
@@ -1590,7 +1590,7 @@ const NewRequest = () => {
                     </React.Fragment>
                   )}
 
-                <Autocomplete
+                <Autocomplete // Payment Types
                   className="FstoSelectForm-root"
                   size="small"
                   options={PAYMENT_TYPES}
@@ -1633,77 +1633,75 @@ const NewRequest = () => {
                 { // From Date, To Date
                   (data.document.id === 7 || data.document.id === 6) &&
                   (
-                    <React.Fragment>
-                      <LocalizationProvider dateAdapter={DateAdapter}>
-                        <DatePicker
-                          value={data.document.from}
-                          maxDate={data.document.to ? new Date(data.document.to) : null}
-                          onChange={(value) => setData({
-                            ...data,
-                            document: {
-                              ...data.document,
-                              from: new Date(value).toISOString().slice(0, 10)
-                            }
-                          })}
-                          renderInput={
-                            props =>
-                              <TextField
-                                {...props}
-                                className="FstoTextfieldForm-root"
-                                variant="outlined"
-                                size="small"
-                                label="From Date"
-                                error={
-                                  error.status
-                                  && Boolean(error.data.from_date)
-                                }
-                                helperText={
-                                  error.status
-                                  && error.data.from_date
-                                  && error.data.from_date[0]
-                                }
-                                fullWidth
-                              />
+                    <LocalizationProvider dateAdapter={DateAdapter}>
+                      <DatePicker
+                        value={data.document.from}
+                        maxDate={data.document.to ? new Date(data.document.to) : null}
+                        onChange={(value) => setData({
+                          ...data,
+                          document: {
+                            ...data.document,
+                            from: value
                           }
-                          showToolbar
-                        />
-                      </LocalizationProvider>
+                        })}
+                        renderInput={
+                          props =>
+                            <TextField
+                              {...props}
+                              className="FstoTextfieldForm-root"
+                              variant="outlined"
+                              size="small"
+                              label="From Date"
+                              error={
+                                error.status
+                                && Boolean(error.data.from_date)
+                              }
+                              helperText={
+                                error.status
+                                && error.data.from_date
+                                && error.data.from_date[0]
+                              }
+                              onKeyPress={(e) => e.preventDefault()}
+                              fullWidth
+                            />
+                        }
+                        showToolbar
+                      />
 
-                      <LocalizationProvider dateAdapter={DateAdapter}>
-                        <DatePicker
-                          value={data.document.to}
-                          minDate={new Date(data.document.from)}
-                          onChange={(value) => setData({
-                            ...data,
-                            document: {
-                              ...data.document,
-                              to: new Date(value).toISOString().slice(0, 10)
-                            }
-                          })}
-                          renderInput={
-                            props =>
-                              <TextField
-                                {...props}
-                                className="FstoTextfieldForm-root"
-                                variant="outlined"
-                                size="small"
-                                label="To Date"
-                                error={
-                                  error.status
-                                  && Boolean(error.data.to_date)
-                                }
-                                helperText={
-                                  error.status
-                                  && error.data.to_date
-                                  && error.data.to_date[0]
-                                }
-                                fullWidth
-                              />
+                      <DatePicker
+                        value={data.document.to}
+                        minDate={new Date(data.document.from)}
+                        onChange={(value) => setData({
+                          ...data,
+                          document: {
+                            ...data.document,
+                            to: value
                           }
-                          showToolbar
-                        />
-                      </LocalizationProvider>
-                    </React.Fragment>
+                        })}
+                        renderInput={
+                          props =>
+                            <TextField
+                              {...props}
+                              className="FstoTextfieldForm-root"
+                              variant="outlined"
+                              size="small"
+                              label="To Date"
+                              error={
+                                error.status
+                                && Boolean(error.data.to_date)
+                              }
+                              helperText={
+                                error.status
+                                && error.data.to_date
+                                && error.data.to_date[0]
+                              }
+                              onKeyPress={(e) => e.preventDefault()}
+                              fullWidth
+                            />
+                        }
+                        showToolbar
+                      />
+                    </LocalizationProvider>
                   )}
 
                 { // Document Number
@@ -1758,55 +1756,53 @@ const NewRequest = () => {
                 { // Request Date, Document Date
                   (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4 || data.document.id === 5 || data.document.id === 8) &&
                   (
-                    <React.Fragment>
-                      <LocalizationProvider dateAdapter={DateAdapter}>
-                        <DatePicker
-                          value={new Date()}
-                          onChange={(value) => { }}
-                          renderInput={
-                            props =>
-                              <TextField
-                                {...props}
-                                className="FstoTextfieldForm-root"
-                                variant="outlined"
-                                size="small"
-                                label="Request Date"
-                                autoComplete="off"
-                                fullWidth
-                              />
-                          }
-                          disabled
-                        />
-                      </LocalizationProvider>
+                    <LocalizationProvider dateAdapter={DateAdapter}>
+                      <DatePicker
+                        value={new Date()}
+                        onChange={(value) => { }}
+                        renderInput={
+                          props =>
+                            <TextField
+                              {...props}
+                              className="FstoTextfieldForm-root"
+                              variant="outlined"
+                              size="small"
+                              label="Request Date"
+                              autoComplete="off"
+                              fullWidth
+                            />
+                        }
+                        readOnly
+                      />
 
-                      <LocalizationProvider dateAdapter={DateAdapter}>
-                        <DatePicker
-                          value={data.document.date}
-                          disabled={data.document.id === 8}
-                          maxDate={new Date()}
-                          onChange={(value) => setData({
-                            ...data,
-                            document: {
-                              ...data.document,
-                              date: new Date(value).toISOString().slice(0, 10)
-                            }
-                          })}
-                          renderInput={
-                            props =>
-                              <TextField
-                                {...props}
-                                className="FstoTextfieldForm-root"
-                                variant="outlined"
-                                size="small"
-                                label="Document Date"
-                                autoComplete="off"
-                                fullWidth
-                              />
+                      <DatePicker
+                        value={data.document.date}
+                        disabled={data.document.id === 8}
+                        maxDate={new Date()}
+                        onChange={(value) => setData({
+                          ...data,
+                          document: {
+                            ...data.document,
+                            date: value
                           }
-                          showToolbar
-                        />
-                      </LocalizationProvider>
-                    </React.Fragment>
+                        })}
+                        renderInput={
+                          props =>
+                            <TextField
+                              {...props}
+                              className="FstoTextfieldForm-root"
+                              variant="outlined"
+                              size="small"
+                              label="Document Date"
+                              autoComplete="off"
+                              onKeyPress={(e) => e.preventDefault()}
+                              fullWidth
+                            />
+                        }
+                        showToolbar
+                        showTodayButton
+                      />
+                    </LocalizationProvider>
                   )}
 
                 { //Document Amount
@@ -1907,7 +1903,8 @@ const NewRequest = () => {
                   className="FstoSelectForm-root"
                   size="small"
                   filterOptions={filterOptions}
-                  options={data.document.company ? COMPANY_CHARGING.find(row => row.id === data.document.company.id).departments : []}
+                  // options={data.document.company ? COMPANY_CHARGING.find(row => row.id === data.document.company.id).departments : []}
+                  options={[]}
                   value={data.document.department}
                   renderInput={
                     props =>
@@ -1955,7 +1952,8 @@ const NewRequest = () => {
                   className="FstoSelectForm-root"
                   size="small"
                   filterOptions={filterOptions}
-                  options={data.document.company ? COMPANY_CHARGING.find(row => row.id === data.document.company.id).locations : []}
+                  // options={data.document.company ? COMPANY_CHARGING.find(row => row.id === data.document.company.id).locations : []}
+                  options={[]}
                   value={data.document.location}
                   renderInput={
                     props =>
@@ -2874,7 +2872,6 @@ const NewRequest = () => {
                   (validate.status && validate.data.includes('po_no')) ||
                   !Boolean(PO.no) ||
                   !Boolean(PO.amount) ||
-                  // !Boolean(PO.balance) ||
                   !Boolean(PO.rr_no.length)
                 }
                 disableElevation
@@ -2928,13 +2925,20 @@ const NewRequest = () => {
                   <Divider variant="middle" sx={{ marginTop: 4, marginBottom: 4 }} />
 
                   <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
-                    <Typography variant="h6">Total P.O. Amount</Typography>
-                    <Typography variant="h6">&#8369;{data.po_group.map((data) => data.amount).reduce((a, b) => a + b).toLocaleString()}</Typography>
+                    <Typography sx={{ fontSize: '1em' }}>Total P.O. Balance</Typography>
+                    <Typography variant="heading">&#8369;{data.po_group.map((data) => data.balance).reduce((a, b) => a + b).toLocaleString()}</Typography>
                   </Box>
 
                   <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
-                    <Typography variant="heading">Total P.O. Balance</Typography>
-                    <Typography variant="heading">&#8369;{data.po_group.map((data) => data.balance).reduce((a, b) => a + b).toLocaleString()}</Typography>
+                    <Typography sx={{ fontSize: '1em' }}>Document Amount</Typography>
+                    <Typography variant="heading">&#8369;{data.document.amount.toLocaleString()}</Typography>
+                  </Box>
+
+                  <Divider sx={{ marginTop: 2, marginBottom: 2 }} />
+
+                  <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
+                    <Typography variant="heading">Variance</Typography>
+                    <Typography variant="heading">&#8369;{(data.po_group.map((data) => data.balance).reduce((a, b) => a + b) - data.document.amount).toLocaleString()}</Typography>
                   </Box>
                 </React.Fragment>
               )

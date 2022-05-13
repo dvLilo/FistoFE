@@ -1,6 +1,7 @@
 {
   "user": [
     {
+      "id": 10791,
       "general_info": {
         "full_id_number": "RDFFLFI-10791",
         "prefix_id": "RDFFLFI",
@@ -18,6 +19,7 @@
       }
     },
     {
+      "id": 10185,
       "general_info": {
         "full_id_number": "RDFFLFI-10785",
         "prefix_id": "RDFFLFI",
@@ -35,6 +37,7 @@
       }
     },
     {
+      "id": 10274,
       "general_info": {
         "full_id_number": "RDFFLFI-10274",
         "prefix_id": "RDFFLFI",
@@ -52,6 +55,7 @@
       }
     },
     {
+      "id": 10390,
       "general_info": {
         "full_id_number": "RDFFLFI-10390",
         "prefix_id": "RDFFLFI",
@@ -69,12 +73,13 @@
       }
     },
     {
+      "id": 10790,
       "general_info": {
         "full_id_number": "RDFFLFI-10790",
         "prefix_id": "RDFFLFI",
         "id_number": 10790,
         "first_name": "HERNANIE ROY",
-        "middle_name": "TABALU",
+        "middle_name": "PANGILINAN",
         "last_name": "PABUSTAN",
         "suffix": ""
       },
@@ -82,7 +87,7 @@
         "position_name": "System Developer"
       },
       "unit_info": {
-        "department_name": "Management Information System"
+        "department_name": "Management Information System Common"
       }
     }
   ],
@@ -123,5 +128,134 @@
       "amount": 39999.95,
       "date_created": "2021-06-21"
     }
-  ]
+  ],
+  "departments": {
+    "code": 200,
+    "message": "Deparments has been fetched.",
+    "result": {
+      "departments": [
+        {
+          "id": 1,
+          "name": "Corporate Common"
+        },
+        {
+          "id": 2,
+          "name": "Human Resources Common"
+        },
+        {
+          "id": 3,
+          "name": "Management Information System Common"
+        },
+        {
+          "id": 4,
+          "name": "Meatshop Administration"
+        },
+        {
+          "id": 5,
+          "name": "Meatshop Production"
+        },
+        {
+          "id": 6,
+          "name": "Supermarket Fresh Options"
+        }
+      ]
+    }
+  },
+  "locations": {
+    "code": 200,
+    "message": "Locations has been fetched.",
+    "result": {
+      "current_page": 1,
+      "data": [
+        {
+          "id": 6,
+          "code": "0000",
+          "location": "Common",
+          "departments": [
+            {
+              "id": 1,
+              "name": "Corporate Common"
+            }
+          ],
+          "updated_at": "2022-04-06 06:41",
+          "deleted_at": null
+        },
+        {
+          "id": 2,
+          "code": "0001",
+          "location": "Head Office",
+          "departments": [
+            {
+              "id": 1,
+              "name": "Corporate Common"
+            },
+            {
+              "id": 2,
+              "name": "Human Resources Common"
+            },
+            {
+              "id": 3,
+              "name": "Management Information System Common"
+            },
+            {
+              "id": 4,
+              "name": "Office of the President/CEO"
+            },
+            {
+              "id": 5,
+              "name": "Office of the Vice-President/COO"
+            },
+            {
+              "id": 6,
+              "name": "Office Administration"
+            },
+            {
+              "id": 7,
+              "name": "Community Relations"
+            },
+            {
+              "id": 8,
+              "name": "Permits and Licenses"
+            },
+            {
+              "id": 9,
+              "name": "Finance Common"
+            },
+            {
+              "id": 10,
+              "name": "Cost and Budget"
+            },
+            {
+              "id": 11,
+              "name": "Accounting Services"
+            },
+            {
+              "id": 12,
+              "name": "Inventory Group"
+            },
+            {
+              "id": 13,
+              "name": "Sales and Inv. Services - Retail"
+            },
+            {
+              "id": 14,
+              "name": "Sales and Inv. Services - F&B"
+            },
+            {
+              "id": 15,
+              "name": "Salary Administration"
+            },
+            {
+              "id": 16,
+              "name": "Benefits Administration"
+            }
+          ],
+          "updated_at": "2022-04-06 06:41",
+          "deleted_at": null
+        }
+      ],
+      "per_page": 10,
+      "total": 10
+    }
+  }
 }

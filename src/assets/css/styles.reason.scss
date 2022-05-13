@@ -1,0 +1,46 @@
+.FstoDialogReason-root {
+
+  & .FstoPaperReason-root {
+    max-width: 420px;
+  }
+
+  & .FstoDialogTitleReason-root {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  & .FstoDialogContentReason-root {
+    font-size: 1em;
+
+    & .FstoDialogContentReason-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    & .FstoDialogContentReason-icon {
+      margin-left: 10px;
+      margin-right: 10px;
+      font-size: 3.5em;
+    }
+
+    & .FstoDialogContentReason-option {
+      margin-bottom: 10px;
+    }
+
+    & .FstoDialogContentReason-input {
+      margin-bottom: 10px;
+    }
+  }
+
+  & .FstoDialogActionsReason-root {
+    padding-top: 20px;
+    padding-bottom: 10px;
+
+    & .FstoDialogActionsReason-button {
+      text-transform: capitalize;
+    }
+  }
+}

@@ -33,7 +33,6 @@ const LocationsForm = (props) => {
   // Dropdown Array
   const [dropdown, setDropdown] = React.useState({
     isFetching: false,
-    companies: [],
     departments: []
   })
 
@@ -41,8 +40,7 @@ const LocationsForm = (props) => {
   const [location, setLocation] = React.useState({
     code: "",
     location: "",
-    company: null,
-    department: null
+    departments: []
   })
 
   React.useEffect(() => {
@@ -54,16 +52,14 @@ const LocationsForm = (props) => {
 
       let response
       try {
-        response = await axios.get(`/api/admin/dropdown/company`)
+        response = await axios.get(`/api/admin/dropdown/department`)
 
         const {
-          companies,
           departments
         } = response.data.result
 
         setDropdown(currentValue => ({
           isFetching: false,
-          companies,
           departments
         }))
       }
@@ -79,7 +75,6 @@ const LocationsForm = (props) => {
 
         setDropdown(currentValue => ({
           isFetching: false,
-          companies: [],
           departments: []
         }))
 
@@ -95,14 +90,7 @@ const LocationsForm = (props) => {
       setLocation({
         code: data.code,
         location: data.location,
-        company: {
-          id: data.company.id,
-          company: data.company.name
-        },
-        department: {
-          id: data.department.id,
-          department: data.department.name
-        }
+        departments: data.departments
       })
     }
   }, [data])
@@ -117,8 +105,7 @@ const LocationsForm = (props) => {
     setLocation({
       code: "",
       location: "",
-      company: null,
-      department: null
+      departments: []
     })
   }
 
@@ -142,15 +129,13 @@ const LocationsForm = (props) => {
             response = await axios.put(`/api/admin/locations/${data.id}/`, {
               code: location.code,
               location: location.location,
-              company: location.company.id,
-              department: location.department.id
+              departments: location.departments.map(department => department.id)
             })
           else
             response = await axios.post(`/api/admin/locations/`, {
               code: location.code,
               location: location.location,
-              company: location.company.id,
-              department: location.department.id
+              departments: location.departments.map(department => department.id)
             })
 
           toast({
@@ -173,6 +158,16 @@ const LocationsForm = (props) => {
               field: data.result.error_field,
               message: data.message
             })
+          }
+          else if (status === 304) {
+            toast({
+              show: true,
+              title: "Info",
+              message: "Nothing has changed.",
+              severity: "info"
+            })
+
+            formClearHandler()
           }
           else
             toast({
@@ -241,57 +236,16 @@ const LocationsForm = (props) => {
       <Autocomplete
         className="FstoSelectForm-root"
         size="small"
-        options={dropdown.companies}
-        value={location.company}
-        renderInput={
-          props =>
-            <TextField
-              {...props}
-              variant="outlined"
-              label="Company"
-              error={!Boolean(dropdown.companies.length) && !dropdown.isFetching}
-              helperText={!Boolean(dropdown.companies.length) && !dropdown.isFetching && "No companies found."}
-            />
-        }
-        PaperComponent={
-          props =>
-            <Paper
-              {...props}
-              sx={{ textTransform: 'capitalize' }}
-            />
-        }
-        getOptionLabel={
-          option => option.company
-        }
-        isOptionEqualToValue={
-          (option, value) => option.id === value.id
-        }
-        onChange={
-          (e, value) => {
-            setLocation({
-              ...location,
-              company: value
-            })
-          }
-        }
-        fullWidth
-        disablePortal
-        disableClearable
-      />
-
-      <Autocomplete
-        className="FstoSelectForm-root"
-        size="small"
         options={dropdown.departments}
-        value={location.department}
+        value={location.departments}
         renderInput={
           props =>
             <TextField
               {...props}
               variant="outlined"
               label="Department"
-              error={!Boolean(dropdown.department.length) && !dropdown.isFetching}
-              helperText={!Boolean(dropdown.department.length) && !dropdown.isFetching && "No departments found."}
+              error={!Boolean(dropdown.departments.length) && !dropdown.isFetching}
+              helperText={!Boolean(dropdown.departments.length) && !dropdown.isFetching && "No departments found."}
             />
         }
         PaperComponent={
@@ -302,7 +256,7 @@ const LocationsForm = (props) => {
             />
         }
         getOptionLabel={
-          option => option.department
+          option => option.name
         }
         isOptionEqualToValue={
           (option, value) => option.id === value.id
@@ -311,13 +265,15 @@ const LocationsForm = (props) => {
           (e, value) => {
             setLocation({
               ...location,
-              department: value
+              departments: value
             })
           }
         }
         fullWidth
+        multiple
         disablePortal
         disableClearable
+        disableCloseOnSelect
       />
 
       <LoadingButton
@@ -330,7 +286,7 @@ const LocationsForm = (props) => {
         disabled={
           !Boolean(location.code.trim()) ||
           !Boolean(location.location.trim()) ||
-          !Boolean(location.company)
+          !Boolean(location.departments.length)
         }
         disableElevation
       >

@@ -259,7 +259,6 @@ body {
 
 .FstoAdrmentForm-root.MuiInputAdornment-root {
   margin-right: 0;
-  color: rgba(0, 0, 0, 0.75);
 }
 
 .FstoSelectForm-root.MuiFormControl-root {
@@ -447,6 +446,43 @@ body {
 
   @media (min-width: 576px) {
     flex-wrap: nowrap;
+  }
+}
+
+.FstoPaperFilter-root.MuiPaper-root {
+  max-width: 430px;
+  padding: 10px 20px;
+
+  & .FstoTypographyFilter-root {
+    margin-bottom: 10px;
+    font-size: 1em;
+    font-weight: 500;
+  }
+
+  & .FstoCheckboxFilter-root {
+    display: block;
+    width: 33.33333333333333%;
+    margin: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  & .FstoTextfieldFilter-root {
+    width: 45%;
+    margin-left: 2.5%;
+    margin-right: 2.5%;
+  }
+
+  & .FstoButtonFilter-root {
+    margin-right: 2.5%;
+    text-transform: capitalize;
+    float: right;
+  }
+
+  & .FstoDividerFilter-root {
+    margin-top: 20px;
+    margin-bottom: 20px;
   }
 }
 

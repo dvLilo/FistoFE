@@ -6,8 +6,15 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  TableSortLabel
+  TableSortLabel,
+
+  Box,
+  Popover,
+  List,
+  ListItem
 } from '@mui/material'
+
+import MoreIcon from '@mui/icons-material/More'
 
 import ActionMenu from '../../../components/ActionMenu'
 import Preloader from '../../../components/Preloader'
@@ -37,7 +44,7 @@ const LocationsTable = (props) => {
             <TableSortLabel active={false}>LOCATION</TableSortLabel>
           </TableCell>
 
-          <TableCell className="FstoTableHead-root">COMPANY</TableCell>
+          <TableCell className="FstoTableHead-root">DEPARTMENTS</TableCell>
 
           <TableCell className="FstoTableHead-root">STATUS</TableCell>
 
@@ -68,7 +75,7 @@ const LocationsTable = (props) => {
                   </TableCell>
 
                   <TableCell className="FstoTableData-root">
-                    {data.company?.name}
+                    <ShowMore data={data.departments} />
                   </TableCell>
 
                   <TableCell className="FstoTableData-root">
@@ -106,6 +113,73 @@ const LocationsTable = (props) => {
         }
       </TableBody>
     </Table>
+  )
+}
+
+const ShowMore = (props) => {
+
+  const { data } = props
+
+  const [anchorEl, setAnchorEl] = React.useState(null)
+
+  return (
+    Boolean(data.length) &&
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      {
+        data.slice(0, 2).map(data => data.name).join(", ")}
+      {
+        data.length > 2 &&
+        <React.Fragment>
+          <MoreIcon
+            sx={{
+              color: 'rgba(0,0,0,0.35)',
+              fontSize: '1.55em',
+              cursor: 'pointer',
+              '&:hover': {
+                color: 'rgba(0,0,0,0.65)'
+              }
+            }}
+            onClick={(e) => setAnchorEl(e.currentTarget)}
+          />
+          <Popover
+            open={Boolean(anchorEl)}
+            elevation={2}
+            anchorEl={anchorEl}
+            onClose={() => setAnchorEl(null)}
+            anchorOrigin={{
+              vertical: 'center',
+              horizontal: 'left',
+            }}
+            transformOrigin={{
+              vertical: 'center',
+              horizontal: 'right',
+            }}
+            transitionDuration={{
+              appear: 200,
+              enter: 200,
+              exit: 200
+            }}
+            PaperProps={{
+              sx: {
+                maxWidth: 260,
+                maxHeight: 210
+              }
+            }}
+            disablePortal
+          >
+            <List dense disablePadding>
+              {
+                data.slice(2, data.length).map((item, index) => (
+                  <ListItem dense key={index}>
+                    {item.name}
+                  </ListItem>
+                ))
+              }
+            </List>
+          </Popover>
+        </React.Fragment>
+      }
+    </Box>
   )
 }
 

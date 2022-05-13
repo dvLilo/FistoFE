@@ -14,7 +14,11 @@ const useTransactions = (URL) => {
     state: "request",
     page: 1,
     rows: 10,
-    search: null
+    search: null,
+    from: null,
+    to: null,
+    suppliers: null,
+    types: null
   })
 
   const fetchData = async () => {
@@ -23,7 +27,11 @@ const useTransactions = (URL) => {
         state: params.state,
         page: params.page,
         rows: params.rows,
-        search: params.search
+        search: params.search,
+        suppliers: params.suppliers ? JSON.stringify(params.suppliers) : params.suppliers,
+        transaction_from: params.from ? new Date(params.from).toISOString().slice(0, 10) : null,
+        transaction_to: params.to ? new Date(params.to).toISOString().slice(0, 10) : null,
+        document_ids: params.types ? JSON.stringify(params.types) : params.types
       }
     })
   }
@@ -35,6 +43,26 @@ const useTransactions = (URL) => {
       ...currentValue,
       page: 1,
       search: data
+    }))
+  }
+
+  const filterData = (data) => {
+    const {
+      from,
+      to,
+      types,
+      suppliers
+    } = data
+
+    if (status === 'loading') return
+
+    setParams(currentValue => ({
+      ...currentValue,
+      page: 1,
+      from,
+      to,
+      types,
+      suppliers
     }))
   }
 
@@ -56,7 +84,7 @@ const useTransactions = (URL) => {
   }))
 
   const { status, data, error, refetch: refetchData } = useQuery(
-    ["transactions", params.search, params.state, params.page, params.rows],
+    ["transactions", params.search, params.state, params.page, params.rows, params.from, params.to, params.types, params.suppliers],
     fetchData,
     {
       retry: false,
@@ -75,7 +103,7 @@ const useTransactions = (URL) => {
   )
 
   return {
-    status, data, error, refetchData, searchData, changeStatus, changePage, changeRows
+    status, data, error, refetchData, searchData, filterData, changeStatus, changePage, changeRows
   }
 }
 
