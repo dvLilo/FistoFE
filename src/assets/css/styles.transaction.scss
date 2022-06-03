@@ -1,5 +1,14 @@
-.FstoPaperTransaction-root {
-  padding: 1em;
+.FstoAlertTransaction-root {
+  margin-bottom: 3em;
+
+  & .FstoAlertTransaction-icon {
+    font-size: 2em;
+  }
+
+  & .FstoAlertTransaction-title {
+    margin: 0;
+    font-size: 1.5em;
+  }
 }
 
 .FstoBoxTable-root {
@@ -58,6 +67,10 @@
   margin-bottom: -1px;
   padding: 10px;
   border: 1px solid #707070;
+
+  & strong {
+    text-transform: capitalize;
+  }
 }
 
 .FstoBoxCell-head {

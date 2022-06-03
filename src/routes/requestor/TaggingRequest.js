@@ -1,7 +1,8 @@
 import React from 'react'
 
-// eslint-disable-next-line
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import axios from 'axios'
+
+import { Link, useNavigate } from 'react-router-dom'
 
 import {
   Box,
@@ -29,13 +30,15 @@ import {
   Add
 } from '@mui/icons-material'
 
-import Transaction from '../../components/Transaction'
-import Preloader from '../../components/Preloader'
-import TaggingRequestActions from './TaggingRequestActions'
-
+import useToast from '../../hooks/useToast'
 import useTransactions from '../../hooks/useTransactions'
-import TaggingRequestFilter from './TaggingRequestFilter'
+
+import Preloader from '../../components/Preloader'
 import ReasonDialog from '../../components/ReasonDialog'
+
+import TaggingRequestActions from './TaggingRequestActions'
+import TaggingRequestFilter from './TaggingRequestFilter'
+import TaggingRequestView from './TaggingRequestView'
 
 const TaggingRequest = () => {
 
@@ -51,54 +54,84 @@ const TaggingRequest = () => {
 
   const navigate = useNavigate()
 
+  const toast = useToast()
+
+  const [active, setActive] = React.useState(true)
   const [state, setState] = React.useState("request")
   const [search, setSearch] = React.useState("")
 
   const [view, setView] = React.useState({
-    id: null,
+    data: null,
     open: false,
     onClose: () => setView(currentValue => ({
       ...currentValue,
-      id: null,
       open: false
     }))
   })
 
-  const [reasonDialog, setReasonDialog] = React.useState({
+  const [reason, setReason] = React.useState({
+    data: null,
     open: false,
-    data: null
+    onClose: () => setReason(currentValue => ({
+      ...currentValue,
+      open: false
+    }))
   })
 
-  const onView = (data) => {
-    const { id } = data
+  React.useEffect(() => {
+    (async () => {
+      try {
+        await axios.post(`/api/users/department-validation`)
 
-    setView(currentValue => ({
-      ...currentValue,
-      id,
-      open: true
-    }))
-  }
+        setActive(false)
+      }
+      catch (error) {
+        if (error.request.status === 404) {
+          setActive(true)
+
+          toast({
+            title: "Error!",
+            message: "Your department is not registered. Please inform the technical support.",
+            severity: "error",
+            duration: null
+          })
+        }
+
+        if (error.request.status !== 404)
+          toast({
+            title: "Error!",
+            message: "Something went wrong whilst validation user department."
+          })
+      }
+    })()
+    // eslint-disable-next-line
+  }, [])
+
+  const onView = (data) => setView(currentValue => ({
+    ...currentValue,
+    data,
+    open: true
+  }))
 
   const onUpdate = (data) => {
     const { id } = data
 
-    navigate(`update-request/${id}`)
+    navigate(`/requestor/update-request/${id}`)
   }
 
-  const onVoid = (data) => {
+  const onVoid = (data) => setReason(currentValue => ({
+    ...currentValue,
+    data,
+    open: true
+  }))
 
-    setReasonDialog({
-      open: true,
-      data: data
-    })
-  }
 
   return (
     <Box className="FstoBox-root">
       <Paper className="FstoPaperTable-root" elevation={1}>
         <Box className="FstoBoxToolbar2-root">
           <Box className="FstoBoxToolbar-left">
-            <Typography variant="heading">Tagging of Request</Typography>
+            <Typography variant="heading">Creation of Request</Typography>
 
             <Button
               className="FstoButtonNew-root"
@@ -106,6 +139,7 @@ const TaggingRequest = () => {
               component={Link}
               startIcon={<Add />}
               to="new-request"
+              disabled={active}
               disableElevation
             >
               New
@@ -126,7 +160,6 @@ const TaggingRequest = () => {
               }}
             >
               <Tab className="FstoTab-root" label="Requested" value="request" disableRipple />
-              <Tab className="FstoTab-root" label="Held" value="hold" disableRipple />
               <Tab className="FstoTab-root" label="Voided" value="void" disableRipple />
             </Tabs>
 
@@ -267,6 +300,7 @@ const TaggingRequest = () => {
 
                         <TableCell className="FstoTableData-root" align="center">
                           <TaggingRequestActions
+                            state={state}
                             data={data}
                             onView={onView}
                             onUpdate={onUpdate}
@@ -286,6 +320,7 @@ const TaggingRequest = () => {
         </TableContainer>
 
         <TablePagination
+          className="FstoTablePagination-root"
           component="div"
           count={data ? data.total : 0}
           page={data ? data.current_page - 1 : 0}
@@ -293,19 +328,13 @@ const TaggingRequest = () => {
           onPageChange={(e, page) => changePage(page)}
           onRowsPerPageChange={(e) => changeRows(e.target.value)}
           rowsPerPageOptions={[10, 20, 50, 100]}
+          showFirstButton
+          showLastButton
         />
 
-        {
-          view.open &&
-          <Transaction id={view.id} open={view.open} onClose={view.onClose} />}
+        <TaggingRequestView {...view} />
 
-        <ReasonDialog
-          data={reasonDialog.data}
-          open={reasonDialog.open}
-          close={() => setReasonDialog({
-            open: false
-          })}
-        />
+        <ReasonDialog {...reason} />
       </Paper>
     </Box>
   )

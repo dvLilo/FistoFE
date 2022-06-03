@@ -19,25 +19,17 @@ import {
   WarningAmberRounded as WarningIcon
 } from '@mui/icons-material'
 
+import useReasons from '../hooks/useReasons'
+
 import '../assets/css/styles.reason.scss'
 
 
-const REASON_LIST = [
-  {
-    id: 1,
-    description: "Cancel by proponent."
-  },
-  {
-    id: 2,
-    description: "Incomplete attachment."
-  },
-  {
-    id: 3,
-    description: "Incomplete details."
-  }
-]
+const ReasonDialog = ({ open = false, data = null, onClose = () => { } }) => {
 
-const ReasonDialog = ({ open = false, data = null, close = () => { } }) => {
+  const {
+    status: REASON_STATUS,
+    data: REASON_LIST
+  } = useReasons()
 
   const [reason, setReason] = React.useState({
     status: "void",
@@ -77,7 +69,7 @@ const ReasonDialog = ({ open = false, data = null, close = () => { } }) => {
         remarks: ""
       }
     })
-    close()
+    onClose()
   }
 
   return (
@@ -91,7 +83,7 @@ const ReasonDialog = ({ open = false, data = null, close = () => { } }) => {
     >
       <DialogTitle className="FstoDialogTitleReason-root">
         Confirmation
-        <IconButton onClick={close}>
+        <IconButton onClick={onClose}>
           <CloseIcon fontSize="small" />
         </IconButton>
       </DialogTitle>
@@ -106,11 +98,14 @@ const ReasonDialog = ({ open = false, data = null, close = () => { } }) => {
           <Autocomplete
             className="FstoDialogContentReason-option"
             size="small"
-            options={REASON_LIST}
+            options={REASON_LIST || []}
             value={
               reason.reason.id && reason.reason.description
                 ? reason.reason
                 : null
+            }
+            loading={
+              REASON_STATUS === 'loading'
             }
             renderInput={
               props =>

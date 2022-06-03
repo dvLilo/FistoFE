@@ -6,9 +6,9 @@
         "full_id_number": "RDFFLFI-10791",
         "prefix_id": "RDFFLFI",
         "id_number": 10791,
-        "first_name": "LIMAY LOUIE",
-        "middle_name": "OCAMPO",
-        "last_name": "DUCUT",
+        "first_name": "Limay Louie",
+        "middle_name": "Ocampo",
+        "last_name": "Ducut",
         "suffix": ""
       },
       "position_info": {
@@ -79,15 +79,15 @@
         "prefix_id": "RDFFLFI",
         "id_number": 10790,
         "first_name": "HERNANIE ROY",
-        "middle_name": "PANGILINAN",
+        "middle_name": "PANGANIBAN",
         "last_name": "PABUSTAN",
         "suffix": ""
       },
       "position_info": {
-        "position_name": "System Developer"
+        "position_name": "AP Associate"
       },
       "unit_info": {
-        "department_name": "Management Information System Common"
+        "department_name": "Finance Common"
       }
     }
   ],

@@ -324,7 +324,7 @@ const NewUser = () => {
 
         let response
         try {
-          response = await axios.post(`/api/admin/users/`, {
+          response = await axios.post(`/api/admin/users`, {
             id_prefix: user.id_prefix,
             id_no: user.id_no,
             role: user.role.name,
@@ -350,7 +350,7 @@ const NewUser = () => {
           setToast({
             show: true,
             title: "Error",
-            message: "Something went wrong whilst creating user account.",
+            message: "Something went wrong whilst saving user account.",
             severity: "error"
           })
 

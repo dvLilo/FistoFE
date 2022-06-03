@@ -28,6 +28,7 @@ import DateAdapter from '@mui/lab/AdapterDateFns'
 import { createFilterOptions } from '@mui/material/Autocomplete'
 
 import useSuppliers from '../../hooks/useSuppliers'
+import useUserDepartment from '../../hooks/useUserDepartment'
 
 const DOCUMENT_TYPES = [
   {
@@ -69,15 +70,21 @@ const TaggingRequestFilter = (props) => {
   const { filterData } = props
 
   const {
-    status,
-    data
+    status: SUPPLIER_STATUS,
+    data: SUPPLIER_LIST
   } = useSuppliers()
+
+  const {
+    status: USERDEPARTMENT_STATUS,
+    data: USERDEPARTMENT_LIST
+  } = useUserDepartment()
 
   const [filter, setFilter] = React.useState({
     from: new Date(),
     to: new Date(),
     types: [1, 2, 3, 4, 5, 6, 7, 8],
-    suppliers: []
+    suppliers: [],
+    departments: []
   })
 
   const [anchor, setAnchor] = React.useState(null)
@@ -101,7 +108,8 @@ const TaggingRequestFilter = (props) => {
       from: filter.from,
       to: filter.to,
       types: filter.types,
-      suppliers: filter.suppliers.map((item) => item.id)
+      suppliers: filter.suppliers.length ? filter.suppliers.map((item) => item.id) : null,
+      department: filter.departments.length ? filter.departments.map((item) => item.name) : null
     })
 
     filterCloseHandler()
@@ -112,7 +120,8 @@ const TaggingRequestFilter = (props) => {
       from: new Date(),
       to: new Date(),
       types: [1, 2, 3, 4, 5, 6, 7, 8],
-      suppliers: []
+      suppliers: [],
+      departments: []
     })
 
     filterData({
@@ -120,7 +129,8 @@ const TaggingRequestFilter = (props) => {
       from: null,
       to: null,
       types: null,
-      suppliers: null
+      suppliers: null,
+      department: null
     })
   }
 
@@ -203,6 +213,31 @@ const TaggingRequestFilter = (props) => {
                   label="From Date"
                 />
             }
+            PopperProps={{
+              placement: "left",
+              modifiers: [
+                {
+                  name: 'flip',
+                  enabled: true,
+                  options: {
+                    altBoundary: true,
+                    rootBoundary: 'document',
+                    padding: 8,
+                  },
+                },
+                {
+                  name: 'preventOverflow',
+                  enabled: true,
+                  options: {
+                    altAxis: false,
+                    altBoundary: false,
+                    tether: false,
+                    rootBoundary: 'document',
+                    padding: 8,
+                  },
+                }
+              ]
+            }}
             showToolbar
           />
 
@@ -222,6 +257,31 @@ const TaggingRequestFilter = (props) => {
                   label="To Date"
                 />
             }
+            PopperProps={{
+              placement: "left",
+              modifiers: [
+                {
+                  name: 'flip',
+                  enabled: true,
+                  options: {
+                    altBoundary: true,
+                    rootBoundary: 'document',
+                    padding: 8,
+                  },
+                },
+                {
+                  name: 'preventOverflow',
+                  enabled: true,
+                  options: {
+                    altAxis: false,
+                    altBoundary: false,
+                    tether: false,
+                    rootBoundary: 'document',
+                    padding: 8,
+                  },
+                }
+              ]
+            }}
             showToolbar
           />
         </LocalizationProvider>
@@ -234,14 +294,10 @@ const TaggingRequestFilter = (props) => {
           size="small"
           limitTags={5}
           filterOptions={filterOptions}
+          options={SUPPLIER_LIST || []}
           value={filter.suppliers}
           loading={
-            status === 'loading' && true
-          }
-          options={
-            status === 'success'
-              ? data.suppliers
-              : []
+            SUPPLIER_STATUS === 'loading'
           }
           sx={{
             width: '95%',
@@ -277,6 +333,59 @@ const TaggingRequestFilter = (props) => {
           multiple
           disableCloseOnSelect
         />
+
+        {
+          USERDEPARTMENT_LIST && USERDEPARTMENT_LIST.length >= 2 &&
+          <React.Fragment>
+            <Divider className="FstoDividerFilter-root" variant="middle" />
+
+            <Typography className="FstoTypographyFilter-root">Department:</Typography>
+            <Autocomplete
+              className="FstoSelectForm-root"
+              size="small"
+              limitTags={5}
+              filterOptions={filterOptions}
+              options={USERDEPARTMENT_LIST || []}
+              value={filter.departments}
+              loading={
+                USERDEPARTMENT_STATUS === 'loading'
+              }
+              sx={{
+                width: '95%',
+                marginLeft: '2.5%',
+                marginRight: '2.5%'
+              }}
+              renderInput={
+                props =>
+                  <TextField
+                    {...props}
+                    variant="outlined"
+                    label="Department"
+                  />
+              }
+              PaperComponent={
+                props =>
+                  <Paper
+                    {...props}
+                    sx={{ textTransform: 'capitalize' }}
+                  />
+              }
+              getOptionLabel={
+                option => option.name
+              }
+              isOptionEqualToValue={
+                (option, value) => option.id === value.id
+              }
+              onChange={(e, value) => setFilter(currentValue => ({
+                ...currentValue,
+                departments: value
+              }))}
+              fullWidth
+              multiple
+              disableCloseOnSelect
+            />
+          </React.Fragment>
+        }
 
         <Divider className="FstoDividerFilter-root" variant="middle" />
 

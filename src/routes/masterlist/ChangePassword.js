@@ -2,7 +2,7 @@ import React from 'react'
 
 import axios from 'axios'
 
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   Box,
@@ -18,6 +18,8 @@ import Toast from '../../components/Toast'
 import Confirm from '../../components/Confirm'
 
 const ChangePassword = () => {
+
+  const navigate = useNavigate()
 
   const [isSaving, setIsSaving] = React.useState(false)
 
@@ -250,8 +252,7 @@ const ChangePassword = () => {
                 className="FstoButtonForm-root"
                 variant="outlined"
                 color="error"
-                to="/dashboard"
-                component={Link}
+                onClick={() => navigate(-1)}
                 disableElevation
               >
                 Back

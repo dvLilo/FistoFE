@@ -132,7 +132,7 @@ const LocationsForm = (props) => {
               departments: location.departments.map(department => department.id)
             })
           else
-            response = await axios.post(`/api/admin/locations/`, {
+            response = await axios.post(`/api/admin/locations`, {
               code: location.code,
               location: location.location,
               departments: location.departments.map(department => department.id)
@@ -148,34 +148,33 @@ const LocationsForm = (props) => {
           refetchData() // refresh the table data
         }
         catch (error) {
-          const { status } = error.request
+          switch (error.request.status) {
+            case 409:
+              setError({
+                status: true,
+                field: error.response.data.result.error_field,
+                message: error.response.data.message
+              })
+              break
 
-          if (status === 409) {
-            const { data } = error.response
+            case 304:
+              formClearHandler()
+              toast({
+                show: true,
+                title: "Info",
+                message: "Nothing has changed.",
+                severity: "info"
+              })
+              break
 
-            setError({
-              status: true,
-              field: data.result.error_field,
-              message: data.message
-            })
+            default:
+              toast({
+                show: true,
+                title: "Error",
+                message: "Something went wrong whilst saving location.",
+                severity: "error"
+              })
           }
-          else if (status === 304) {
-            toast({
-              show: true,
-              title: "Info",
-              message: "Nothing has changed.",
-              severity: "info"
-            })
-
-            formClearHandler()
-          }
-          else
-            toast({
-              show: true,
-              title: "Error",
-              message: "Something went wrong whilst saving location.",
-              severity: "error"
-            })
         }
 
         setIsSaving(false)

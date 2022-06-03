@@ -37,6 +37,21 @@ const UpdateUser = () => {
   // eslint-disable-next-line
   const [isValidating, setIsValidating] = React.useState(false)
 
+  const [update, setUpdate] = React.useState({
+    last_name: true,
+    first_name: true,
+    middle_name: true,
+    suffix_name: true,
+    department: true,
+    position: true
+  })
+
+  const [error, setError] = React.useState({
+    status: false,
+    field: "",
+    message: ""
+  })
+
   const [toast, setToast] = React.useState({
     show: false,
     title: null,
@@ -325,6 +340,31 @@ const UpdateUser = () => {
             unit_info: { department_name }
           } = response.data
 
+          if (
+            user.first_name === first_name &&
+            user.middle_name === middle_name &&
+            user.last_name === last_name &&
+            user.position === position_name &&
+            user.department === department_name &&
+            (user.suffix_name === null && suffix === "")
+          ) {
+            setToast({
+              show: true,
+              title: "Info",
+              message: "Nothing has changed.",
+              severity: "info"
+            })
+            setConfirm(currentValue => ({
+              ...currentValue,
+              show: false,
+              loading: false
+            }))
+
+            return
+          }
+
+          departmentChangeHandler(department_name)
+
           setUser(currentValue => ({
             ...currentValue,
             last_name: last_name,
@@ -334,10 +374,19 @@ const UpdateUser = () => {
             department: department_name,
             position: position_name
           }))
+          setUpdate({
+            last_name: user.last_name === last_name,
+            first_name: user.first_name === first_name,
+            middle_name: user.middle_name === middle_name,
+            suffix_name: user.suffix_name === null && suffix === "",
+            department: user.department === department_name,
+            position: user.position === position_name
+          })
           setToast({
             show: true,
-            title: "Success",
-            message: "Employee details has been updated from Sedar."
+            title: "Sync Successfully",
+            message: "Employee details has been fetched from Sedar.",
+            severity: "info"
           })
           setConfirm(currentValue => ({
             ...currentValue,
@@ -367,6 +416,43 @@ const UpdateUser = () => {
     })
   }
 
+  const departmentChangeHandler = async (value) => {
+    setError({
+      status: false,
+      field: "",
+      message: ""
+    })
+
+    try {
+      await axios.post(`/api/users/department-validation`, {
+        department: value
+      })
+    }
+    catch (error) {
+      if (error.request.status === 404) {
+        const {
+          message,
+          result: { error_field }
+        } = error.response.data
+
+        setError({
+          status: true,
+          field: error_field,
+          message: message
+        })
+      }
+
+      if (error.request.status !== 404) {
+        setToast({
+          show: true,
+          title: "Error",
+          message: "Something went wrong whilst validating department.",
+          severity: "error"
+        })
+      }
+    }
+  }
+
   const formSubmitHandler = (e) => {
     e.preventDefault()
 
@@ -384,6 +470,12 @@ const UpdateUser = () => {
         let response
         try {
           response = await axios.put(`/api/admin/users/${id}`, {
+            first_name: user.first_name,
+            middle_name: user.middle_name,
+            last_name: user.last_name,
+            suffix: user.suffix_name,
+            department: user.department,
+            position: user.position,
             role: user.role.name,
             permissions: user.permissions,
             document_types: user.document_types
@@ -396,12 +488,33 @@ const UpdateUser = () => {
           })
         }
         catch (error) {
-          setToast({
-            show: true,
-            title: "Error",
-            message: "Something went wrong whilst creating user account.",
-            severity: "error"
-          })
+          switch (error.request.status) {
+            case 409:
+              setToast({
+                show: true,
+                title: "Error",
+                message: error.response.data.message,
+                severity: "error"
+              })
+              break;
+
+            case 304:
+              setToast({
+                show: true,
+                title: "Info",
+                message: "Nothing has changed.",
+                severity: "info"
+              })
+              break;
+
+            default:
+              setToast({
+                show: true,
+                title: "Error",
+                message: "Something went wrong whilst saving user account.",
+                severity: "error"
+              })
+          }
 
           console.log("Fisto Error Details: ", error.request)
         }
@@ -534,7 +647,7 @@ const UpdateUser = () => {
               endAdornment: (
                 <InputAdornment position="end">
                   <Button size="small" startIcon={<SyncIcon fontSize="small" />} onClick={() => sedarSyncHandler(user.id_no)}>
-                    Update with Sedar
+                    Sync with Sedar
                   </Button>
                 </InputAdornment>
               )
@@ -555,14 +668,19 @@ const UpdateUser = () => {
             variant="outlined"
             autoComplete="off"
             size="small"
+            color="info"
             value={user.last_name.toLowerCase()}
+            InputProps={{
+              readOnly: !update.last_name
+            }}
             InputLabelProps={{
               className: "FstoLabelForm-root"
             }}
             sx={{
               input: { textTransform: "capitalize" }
             }}
-            disabled
+            focused={!update.last_name}
+            disabled={update.last_name}
             fullWidth
           />
 
@@ -572,14 +690,19 @@ const UpdateUser = () => {
             variant="outlined"
             autoComplete="off"
             size="small"
+            color="info"
             value={user.first_name.toLowerCase()}
+            InputProps={{
+              readOnly: !update.first_name
+            }}
             InputLabelProps={{
               className: "FstoLabelForm-root"
             }}
             sx={{
               input: { textTransform: "capitalize" }
             }}
-            disabled
+            focused={!update.first_name}
+            disabled={update.first_name}
             fullWidth
           />
 
@@ -589,14 +712,19 @@ const UpdateUser = () => {
             variant="outlined"
             autoComplete="off"
             size="small"
+            color="info"
             value={user.middle_name.toLowerCase()}
+            InputProps={{
+              readOnly: !update.middle_name
+            }}
             InputLabelProps={{
               className: "FstoLabelForm-root"
             }}
             sx={{
               input: { textTransform: "capitalize" }
             }}
-            disabled
+            focused={!update.middle_name}
+            disabled={update.middle_name}
             fullWidth
           />
 
@@ -606,11 +734,24 @@ const UpdateUser = () => {
             variant="outlined"
             autoComplete="off"
             size="small"
+            color="info"
             value={user.department}
+            error={error.status && error.field === "department"}
+            helperText={
+              error.status &&
+              error.field === "department" &&
+              <React.Fragment>
+                {error.message} <Link to="/dashboard/departments" state={{ department: user.department }}>Click here</Link> to register.
+              </React.Fragment>
+            }
+            InputProps={{
+              readOnly: !update.department
+            }}
             InputLabelProps={{
               className: "FstoLabelForm-root"
             }}
-            disabled
+            focused={!update.department}
+            disabled={update.department}
             fullWidth
           />
 
@@ -620,11 +761,16 @@ const UpdateUser = () => {
             variant="outlined"
             autoComplete="off"
             size="small"
+            color="info"
             value={user.position}
+            InputProps={{
+              readOnly: !update.position
+            }}
             InputLabelProps={{
               className: "FstoLabelForm-root"
             }}
-            disabled
+            focused={!update.position}
+            disabled={update.position}
             fullWidth
           />
 
@@ -635,6 +781,9 @@ const UpdateUser = () => {
             autoComplete="off"
             size="small"
             value={user.username}
+            InputProps={{
+              readOnly: true
+            }}
             InputLabelProps={{
               className: "FstoLabelForm-root"
             }}
@@ -683,6 +832,7 @@ const UpdateUser = () => {
             loading={isSaving}
             startIcon={<></>}
             disabled={
+              error.status ||
               !Boolean(user.id_no) ||
               !Boolean(user.last_name) ||
               !Boolean(user.first_name) ||

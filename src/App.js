@@ -46,6 +46,7 @@ import Reasons from './routes/masterlist/Reasons/'
 import TaggingRequest from './routes/requestor/TaggingRequest'
 import NewRequest from './routes/requestor/NewRequest'
 import UpdateRequest from './routes/requestor/UpdateRequest'
+import ReturnedDocument from './routes/requestor/ReturnedDocument'
 
 import NotFound from './exceptions/NotFound'
 import AccessDenied from './exceptions/AccessDenied'
@@ -54,6 +55,7 @@ import Sandbox from './Sandbox'
 import FistoProvider from './contexts/FistoContext'
 
 import { QueryClient, QueryClientProvider } from 'react-query'
+import DocumentTagging from './routes/tagging/DocumentTagging'
 
 // Create a client
 const queryClient = new QueryClient()
@@ -133,99 +135,69 @@ const App = () => {
     }
   }), [colorScheme, prefersDarkMode]);
 
-
-  // const currentUser = useSelector(state => state.user)
-
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <Routes>
-          <Route exact strict path="*" element={<NotFound />} />
-          <Route exact strict path="/403" element={<AccessDenied />} />
-          <Route
-            exact
-            path="/sandbox"
-            element={
-              <QueryClientProvider client={queryClient}>
-                <FistoProvider><Sandbox /></FistoProvider>
-              </QueryClientProvider>
-            }
-          />
-          <Route
-            exact
-            path="/"
-            element={
-              <Landing />
-            }
-          />
-          <Route
-            exact
-            path="/dashboard"
-            element={
-              <ProtectedRoute />
-            }
-          >
-            <Route
-              exact
-              path="/dashboard"
-              element={
-                <Dashboard />
-              }
-            >
-              <Route index exact strict element={<UserAccounts />} />
-              <Route exact strict path="new-user" element={<NewUser />} />
-              <Route exact strict path="update-user/:id" element={<UpdateUser />} />
-              <Route exact strict path="change-password" element={<ChangePassword />} />
-              <Route exact strict path="categories" element={<Categories />} />
-              <Route exact strict path="document-types" element={<DocumentTypes />} />
-              <Route exact strict path="companies" element={<Companies />} />
-              <Route exact strict path="departments" element={<Departments />} />
-              <Route exact strict path="locations" element={<Locations />} />
-              <Route exact strict path="references" element={<References />} />
-              <Route exact strict path="supplier-types" element={<SupplierTypes />} />
-              <Route exact strict path="suppliers" element={<Suppliers />} />
-              <Route exact strict path="utility-categories" element={<UtilityCategories />} />
-              <Route exact strict path="utility-locations" element={<UtilityLocations />} />
-              <Route exact strict path="account-numbers" element={<AccountNumbers />} />
-              <Route exact strict path="credit-cards" element={<CreditCards />} />
-              <Route exact strict path="account-titles" element={<AccountTitles />} />
-              <Route exact strict path="payroll-clients" element={<PayrollClients />} />
-              <Route exact strict path="payroll-categories" element={<PayrollCategories />} />
-              <Route exact strict path="banks" element={<Banks />} />
-              <Route exact strict path="reasons" element={<Reasons />} />
 
-              {/* <Route exact strict path="tagging-request" element={currentUser?.permissions.includes(1) || currentUser?.permissions.includes(2) ? <TaggingRequest /> : <AccessDenied />} />
-              <Route exact strict path="tagging-request/new-request" element={<NewRequest />} /> */}
-            </Route>
-          </Route>
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <Routes>
+            <Route exact strict path="*" element={<NotFound />} />
+            <Route exact strict path="/403" element={<AccessDenied />} />
 
-          <Route
-            exact
-            path="/requestor"
-            element={
-              <ProtectedRoute />
-            }
-          >
-            <Route
-              exact
-              path="/requestor"
-              element={
-                <Dashboard />
-              }
-            >
-              <Route index exact strict element={
-                <QueryClientProvider client={queryClient}>
-                  <TaggingRequest />
-                </QueryClientProvider>}
-              />
-              <Route exact strict path="new-request" element={<NewRequest />} />
-              <Route exact strict path="update-request/:id" element={<UpdateRequest />} />
+            <Route exact path="/sandbox" element={<FistoProvider><Sandbox /></FistoProvider>} />
+
+            <Route exact path="/" element={<Landing />} />
+
+            <Route exact path="/user/change-password" element={<ProtectedRoute />}>
+              <Route exact path="/user/change-password" element={<Dashboard />}>
+                <Route index exact strict element={<ChangePassword />} />
+              </Route>
             </Route>
-          </Route>
-        </Routes>
-      </Router>
-    </ThemeProvider>
+
+            <Route exact path="/dashboard" element={<ProtectedRoute />}>
+              <Route exact path="/dashboard" element={<Dashboard />}>
+                <Route index exact strict element={<UserAccounts />} />
+                <Route exact strict path="new-user" element={<NewUser />} />
+                <Route exact strict path="update-user/:id" element={<UpdateUser />} />
+                <Route exact strict path="categories" element={<Categories />} />
+                <Route exact strict path="document-types" element={<DocumentTypes />} />
+                <Route exact strict path="companies" element={<Companies />} />
+                <Route exact strict path="departments" element={<Departments />} />
+                <Route exact strict path="locations" element={<Locations />} />
+                <Route exact strict path="references" element={<References />} />
+                <Route exact strict path="supplier-types" element={<SupplierTypes />} />
+                <Route exact strict path="suppliers" element={<Suppliers />} />
+                <Route exact strict path="utility-categories" element={<UtilityCategories />} />
+                <Route exact strict path="utility-locations" element={<UtilityLocations />} />
+                <Route exact strict path="account-numbers" element={<AccountNumbers />} />
+                <Route exact strict path="credit-cards" element={<CreditCards />} />
+                <Route exact strict path="account-titles" element={<AccountTitles />} />
+                <Route exact strict path="payroll-clients" element={<PayrollClients />} />
+                <Route exact strict path="payroll-categories" element={<PayrollCategories />} />
+                <Route exact strict path="banks" element={<Banks />} />
+                <Route exact strict path="reasons" element={<Reasons />} />
+              </Route>
+            </Route>
+
+            <Route exact path="/requestor" element={<ProtectedRoute />}>
+              <Route exact path="/requestor" element={<Dashboard />}>
+                <Route index exact strict element={<TaggingRequest />} />
+                <Route exact strict path="new-request" element={<NewRequest />} />
+                <Route exact strict path="update-request/:id" element={<UpdateRequest />} />
+                <Route exact strict path="returned-documents" element={<ReturnedDocument />} />
+              </Route>
+            </Route>
+
+            <Route exact path="/tagging" element={<ProtectedRoute />}>
+              <Route exact path="/tagging" element={<Dashboard />}>
+                <Route index exact strict element={<DocumentTagging />} />
+              </Route>
+            </Route>
+          </Routes>
+        </Router>
+      </QueryClientProvider>
+    </ThemeProvider >
   )
 }
 

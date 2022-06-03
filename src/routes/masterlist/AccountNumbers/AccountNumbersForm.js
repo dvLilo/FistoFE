@@ -149,7 +149,7 @@ const AccountNumbersForm = (props) => {
               supplier_id: accountNumber.supplier.id
             })
           else
-            response = await axios.post(`/api/admin/account-number/`, {
+            response = await axios.post(`/api/admin/account-number`, {
               account_no: accountNumber.number,
               location_id: accountNumber.location.id,
               category_id: accountNumber.category.id,
@@ -166,23 +166,32 @@ const AccountNumbersForm = (props) => {
           refetchData() // refresh the table data
         }
         catch (error) {
-          const { status } = error.request
+          switch (error.request.status) {
+            case 409:
+              setError({
+                status: true,
+                message: error.response.data.message
+              })
+              break
 
-          if (status === 409) {
-            const { data } = error.response
+            case 304:
+              formClearHandler()
+              toast({
+                show: true,
+                title: "Info",
+                message: "Nothing has changed.",
+                severity: "info"
+              })
+              break
 
-            setError({
-              status: true,
-              message: data.message
-            })
+            default:
+              toast({
+                show: true,
+                title: "Error",
+                message: "Something went wrong whilst saving account number.",
+                severity: "error"
+              })
           }
-          else
-            toast({
-              show: true,
-              title: "Error",
-              message: "Something went wrong whilst saving account number.",
-              severity: "error"
-            })
         }
 
         setIsSaving(false)

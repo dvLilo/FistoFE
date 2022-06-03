@@ -24,6 +24,7 @@ import {
   // Circle as BulletFilled,
 
   SettingsOutlined as Masterlist,
+  PostAddOutlined as Request,
   FeedOutlined as Document,
   ConfirmationNumberOutlined as Voucher,
   LocalAtmOutlined as Cheque,
@@ -119,7 +120,7 @@ const Sidebar = () => {
 
           <Accordion>
             <AccordionSummary>
-              <Masterlist sx={{ mr: 2.5 }} />Master List
+              <Masterlist sx={{ mr: 2.5 }} /> Master List
             </AccordionSummary>
             <AccordionDetails>
               <RouterLink className="FstoLink-root" to="/dashboard">User Accounts</RouterLink>
@@ -146,37 +147,29 @@ const Sidebar = () => {
 
           <Accordion>
             <AccordionSummary>
-              <Document sx={{ mr: 2.5 }} />Documents
+              <Request sx={{ mr: 2.5 }} /> Requests
             </AccordionSummary>
             <AccordionDetails>
-              <RouterLink className="FstoLink-root" to="/requestor">Tagging of Request</RouterLink>
+              <RouterLink className="FstoLink-root" to="/requestor">Creation of Request</RouterLink>
+              <RouterLink className="FstoLink-root" to="/requestor/returned-documents">Returned Requests</RouterLink>
 
             </AccordionDetails>
           </Accordion>
 
           <Accordion>
             <AccordionSummary>
-              <Voucher sx={{ mr: 2.5 }} />Voucher
+              <Document sx={{ mr: 2.5 }} /> Documents
             </AccordionSummary>
             <AccordionDetails>
-              {/* RouterLink here... */}
+              <RouterLink className="FstoLink-root" to="/tagging">Tagging of Documents</RouterLink>
+              <RouterLink className="FstoLink-root" to="/tagging/returned-documents">Returned Documents</RouterLink>
 
             </AccordionDetails>
           </Accordion>
 
           <Accordion>
             <AccordionSummary>
-              <Cheque sx={{ mr: 2.5 }} />Cheque
-            </AccordionSummary>
-            <AccordionDetails>
-              {/* RouterLink here... */}
-
-            </AccordionDetails>
-          </Accordion>
-
-          <Accordion>
-            <AccordionSummary>
-              <Approval sx={{ mr: 2.5 }} />Approval
+              <Voucher sx={{ mr: 2.5 }} /> Voucher
             </AccordionSummary>
             <AccordionDetails>
               {/* RouterLink here... */}
@@ -186,7 +179,7 @@ const Sidebar = () => {
 
           <Accordion>
             <AccordionSummary>
-              <Confidential sx={{ mr: 2.5 }} />Confidential
+              <Cheque sx={{ mr: 2.5 }} /> Cheque
             </AccordionSummary>
             <AccordionDetails>
               {/* RouterLink here... */}
@@ -196,7 +189,27 @@ const Sidebar = () => {
 
           <Accordion>
             <AccordionSummary>
-              <Reports sx={{ mr: 2.5 }} />Reports
+              <Approval sx={{ mr: 2.5 }} /> Approval
+            </AccordionSummary>
+            <AccordionDetails>
+              {/* RouterLink here... */}
+
+            </AccordionDetails>
+          </Accordion>
+
+          <Accordion>
+            <AccordionSummary>
+              <Confidential sx={{ mr: 2.5 }} /> Confidential
+            </AccordionSummary>
+            <AccordionDetails>
+              {/* RouterLink here... */}
+
+            </AccordionDetails>
+          </Accordion>
+
+          <Accordion>
+            <AccordionSummary>
+              <Reports sx={{ mr: 2.5 }} /> Reports
             </AccordionSummary>
             <AccordionDetails>
               {/* RouterLink here... */}

@@ -2,6 +2,8 @@ import React from 'react'
 
 import axios from 'axios'
 
+import { useLocation } from 'react-router-dom'
+
 import {
   Paper,
   TextField,
@@ -12,6 +14,8 @@ import {
 import { LoadingButton } from '@mui/lab'
 
 const DepartmentsForm = (props) => {
+
+  const location = useLocation()
 
   const {
     data,
@@ -42,6 +46,16 @@ const DepartmentsForm = (props) => {
     department: "",
     company: null
   })
+
+  React.useEffect(() => {
+    const { state } = location
+
+    if (state) setDepartment(currentValue => ({
+      ...currentValue,
+      department: state.department
+    }))
+    // eslint-disable-next-line
+  }, [])
 
   React.useEffect(() => {
     (async () => {
@@ -135,7 +149,7 @@ const DepartmentsForm = (props) => {
               company: department.company.id
             })
           else
-            response = await axios.post(`/api/admin/departments/`, {
+            response = await axios.post(`/api/admin/departments`, {
               code: department.code,
               department: department.department,
               company: department.company.id
@@ -151,24 +165,33 @@ const DepartmentsForm = (props) => {
           refetchData() // refresh the table data
         }
         catch (error) {
-          const { status } = error.request
+          switch (error.request.status) {
+            case 409:
+              setError({
+                status: true,
+                field: error.response.data.result.error_field,
+                message: error.response.data.message
+              })
+              break
 
-          if (status === 409) {
-            const { data } = error.response
+            case 304:
+              formClearHandler()
+              toast({
+                show: true,
+                title: "Info",
+                message: "Nothing has changed.",
+                severity: "info"
+              })
+              break
 
-            setError({
-              status: true,
-              field: data.result.error_field,
-              message: data.message
-            })
+            default:
+              toast({
+                show: true,
+                title: "Error",
+                message: "Something went wrong whilst saving department.",
+                severity: "error"
+              })
           }
-          else
-            toast({
-              show: true,
-              title: "Error",
-              message: "Something went wrong whilst saving department.",
-              severity: "error"
-            })
         }
 
         setIsSaving(false)

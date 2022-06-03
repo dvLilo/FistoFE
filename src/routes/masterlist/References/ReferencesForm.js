@@ -77,7 +77,7 @@ const ReferencesForm = (props) => {
               description: reference.description
             })
           else
-            response = await axios.post(`/api/admin/referrences/`, {
+            response = await axios.post(`/api/admin/referrences`, {
               type: reference.type,
               description: reference.description
             })
@@ -92,23 +92,32 @@ const ReferencesForm = (props) => {
           refetchData() // refresh the table data
         }
         catch (error) {
-          const { status } = error.request
+          switch (error.request.status) {
+            case 409:
+              setError({
+                status: true,
+                message: error.response.data.message
+              })
+              break
 
-          if (status === 409) {
-            const { data } = error.response
+            case 304:
+              formClearHandler()
+              toast({
+                show: true,
+                title: "Info",
+                message: "Nothing has changed.",
+                severity: "info"
+              })
+              break
 
-            setError({
-              status: true,
-              message: data.message
-            })
+            default:
+              toast({
+                show: true,
+                title: "Error",
+                message: "Something went wrong whilst saving reference.",
+                severity: "error"
+              })
           }
-          else
-            toast({
-              show: true,
-              title: "Error",
-              message: "Something went wrong whilst saving reference.",
-              severity: "error"
-            })
         }
 
         setIsSaving(false)

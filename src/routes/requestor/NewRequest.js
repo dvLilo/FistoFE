@@ -39,6 +39,16 @@ import { createFilterOptions } from '@mui/material/Autocomplete'
 import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
 
+import useSuppliers from '../../hooks/useSuppliers'
+import useCompanies from '../../hooks/useCompanies'
+import useDepartments from '../../hooks/useDepartments'
+import useLocations from '../../hooks/useLocations'
+import usePayrollClents from '../../hooks/usePayrollClents'
+import usePayrollCategories from '../../hooks/usePayrollCategories'
+import useAccountNumbers from '../../hooks/useAccountNumbers'
+import useUtilityCategories from '../../hooks/useUtilityCategories'
+import useUtilityLocations from '../../hooks/useUtilityLocations'
+
 
 const PAYMENT_TYPES = [
   {
@@ -189,9 +199,9 @@ const NewRequest = () => {
 
       category: null,
 
-      company: { id: 1, name: "RDF Corporate Services" },
-      department: { id: 1, name: "Corporate Common" },
-      location: { id: 1, name: "Common" },
+      company: null,
+      department: null,
+      location: null,
 
       supplier: null,
 
@@ -239,7 +249,7 @@ const NewRequest = () => {
     rr_no: []
   })
 
-  const [DOCUMENT_TYPES, setDocumentTypes] = React.useState({ fetching: true, data: [] })
+  const [DOCUMENT_TYPES, setDocumentTypes] = React.useState({ fetching: true, disabled: false, data: [] })
   React.useEffect(() => {
     (async () => {
       let response
@@ -280,63 +290,110 @@ const NewRequest = () => {
 
     // eslint-disable-next-line
   }, [])
-
-  const [COMPANY_CHARGING, setCompanyCharging] = React.useState([])
-  React.useEffect(() => {
+  React.useEffect(() => { // User Department Validation
     (async () => {
-      let response
       try {
-        response = await axios.get(`/api/dropdown/charging`)
+        await axios.post(`/api/users/department-validation`)
 
-        const { companies } = response.data.result
-
-        setCompanyCharging(companies)
+        setDocumentTypes(currentValue => ({
+          ...currentValue,
+          disabled: false
+        }))
       }
       catch (error) {
-        console.log("Fisto Error Status", error.request)
+        if (error.request.status === 404) {
+          setDocumentTypes(currentValue => ({
+            ...currentValue,
+            disabled: true
+          }))
 
-        toast({
-          open: true,
-          severity: "error",
-          title: "Error!",
-          message: "Something went wrong whilst trying to connect to the server. Please try again later."
-        })
+          toast({
+            title: "Error!",
+            message: "Your department is not registered. Please inform the technical support.",
+            severity: "error",
+            duration: null
+          })
+        }
+
+        if (error.request.status !== 404)
+          toast({
+            title: "Error!",
+            message: "Something went wrong whilst validation user department."
+          })
       }
     })()
-
     // eslint-disable-next-line
   }, [])
 
-  const [SUPPLIER_LIST, setSupplierList] = React.useState([])
+  const {
+    status: SUPPLIER_STATUS,
+    data: SUPPLIER_LIST
+  } = useSuppliers()
+
+  const {
+    status: COMPANY_STATUS,
+    data: COMPANY_LIST
+  } = useCompanies()
+
+  const {
+    status: DEPARTMENT_STATUS,
+    data: DEPARTMENT_LIST
+  } = useDepartments(data.document.company?.id)
+
+  const {
+    status: LOCATION_STATUS,
+    data: LOCATION_LIST
+  } = useLocations(data.document.department?.id)
+
+  const {
+    refetch: fetchPayrollClients,
+    status: PAYROLL_CLIENTS_STATUS,
+    data: PAYROLL_CLIENTS_LIST
+  } = usePayrollClents()
   React.useEffect(() => {
-    (async () => {
-      let response
-      try {
-        response = await axios.get(`/api/dropdown/suppliers`, {
-          params: {
-            status: 1,
-            paginate: 0
-          }
-        })
+    if (data.document.id === 7) fetchPayrollClients()
+    // eslint-disable-next-line 
+  }, [data.document.id])
 
-        const { suppliers } = response.data.result
+  const {
+    refetch: fetchAccountNumbers,
+    status: ACCOUNT_NUMBERS_STATUS,
+    data: ACCOUNT_NUMBERS_LIST
+  } = useAccountNumbers()
+  React.useEffect(() => {
+    if (data.document.id === 6) fetchAccountNumbers()
+    // eslint-disable-next-line 
+  }, [data.document.id])
 
-        setSupplierList(suppliers)
-      }
-      catch (error) {
-        console.log("Fisto Error Status", error.request)
+  const {
+    refetch: fetchUtilityCategories,
+    status: UTILITY_CATEGORIES_STATUS,
+    data: UTILITY_CATEGORIES_LIST
+  } = useUtilityCategories()
+  React.useEffect(() => {
+    if (data.document.id === 6) fetchUtilityCategories()
+    // eslint-disable-next-line 
+  }, [data.document.id])
 
-        toast({
-          open: true,
-          severity: "error",
-          title: "Error!",
-          message: "Something went wrong whilst trying to connect to the server. Please try again later."
-        })
-      }
-    })()
+  const {
+    refetch: fetchUtilityLocations,
+    status: UTILITY_LOCATIONS_STATUS,
+    data: UTILITY_LOCATIONS_LIST
+  } = useUtilityLocations()
+  React.useEffect(() => {
+    if (data.document.id === 6) fetchUtilityLocations()
+    // eslint-disable-next-line 
+  }, [data.document.id])
 
-    // eslint-disable-next-line
-  }, [])
+  const {
+    refetch: fetchPayrollCategories,
+    status: PAYROLL_CATEGORIES_STATUS,
+    data: PAYROLL_CATEGORIES_LIST
+  } = usePayrollCategories()
+  React.useEffect(() => {
+    if (data.document.id === 7) fetchPayrollCategories()
+    // eslint-disable-next-line 
+  }, [data.document.id])
 
   const [PETTYCASHFUND_LIST, setPettyCashFundList] = React.useState([])
   React.useEffect(() => {
@@ -366,206 +423,6 @@ const NewRequest = () => {
     // eslint-disable-next-line
   }, [data.document.id])
 
-  const [PAYROLL_CLIENTS, setPayrollClients] = React.useState([])
-  React.useEffect(() => {
-    (async () => {
-      if (data.document.id === 7) {
-        let response
-        try {
-          response = await axios.get(`/api/dropdown/payroll-clients`, {
-            params: {
-              status: 1,
-              paginate: 0
-            }
-          })
-
-          const { payroll_clients } = response.data.result
-
-          setPayrollClients(payroll_clients)
-        }
-        catch (error) {
-          console.log("Fisto Error Status", error.request)
-
-          toast({
-            open: true,
-            severity: "error",
-            title: "Error!",
-            message: "Something went wrong whilst trying to connect to the server. Please try again later."
-          })
-        }
-      }
-    })()
-
-    // eslint-disable-next-line
-  }, [data.document.id])
-
-  const [PAYROLL_CATEGORIES, setPayrollCategories] = React.useState([])
-  React.useEffect(() => {
-    (async () => {
-      if (data.document.id === 7) {
-        let response
-        try {
-          response = await axios.get(`/api/dropdown/payroll-categories`, {
-            params: {
-              status: 1,
-              paginate: 0
-            }
-          })
-
-          const { payroll_categories } = response.data.result
-
-          setPayrollCategories(payroll_categories)
-        }
-        catch (error) {
-          console.log("Fisto Error Status", error.request)
-
-          toast({
-            open: true,
-            severity: "error",
-            title: "Error!",
-            message: "Something went wrong whilst trying to connect to the server. Please try again later."
-          })
-        }
-      }
-    })()
-
-    // eslint-disable-next-line
-  }, [data.document.id])
-
-  const [ACCOUNT_NUMBERS, setAccountNumbers] = React.useState([])
-  React.useEffect(() => {
-    (async () => {
-      if (data.document.id === 6) {
-        let response
-        try {
-          response = await axios.get(`/api/dropdown/account-numbers`, {
-            params: {
-              status: 1,
-              paginate: 0
-            }
-          })
-
-          const { account_numbers } = response.data.result
-
-          setAccountNumbers(account_numbers)
-        }
-        catch (error) {
-          console.log("Fisto Error Status", error.request)
-
-          toast({
-            open: true,
-            severity: "error",
-            title: "Error!",
-            message: "Something went wrong whilst trying to connect to the server. Please try again later."
-          })
-        }
-      }
-    })()
-
-    // eslint-disable-next-line
-  }, [data.document.id])
-
-  const [UTILITY_CATEGORIES, setUtilityCategories] = React.useState([])
-  React.useEffect(() => {
-    (async () => {
-      if (data.document.id === 6) {
-        let response
-        try {
-          response = await axios.get(`/api/dropdown/utility-categories`, {
-            params: {
-              status: 1,
-              paginate: 0
-            }
-          })
-
-          const { utility_categories } = response.data.result
-
-          setUtilityCategories(utility_categories)
-        }
-        catch (error) {
-          console.log("Fisto Error Status", error.request)
-
-          toast({
-            open: true,
-            severity: "error",
-            title: "Error!",
-            message: "Something went wrong whilst trying to connect to the server. Please try again later."
-          })
-        }
-      }
-    })()
-
-    // eslint-disable-next-line
-  }, [data.document.id])
-
-  const [UTILITY_LOCATIONS, setUtilityLocations] = React.useState([])
-  React.useEffect(() => {
-    (async () => {
-      if (data.document.id === 6) {
-        let response
-        try {
-          response = await axios.get(`/api/dropdown/utility-locations`, {
-            params: {
-              status: 1,
-              paginate: 0
-            }
-          })
-
-          const { utility_locations } = response.data.result
-
-          setUtilityLocations(utility_locations)
-        }
-        catch (error) {
-          console.log("Fisto Error Status", error.request)
-
-          toast({
-            open: true,
-            severity: "error",
-            title: "Error!",
-            message: "Something went wrong whilst trying to connect to the server. Please try again later."
-          })
-        }
-      }
-    })()
-
-    // eslint-disable-next-line
-  }, [data.document.id])
-
-  // const [REFERENCE_TYPES, setReferenceTypes] = React.useState([])
-  // React.useEffect(() => {
-  //   (async () => {
-  //     if (data.document.id === 4) {
-  //       let response
-  //       try {
-  //         response = await axios.get(`/api/dropdown/references`, {
-  //           params: {
-  //             status: 1,
-  //             paginate: 0
-  //           }
-  //         })
-
-  //         const { referrences } = response.data.result
-
-  //         setReferenceTypes(referrences)
-  //       }
-  //       catch (error) {
-  //         console.log("Fisto Error Status", error.request)
-
-  //         toast({
-  //           open: true,
-  //           severity: "error",
-  //           title: "Error!",
-  //           message: "Something went wrong whilst trying to connect to the server. Please try again later."
-  //         })
-  //       }
-  //     }
-  //   })()
-
-  //   // eslint-disable-next-line
-  // }, [data.document.id])
-
-
-
 
   React.useEffect(() => { // Reference Number Validation
     if (data.document.id === 4
@@ -587,7 +444,7 @@ const NewRequest = () => {
 
   React.useEffect(() => { // Utility Account Number Auto Select
     if (data.document.supplier && data.document.utility.category && data.document.utility.location) {
-      const account_numbers = ACCOUNT_NUMBERS.filter(row => row.supplier.id === data.document.supplier.id && row.category.id === data.document.utility.category.id && row.location.id === data.document.utility.location.id)
+      const account_numbers = ACCOUNT_NUMBERS_LIST.filter(row => row.supplier.id === data.document.supplier.id && row.category.id === data.document.utility.category.id && row.location.id === data.document.utility.location.id)
 
       if (account_numbers.length === 1)
         setData(currentValue => ({
@@ -656,17 +513,18 @@ const NewRequest = () => {
     // eslint-disable-next-line
   }, [data.document.from, data.document.to, data.document.company, data.document.department, data.document.utility.category, data.document.utility.location])
 
-  // React.useEffect(() => {
-  //   const unload = (e) => {
-  //     e = e || window.event
 
-  //     if (e) e.returnValue = 'Are you sure you want to proceed?'
-  //     return 'Are you sure you want to proceed?'
-  //   }
+  React.useEffect(() => {
+    const unload = (e) => {
+      e = e || window.event
 
-  //   window.addEventListener("beforeunload", unload)
-  //   return () => window.removeEventListener("beforeunload", unload)
-  // }, [])
+      if (e) e.returnValue = 'Are you sure you want to proceed?'
+      return 'Are you sure you want to proceed?'
+    }
+
+    window.addEventListener("beforeunload", unload)
+    return () => window.removeEventListener("beforeunload", unload)
+  }, [])
 
 
   const isDisabled = () => {
@@ -813,9 +671,27 @@ const NewRequest = () => {
       ]
     }))
 
+    let document_prefix
+    switch (data.document.id) {
+      case 1:
+        document_prefix = "pad#"
+        break
+      case 2:
+        document_prefix = "prmc#"
+        break
+      case 3:
+        document_prefix = "prmm#"
+        break
+      case 5:
+        document_prefix = "cb#"
+        break
+      default:
+        document_prefix = null
+    }
+
     try {
       await axios.post(`/api/transactions/validate-document-no`, {
-        document_no: data.document.no
+        document_no: `${document_prefix}${data.document.no}`
       })
     }
     catch (error) {
@@ -922,8 +798,8 @@ const NewRequest = () => {
       rr_no: PO.rr_no,
       batch: PO.batch
     })
-    else setData({
-      ...data,
+    else setData(currentValue => ({
+      ...currentValue,
       po_group: [
         {
           no: PO.no,
@@ -932,9 +808,9 @@ const NewRequest = () => {
           rr_no: PO.rr_no,
           batch: PO.batch
         },
-        ...data.po_group,
+        ...currentValue.po_group
       ]
-    })
+    }))
 
     setPO({
       update: false,
@@ -1071,11 +947,6 @@ const NewRequest = () => {
     })
   }
 
-  const filterOptions = createFilterOptions({
-    matchFrom: 'any',
-    limit: 100
-  })
-
   const transformData = (ID) => {
     switch (ID) {
       case 1: // PAD - Post Acquisition Delivery
@@ -1083,7 +954,7 @@ const NewRequest = () => {
           requestor: data.requestor,
           document: {
             id: data.document.id,
-            no: data.document.no,
+            no: `pad#${data.document.no}`,
             name: data.document.name,
             payment_type: data.document.payment_type,
             amount: data.document.amount,
@@ -1105,7 +976,7 @@ const NewRequest = () => {
           requestor: data.requestor,
           document: {
             id: data.document.id,
-            no: data.document.no,
+            no: `prmc#${data.document.no}`,
             name: data.document.name,
             payment_type: data.document.payment_type,
             amount: data.document.amount,
@@ -1152,7 +1023,7 @@ const NewRequest = () => {
           requestor: data.requestor,
           document: {
             id: data.document.id,
-            no: data.document.no,
+            no: `cb#${data.document.no}`,
             cip: data.document.cip,
             name: data.document.name,
             payment_type: data.document.payment_type,
@@ -1384,6 +1255,11 @@ const NewRequest = () => {
     })
   }
 
+  const filterOptions = createFilterOptions({
+    matchFrom: 'any',
+    limit: 100
+  })
+
   return (
     <Box className="FstoBox-root">
       <Paper className="FstoPaperForm-root" elevation={1}>
@@ -1396,6 +1272,7 @@ const NewRequest = () => {
             options={DOCUMENT_TYPES.data}
             value={DOCUMENT_TYPES.data.find(row => row.id === data.document.id) || null}
             loading={DOCUMENT_TYPES.fetching}
+            disabled={DOCUMENT_TYPES.disabled}
             renderInput={
               props =>
                 <TextField
@@ -1853,8 +1730,11 @@ const NewRequest = () => {
                 <Autocomplete // Company Charging
                   className="FstoSelectForm-root"
                   size="small"
-                  options={COMPANY_CHARGING}
+                  options={COMPANY_LIST || []}
                   value={data.document.company}
+                  loading={
+                    COMPANY_STATUS === 'loading'
+                  }
                   renderInput={
                     props =>
                       <TextField
@@ -1903,9 +1783,11 @@ const NewRequest = () => {
                   className="FstoSelectForm-root"
                   size="small"
                   filterOptions={filterOptions}
-                  // options={data.document.company ? COMPANY_CHARGING.find(row => row.id === data.document.company.id).departments : []}
-                  options={[]}
+                  options={DEPARTMENT_LIST || []}
                   value={data.document.department}
+                  loading={
+                    DEPARTMENT_STATUS === 'loading'
+                  }
                   renderInput={
                     props =>
                       <TextField
@@ -1940,7 +1822,8 @@ const NewRequest = () => {
                     ...data,
                     document: {
                       ...data.document,
-                      department: value
+                      department: value,
+                      location: null
                     }
                   })}
                   fullWidth
@@ -1952,9 +1835,11 @@ const NewRequest = () => {
                   className="FstoSelectForm-root"
                   size="small"
                   filterOptions={filterOptions}
-                  // options={data.document.company ? COMPANY_CHARGING.find(row => row.id === data.document.company.id).locations : []}
-                  options={[]}
+                  options={LOCATION_LIST || []}
                   value={data.document.location}
+                  loading={
+                    LOCATION_STATUS === 'loading'
+                  }
                   renderInput={
                     props =>
                       <TextField
@@ -1993,11 +1878,16 @@ const NewRequest = () => {
                   size="small"
                   filterOptions={filterOptions}
                   options={
-                    data.document.id === 8
-                      ? SUPPLIER_LIST.filter(row => row.name.match(/PCF.*/) ? row : null)
-                      : SUPPLIER_LIST
+                    Boolean(SUPPLIER_LIST.length)
+                      ? data.document.id === 8
+                        ? SUPPLIER_LIST.filter(row => row.name.match(/PCF.*/) ? row : null)
+                        : SUPPLIER_LIST
+                      : []
                   }
                   value={data.document.supplier}
+                  loading={
+                    SUPPLIER_STATUS === 'loading'
+                  }
                   renderInput={
                     props =>
                       <TextField
@@ -2057,7 +1947,6 @@ const NewRequest = () => {
                       <Autocomplete
                         className="FstoSelectForm-root"
                         size="small"
-                        // options={REFERENCE_TYPES}
                         options={data.document.supplier?.references || []}
                         value={data.document.reference.id ? data.document.reference : null}
                         renderInput={
@@ -2306,8 +2195,11 @@ const NewRequest = () => {
                         className="FstoSelectForm-root"
                         size="small"
                         filterOptions={filterOptions}
-                        options={UTILITY_CATEGORIES}
+                        options={UTILITY_CATEGORIES_LIST || []}
                         value={data.document.utility.category}
+                        loading={
+                          UTILITY_CATEGORIES_STATUS === 'loading'
+                        }
                         renderInput={
                           props =>
                             <TextField
@@ -2358,8 +2250,11 @@ const NewRequest = () => {
                         className="FstoSelectForm-root"
                         size="small"
                         filterOptions={filterOptions}
-                        options={UTILITY_LOCATIONS}
+                        options={UTILITY_LOCATIONS_LIST || []}
                         value={data.document.utility.location}
+                        loading={
+                          UTILITY_LOCATIONS_STATUS === 'loading'
+                        }
                         renderInput={
                           props =>
                             <TextField
@@ -2411,13 +2306,18 @@ const NewRequest = () => {
                         size="small"
                         filterOptions={filterOptions}
                         options={
-                          data.document.supplier && data.document.utility.category && data.document.utility.location
-                            ? ACCOUNT_NUMBERS.filter(row => row.supplier.id === data.document.supplier.id && row.category.id === data.document.utility.category.id && row.location.id === data.document.utility.location.id)
-                            : data.document.supplier || data.document.utility.category || data.document.utility.location
-                              ? ACCOUNT_NUMBERS.filter(row => row.supplier.id === data.document.supplier?.id || row.category.id === data.document.utility.category?.id || row.location.id === data.document.utility.location?.id)
-                              : ACCOUNT_NUMBERS
+                          Boolean(ACCOUNT_NUMBERS_LIST?.length)
+                            ? data.document.supplier && data.document.utility.category && data.document.utility.location
+                              ? ACCOUNT_NUMBERS_LIST.filter(row => row.supplier.id === data.document.supplier.id && row.category.id === data.document.utility.category.id && row.location.id === data.document.utility.location.id)
+                              : data.document.supplier || data.document.utility.category || data.document.utility.location
+                                ? ACCOUNT_NUMBERS_LIST.filter(row => row.supplier.id === data.document.supplier?.id || row.category.id === data.document.utility.category?.id || row.location.id === data.document.utility.location?.id)
+                                : ACCOUNT_NUMBERS_LIST
+                            : []
                         }
                         value={data.document.utility.account_no}
+                        loading={
+                          ACCOUNT_NUMBERS_STATUS === 'loading'
+                        }
                         renderInput={
                           props =>
                             <TextField
@@ -2513,8 +2413,11 @@ const NewRequest = () => {
                         className="FstoSelectForm-root"
                         size="small"
                         filterOptions={filterOptions}
-                        options={PAYROLL_CLIENTS}
+                        options={PAYROLL_CLIENTS_LIST || []}
                         value={data.document.payroll.clients}
+                        loading={
+                          PAYROLL_CLIENTS_STATUS === 'loading'
+                        }
                         renderInput={
                           props =>
                             <TextField
@@ -2566,8 +2469,11 @@ const NewRequest = () => {
                         className="FstoSelectForm-root"
                         size="small"
                         filterOptions={filterOptions}
-                        options={PAYROLL_CATEGORIES}
+                        options={PAYROLL_CATEGORIES_LIST || []}
                         value={data.document.payroll.category}
+                        loading={
+                          PAYROLL_CATEGORIES_STATUS === 'loading'
+                        }
                         renderInput={
                           props =>
                             <TextField
@@ -2929,17 +2835,47 @@ const NewRequest = () => {
                     <Typography variant="heading">&#8369;{data.po_group.map((data) => data.balance).reduce((a, b) => a + b).toLocaleString()}</Typography>
                   </Box>
 
-                  <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
-                    <Typography sx={{ fontSize: '1em' }}>Document Amount</Typography>
-                    <Typography variant="heading">&#8369;{data.document.amount.toLocaleString()}</Typography>
-                  </Box>
+                  {
+                    data.document.amount && (data.document.id === 1 || data.document.id === 5)
+                    &&
+                    <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
+                      <Typography sx={{ fontSize: '1em' }}>Document Amount</Typography>
+                      <Typography variant="heading">&#8369;{data.document.amount.toLocaleString()}</Typography>
+                    </Box>
+                  }
+
+                  {
+                    data.document.reference.amount && data.document.id === 4
+                    &&
+                    <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
+                      <Typography sx={{ fontSize: '1em' }}>Reference Amount</Typography>
+                      <Typography variant="heading">&#8369;{data.document.reference.amount.toLocaleString()}</Typography>
+                    </Box>
+                  }
 
                   <Divider sx={{ marginTop: 2, marginBottom: 2 }} />
 
-                  <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
-                    <Typography variant="heading">Variance</Typography>
-                    <Typography variant="heading">&#8369;{(data.po_group.map((data) => data.balance).reduce((a, b) => a + b) - data.document.amount).toLocaleString()}</Typography>
-                  </Box>
+                  {
+                    data.document.amount && (data.document.id === 1 || data.document.id === 5)
+                    &&
+                    <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
+                      <Typography variant="heading">Variance</Typography>
+                      <Typography variant="heading">
+                        &#8369;{(data.po_group.map((data) => data.balance).reduce((a, b) => a + b) - data.document.amount).toLocaleString()}
+                      </Typography>
+                    </Box>
+                  }
+
+                  {
+                    data.document.reference.amount && data.document.id === 4
+                    &&
+                    <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
+                      <Typography variant="heading">Variance</Typography>
+                      <Typography variant="heading">
+                        &#8369;{(data.po_group.map((data) => data.balance).reduce((a, b) => a + b) - data.document.reference.amount).toLocaleString()}
+                      </Typography>
+                    </Box>
+                  }
                 </React.Fragment>
               )
             }

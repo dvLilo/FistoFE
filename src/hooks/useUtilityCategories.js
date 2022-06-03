@@ -4,12 +4,12 @@ import { useQuery } from 'react-query'
 
 import useToast from './useToast'
 
-const useSuppliers = () => {
+const useUtilityCategories = () => {
 
   const toast = useToast()
 
-  const fetchSupplierList = async () => {
-    return await axios.get(`/api/dropdown/suppliers`, {
+  const fetchUtilityCategoriesList = async () => {
+    return await axios.get(`/api/dropdown/utility-categories`, {
       params: {
         status: 1,
         paginate: 0
@@ -18,12 +18,14 @@ const useSuppliers = () => {
   }
 
   const {
+    refetch,
     status,
     data,
     error
-  } = useQuery("SUPPLIERS", fetchSupplierList, {
+  } = useQuery("UTILITY_CATEGORIES", fetchUtilityCategoriesList, {
+    enabled: false,
     refetchOnWindowFocus: false,
-    select: (response) => response.data.result.suppliers,
+    select: (response) => response.data.result.utility_categories,
     onError: (error) => {
       if (error.request.status !== 404)
         toast({
@@ -35,7 +37,7 @@ const useSuppliers = () => {
     }
   })
 
-  return { status, data, error }
+  return { refetch, status, data, error }
 }
 
-export default useSuppliers
+export default useUtilityCategories

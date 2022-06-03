@@ -486,6 +486,28 @@ body {
   }
 }
 
+.FstoDialogTransaction-root {
+
+  & .FstoDialogTransaction-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  & .FstoPaperTransaction-root {
+    padding: 1em;
+  }
+
+  & .FstoBoxTransaction-root {
+    display: flex;
+    gap: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+
+
 
 
 

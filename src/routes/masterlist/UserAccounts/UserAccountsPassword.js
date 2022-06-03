@@ -33,7 +33,7 @@ const UserAccountsPassword = () => {
       </DialogContent>
 
       <DialogActions>
-        <Button variant="contained" color="primary" to="change-password" component={Link} sx={{ textTransform: "capitalize" }} disableElevation>Change Password</Button>
+        <Button variant="contained" color="primary" to="/user/change-password" component={Link} sx={{ textTransform: "capitalize" }} disableElevation>Change Password</Button>
       </DialogActions>
     </Dialog>
   )

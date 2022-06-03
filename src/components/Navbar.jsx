@@ -161,7 +161,7 @@ const Navbar = () => {
         <Typography variant="subtitle1">
           <Link
             color="inherit"
-            to="change-password"
+            to="/user/change-password"
             component={RouterLink}
             onClick={closeMenuHandler}
             sx={{

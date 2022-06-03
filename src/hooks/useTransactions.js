@@ -18,7 +18,8 @@ const useTransactions = (URL) => {
     from: null,
     to: null,
     suppliers: null,
-    types: null
+    types: null,
+    department: null
   })
 
   const fetchData = async () => {
@@ -28,6 +29,7 @@ const useTransactions = (URL) => {
         page: params.page,
         rows: params.rows,
         search: params.search,
+        department: params.department ? JSON.stringify(params.department) : params.department,
         suppliers: params.suppliers ? JSON.stringify(params.suppliers) : params.suppliers,
         transaction_from: params.from ? new Date(params.from).toISOString().slice(0, 10) : null,
         transaction_to: params.to ? new Date(params.to).toISOString().slice(0, 10) : null,
@@ -51,7 +53,8 @@ const useTransactions = (URL) => {
       from,
       to,
       types,
-      suppliers
+      suppliers,
+      department
     } = data
 
     if (status === 'loading') return
@@ -62,7 +65,8 @@ const useTransactions = (URL) => {
       from,
       to,
       types,
-      suppliers
+      suppliers,
+      department
     }))
   }
 
@@ -84,7 +88,7 @@ const useTransactions = (URL) => {
   }))
 
   const { status, data, error, refetch: refetchData } = useQuery(
-    ["transactions", params.search, params.state, params.page, params.rows, params.from, params.to, params.types, params.suppliers],
+    ["transactions", params.search, params.state, params.page, params.rows, params.from, params.to, params.types, params.department, params.suppliers],
     fetchData,
     {
       retry: false,
