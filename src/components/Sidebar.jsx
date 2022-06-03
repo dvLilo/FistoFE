@@ -172,7 +172,7 @@ const Sidebar = () => {
               <Voucher sx={{ mr: 2.5 }} /> Voucher
             </AccordionSummary>
             <AccordionDetails>
-              {/* RouterLink here... */}
+              <RouterLink className="FstoLink-root" to="/vouchering">Creation of Voucher</RouterLink>
 
             </AccordionDetails>
           </Accordion>

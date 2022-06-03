@@ -36,8 +36,12 @@ const DocumentTaggingActions = ({ data, state, onReceive, onManage, onView }) =>
         elevation={2}
         anchorEl={anchor}
         anchorOrigin={{
-          horizontal: -60,
-          vertical: 'bottom'
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
         }}
         MenuListProps={{
           sx: { py: 0.5 }

@@ -8,20 +8,12 @@ import {
 
 import {
   MoreHoriz as MoreIcon,
-  Visibility as ViewIcon,
-  Edit as UpdateIcon,
-  RemoveCircle as VoidIcon
+  TaskOutlined as ReceiveIcon,
+  VisibilityOutlined as ViewIcon,
+  DescriptionOutlined as ManageIcon
 } from '@mui/icons-material'
 
-const TaggingRequestActions = (props) => {
-
-  const {
-    state,
-    data,
-    onView = () => { },
-    onUpdate = () => { },
-    onVoid = () => { }
-  } = props
+const DocumentVoucheringActions = ({ data, state, onReceive, onManage, onView }) => {
 
   const [anchor, setAnchor] = React.useState(null)
 
@@ -58,46 +50,46 @@ const TaggingRequestActions = (props) => {
         disablePortal
       >
         {
-          (state === `request` || state === `hold` || state === `void`)
-          &&
-          <MenuItem dense
+          state === `pending` &&
+          <MenuItem
+            sx={{ fontWeight: 500 }}
+            onClick={() => {
+              onReceive(data.id)
+              actionCloseHandler()
+            }}
+            dense
+          >
+            <ReceiveIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Receive
+          </MenuItem>}
+
+        {
+          state === `receive` &&
+          <MenuItem
+            sx={{ fontWeight: 500 }}
+            onClick={() => {
+              onManage(data)
+              actionCloseHandler()
+            }}
+            dense
+          >
+            <ManageIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Manage
+          </MenuItem>}
+
+        {
+          (state === `approve` || state === `hold` || state === `return` || state === `void`) &&
+          <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
               onView(data)
               actionCloseHandler()
             }}
+            dense
           >
             <ViewIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> View
-          </MenuItem>}
-
-        {
-          (state === `request`)
-          &&
-          <MenuItem dense
-            sx={{ fontWeight: 500 }}
-            onClick={() => {
-              onUpdate(data)
-              actionCloseHandler()
-            }}
-          >
-            <UpdateIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Edit
-          </MenuItem>}
-
-        {
-          (state === `request`)
-          &&
-          <MenuItem dense
-            sx={{ fontWeight: 500 }}
-            onClick={() => {
-              onVoid(data)
-              actionCloseHandler()
-            }}
-          >
-            <VoidIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Void
           </MenuItem>}
       </Menu>
     </React.Fragment>
   )
 }
 
-export default TaggingRequestActions
+export default DocumentVoucheringActions

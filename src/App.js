@@ -48,6 +48,10 @@ import NewRequest from './routes/requestor/NewRequest'
 import UpdateRequest from './routes/requestor/UpdateRequest'
 import ReturnedDocument from './routes/requestor/ReturnedDocument'
 
+import DocumentTagging from './routes/tagging/DocumentTagging'
+
+import DocumentVouchering from './routes/vouchering/DocumentVouchering'
+
 import NotFound from './exceptions/NotFound'
 import AccessDenied from './exceptions/AccessDenied'
 import Sandbox from './Sandbox'
@@ -55,7 +59,6 @@ import Sandbox from './Sandbox'
 import FistoProvider from './contexts/FistoContext'
 
 import { QueryClient, QueryClientProvider } from 'react-query'
-import DocumentTagging from './routes/tagging/DocumentTagging'
 
 // Create a client
 const queryClient = new QueryClient()
@@ -192,6 +195,12 @@ const App = () => {
             <Route exact path="/tagging" element={<ProtectedRoute />}>
               <Route exact path="/tagging" element={<Dashboard />}>
                 <Route index exact strict element={<DocumentTagging />} />
+              </Route>
+            </Route>
+
+            <Route exact path="/vouchering" element={<ProtectedRoute />}>
+              <Route exact path="/vouchering" element={<Dashboard />}>
+                <Route index exact strict element={<DocumentVouchering />} />
               </Route>
             </Route>
           </Routes>
