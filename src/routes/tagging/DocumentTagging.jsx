@@ -28,12 +28,9 @@ import useConfirm from '../../hooks/useConfirm'
 
 import Preloader from '../../components/Preloader'
 
+import DocumentTaggingFilter from './DocumentTaggingFilter'
 import DocumentTaggingActions from './DocumentTaggingActions'
 import DocumentTaggingTransaction from './DocumentTaggingTransaction'
-import DocumentTaggingTransactionTagged from './DocumentTaggingTransactionTagged'
-import DocumentTaggingTransactionHeld from './DocumentTaggingTransactionHeld'
-import DocumentTaggingTransactionVoided from './DocumentTaggingTransactionVoided'
-import DocumentTaggingFilter from './DocumentTaggingFilter'
 
 const data = [
   {
@@ -51,7 +48,7 @@ const data = [
     referrence_total_amount: null,
     referrence_amount: null,
     document_amount: 10000,
-    payment_type: "full",
+    payment_type: "Full",
     status: "Pending"
   }
 ]
@@ -71,37 +68,10 @@ const DocumentTagging = () => {
     }))
   })
 
-  const [taggedTransaction, setTaggedTransaction] = React.useState({
-    data: null,
-    open: false,
-    onClose: () => setTaggedTransaction(currentValue => ({
-      ...currentValue,
-      open: false
-    }))
-  })
-
-  const [heldTransaction, setHeldTransaction] = React.useState({
-    data: null,
-    open: false,
-    onClose: () => setHeldTransaction(currentValue => ({
-      ...currentValue,
-      open: false
-    }))
-  })
-
-  const [voidedTransaction, setVoidedTransaction] = React.useState({
-    data: null,
-    open: false,
-    onClose: () => setVoidedTransaction(currentValue => ({
-      ...currentValue,
-      open: false
-    }))
-  })
-
   const onReceive = (ID) => {
     confirm({
       open: true,
-      onConfirm: () => console.log("Hello, world.", ID)
+      onConfirm: () => console.log("Transaction", ID, "has been received.")
     })
   }
 
@@ -114,19 +84,7 @@ const DocumentTagging = () => {
   }
 
   const onView = (data) => {
-    if (state === `tag`) setTaggedTransaction(currentValue => ({
-      ...currentValue,
-      data,
-      open: true
-    }))
-
-    if (state === `hold`) setHeldTransaction(currentValue => ({
-      ...currentValue,
-      data,
-      open: true
-    }))
-
-    if (state === `void`) setVoidedTransaction(currentValue => ({
+    setManage(currentValue => ({
       ...currentValue,
       data,
       open: true
@@ -356,13 +314,7 @@ const DocumentTagging = () => {
           showLastButton
         />
 
-        <DocumentTaggingTransaction {...manage} />
-
-        <DocumentTaggingTransactionTagged {...taggedTransaction} />
-
-        <DocumentTaggingTransactionHeld {...heldTransaction} />
-
-        <DocumentTaggingTransactionVoided {...voidedTransaction} />
+        <DocumentTaggingTransaction state={state} {...manage} />
       </Paper>
     </Box>
   )

@@ -29,6 +29,7 @@ import useConfirm from '../../hooks/useConfirm'
 import Preloader from '../../components/Preloader'
 
 import DocumentVoucheringActions from './DocumentVoucheringActions'
+import DocumentVoucheringTransaction from './DocumentVoucheringTransaction'
 
 const data = [
   {
@@ -57,39 +58,36 @@ const DocumentVouchering = () => {
 
   const [state, setState] = React.useState("pending")
 
+  const [manage, setManage] = React.useState({
+    data: null,
+    open: false,
+    onClose: () => setManage(currentValue => ({
+      ...currentValue,
+      open: false
+    }))
+  })
+
   const onReceive = (ID) => {
     confirm({
       open: true,
-      onConfirm: () => console.log("Hello, world.", ID)
+      onConfirm: () => console.log("Transaction", ID, "has been received.")
     })
   }
 
   const onManage = (data) => {
-    // setManage(currentValue => ({
-    //   ...currentValue,
-    //   data,
-    //   open: true
-    // }))
+    setManage(currentValue => ({
+      ...currentValue,
+      data,
+      open: true
+    }))
   }
 
   const onView = (data) => {
-    // if (state === `tag`) setTaggedTransaction(currentValue => ({
-    //   ...currentValue,
-    //   data,
-    //   open: true
-    // }))
-
-    // if (state === `hold`) setHeldTransaction(currentValue => ({
-    //   ...currentValue,
-    //   data,
-    //   open: true
-    // }))
-
-    // if (state === `void`) setVoidedTransaction(currentValue => ({
-    //   ...currentValue,
-    //   data,
-    //   open: true
-    // }))
+    setManage(currentValue => ({
+      ...currentValue,
+      data,
+      open: true
+    }))
   }
 
   return (
@@ -281,6 +279,8 @@ const DocumentVouchering = () => {
           showFirstButton
           showLastButton
         />
+
+        <DocumentVoucheringTransaction state={state} {...manage} />
       </Paper>
     </Box>
   )

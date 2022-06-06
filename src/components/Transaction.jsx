@@ -357,7 +357,7 @@ const Transaction = (props) => {
               </Box>
 
               <Box className="FstoBoxCell-root FstoBoxCell-head">
-                <strong>Receive Receipt Report</strong>
+                <strong>Receive Receipt Number</strong>
               </Box>
 
               <Box className="FstoBoxCell-root FstoBoxCell-head">

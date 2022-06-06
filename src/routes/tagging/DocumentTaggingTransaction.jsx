@@ -24,6 +24,7 @@ const DocumentTaggingTransaction = (props) => {
   const confirm = useConfirm()
 
   const {
+    state,
     data,
     open = false,
     onClose = () => { }
@@ -36,7 +37,17 @@ const DocumentTaggingTransaction = (props) => {
     confirm({
       open: true,
       wait: true,
-      onConfirm: () => console.log(`${data.transaction_id} has been tagged.`)
+      onConfirm: () => console.log(`${data.transaction_id} has been tagged/saved.`)
+    })
+  }
+
+  const submitUnholdHandler = () => {
+    onClose()
+
+    confirm({
+      open: true,
+      wait: true,
+      onConfirm: () => console.log(`${data.transaction_id} has been unhold.`)
     })
   }
 
@@ -83,65 +94,88 @@ const DocumentTaggingTransaction = (props) => {
       <DialogContent className="FstoDialogTransaction-body">
         <Transaction data={data} />
 
-        <form id="FstoFormTransaction" onSubmit={submitTagHandler}>
-          <Box className="FstoBoxTransaction-root">
-            <Autocomplete
-              className="FstoSelectForm-root"
-              size="small"
-              options={[]}
-              value={null}
-              renderInput={
-                props =>
-                  <TextField
-                    {...props}
-                    variant="outlined"
-                    label="Distribute To..."
-                  />
-              }
-              PaperComponent={
-                props =>
-                  <Paper
-                    {...props}
-                    sx={{ textTransform: 'capitalize' }}
-                  />
-              }
-              sx={{ width: `33.33%` }}
-              onChange={(e, value) => console.log(value)}
-              disablePortal
-              disableClearable
-            />
-          </Box>
-        </form>
+        {
+          (state === `receive` || state === `tag`) &&
+          <form id="FstoFormTransaction" onSubmit={submitTagHandler}>
+            <Box className="FstoBoxTransaction-root">
+              <Autocomplete
+                className="FstoSelectForm-root"
+                size="small"
+                options={[]}
+                value={null}
+                renderInput={
+                  props =>
+                    <TextField
+                      {...props}
+                      variant="outlined"
+                      label="Distribute To..."
+                    />
+                }
+                PaperComponent={
+                  props =>
+                    <Paper
+                      {...props}
+                      sx={{ textTransform: 'capitalize' }}
+                    />
+                }
+                sx={{ marginX: `10px` }}
+                onChange={(e, value) => console.log(value)}
+                disablePortal
+                disableClearable
+              />
+            </Box>
+          </form>
+        }
       </DialogContent>
 
-      <DialogActions>
-        <Button
-          className="FstoButtonForm-root"
-          type="submit"
-          form="FstoFormTransaction"
-          variant="contained"
-          disableElevation
-        > Tag
-        </Button>
+      {
+        (state === `receive` || state === `tag` || state === `hold`) &&
+        <DialogActions>
+          {
+            (state === `receive` || state === `tag`) &&
+            <Button
+              className="FstoButtonForm-root"
+              type="submit"
+              form="FstoFormTransaction"
+              variant="contained"
+              disableElevation
+            > {state === `receive` ? "Tag" : "Save"}
+            </Button>
+          }
 
-        <Button
-          className="FstoButtonForm-root"
-          variant="outlined"
-          color="error"
-          onClick={submitHoldHandler}
-          disableElevation
-        > Hold
-        </Button>
+          {
+            state === `hold` &&
+            <Button
+              className="FstoButtonForm-root"
+              variant="contained"
+              onClick={submitUnholdHandler}
+              disableElevation
+            > Unhold
+            </Button>
+          }
 
-        <Button
-          className="FstoButtonForm-root"
-          variant="outlined"
-          color="error"
-          onClick={submitVoidHandler}
-          disableElevation
-        > Void
-        </Button>
-      </DialogActions>
+          {
+            state !== `hold` &&
+            <Button
+              className="FstoButtonForm-root"
+              variant="outlined"
+              color="error"
+              onClick={submitHoldHandler}
+              disableElevation
+            > Hold
+            </Button>
+          }
+
+          <Button
+            className="FstoButtonForm-root"
+            variant="outlined"
+            color="error"
+            onClick={submitVoidHandler}
+            disableElevation
+          > Void
+          </Button>
+        </DialogActions>
+      }
     </Dialog>
   )
 }

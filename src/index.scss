@@ -499,10 +499,39 @@ body {
   }
 
   & .FstoBoxTransaction-root {
-    display: flex;
-    gap: 10px;
+    display: grid;
+    grid-template-columns: 33.33% 33.33% 33.33%;
     padding-left: 10px;
     padding-right: 10px;
+  }
+}
+
+.FstoDialogAccountTitle-root {
+
+  & .FstoDialogAccountTitle-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  & .FstoDialogAccountTitle-content {
+    overflow: initial;
+  }
+
+  & .FstoPaperAccountTitle-root {
+    max-width: 1100px;
+    min-height: 75vh;
+  }
+
+  & .FstoBoxAccountTitle-root {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    padding-bottom: 30px;
+  }
+
+  & .FstoBoxAccountTitle-root:first-of-type {
+    border-bottom: 3px solid #707070;
   }
 }
 
