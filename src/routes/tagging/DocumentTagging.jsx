@@ -16,7 +16,8 @@ import {
   TableSortLabel,
   TablePagination,
   Tabs,
-  Tab
+  Tab,
+  Stack
 } from '@mui/material'
 
 import {
@@ -116,38 +117,40 @@ const DocumentTagging = () => {
               <Tab className="FstoTab-root" label="Voided" value="void" disableRipple />
             </Tabs>
 
-            <TextField
-              className="FstoTextFieldToolbar-root"
-              variant="outlined"
-              size="small"
-              autoComplete="off"
-              placeholder="Search"
-              InputProps={{
-                className: "FstoTextfieldSearch-root",
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Search />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      edge="end"
-                      size="small"
-                      onClick={() => { }}
-                    >
-                      <Close fontSize="small" />
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }}
-              onChange={(e) => console.log(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") console.log(e.target.value)
-              }}
-            />
+            <Stack className="FstoStackToolbar-root" direction="row">
+              <TextField
+                className="FstoTextFieldToolbar-root"
+                variant="outlined"
+                size="small"
+                autoComplete="off"
+                placeholder="Search"
+                InputProps={{
+                  className: "FstoTextfieldSearch-root",
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        edge="end"
+                        size="small"
+                        onClick={() => { }}
+                      >
+                        <Close fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+                onChange={(e) => console.log(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") console.log(e.target.value)
+                }}
+              />
 
-            <DocumentTaggingFilter />
+              <DocumentTaggingFilter />
+            </Stack>
           </Box>
         </Box>
 
@@ -207,10 +210,6 @@ const DocumentTagging = () => {
                   <TableSortLabel>AMOUNT</TableSortLabel>
                 </TableCell>
 
-                <TableCell className="FstoTableHead-root" align="center">
-                  <TableSortLabel>STATUS</TableSortLabel>
-                </TableCell>
-
                 <TableCell className="FstoTableHead-root" align="center">ACTIONS</TableCell>
               </TableRow>
             </TableHead>
@@ -220,7 +219,7 @@ const DocumentTagging = () => {
                 !Boolean(data.length)
                   ? <Preloader row={5} col={10} />
                   : data.map((item, index) => (
-                    <TableRow key={index}>
+                    <TableRow hover key={index}>
                       {
                         state !== `tag`
                         &&
@@ -279,10 +278,6 @@ const DocumentTagging = () => {
                             ? <>&#8369;{item.document_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</>
                             : <>&mdash;</>
                         }
-                      </TableCell>
-
-                      <TableCell className="FstoTableData-root" align="center">
-                        {item.status}
                       </TableCell>
 
                       <TableCell className="FstoTableData-root" align="center">

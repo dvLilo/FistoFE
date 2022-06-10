@@ -2,7 +2,7 @@ import React from 'react'
 
 import axios from 'axios'
 
-import { Link } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import NumberFormat from 'react-number-format'
 
@@ -16,8 +16,7 @@ import {
   Chip,
   Stack,
   IconButton,
-  Divider,
-  InputAdornment
+  Divider
 } from '@mui/material'
 
 import {
@@ -34,7 +33,7 @@ import {
 
 import DateAdapter from '@mui/lab/AdapterDateFns'
 
-import { createFilterOptions } from '@mui/material/Autocomplete'
+import { createFilterOptions } from '@mui/material/Autocomplete';
 
 import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
@@ -143,21 +142,22 @@ const NumberField = React.forwardRef(function NumberField(props, ref) {
         })
       }}
       prefix="₱"
-      allowNegative={false}
-      // decimalScale={2}
-      // fixedDecimalScale
       thousandSeparator
       isNumericString
     />
   )
 })
 
-const NewRequest = () => {
+const UpdateRequest = () => {
+
+  const { id } = useParams()
 
   const toast = useToast()
   const confirm = useConfirm()
+  const navigate = useNavigate()
 
   const [isSaving, setIsSaving] = React.useState(false)
+  // const [isFetching, setIsFetching] = React.useState(false)
 
   const [validate, setValidate] = React.useState({
     status: false,
@@ -170,6 +170,8 @@ const NewRequest = () => {
   })
 
   const [data, setData] = React.useState({
+    transaction: [],
+
     requestor: {
       id: null,
       id_prefix: null,
@@ -186,9 +188,8 @@ const NewRequest = () => {
     document: {
       id: null,
       name: "",
-      payment_type: "Full",
+      payment_type: "",
       no: "",
-      cip: "",
       from: null,
       to: null,
       date: null,
@@ -249,36 +250,60 @@ const NewRequest = () => {
     rr_no: []
   })
 
-  const [DOCUMENT_TYPES, setDocumentTypes] = React.useState({ fetching: true, disabled: false, data: [] })
+  React.useEffect(() => {
+    (async () => {
+      let response
+      try {
+        response = await axios.get(`/api/transactions/${id}`)
+
+        const {
+          transaction,
+          requestor,
+          document,
+          po_group
+        } = response.data.result
+
+        const po_group_new = po_group.map((item) => {
+          const data = {
+            ...item,
+            balance: item.previous_balance,
+            batch: true
+          }
+
+          delete data.previous_balance
+          return data
+        })
+
+        setData(currentValue => ({
+          transaction,
+          requestor,
+          document: {
+            ...currentValue.document,
+            ...document
+          },
+          po_group: po_group_new
+        }))
+      }
+      catch (error) { }
+    })()
+
+    // eslint-disable-next-line
+  }, [])
+
+  const [DOCUMENT_TYPES, setDocumentTypes] = React.useState([])
   React.useEffect(() => {
     (async () => {
       let response
       try {
         response = await axios.get(`/api/dropdown/current-user`)
 
-        const { id, id_prefix, id_no, first_name, middle_name, last_name, suffix, role, position, department, document_types } = response.data.result
+        const { document_types } = response.data.result
 
-        setDocumentTypes({ fetching: false, data: document_types })
-        setData(currentValue => ({
-          ...currentValue,
-          requestor: {
-            id,
-            id_prefix,
-            id_no,
-            first_name,
-            middle_name,
-            last_name,
-            suffix,
-            role,
-            position,
-            department
-          }
-        }))
+        setDocumentTypes(document_types)
       }
       catch (error) {
         console.log("Fisto Error Status", error.request)
 
-        setDocumentTypes({ fetching: false, data: [] })
         toast({
           open: true,
           severity: "error",
@@ -290,45 +315,6 @@ const NewRequest = () => {
 
     // eslint-disable-next-line
   }, [])
-  React.useEffect(() => { // User Department Validation
-    (async () => {
-      try {
-        await axios.post(`/api/users/department-validation`)
-
-        setDocumentTypes(currentValue => ({
-          ...currentValue,
-          disabled: false
-        }))
-      }
-      catch (error) {
-        if (error.request.status === 404) {
-          setDocumentTypes(currentValue => ({
-            ...currentValue,
-            disabled: true
-          }))
-
-          toast({
-            title: "Error!",
-            message: "Your department is not registered. Please inform the technical support.",
-            severity: "error",
-            duration: null
-          })
-        }
-
-        if (error.request.status !== 404)
-          toast({
-            title: "Error!",
-            message: "Something went wrong whilst validation user department."
-          })
-      }
-    })()
-    // eslint-disable-next-line
-  }, [])
-
-  const {
-    status: SUPPLIER_STATUS,
-    data: SUPPLIER_LIST
-  } = useSuppliers()
 
   const {
     status: COMPANY_STATUS,
@@ -346,12 +332,27 @@ const NewRequest = () => {
   } = useLocations(data.document.department?.id)
 
   const {
+    status: SUPPLIER_STATUS,
+    data: SUPPLIER_LIST
+  } = useSuppliers()
+
+  const {
     refetch: fetchPayrollClients,
     status: PAYROLL_CLIENTS_STATUS,
     data: PAYROLL_CLIENTS_LIST
   } = usePayrollClents()
   React.useEffect(() => {
     if (data.document.id === 7) fetchPayrollClients()
+    // eslint-disable-next-line 
+  }, [data.document.id])
+
+  const {
+    refetch: fetchPayrollCategories,
+    status: PAYROLL_CATEGORIES_STATUS,
+    data: PAYROLL_CATEGORIES_LIST
+  } = usePayrollCategories()
+  React.useEffect(() => {
+    if (data.document.id === 7) fetchPayrollCategories()
     // eslint-disable-next-line 
   }, [data.document.id])
 
@@ -385,16 +386,6 @@ const NewRequest = () => {
     // eslint-disable-next-line 
   }, [data.document.id])
 
-  const {
-    refetch: fetchPayrollCategories,
-    status: PAYROLL_CATEGORIES_STATUS,
-    data: PAYROLL_CATEGORIES_LIST
-  } = usePayrollCategories()
-  React.useEffect(() => {
-    if (data.document.id === 7) fetchPayrollCategories()
-    // eslint-disable-next-line 
-  }, [data.document.id])
-
   const [PETTYCASHFUND_LIST, setPettyCashFundList] = React.useState([])
   React.useEffect(() => {
     (async () => {
@@ -424,6 +415,8 @@ const NewRequest = () => {
   }, [data.document.id])
 
 
+
+
   React.useEffect(() => { // Reference Number Validation
     if (data.document.id === 4
       && data.document.company
@@ -443,6 +436,8 @@ const NewRequest = () => {
 
 
   React.useEffect(() => { // Utility Account Number Auto Select
+    if (!ACCOUNT_NUMBERS_LIST) return
+
     if (data.document.supplier && data.document.utility.category && data.document.utility.location) {
       const account_numbers = ACCOUNT_NUMBERS_LIST.filter(row => row.supplier.id === data.document.supplier.id && row.category.id === data.document.utility.category.id && row.location.id === data.document.utility.location.id)
 
@@ -512,19 +507,6 @@ const NewRequest = () => {
 
     // eslint-disable-next-line
   }, [data.document.from, data.document.to, data.document.company, data.document.department, data.document.utility.category, data.document.utility.location])
-
-
-  React.useEffect(() => {
-    const unload = (e) => {
-      e = e || window.event
-
-      if (e) e.returnValue = 'Are you sure you want to proceed?'
-      return 'Are you sure you want to proceed?'
-    }
-
-    window.addEventListener("beforeunload", unload)
-    return () => window.removeEventListener("beforeunload", unload)
-  }, [])
 
 
   const isDisabled = () => {
@@ -671,27 +653,10 @@ const NewRequest = () => {
       ]
     }))
 
-    let document_prefix
-    switch (data.document.id) {
-      case 1:
-        document_prefix = "pad#"
-        break
-      case 2:
-        document_prefix = "prmc#"
-        break
-      case 3:
-        document_prefix = "prmm#"
-        break
-      case 5:
-        document_prefix = "cb#"
-        break
-      default:
-        document_prefix = null
-    }
-
     try {
       await axios.post(`/api/transactions/validate-document-no`, {
-        document_no: `${document_prefix}${data.document.no}`
+        transaction_id: data.transaction.id,
+        document_no: data.document.no
       })
     }
     catch (error) {
@@ -734,6 +699,7 @@ const NewRequest = () => {
 
     try {
       await axios.post(`/api/transactions/validate-reference-no`, {
+        transaction_id: data.transaction.id,
         reference_no: data.document.reference.no,
         company_id: data.document.company.id
       })
@@ -798,8 +764,8 @@ const NewRequest = () => {
       rr_no: PO.rr_no,
       batch: PO.batch
     })
-    else setData(currentValue => ({
-      ...currentValue,
+    else setData({
+      ...data,
       po_group: [
         {
           no: PO.no,
@@ -808,9 +774,9 @@ const NewRequest = () => {
           rr_no: PO.rr_no,
           batch: PO.batch
         },
-        ...currentValue.po_group
+        ...data.po_group,
       ]
-    }))
+    })
 
     setPO({
       update: false,
@@ -858,6 +824,7 @@ const NewRequest = () => {
       response = await axios.post(`/api/transactions/validate-po-no`, {
         payment_type: data.document.payment_type,
         company_id: data.document.company.id,
+        transaction_id: data.transaction.id,
         po_no: PO.no
       })
 
@@ -947,6 +914,11 @@ const NewRequest = () => {
     })
   }
 
+  const filterOptions = createFilterOptions({
+    matchFrom: 'any',
+    limit: 100
+  })
+
   const transformData = (ID) => {
     switch (ID) {
       case 1: // PAD - Post Acquisition Delivery
@@ -954,11 +926,11 @@ const NewRequest = () => {
           requestor: data.requestor,
           document: {
             id: data.document.id,
-            no: `pad#${data.document.no}`,
+            no: data.document.no,
             name: data.document.name,
             payment_type: data.document.payment_type,
             amount: data.document.amount,
-            date: new Date(data.document.date).toISOString().slice(0, 10),
+            date: data.document.date,
 
             company: data.document.company,
             department: data.document.department,
@@ -976,11 +948,11 @@ const NewRequest = () => {
           requestor: data.requestor,
           document: {
             id: data.document.id,
-            no: `prmc#${data.document.no}`,
+            no: data.document.no,
             name: data.document.name,
             payment_type: data.document.payment_type,
             amount: data.document.amount,
-            date: new Date(data.document.date).toISOString().slice(0, 10),
+            date: data.document.date,
 
             company: data.document.company,
             department: data.document.department,
@@ -1004,7 +976,7 @@ const NewRequest = () => {
             id: data.document.id,
             name: data.document.name,
             payment_type: data.document.payment_type,
-            date: new Date(data.document.date).toISOString().slice(0, 10),
+            date: data.document.date,
 
             company: data.document.company,
             department: data.document.department,
@@ -1023,12 +995,11 @@ const NewRequest = () => {
           requestor: data.requestor,
           document: {
             id: data.document.id,
-            no: `cb#${data.document.no}`,
-            cip: data.document.cip,
+            no: data.document.no,
             name: data.document.name,
             payment_type: data.document.payment_type,
             amount: data.document.amount,
-            date: new Date(data.document.date).toISOString().slice(0, 10),
+            date: data.document.date,
 
             company: data.document.company,
             department: data.document.department,
@@ -1049,8 +1020,8 @@ const NewRequest = () => {
             name: data.document.name,
             payment_type: data.document.payment_type,
             amount: data.document.amount,
-            from: new Date(data.document.from).toISOString().slice(0, 10),
-            to: new Date(data.document.to).toISOString().slice(0, 10),
+            from: data.document.from,
+            to: data.document.to,
 
             company: data.document.company,
             department: data.document.department,
@@ -1070,8 +1041,8 @@ const NewRequest = () => {
             id: data.document.id,
             name: data.document.name,
             payment_type: data.document.payment_type,
-            from: new Date(data.document.from).toISOString().slice(0, 10),
-            to: new Date(data.document.to).toISOString().slice(0, 10),
+            from: data.document.from,
+            to: data.document.to,
             amount: data.document.amount,
 
             company: data.document.company,
@@ -1094,7 +1065,7 @@ const NewRequest = () => {
             name: data.document.name,
             payment_type: data.document.payment_type,
             amount: data.document.amount,
-            date: new Date(data.document.date).toISOString().slice(0, 10),
+            date: data.document.date,
 
             company: data.document.company,
             department: data.document.department,
@@ -1132,6 +1103,8 @@ const NewRequest = () => {
 
     setData(currentValue => ({
       ...currentValue,
+
+      transaction: [],
 
       document: {
         id: null,
@@ -1255,11 +1228,6 @@ const NewRequest = () => {
     })
   }
 
-  const filterOptions = createFilterOptions({
-    matchFrom: 'any',
-    limit: 100
-  })
-
   return (
     <Box className="FstoBox-root">
       <Paper className="FstoPaperForm-root" elevation={1}>
@@ -1269,10 +1237,8 @@ const NewRequest = () => {
           <Autocomplete
             className="FstoSelectForm-root"
             size="small"
-            options={DOCUMENT_TYPES.data}
-            value={DOCUMENT_TYPES.data.find(row => row.id === data.document.id) || null}
-            loading={DOCUMENT_TYPES.fetching}
-            disabled={DOCUMENT_TYPES.disabled}
+            options={DOCUMENT_TYPES}
+            value={DOCUMENT_TYPES.find(row => row.id === data.document.id) || null}
             renderInput={
               props =>
                 <TextField
@@ -1300,7 +1266,7 @@ const NewRequest = () => {
                 ...data.document,
                 id: value.id,
                 name: value.type,
-                payment_type: value.id === 4 ? null : "Full"
+                payment_type: ""
               }
             })}
             fullWidth
@@ -1357,15 +1323,13 @@ const NewRequest = () => {
                             ...data,
                             document: {
                               ...data.document,
-                              date: new Date(value.date_created).toISOString().slice(0, 7),
-                              payment_type: "Full",
-                              amount: value.amount,
                               pcf_batch: {
                                 name: value.name,
                                 letter: value.letter,
                                 date: value.date
                               },
-                              supplier: SUPPLIER_LIST.find(row => row.name.replace(/\s|-/g, '').toLowerCase() === value.branch.replace(/\s|-/g, '').toLowerCase()) || null
+                              payment_type: "Full",
+                              amount: value.amount,
                             }
                           })
                           checkPettyCashFundNameHandler(value.name)
@@ -1421,7 +1385,6 @@ const NewRequest = () => {
                           }
                         })}
                         fullWidth
-                        disabled
                         disablePortal
                         disableClearable
                       />
@@ -1461,13 +1424,12 @@ const NewRequest = () => {
                               />
                           }
                           showToolbar
-                          disabled
                         />
                       </LocalizationProvider>
                     </React.Fragment>
                   )}
 
-                <Autocomplete // Payment Types
+                <Autocomplete
                   className="FstoSelectForm-root"
                   size="small"
                   options={PAYMENT_TYPES}
@@ -1510,75 +1472,76 @@ const NewRequest = () => {
                 { // From Date, To Date
                   (data.document.id === 7 || data.document.id === 6) &&
                   (
-                    <LocalizationProvider dateAdapter={DateAdapter}>
-                      <DatePicker
-                        value={data.document.from}
-                        maxDate={data.document.to ? new Date(data.document.to) : null}
-                        onChange={(value) => setData({
-                          ...data,
-                          document: {
-                            ...data.document,
-                            from: value
+                    <React.Fragment>
+                      <LocalizationProvider dateAdapter={DateAdapter}>
+                        <DatePicker
+                          value={data.document.from}
+                          onChange={(value) => setData({
+                            ...data,
+                            document: {
+                              ...data.document,
+                              from: new Date(value).toISOString().slice(0, 10)
+                            }
+                          })}
+                          renderInput={
+                            props =>
+                              <TextField
+                                {...props}
+                                className="FstoTextfieldForm-root"
+                                variant="outlined"
+                                size="small"
+                                label="From Date"
+                                error={
+                                  error.status
+                                  && Boolean(error.data.from_date)
+                                }
+                                helperText={
+                                  error.status
+                                  && error.data.from_date
+                                  && error.data.from_date[0]
+                                }
+                                fullWidth
+                              />
                           }
-                        })}
-                        renderInput={
-                          props =>
-                            <TextField
-                              {...props}
-                              className="FstoTextfieldForm-root"
-                              variant="outlined"
-                              size="small"
-                              label="From Date"
-                              error={
-                                error.status
-                                && Boolean(error.data.from_date)
-                              }
-                              helperText={
-                                error.status
-                                && error.data.from_date
-                                && error.data.from_date[0]
-                              }
-                              onKeyPress={(e) => e.preventDefault()}
-                              fullWidth
-                            />
-                        }
-                        showToolbar
-                      />
+                          showToolbar
+                        />
+                      </LocalizationProvider>
 
-                      <DatePicker
-                        value={data.document.to}
-                        minDate={new Date(data.document.from)}
-                        onChange={(value) => setData({
-                          ...data,
-                          document: {
-                            ...data.document,
-                            to: value
+                      <LocalizationProvider dateAdapter={DateAdapter}>
+                        <DatePicker
+                          value={data.document.to}
+                          minDate={new Date(data.document.from)}
+                          onChange={(value) => setData({
+                            ...data,
+                            document: {
+                              ...data.document,
+                              to: new Date(value).toISOString().slice(0, 10)
+                            }
+                          })}
+                          renderInput={
+                            props =>
+                              <TextField
+                                {...props}
+                                className="FstoTextfieldForm-root"
+                                variant="outlined"
+                                size="small"
+                                label="To Date"
+                                error={
+                                  error.status
+                                  && Boolean(error.data.to_date)
+                                }
+                                helperText={
+                                  error.status
+                                  && error.data.to_date
+                                  && error.data.to_date[0]
+                                }
+                                fullWidth
+                              />
                           }
-                        })}
-                        renderInput={
-                          props =>
-                            <TextField
-                              {...props}
-                              className="FstoTextfieldForm-root"
-                              variant="outlined"
-                              size="small"
-                              label="To Date"
-                              error={
-                                error.status
-                                && Boolean(error.data.to_date)
-                              }
-                              helperText={
-                                error.status
-                                && error.data.to_date
-                                && error.data.to_date[0]
-                              }
-                              onKeyPress={(e) => e.preventDefault()}
-                              fullWidth
-                            />
-                        }
-                        showToolbar
-                      />
-                    </LocalizationProvider>
+                          showToolbar
+                        />
+                      </LocalizationProvider>
+                    </React.Fragment>
                   )}
 
                 { // Document Number
@@ -1590,7 +1553,6 @@ const NewRequest = () => {
                       variant="outlined"
                       autoComplete="off"
                       size="small"
-                      type="number"
                       value={data.document.no}
                       error={
                         error.status
@@ -1605,7 +1567,6 @@ const NewRequest = () => {
                           && validate.data.includes('document_no')
                           && "Please wait...")
                       }
-                      onKeyDown={(e) => ["E", "e", ".", "+", "-"].includes(e.key) && e.preventDefault()}
                       onChange={(e) => setData({
                         ...data,
                         document: {
@@ -1614,15 +1575,6 @@ const NewRequest = () => {
                         }
                       })}
                       onBlur={checkDocumentNumberHandler}
-                      InputProps={{
-                        startAdornment: data.document.no &&
-                          <InputAdornment className="FstoAdrmentForm-root" position="start">
-                            {data.document.id === 1 && "pad#"}
-                            {data.document.id === 2 && "prmc#"}
-                            {data.document.id === 3 && "prmm#"}
-                            {data.document.id === 5 && "cb#"}
-                          </InputAdornment>
-                      }}
                       InputLabelProps={{
                         className: "FstoLabelForm-root"
                       }}
@@ -1630,37 +1582,18 @@ const NewRequest = () => {
                     />
                   )}
 
-                { // Request Date, Document Date
+                { //Document Date
                   (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4 || data.document.id === 5 || data.document.id === 8) &&
                   (
                     <LocalizationProvider dateAdapter={DateAdapter}>
                       <DatePicker
-                        value={new Date()}
-                        onChange={(value) => { }}
-                        renderInput={
-                          props =>
-                            <TextField
-                              {...props}
-                              className="FstoTextfieldForm-root"
-                              variant="outlined"
-                              size="small"
-                              label="Request Date"
-                              autoComplete="off"
-                              fullWidth
-                            />
-                        }
-                        readOnly
-                      />
-
-                      <DatePicker
                         value={data.document.date}
-                        disabled={data.document.id === 8}
                         maxDate={new Date()}
                         onChange={(value) => setData({
                           ...data,
                           document: {
                             ...data.document,
-                            date: value
+                            date: new Date(value).toISOString().slice(0, 10)
                           }
                         })}
                         renderInput={
@@ -1672,12 +1605,10 @@ const NewRequest = () => {
                               size="small"
                               label="Document Date"
                               autoComplete="off"
-                              onKeyPress={(e) => e.preventDefault()}
                               fullWidth
                             />
                         }
                         showToolbar
-                        showTodayButton
                       />
                     </LocalizationProvider>
                   )}
@@ -1878,7 +1809,7 @@ const NewRequest = () => {
                   size="small"
                   filterOptions={filterOptions}
                   options={
-                    Boolean(SUPPLIER_LIST.length)
+                    SUPPLIER_LIST
                       ? data.document.id === 8
                         ? SUPPLIER_LIST.filter(row => row.name.match(/PCF.*/) ? row : null)
                         : SUPPLIER_LIST
@@ -1992,7 +1923,6 @@ const NewRequest = () => {
                         variant="outlined"
                         autoComplete="off"
                         size="small"
-                        type="number"
                         value={data.document.reference.no}
                         error={
                           error.status
@@ -2007,7 +1937,6 @@ const NewRequest = () => {
                             && validate.data.includes('reference_no')
                             && "Please wait...")
                         }
-                        onKeyDown={(e) => ["E", "e", ".", "+", "-"].includes(e.key) && e.preventDefault()}
                         onChange={(e) => setData({
                           ...data,
                           document: {
@@ -2086,7 +2015,7 @@ const NewRequest = () => {
                       className="FstoSelectForm-root"
                       size="small"
                       filterOptions={filterOptions}
-                      options={DOCUMENT_TYPES.data.find(type => type.id === data.document.id).categories}
+                      options={DOCUMENT_TYPES.length ? DOCUMENT_TYPES.find(type => type.id === data.document.id).categories : []}
                       value={data.document.category}
                       renderInput={
                         props =>
@@ -2230,17 +2159,17 @@ const NewRequest = () => {
                         isOptionEqualToValue={
                           (option, value) => option.id === value.id
                         }
-                        onChange={(e, value) => setData({
-                          ...data,
+                        onChange={(e, value) => setData(currentValue => ({
+                          ...currentValue,
                           document: {
-                            ...data.document,
+                            ...currentValue.document,
                             utility: {
-                              ...data.document.utility,
+                              ...currentValue.document.utility,
                               category: value,
                               account_no: null
                             }
                           }
-                        })}
+                        }))}
                         fullWidth
                         disablePortal
                         disableClearable
@@ -2285,17 +2214,17 @@ const NewRequest = () => {
                         isOptionEqualToValue={
                           (option, value) => option.id === value.id
                         }
-                        onChange={(e, value) => setData({
-                          ...data,
+                        onChange={(e, value) => setData(currentValue => ({
+                          ...currentValue,
                           document: {
-                            ...data.document,
+                            ...currentValue.document,
                             utility: {
-                              ...data.document.utility,
+                              ...currentValue.document.utility,
                               location: value,
                               account_no: null
                             }
                           }
-                        })}
+                        }))}
                         fullWidth
                         disablePortal
                         disableClearable
@@ -2339,19 +2268,19 @@ const NewRequest = () => {
                         isOptionEqualToValue={
                           (option, value) => option.id === value.id
                         }
-                        onChange={(e, value) => setData({
-                          ...data,
+                        onChange={(e, value) => setData(currentValue => ({
+                          ...currentValue,
                           document: {
-                            ...data.document,
+                            ...currentValue.document,
                             utility: {
-                              ...data.document.utility,
+                              ...currentValue.document.utility,
                               account_no: {
                                 id: value.id,
                                 no: value.no
                               }
                             }
                           }
-                        })}
+                        }))}
                         fullWidth
                         disablePortal
                         disableClearable
@@ -2571,30 +2500,6 @@ const NewRequest = () => {
                     </React.Fragment>
                   )}
 
-                { // CAPEX Number
-                  (data.document.id === 5) &&
-                  (
-                    <TextField
-                      className="FstoTextfieldForm-root"
-                      label="CAPEX"
-                      variant="outlined"
-                      autoComplete="off"
-                      size="small"
-                      value={data.document.cip}
-                      onChange={(e) => setData({
-                        ...data,
-                        document: {
-                          ...data.document,
-                          cip: e.target.value
-                        }
-                      })}
-                      InputLabelProps={{
-                        className: "FstoLabelForm-root"
-                      }}
-                      fullWidth
-                    />
-                  )}
-
                 <TextField
                   className="FstoTextfieldForm-root"
                   label="Remarks (Optional)"
@@ -2602,7 +2507,7 @@ const NewRequest = () => {
                   autoComplete="off"
                   size="small"
                   rows={3}
-                  value={data.document.remarks}
+                  value={data.document.remarks ? data.document.remarks : undefined}
                   onChange={(e) => setData({
                     ...data,
                     document: {
@@ -2629,26 +2534,17 @@ const NewRequest = () => {
             startIcon={<></>}
             disabled={isDisabled()}
             disableElevation
-          >Save</LoadingButton>
+          > Update
+          </LoadingButton>
 
-          {
-            data.document.id
-              ? <Button
-                className="FstoButtonForm-root"
-                variant="outlined"
-                color="error"
-                onClick={truncateData}
-                disableElevation
-              >Clear</Button>
-              : <Button
-                className="FstoButtonForm-root"
-                variant="outlined"
-                color="error"
-                to="/requestor"
-                component={Link}
-                disableElevation
-              >Back</Button>
-          }
+          <Button
+            className="FstoButtonForm-root"
+            variant="outlined"
+            color="error"
+            onClick={() => navigate(-1)}
+            disableElevation
+          > Back
+          </Button>
         </form>
       </Paper>
 
@@ -2665,7 +2561,6 @@ const NewRequest = () => {
                 variant="outlined"
                 autoComplete="off"
                 size="small"
-                type="number"
                 value={PO.no}
                 error={
                   error.status
@@ -2680,9 +2575,8 @@ const NewRequest = () => {
                     && validate.data.includes('po_no')
                     && "Please wait...")
                 }
+                onBlur={checkPurchaseOrderHandler}
                 onKeyPress={(e) => {
-                  ["E", "e", ".", "+", "-"].includes(e.key) && e.preventDefault()
-
                   if (e.key === "Enter")
                     checkPurchaseOrderHandler(e)
                 }}
@@ -2690,11 +2584,6 @@ const NewRequest = () => {
                   ...PO,
                   no: e.target.value
                 })}
-                onBlur={checkPurchaseOrderHandler}
-                InputProps={{
-                  startAdornment: PO.no &&
-                    <InputAdornment className="FstoAdrmentForm-root" position="start">PO#</InputAdornment>
-                }}
                 InputLabelProps={{
                   className: "FstoLabelForm-attachment"
                 }}
@@ -2729,7 +2618,6 @@ const NewRequest = () => {
                 className="FstoSelectForm-attachment"
                 size="small"
                 options={[]}
-                limitTags={3}
                 value={PO.rr_no}
                 renderTags={
                   (value, getTagProps) => value.map(
@@ -2778,6 +2666,7 @@ const NewRequest = () => {
                   (validate.status && validate.data.includes('po_no')) ||
                   !Boolean(PO.no) ||
                   !Boolean(PO.amount) ||
+                  // !Boolean(PO.balance) ||
                   !Boolean(PO.rr_no.length)
                 }
                 disableElevation
@@ -2831,51 +2720,14 @@ const NewRequest = () => {
                   <Divider variant="middle" sx={{ marginTop: 4, marginBottom: 4 }} />
 
                   <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
-                    <Typography sx={{ fontSize: '1em' }}>Total P.O. Balance</Typography>
-                    <Typography variant="heading">&#8369;{data.po_group.map((data) => data.balance).reduce((a, b) => a + b).toLocaleString()}</Typography>
+                    <Typography variant="h6">Total P.O. Amount</Typography>
+                    <Typography variant="h6">&#8369;{data.po_group.map((data) => data.amount).reduce((a, b) => a + b).toLocaleString()}</Typography>
                   </Box>
 
-                  {
-                    data.document.amount && (data.document.id === 1 || data.document.id === 5)
-                    &&
-                    <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
-                      <Typography sx={{ fontSize: '1em' }}>Document Amount</Typography>
-                      <Typography variant="heading">&#8369;{data.document.amount.toLocaleString()}</Typography>
-                    </Box>
-                  }
-
-                  {
-                    data.document.reference.amount && data.document.id === 4
-                    &&
-                    <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
-                      <Typography sx={{ fontSize: '1em' }}>Reference Amount</Typography>
-                      <Typography variant="heading">&#8369;{data.document.reference.amount.toLocaleString()}</Typography>
-                    </Box>
-                  }
-
-                  <Divider sx={{ marginTop: 2, marginBottom: 2 }} />
-
-                  {
-                    data.document.amount && (data.document.id === 1 || data.document.id === 5)
-                    &&
-                    <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
-                      <Typography variant="heading">Variance</Typography>
-                      <Typography variant="heading">
-                        &#8369;{(data.po_group.map((data) => data.balance).reduce((a, b) => a + b) - data.document.amount).toLocaleString()}
-                      </Typography>
-                    </Box>
-                  }
-
-                  {
-                    data.document.reference.amount && data.document.id === 4
-                    &&
-                    <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
-                      <Typography variant="heading">Variance</Typography>
-                      <Typography variant="heading">
-                        &#8369;{(data.po_group.map((data) => data.balance).reduce((a, b) => a + b) - data.document.reference.amount).toLocaleString()}
-                      </Typography>
-                    </Box>
-                  }
+                  <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
+                    <Typography variant="heading">Total P.O. Balance</Typography>
+                    <Typography variant="heading">&#8369;{data.po_group.map((data) => data.balance).reduce((a, b) => a + b).toLocaleString()}</Typography>
+                  </Box>
                 </React.Fragment>
               )
             }
@@ -2886,4 +2738,4 @@ const NewRequest = () => {
   )
 }
 
-export default NewRequest
+export default UpdateRequest

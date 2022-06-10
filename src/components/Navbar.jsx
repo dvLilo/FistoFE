@@ -99,7 +99,7 @@ const Navbar = () => {
       </Box>
 
       <Box className="FstoNavbar-user">
-        <h5>Hi, {user?.first_name.split(" ")[0]}</h5>
+        <h5>Hi, {user?.first_name.toLowerCase().split(" ")[0]}</h5>
 
         <IconButton
           sx={{ backgroundColor: "#E0E0E0", ml: 1 }}

@@ -161,8 +161,9 @@ const Sidebar = () => {
               <Document sx={{ mr: 2.5 }} /> Documents
             </AccordionSummary>
             <AccordionDetails>
-              <RouterLink className="FstoLink-root" to="/tagging">Tagging of Documents</RouterLink>
-              <RouterLink className="FstoLink-root" to="/tagging/returned-documents">Returned Documents</RouterLink>
+              <RouterLink className="FstoLink-root" to="/documents/tagging">Tagging of Documents</RouterLink>
+              <RouterLink className="FstoLink-root" to="/documents/transmitting">Transmittal of Documents</RouterLink>
+              <RouterLink className="FstoLink-root" to="/documents/returned-documents">Returned Documents</RouterLink>
 
             </AccordionDetails>
           </Accordion>
@@ -182,7 +183,7 @@ const Sidebar = () => {
               <Cheque sx={{ mr: 2.5 }} /> Cheque
             </AccordionSummary>
             <AccordionDetails>
-              {/* RouterLink here... */}
+              <RouterLink className="FstoLink-root" to="/cheque/chequing">Creation of Cheque</RouterLink>
 
             </AccordionDetails>
           </Accordion>
@@ -192,7 +193,7 @@ const Sidebar = () => {
               <Approval sx={{ mr: 2.5 }} /> Approval
             </AccordionSummary>
             <AccordionDetails>
-              {/* RouterLink here... */}
+              <RouterLink className="FstoLink-root" to="/approval">Transaction Approval</RouterLink>
 
             </AccordionDetails>
           </Accordion>

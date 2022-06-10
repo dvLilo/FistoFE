@@ -22,6 +22,7 @@ import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded'
 export const FistoContext = React.createContext()
 
 const FistoProvider = ({ children }) => {
+
   const [dialog, setDialog] = React.useState({
     open: false,
     wait: false,

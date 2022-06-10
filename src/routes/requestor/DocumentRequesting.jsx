@@ -21,7 +21,8 @@ import {
   TableSortLabel,
   TablePagination,
   Tabs,
-  Tab
+  Tab,
+  Stack
 } from '@mui/material'
 
 import {
@@ -36,15 +37,16 @@ import useTransactions from '../../hooks/useTransactions'
 import Preloader from '../../components/Preloader'
 import ReasonDialog from '../../components/ReasonDialog'
 
-import TaggingRequestActions from './TaggingRequestActions'
-import TaggingRequestFilter from './TaggingRequestFilter'
-import TaggingRequestView from './TaggingRequestView'
+import DocumentRequestingActions from './DocumentRequestingActions'
+import DocumentRequestingFilter from './DocumentRequestingFilter'
+import DocumentRequestingTransaction from './DocumentRequestingTransaction'
 
-const TaggingRequest = () => {
+const DocumentRequesting = () => {
 
   const {
     status,
     data,
+    refetchData,
     searchData,
     filterData,
     changeStatus,
@@ -163,43 +165,45 @@ const TaggingRequest = () => {
               <Tab className="FstoTab-root" label="Voided" value="void" disableRipple />
             </Tabs>
 
-            <TextField
-              className="FstoTextFieldToolbar-root"
-              variant="outlined"
-              size="small"
-              autoComplete="off"
-              placeholder="Search"
-              value={search}
-              InputProps={{
-                className: "FstoTextfieldSearch-root",
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Search />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      edge="end"
-                      size="small"
-                      disabled={!Boolean(search)}
-                      onClick={() => {
-                        setSearch("")
-                        searchData(null)
-                      }}
-                    >
-                      <Close fontSize="small" />
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") searchData(e.target.value)
-              }}
-            />
+            <Stack className="FstoStackToolbar-root" direction="row">
+              <TextField
+                className="FstoTextFieldToolbar-root"
+                variant="outlined"
+                size="small"
+                autoComplete="off"
+                placeholder="Search"
+                value={search}
+                InputProps={{
+                  className: "FstoTextfieldSearch-root",
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        edge="end"
+                        size="small"
+                        disabled={!Boolean(search)}
+                        onClick={() => {
+                          setSearch("")
+                          searchData(null)
+                        }}
+                      >
+                        <Close fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") searchData(e.target.value)
+                }}
+              />
 
-            <TaggingRequestFilter filterData={filterData} />
+              <DocumentRequestingFilter filterData={filterData} />
+            </Stack>
           </Box>
         </Box>
 
@@ -253,7 +257,7 @@ const TaggingRequest = () => {
                   ? <Preloader row={5} col={10} />
                   : data
                     ? data.data.map((data, index) => (
-                      <TableRow key={index}>
+                      <TableRow hover key={index}>
                         <TableCell className="FstoTableData-root">
                           {data.date_requested}
                         </TableCell>
@@ -299,7 +303,7 @@ const TaggingRequest = () => {
                         </TableCell>
 
                         <TableCell className="FstoTableData-root" align="center">
-                          <TaggingRequestActions
+                          <DocumentRequestingActions
                             state={state}
                             data={data}
                             onView={onView}
@@ -332,12 +336,12 @@ const TaggingRequest = () => {
           showLastButton
         />
 
-        <TaggingRequestView {...view} />
+        <DocumentRequestingTransaction {...view} />
 
-        <ReasonDialog {...reason} />
+        <ReasonDialog onSuccess={refetchData} {...reason} />
       </Paper>
     </Box>
   )
 }
 
-export default TaggingRequest
+export default DocumentRequesting

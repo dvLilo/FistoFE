@@ -1,7 +1,5 @@
 import React from 'react'
 
-import { useNavigate } from 'react-router-dom'
-
 import {
   Box,
   Paper,
@@ -18,7 +16,8 @@ import {
   TableSortLabel,
   TablePagination,
   Tabs,
-  Tab
+  Tab,
+  Stack
 } from '@mui/material'
 
 import {
@@ -26,17 +25,23 @@ import {
   Close
 } from '@mui/icons-material'
 
-import Preloader from '../../components/Preloader'
-import ReasonDialog from '../../components/ReasonDialog'
+import useConfirm from '../../hooks/useConfirm'
 
-import DocumentRequestingActions from './DocumentRequestingActions'
-import DocumentRequestingTransaction from './DocumentRequestingTransaction'
+import Preloader from '../../components/Preloader'
+
+import DocumentChequingFilter from './DocumentChequingFilter'
+import DocumentChequingActions from './DocumentChequingActions'
+import DocumentChequingTransaction from './DocumentChequingTransaction'
 
 const data = [
   {
-    id: 43,
-    date_requested: "2022-04-19 13:47:24",
-    transaction_id: "MIS035",
+    id: 52,
+    date_requested: "2022-05-12 11:46:28",
+    transaction_id: "MIS076",
+    tagged: {
+      no: 92101,
+      date: "2022-06-01 11:46:28"
+    },
     document_type: "PAD",
     company: "RDF Corporate Services",
     supplier: "1ST ADVENUE ADVERTISING",
@@ -46,61 +51,58 @@ const data = [
     document_amount: 10000,
     payment_type: "Full",
     status: "Pending"
-  },
+  }
 ]
 
-const ReturnedDocument = () => {
+const DocumentChequing = () => {
 
-  const navigate = useNavigate()
+  const confirm = useConfirm()
 
-  const [state, setState] = React.useState("return")
+  const [state, setState] = React.useState("pending")
 
-  const [view, setView] = React.useState({
+  const [manage, setManage] = React.useState({
     data: null,
     open: false,
-    onClose: () => setView(currentValue => ({
+    onBack: undefined,
+    onClose: () => setManage(currentValue => ({
       ...currentValue,
       open: false
     }))
   })
 
-  const [reason, setReason] = React.useState({
-    data: null,
-    open: false,
-    onClose: () => setReason(currentValue => ({
-      ...currentValue,
-      open: false
-    }))
-  })
-
-  const onView = (data) => setView(currentValue => ({
-    ...currentValue,
-    data,
-    open: true
-  }))
-
-  const onUpdate = (data) => {
-    const { id } = data
-
-    navigate(`/requestor/update-request/${id}`)
+  const onReceive = (ID) => {
+    confirm({
+      open: true,
+      onConfirm: () => console.log("Transaction", ID, "has been received.")
+    })
   }
 
-  const onVoid = (data) => setReason(currentValue => ({
-    ...currentValue,
-    data,
-    open: true
-  }))
+  const onManage = (data) => {
+    setManage(currentValue => ({
+      ...currentValue,
+      data,
+      open: true,
+      onBack: onManage
+    }))
+  }
+
+  const onView = (data) => {
+    setManage(currentValue => ({
+      ...currentValue,
+      data,
+      open: true
+    }))
+  }
 
   return (
     <Box className="FstoBox-root">
       <Paper className="FstoPaperTable-root" elevation={1}>
         <Box className="FstoBoxToolbar2-root">
           <Box className="FstoBoxToolbar-left">
-            <Typography variant="heading">Returned Requests</Typography>
+            <Typography variant="heading">Creation of Cheque</Typography>
           </Box>
 
           <Box className="FstoBoxToolbar-right">
-
             <Tabs
               className="FstoTabsToolbar-root"
               value={state}
@@ -110,41 +112,49 @@ const ReturnedDocument = () => {
                 children: <span className="FstoTabsIndicator-root" />
               }}
             >
-              <Tab className="FstoTab-root" label="Returned" value="return" disableRipple />
+              <Tab className="FstoTab-root" label="Pending" value="pending" disableRipple />
+              <Tab className="FstoTab-root" label="Received" value="receive" disableRipple />
+              <Tab className="FstoTab-root" label="Created" value="create" disableRipple />
+              <Tab className="FstoTab-root" label="Released" value="release" disableRipple />
               <Tab className="FstoTab-root" label="Held" value="hold" disableRipple />
+              <Tab className="FstoTab-root" label="Returned" value="return" disableRipple />
               <Tab className="FstoTab-root" label="Voided" value="void" disableRipple />
             </Tabs>
 
-            <TextField
-              className="FstoTextFieldToolbar-root"
-              variant="outlined"
-              size="small"
-              autoComplete="off"
-              placeholder="Search"
-              InputProps={{
-                className: "FstoTextfieldSearch-root",
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Search />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      edge="end"
-                      size="small"
-                      onClick={() => { }}
-                    >
-                      <Close fontSize="small" />
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }}
-              onChange={(e) => console.log(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") console.log(e.target.value)
-              }}
-            />
+            <Stack className="FstoStackToolbar-root" direction="row">
+              <TextField
+                className="FstoTextFieldToolbar-root"
+                variant="outlined"
+                size="small"
+                autoComplete="off"
+                placeholder="Search"
+                InputProps={{
+                  className: "FstoTextfieldSearch-root",
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        edge="end"
+                        size="small"
+                        onClick={() => { }}
+                      >
+                        <Close fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+                onChange={(e) => console.log(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") console.log(e.target.value)
+                }}
+              />
+
+              <DocumentChequingFilter />
+            </Stack>
           </Box>
         </Box>
 
@@ -153,7 +163,11 @@ const ReturnedDocument = () => {
             <TableHead>
               <TableRow>
                 <TableCell className="FstoTableHead-root">
-                  <TableSortLabel>DATE REQUESTED</TableSortLabel>
+                  <TableSortLabel>DATE TRANSMITTED</TableSortLabel>
+                </TableCell>
+
+                <TableCell className="FstoTableHead-root">
+                  <TableSortLabel>TAG NO.</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableHead-root">
@@ -184,10 +198,6 @@ const ReturnedDocument = () => {
                   <TableSortLabel>AMOUNT</TableSortLabel>
                 </TableCell>
 
-                <TableCell className="FstoTableHead-root" align="center">
-                  <TableSortLabel>STATUS</TableSortLabel>
-                </TableCell>
-
                 <TableCell className="FstoTableHead-root" align="center">ACTIONS</TableCell>
               </TableRow>
             </TableHead>
@@ -199,7 +209,11 @@ const ReturnedDocument = () => {
                   : data.map((item, index) => (
                     <TableRow hover key={index}>
                       <TableCell className="FstoTableData-root">
-                        {item.date_requested}
+                        {item.tagged.date}
+                      </TableCell>
+
+                      <TableCell className="FstoTableData-root">
+                        {item.tagged.no}
                       </TableCell>
 
                       <TableCell className="FstoTableData-root">
@@ -239,16 +253,12 @@ const ReturnedDocument = () => {
                       </TableCell>
 
                       <TableCell className="FstoTableData-root" align="center">
-                        {item.status}
-                      </TableCell>
-
-                      <TableCell className="FstoTableData-root" align="center">
-                        <DocumentRequestingActions
-                          state={state}
+                        <DocumentChequingActions
                           data={item}
+                          state={state}
+                          onReceive={onReceive}
+                          onManage={onManage}
                           onView={onView}
-                          onUpdate={onUpdate}
-                          onVoid={onVoid}
                         />
                       </TableCell>
                     </TableRow>
@@ -271,12 +281,10 @@ const ReturnedDocument = () => {
           showLastButton
         />
 
-        <DocumentRequestingTransaction {...view} />
-
-        <ReasonDialog onSuccess={() => { }} {...reason} />
+        <DocumentChequingTransaction state={state} {...manage} />
       </Paper>
     </Box>
   )
 }
 
-export default ReturnedDocument
+export default DocumentChequing

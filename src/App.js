@@ -43,20 +43,32 @@ import Banks from './routes/masterlist/Banks/'
 import Reasons from './routes/masterlist/Reasons/'
 
 // Requestor
-import TaggingRequest from './routes/requestor/TaggingRequest'
+import DocumentRequesting from './routes/requestor/DocumentRequesting'
 import NewRequest from './routes/requestor/NewRequest'
 import UpdateRequest from './routes/requestor/UpdateRequest'
 import ReturnedDocument from './routes/requestor/ReturnedDocument'
 
+// Tagging
 import DocumentTagging from './routes/tagging/DocumentTagging'
 
+// Vouchering
 import DocumentVouchering from './routes/vouchering/DocumentVouchering'
+
+// Approving
+import DocumentApproving from './routes/approving/DocumentApproving'
+
+// Transmitting
+import DocumentTransmitting from './routes/transmitting/DocumentTransmitting'
+
+// Chequing
+import DocumentChequing from './routes/chequing/DocumentChequing'
 
 import NotFound from './exceptions/NotFound'
 import AccessDenied from './exceptions/AccessDenied'
 import Sandbox from './Sandbox'
 
 import FistoProvider from './contexts/FistoContext'
+import PasswordContextProvider from './contexts/PasswordContext'
 
 import { QueryClient, QueryClientProvider } from 'react-query'
 
@@ -119,6 +131,13 @@ const App = () => {
             transform: 'translate(18px, -6px) scale(0.85)'
           }
         }
+      },
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            textTransform: 'capitalize'
+          }
+        }
       }
     },
     palette: {
@@ -160,7 +179,13 @@ const App = () => {
 
             <Route exact path="/dashboard" element={<ProtectedRoute />}>
               <Route exact path="/dashboard" element={<Dashboard />}>
-                <Route index exact strict element={<UserAccounts />} />
+                <Route index exact strict
+                  element={
+                    <PasswordContextProvider>
+                      <UserAccounts />
+                    </PasswordContextProvider>
+                  }
+                />
                 <Route exact strict path="new-user" element={<NewUser />} />
                 <Route exact strict path="update-user/:id" element={<UpdateUser />} />
                 <Route exact strict path="categories" element={<Categories />} />
@@ -185,22 +210,61 @@ const App = () => {
 
             <Route exact path="/requestor" element={<ProtectedRoute />}>
               <Route exact path="/requestor" element={<Dashboard />}>
-                <Route index exact strict element={<TaggingRequest />} />
+                <Route index exact strict
+                  element={
+                    <PasswordContextProvider>
+                      <DocumentRequesting />
+                    </PasswordContextProvider>
+                  }
+                />
                 <Route exact strict path="new-request" element={<NewRequest />} />
                 <Route exact strict path="update-request/:id" element={<UpdateRequest />} />
                 <Route exact strict path="returned-documents" element={<ReturnedDocument />} />
               </Route>
             </Route>
 
-            <Route exact path="/tagging" element={<ProtectedRoute />}>
-              <Route exact path="/tagging" element={<Dashboard />}>
-                <Route index exact strict element={<DocumentTagging />} />
+            <Route exact path="/documents" element={<ProtectedRoute />}>
+              <Route exact path="/documents" element={<Dashboard />}>
+                <Route exact strict
+                  path="tagging"
+                  element={
+                    <PasswordContextProvider>
+                      <DocumentTagging />
+                    </PasswordContextProvider>
+                  }
+                />
+                <Route exact strict path="transmitting" element={<DocumentTransmitting />} />
               </Route>
             </Route>
 
             <Route exact path="/vouchering" element={<ProtectedRoute />}>
               <Route exact path="/vouchering" element={<Dashboard />}>
                 <Route index exact strict element={<DocumentVouchering />} />
+              </Route>
+            </Route>
+
+            <Route exact path="/approval" element={<ProtectedRoute />}>
+              <Route exact path="/approval" element={<Dashboard />}>
+                <Route index exact strict
+                  element={
+                    <PasswordContextProvider>
+                      <DocumentApproving />
+                    </PasswordContextProvider>
+                  }
+                />
+              </Route>
+            </Route>
+
+            <Route exact path="/cheque" element={<ProtectedRoute />}>
+              <Route exact path="/cheque" element={<Dashboard />}>
+                <Route exact strict
+                  path="chequing"
+                  element={
+                    <PasswordContextProvider>
+                      <DocumentChequing />
+                    </PasswordContextProvider>
+                  }
+                />
               </Route>
             </Route>
           </Routes>

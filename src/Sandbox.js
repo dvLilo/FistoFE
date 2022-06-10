@@ -203,7 +203,7 @@ const Sandbox = () => {
 
   const {
     status, data
-  } = useTransaction(1)
+  } = useTransaction(72)
 
   return ReactDOM.createPortal(
     <React.Fragment>

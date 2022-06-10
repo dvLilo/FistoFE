@@ -19,7 +19,6 @@ import Confirm from '../../../components/Confirm'
 import UserAccountsTable from './UserAccountsTable'
 import UserAccountsToolbar from './UserAccountsToolbar'
 import UserAccountsViewer from './UserAccountsViewer'
-import UserAccountsPassword from './UserAccountsPassword'
 
 const UserAccounts = () => {
 
@@ -211,8 +210,6 @@ const UserAccounts = () => {
             }))
           }}
         />
-
-        <UserAccountsPassword />
       </Paper>
     </Box>
   )

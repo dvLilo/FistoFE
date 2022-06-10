@@ -10,7 +10,7 @@ import {
   FilterList as FilterIcon
 } from '@mui/icons-material'
 
-const DocumentTaggingFilter = () => {
+const DocumentApprovingFilter = () => {
 
   const [anchor, setAnchor] = React.useState(null)
 
@@ -53,4 +53,4 @@ const DocumentTaggingFilter = () => {
   )
 }
 
-export default DocumentTaggingFilter
+export default DocumentApprovingFilter

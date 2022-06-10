@@ -65,7 +65,7 @@ const DOCUMENT_TYPES = [
   }
 ]
 
-const TaggingRequestFilter = (props) => {
+const DocumentRequestingFilter = (props) => {
 
   const { filterData } = props
 
@@ -136,7 +136,7 @@ const TaggingRequestFilter = (props) => {
 
   return (
     <React.Fragment>
-      <IconButton onClick={filterOpenHandler}>
+      <IconButton className="FstoIconButtonFilter-root" onClick={filterOpenHandler}>
         <FilterIcon />
       </IconButton>
 
@@ -409,4 +409,4 @@ const TaggingRequestFilter = (props) => {
   )
 }
 
-export default TaggingRequestFilter
+export default DocumentRequestingFilter

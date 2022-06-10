@@ -27,7 +27,7 @@ import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 
-const AccountTitle = (props) => {
+const ChequeEntry = (props) => {
 
   const {
     data,
@@ -37,35 +37,35 @@ const AccountTitle = (props) => {
     onSubmit = () => { }
   } = props
 
-  const submitAccountTitleHandler = () => {
+  const submitChequehandler = () => {
     onClose()
     onSubmit(data)
   }
 
-  const backAccountTitleHandler = () => {
+  const backChequeHandler = () => {
     onClose()
     onBack(data)
   }
 
   return (
     <Dialog
-      className="FstoDialogAccountTitle-root"
+      className="FstoDialogCheque-root"
       open={open}
       PaperProps={{
-        className: "FstoPaperAccountTitle-root"
+        className: "FstoPaperCheque-root"
       }}
       fullWidth
       disablePortal
     >
-      <DialogTitle className="FstoDialogAccountTitle-title">
-        Account Title Entry
+      <DialogTitle className="FstoDialogCheque-title">
+        Cheque Details Entry
         <IconButton size="large" onClick={onClose}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
 
-      <DialogContent className="FstoDialogAccountTitle-content">
-        <Box className="FstoBoxAccountTitle-root">
+      <DialogContent className="FstoDialogCheque-content">
+        <Box className="FstoBoxCheque-root">
           <Autocomplete
             className="FstoSelectForm-root"
             size="small"
@@ -76,32 +76,7 @@ const AccountTitle = (props) => {
                 <TextField
                   {...props}
                   variant="outlined"
-                  label="Entry"
-                />
-            }
-            PaperComponent={
-              props =>
-                <Paper
-                  {...props}
-                  sx={{ textTransform: 'capitalize' }}
-                />
-            }
-            onChange={(e, value) => console.log(value)}
-            disablePortal
-            disableClearable
-          />
-
-          <Autocomplete
-            className="FstoSelectForm-root"
-            size="small"
-            options={[]}
-            value={null}
-            renderInput={
-              props =>
-                <TextField
-                  {...props}
-                  variant="outlined"
-                  label="Account Title"
+                  label="Bank"
                 />
             }
             PaperComponent={
@@ -118,7 +93,7 @@ const AccountTitle = (props) => {
 
           <TextField
             className="FstoTextfieldForm-root"
-            label="Amount"
+            label="Cheque Number"
             variant="outlined"
             autoComplete="off"
             size="small"
@@ -127,7 +102,16 @@ const AccountTitle = (props) => {
 
           <TextField
             className="FstoTextfieldForm-root"
-            label="Remarks (Optional)"
+            label="Cheque Date"
+            variant="outlined"
+            autoComplete="off"
+            size="small"
+            onChange={() => { }}
+          />
+
+          <TextField
+            className="FstoTextfieldForm-root"
+            label="Amount"
             variant="outlined"
             autoComplete="off"
             size="small"
@@ -147,31 +131,19 @@ const AccountTitle = (props) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Account Title</TableCell>
-                <TableCell className="FstoTabelCellAccountTitle-root" align="right">Debit</TableCell>
-                <TableCell>Credit</TableCell>
+                <TableCell>Bank</TableCell>
+                <TableCell>Cheque Number</TableCell>
+                <TableCell className="FstoTabelCellCheque-root">Date</TableCell>
+                <TableCell>Amount</TableCell>
                 <TableCell align="right">Action</TableCell>
               </TableRow>
             </TableHead>
 
-            <TableBody className="FstoTableBodyAccountTitle-root">
+            <TableBody className="FstoTableBodyCheque-root">
               <TableRow>
-                <TableCell size="small"><strong>SE - Depr - Equipment, Furniture & Fixtures</strong><br /><i>Payment for chairset in Corporate Common. Payment for chairset in Corporate Common.</i></TableCell>
-                <TableCell className="FstoTabelCellAccountTitle-root" align="right" size="small">₱100,000.00</TableCell>
-                <TableCell size="small">&mdash;</TableCell>
-                <TableCell align="right" size="small">
-                  <IconButton>
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton>
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-
-              <TableRow>
-                <TableCell size="small">Accounts Payable</TableCell>
-                <TableCell className="FstoTabelCellAccountTitle-root" align="right" size="small">&mdash;</TableCell>
+                <TableCell size="small">AUB Angeles Branch</TableCell>
+                <TableCell size="small">203-4024-424</TableCell>
+                <TableCell className="FstoTabelCellCheque-root" size="small">11/27/2021</TableCell>
                 <TableCell size="small">₱100,000.00</TableCell>
                 <TableCell align="right" size="small">
                   <IconButton>
@@ -186,30 +158,30 @@ const AccountTitle = (props) => {
           </Table>
         </TableContainer>
 
-        <Stack className="FstoStackAccountTitle-root" direction="row">
-          <Typography variant="body1" sx={{ flex: 1 }}>Total Credit Amount</Typography>
+        <Stack className="FstoDialogCheque-root" direction="row">
+          <Typography variant="body1" sx={{ flex: 1 }}>Total Cheque Amount</Typography>
           <Typography variant="h6">₱100,000.00</Typography>
         </Stack>
 
-        <Stack className="FstoStackAccountTitle-root" direction="row">
-          <Typography variant="body1" sx={{ flex: 1 }}>Total Debit Amount</Typography>
+        <Stack className="FstoDialogCheque-root" direction="row">
+          <Typography variant="body1" sx={{ flex: 1 }}>Document Amount</Typography>
           <Typography variant="h6">₱100,000.00</Typography>
         </Stack>
 
         <Divider variant="middle" sx={{ marginY: 2 }} />
 
-        <Stack className="FstoStackAccountTitle-root" direction="row">
+        <Stack className="FstoDialogCheque-root" direction="row">
           <Typography variant="body1" sx={{ flex: 1 }}>Variance</Typography>
           <Typography variant="h6">₱0.00</Typography>
         </Stack>
       </DialogContent>
 
-      <DialogActions className="FstoDialogAccountTitle-actions">
+      <DialogActions className="FstoDialogCheque-actions">
         <Button
           variant="outlined"
           color="info"
           size="large"
-          onClick={backAccountTitleHandler}
+          onClick={backChequeHandler}
           disableElevation
         > Back
         </Button>
@@ -217,7 +189,7 @@ const AccountTitle = (props) => {
         <Button
           variant="contained"
           size="large"
-          onClick={submitAccountTitleHandler}
+          onClick={submitChequehandler}
           disableElevation
         > Submit
         </Button>
@@ -226,4 +198,4 @@ const AccountTitle = (props) => {
   )
 }
 
-export default AccountTitle
+export default ChequeEntry

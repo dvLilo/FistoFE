@@ -11,7 +11,7 @@ import CloseIcon from '@mui/icons-material/Close'
 
 import Transaction from '../../components/Transaction'
 
-const TaggingRequestView = (props) => {
+const DocumentRequestingTransaction = (props) => {
 
   const {
     data,
@@ -38,11 +38,11 @@ const TaggingRequestView = (props) => {
         </IconButton>
       </DialogTitle>
 
-      <DialogContent className="FstoDialogTransaction-body">
+      <DialogContent className="FstoDialogTransaction-content">
         <Transaction data={data} />
       </DialogContent>
     </Dialog>
   )
 }
 
-export default TaggingRequestView
+export default DocumentRequestingTransaction

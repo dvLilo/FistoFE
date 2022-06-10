@@ -14,13 +14,168 @@ import ReportIcon from '@mui/icons-material/ReportOutlined'
 
 import useTransaction from '../hooks/useTransaction'
 
+// const status = `success`
+// const data = {
+//   "transaction": {
+//     "id": 114,
+//     "is_latest_transaction": 1,
+//     "request_id": 103,
+//     "no": "MIS104",
+//     "date_requested": "2022-05-31 09:59:21",
+//     "data_received": null,
+//     "status": "Pending",
+//     "state": "request"
+//   },
+//   "reason": {
+//     "id": null,
+//     "description": null,
+//     "remarks": null
+//   },
+//   "requestor": {
+//     "id": 1,
+//     "id_prefix": "RDFFLFI",
+//     "id_no": 10791,
+//     "role": "Administrator",
+//     "position": "System Developer",
+//     "first_name": "Limay Louie",
+//     "middle_name": "Ocampo",
+//     "last_name": "Ducut",
+//     "suffix": null,
+//     "department": "Management Information System"
+//   },
+//   "document": {
+//     "id": 4,
+//     "name": "Receipt",
+//     "date": "2022-05-31 00:00:00",
+//     "payment_type": "Partial",
+//     "remarks": null,
+//     "category": {
+//       "id": 1,
+//       "name": "general"
+//     },
+//     "company": {
+//       "id": 1,
+//       "name": "RDF Corporate Services"
+//     },
+//     "department": {
+//       "id": 1,
+//       "name": "Corporate Common"
+//     },
+//     "location": {
+//       "id": 5,
+//       "name": "Common"
+//     },
+//     "supplier": {
+//       "id": 30,
+//       "name": "1ST ADVENUE ADVERTISING"
+//     },
+//     "reference": {
+//       "id": 2,
+//       "type": "OR",
+//       "no": "999903",
+//       "amount": 2000
+//     }
+//   },
+//   "po_group": [
+//     {
+//       "no": "999902",
+//       "amount": 5000,
+//       "rr_no": [
+//         "0987654321"
+//       ],
+//       "previous_balance": 2000,
+//       "balance": 0
+//     },
+//     {
+//       "no": "999901",
+//       "amount": 10000,
+//       "rr_no": [
+//         "1234567890"
+//       ],
+//       "previous_balance": 0,
+//       "balance": 0
+//     }
+//   ],
+//   "voucher": {
+//     "ap_associate": {
+//       "id": 1,
+//       "name": "LORENZO YUMOL"
+//     },
+//     "approver": {
+//       "id": 1,
+//       "name": "REDEN CUNANAN"
+//     },
+//     "receipt_type": "official",
+//     "witholding_tax": 4850,
+//     "percentage_tax": 1860,
+//     "gross_amount": 100000,
+//     "net_amount": 100000,
+//     "month_in": 2206,
+//     "no": "FO-1001-9999",
+//     "date_vouchered": "2022-06-08 00:00:00",
+//     "date_filed": "2022-06-08 00:00:00",
+//     "account_title": {
+//       "account_title_details": [
+//         {
+//           "id": 1,
+//           "name": "SE - Depr. Equipment, Furniture & Fixtures",
+//           "type": "debit",
+//           "amount": 100000,
+//           "remarks": "Payment for office chair in Corporate Common."
+//         },
+//         {
+//           "id": 2,
+//           "name": "Accounts Payable",
+//           "type": "credit",
+//           "amount": 100000,
+//           "remarks": null
+//         }
+//       ]
+//     }
+//   },
+//   "cheque": {
+//     "date": "2022-06-08 00:00:00",
+//     "cheque_details": [
+//       {
+//         "no": "203-4024-424",
+//         "date": "2022-06-08 00:00:00",
+//         "amount": 100000,
+//         "bank": {
+//           "id": 1,
+//           "name": "Asia United Bank"
+//         }
+//       }
+//     ],
+//     "account_title": {
+//       "account_title_details": [
+//         {
+//           "id": 2,
+//           "name": "Accounts Payable",
+//           "type": "debit",
+//           "amount": 100000
+//         },
+//         {
+//           "id": 3,
+//           "name": "Clearing - AUB",
+//           "type": "credit",
+//           "amount": 100000
+//         }
+//       ]
+//     }
+//   }
+// }
+
 const Transaction = (props) => {
 
-  const ID = props.data?.id
+  const {
+    data: transaction,
+    onView = () => { }
+  } = props
+
   const {
     status,
     data
-  } = useTransaction(ID)
+  } = useTransaction(transaction.id)
 
   return (
     <React.Fragment>
@@ -241,10 +396,49 @@ const Transaction = (props) => {
                 Reference Type
                 <strong>{data?.document.reference.type}</strong>
               </Box>
+            </Box>
 
+            <Box className="FstoBoxRow-half">
               <Box className="FstoBoxCell-root">
                 Reference Amount
                 <strong>&#8369;{data?.document.reference.amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+              </Box>
+            </Box>
+          </Box>}
+
+        { // Type of Receipt, Withholding Tax, Percentage Tax, Net of Amount
+          (data?.voucher.receipt_type !== null)
+          &&
+          <Box className="FstoBoxRow-root">
+            <Box className="FstoBoxRow-half">
+              <Box className="FstoBoxCell-root">
+                Type of Receipt
+                <strong>{data?.voucher.receipt_type}</strong>
+              </Box>
+
+              {
+                (data?.voucher.witholding_tax !== null)
+                &&
+                <Box className="FstoBoxCell-root">
+                  Withholding Tax
+                  <strong>&#8369;{data?.voucher.witholding_tax.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                </Box>
+              }
+            </Box>
+
+            <Box className="FstoBoxRow-half">
+              {
+                (data?.voucher.percentage_tax !== null)
+                &&
+                <Box className="FstoBoxCell-root">
+                  Percentage Tax
+                  <strong>&#8369;{data?.voucher.percentage_tax.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                </Box>
+              }
+
+              <Box className="FstoBoxCell-root">
+                Net of Amount
+                <strong>&#8369;{data?.voucher.net_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
               </Box>
             </Box>
           </Box>}
@@ -300,7 +494,6 @@ const Transaction = (props) => {
             </Box>
           </Box>}
 
-
         <Box className="FstoBoxRow-root">
           <Box className="FstoBoxRow-half">
             <Box className="FstoBoxCell-root">
@@ -344,7 +537,7 @@ const Transaction = (props) => {
         </Box>
       </Box>
 
-      {
+      { // PO Information
         Boolean(data?.po_group.length)
         &&
         <React.Fragment>
@@ -383,6 +576,85 @@ const Transaction = (props) => {
               ))}
           </Box>
         </React.Fragment>}
+
+      { // Voucher Information
+        Boolean(data?.voucher.no) &&
+        Boolean(data?.voucher.month_in) &&
+        Boolean(data?.voucher.date_vouchered)
+        &&
+        <React.Fragment>
+          <Box className="FstoBoxTable-root">
+            <Box className="FstoBoxRow-alt">
+              <Box className="FstoBoxCell-root FstoBoxCell-head">
+                <strong>Voucher Information</strong>
+              </Box>
+            </Box>
+
+            <Box className="FstoBoxRow-alt">
+              <Box className="FstoBoxCell-alt">
+                Voucher Number
+                <strong>{data?.voucher.no}</strong>
+              </Box>
+
+              <Box className="FstoBoxCell-alt">
+                Voucher Month
+                <strong>{data?.voucher.month_in}</strong>
+              </Box>
+
+              <Box className="FstoBoxCell-alt">
+                Date Vouchered
+                <strong>
+                  {
+                    new Date(data?.voucher.date_vouchered).toLocaleString("default", {
+                      month: "numeric",
+                      day: "numeric",
+                      year: "numeric",
+                      hour: "numeric",
+                      minute: "numeric"
+                    })}
+                </strong>
+              </Box>
+
+              {
+                (data?.voucher.date_filed)
+                &&
+                <Box className="FstoBoxCell-alt">
+                  Date Filed
+                  <strong>
+                    {
+                      new Date(data?.voucher.date_filed).toLocaleString("default", {
+                        month: "numeric",
+                        day: "numeric",
+                        year: "numeric",
+                        hour: "numeric",
+                        minute: "numeric"
+                      })}
+                  </strong>
+                </Box>
+              }
+
+              <Box className="FstoBoxCell-alt">
+                Account Title Details
+                <strong style={{ color: `blue`, cursor: `pointer` }} onClick={onView}>Update</strong>
+              </Box>
+
+              <Box className="FstoBoxCell-alt">
+                Vouchered by
+                <strong>{data?.voucher.ap_associate.name.toLowerCase()}</strong>
+              </Box>
+
+              {
+                (data?.voucher.approver)
+                &&
+                <Box className="FstoBoxCell-alt">
+                  Approved by
+                  <strong>{data?.voucher.approver.name.toLowerCase()}</strong>
+                </Box>
+              }
+            </Box>
+          </Box>
+        </React.Fragment>}
+
     </React.Fragment>
   )
 }

@@ -19,6 +19,10 @@ body {
     .FstoPurchaseOrder-root:after {
       background-color: #1e1e1e;
     }
+
+    .FstoBoxCell-head {
+      background-color: rgba(206, 212, 217, 0);
+    }
   }
 
   &.system {
@@ -27,6 +31,10 @@ body {
       .FstoPurchaseOrder-root:before,
       .FstoPurchaseOrder-root:after {
         background-color: #1e1e1e;
+      }
+
+      .FstoBoxCell-head {
+        background-color: rgba(206, 212, 217, 0);
       }
     }
   }
@@ -120,7 +128,7 @@ body {
   .FstoBoxToolbar-left,
   .FstoBoxToolbar-right {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     width: 100%;
 
     .FstoTextFieldToolbar-root {
@@ -139,6 +147,7 @@ body {
   }
 
   .FstoBoxToolbar-left {
+    align-items: center;
     justify-content: center;
   }
 
@@ -157,6 +166,7 @@ body {
 
     .FstoBoxToolbar-right {
       flex-direction: row;
+      align-items: center;
       width: auto;
 
       .FstoTabsToolbar-root {
@@ -449,6 +459,10 @@ body {
   }
 }
 
+.FstoIconButtonFilter-root.MuiIconButton-root {
+  margin-left: 0.25em;
+}
+
 .FstoPaperFilter-root.MuiPaper-root {
   max-width: 430px;
   padding: 10px 20px;
@@ -486,6 +500,25 @@ body {
   }
 }
 
+.FstoDialogPassword-root {
+
+  & .FstoDialogPassword-content {
+    display: flex;
+    flex-direction: row;
+    padding-left: 3em;
+    padding-right: 3em;
+  }
+
+  & .FstoDialogPassword-icon {
+    margin-right: 16px;
+    font-size: 3.25em;
+  }
+
+  & .FstoPaperPassword-root {
+    min-height: 190px;
+  }
+}
+
 .FstoDialogTransaction-root {
 
   & .FstoDialogTransaction-title {
@@ -494,13 +527,17 @@ body {
     align-items: center;
   }
 
+  & .FstoDialogTransaction-actions {
+    padding: 2em;
+  }
+
   & .FstoPaperTransaction-root {
-    padding: 1em;
+    min-height: 85vh;
   }
 
   & .FstoBoxTransaction-root {
     display: grid;
-    grid-template-columns: 33.33% 33.33% 33.33%;
+    grid-template-columns: repeat(3, 33.33%);
     padding-left: 10px;
     padding-right: 10px;
   }
@@ -533,6 +570,76 @@ body {
   & .FstoBoxAccountTitle-root:first-of-type {
     border-bottom: 3px solid #707070;
   }
+
+  & .FstoSelectForm-root {
+    flex-grow: 1;
+    margin-bottom: 0;
+  }
+
+  & .FstoSelectForm-root:first-of-type {
+    flex-grow: 0;
+    flex-basis: 210px;
+  }
+
+  & .FstoTextfieldForm-root {
+    flex: 1;
+    margin-bottom: 0;
+  }
+
+  & .FstoTableBodyAccountTitle-root {
+    border-bottom: 3px solid rgba(224, 224, 224, 1);
+  }
+
+  & .FstoTabelCellAccountTitle-root {
+    border-right: 1px solid rgba(224, 224, 224, 1);
+  }
+
+}
+
+
+
+.FstoDialogCheque-root {
+
+  & .FstoDialogCheque-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  & .FstoDialogCheque-content {
+    overflow: initial;
+  }
+
+  & .FstoPaperCheque-root {
+    max-width: 1100px;
+    min-height: 75vh;
+  }
+
+  & .FstoBoxCheque-root {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    padding-bottom: 30px;
+  }
+
+  & .FstoBoxCheque-root:first-of-type {
+    border-bottom: 3px solid #707070;
+  }
+
+  & .FstoSelectForm-root,
+  & .FstoTextfieldForm-root {
+    flex: 1;
+    margin-bottom: 0;
+  }
+
+  & .FstoTableBodyCheque-root {
+    border-bottom: 3px solid rgba(224, 224, 224, 1);
+  }
+
+  & .FstoTabelCellCheque-root {
+    border-right: 1px solid rgba(224, 224, 224, 1);
+  }
+
 }
 
 

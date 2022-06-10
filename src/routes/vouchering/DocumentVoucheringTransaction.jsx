@@ -40,26 +40,27 @@ const DocumentVoucheringTransaction = (props) => {
     state,
     data,
     open = false,
+    onBack = () => { },
     onClose = () => { }
   } = props
 
   const [manageAccountTitle, setManageAccountTitle] = React.useState({
     data: null,
     open: false,
+    onBack: undefined,
+    onSubmit: undefined,
     onClose: () => setManageAccountTitle(currentValue => ({
       ...currentValue,
       open: false
     }))
   })
 
-  const submitApproveHandler = (e) => {
-    e.preventDefault()
-    onClose()
-
-    setManageAccountTitle(currentValue => ({
-      ...currentValue,
-      open: true
-    }))
+  const onSubmit = () => {
+    confirm({
+      open: true,
+      wait: true,
+      onConfirm: () => console.log(`${data.transaction_id} has been submitted.`)
+    })
   }
 
   const submitHoldHandler = () => {
@@ -102,6 +103,30 @@ const DocumentVoucheringTransaction = (props) => {
     })
   }
 
+  const onAccountTitleManage = () => {
+    onClose()
+
+    setManageAccountTitle(currentValue => ({
+      ...currentValue,
+      data: data,
+      open: true,
+      onBack: onBack,
+      onSubmit: onSubmit
+    }))
+  }
+
+  const onAccountTitleView = () => {
+    onClose()
+
+    setManageAccountTitle(currentValue => ({
+      ...currentValue,
+      data: data,
+      open: true,
+      onBack: onBack,
+      onSubmit: onSubmit
+    }))
+  }
+
   return (
     <React.Fragment>
       <Dialog
@@ -112,7 +137,6 @@ const DocumentVoucheringTransaction = (props) => {
         PaperProps={{
           className: "FstoPaperTransaction-root"
         }}
-        onClose={onClose}
         fullWidth
         disablePortal
       >
@@ -122,12 +146,13 @@ const DocumentVoucheringTransaction = (props) => {
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent className="FstoDialogTransaction-body">
-          <Transaction data={data} />
+
+        <DialogContent className="FstoDialogTransaction-content">
+          <Transaction data={data} onView={onAccountTitleView} />
 
           {
             (state === `receive` || state === `approve`) &&
-            <form id="FstoFormTransaction" onSubmit={submitApproveHandler}>
+            <React.Fragment>
               <Box className="FstoBoxTransaction-root">
                 <Autocomplete
                   className="FstoSelectForm-root"
@@ -244,20 +269,19 @@ const DocumentVoucheringTransaction = (props) => {
                   disableClearable
                 />
               </Box>
-            </form>
+            </React.Fragment>
           }
         </DialogContent>
 
         {
           (state === `receive` || state === `approve` || state === `hold`) &&
-          <DialogActions>
+          <DialogActions className="FstoDialogTransaction-actions">
             {
               (state === `receive` || state === `approve`) &&
               <Button
-                className="FstoButtonForm-root"
-                type="submit"
-                form="FstoFormTransaction"
                 variant="contained"
+                size="large"
+                onClick={onAccountTitleManage}
                 disableElevation
               > {state === `receive` ? "Approve" : "Save"}
               </Button>
@@ -266,8 +290,8 @@ const DocumentVoucheringTransaction = (props) => {
             {
               state === `hold` &&
               <Button
-                className="FstoButtonForm-root"
                 variant="contained"
+                size="large"
                 onClick={submitUnholdHandler}
                 disableElevation
               > Unhold
@@ -277,8 +301,8 @@ const DocumentVoucheringTransaction = (props) => {
             {
               state !== `hold` &&
               <Button
-                className="FstoButtonForm-root"
                 variant="outlined"
+                size="large"
                 color="error"
                 onClick={submitHoldHandler}
                 disableElevation
@@ -287,8 +311,8 @@ const DocumentVoucheringTransaction = (props) => {
             }
 
             <Button
-              className="FstoButtonForm-root"
               variant="outlined"
+              size="large"
               color="error"
               onClick={submitReturnHandler}
               disableElevation
@@ -296,8 +320,8 @@ const DocumentVoucheringTransaction = (props) => {
             </Button>
 
             <Button
-              className="FstoButtonForm-root"
               variant="outlined"
+              size="large"
               color="error"
               onClick={submitVoidHandler}
               disableElevation

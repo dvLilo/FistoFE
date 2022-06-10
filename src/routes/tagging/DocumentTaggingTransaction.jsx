@@ -61,6 +61,16 @@ const DocumentTaggingTransaction = (props) => {
     })
   }
 
+  const submitReturnHandler = () => {
+    onClose()
+
+    confirm({
+      open: true,
+      wait: true,
+      onConfirm: () => console.log(`${data.transaction_id} has been return.`)
+    })
+  }
+
   const submitVoidHandler = () => {
     onClose()
 
@@ -91,7 +101,7 @@ const DocumentTaggingTransaction = (props) => {
         </IconButton>
       </DialogTitle>
 
-      <DialogContent className="FstoDialogTransaction-body">
+      <DialogContent className="FstoDialogTransaction-content">
         <Transaction data={data} />
 
         {
@@ -130,14 +140,14 @@ const DocumentTaggingTransaction = (props) => {
 
       {
         (state === `receive` || state === `tag` || state === `hold`) &&
-        <DialogActions>
+        <DialogActions className="FstoDialogTransaction-actions">
           {
             (state === `receive` || state === `tag`) &&
             <Button
-              className="FstoButtonForm-root"
+              variant="contained"
+              size="large"
               type="submit"
               form="FstoFormTransaction"
-              variant="contained"
               disableElevation
             > {state === `receive` ? "Tag" : "Save"}
             </Button>
@@ -146,8 +156,8 @@ const DocumentTaggingTransaction = (props) => {
           {
             state === `hold` &&
             <Button
-              className="FstoButtonForm-root"
               variant="contained"
+              size="large"
               onClick={submitUnholdHandler}
               disableElevation
             > Unhold
@@ -157,8 +167,8 @@ const DocumentTaggingTransaction = (props) => {
           {
             state !== `hold` &&
             <Button
-              className="FstoButtonForm-root"
               variant="outlined"
+              size="large"
               color="error"
               onClick={submitHoldHandler}
               disableElevation
@@ -167,8 +177,17 @@ const DocumentTaggingTransaction = (props) => {
           }
 
           <Button
-            className="FstoButtonForm-root"
             variant="outlined"
+            size="large"
+            color="error"
+            onClick={submitReturnHandler}
+            disableElevation
+          > Return
+          </Button>
+
+          <Button
+            variant="outlined"
+            size="large"
             color="error"
             onClick={submitVoidHandler}
             disableElevation
