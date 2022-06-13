@@ -38,7 +38,7 @@ const UserAccountsToolbar = (props) => {
           variant="contained"
           component={Link}
           startIcon={<AddIcon />}
-          to="new-user"
+          to="/masterlist/new-user"
           disableElevation
         >
           New

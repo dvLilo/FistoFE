@@ -2,7 +2,7 @@ import React from 'react'
 
 import axios from 'axios'
 
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 
 import {
   Box,
@@ -30,6 +30,7 @@ import Confirm from '../../../components/Confirm'
 const UpdateUser = () => {
 
   const { id } = useParams()
+  const navigate = useNavigate()
 
   const [isSaving, setIsSaving] = React.useState(false)
   // eslint-disable-next-line
@@ -853,8 +854,7 @@ const UpdateUser = () => {
             className="FstoButtonForm-root"
             variant="outlined"
             color="error"
-            to="/dashboard"
-            component={Link}
+            onClick={() => navigate(-1)}
             disableElevation
           >
             {

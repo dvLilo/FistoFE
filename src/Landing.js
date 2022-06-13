@@ -67,7 +67,7 @@ const Landing = () => {
       response = await axios.post(`/api/login`, credential)
       const { token, ...user } = response.data.result
 
-      const encryptedUser = CryptoJS.AES.encrypt(JSON.stringify(user), "Fistocutie.").toString()
+      const encryptedUser = CryptoJS.AES.encrypt(JSON.stringify(user), process.env.REACT_APP_SECRET_KEY).toString()
 
       window.localStorage.setItem('token', JSON.stringify(token))
       window.localStorage.setItem('user', encryptedUser)
@@ -78,11 +78,28 @@ const Landing = () => {
       let REDIRECT
       switch (user.role) {
         case 'Requestor':
-          REDIRECT = '/requestor'
+          REDIRECT = '/request'
+          break
+
+        case 'AP Tagging':
+          REDIRECT = '/document/tagging'
+          break
+
+        case 'AP Associate':
+        case 'AP Specialist':
+          REDIRECT = '/voucher/vouchering'
+          break
+
+        case 'Treasury Associate':
+          REDIRECT = '/cheque/chequing'
+          break
+
+        case 'Approver':
+          REDIRECT = '/approval'
           break
 
         default:
-          REDIRECT = '/dashboard'
+          REDIRECT = '/masterlist/users'
       }
 
       // Redirect to Dashboard
@@ -97,7 +114,7 @@ const Landing = () => {
       if (error.request.status === 401) {
         setToast({
           show: true,
-          message: "Invalid username or password."
+          message: "Invalid username or password. Please try again."
         })
       }
       else {

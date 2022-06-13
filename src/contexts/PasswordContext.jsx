@@ -17,7 +17,7 @@ export const PasswordContext = React.createContext()
 
 const PasswordContextProvider = ({ children }) => {
 
-  const { state } = useLocation()
+  const { state, pathname } = useLocation()
 
   return (
     <PasswordContext.Provider value={null}>
@@ -49,8 +49,11 @@ const PasswordContextProvider = ({ children }) => {
           <Button
             variant="contained"
             color="primary"
-            to="/user/change-password"
             component={Link}
+            to="/user/change-password"
+            state={{
+              previous_pathname: pathname
+            }}
             disableElevation
           > Change Password
           </Button>

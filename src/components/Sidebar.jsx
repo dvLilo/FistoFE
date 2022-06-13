@@ -24,7 +24,6 @@ import {
   // Circle as BulletFilled,
 
   SettingsOutlined as Masterlist,
-  PostAddOutlined as Request,
   FeedOutlined as Document,
   ConfirmationNumberOutlined as Voucher,
   LocalAtmOutlined as Cheque,
@@ -71,6 +70,7 @@ const AccordionSummary = styled((props) => (
 }))
 
 const Sidebar = () => {
+  const user = useSelector(state => state.user)
   const open = useSelector(state => state.sidebar)
   const color = useSelector(state => state.color)
   const dispatch = useDispatch()
@@ -118,95 +118,120 @@ const Sidebar = () => {
 
           <img className="FstoSidebar-logo" src={FistoLogo} alt="Fistó App" />
 
-          <Accordion>
-            <AccordionSummary>
-              <Masterlist sx={{ mr: 2.5 }} /> Master List
-            </AccordionSummary>
-            <AccordionDetails>
-              <RouterLink className="FstoLink-root" to="/dashboard">User Accounts</RouterLink>
-              <RouterLink className="FstoLink-root" to="/dashboard/categories">Categories</RouterLink>
-              <RouterLink className="FstoLink-root" to="/dashboard/document-types">Document Types</RouterLink>
-              <RouterLink className="FstoLink-root" to="/dashboard/companies">Companies</RouterLink>
-              <RouterLink className="FstoLink-root" to="/dashboard/departments">Departments</RouterLink>
-              <RouterLink className="FstoLink-root" to="/dashboard/locations">Locations</RouterLink>
-              <RouterLink className="FstoLink-root" to="/dashboard/references">References</RouterLink>
-              <RouterLink className="FstoLink-root" to="/dashboard/supplier-types">Urgency Types</RouterLink>
-              <RouterLink className="FstoLink-root" to="/dashboard/suppliers">Suppliers</RouterLink>
-              <RouterLink className="FstoLink-root" to="/dashboard/utility-categories">Utility Categories</RouterLink>
-              <RouterLink className="FstoLink-root" to="/dashboard/utility-locations">Utility Locations</RouterLink>
-              <RouterLink className="FstoLink-root" to="/dashboard/account-numbers">Utility Account</RouterLink>
-              <RouterLink className="FstoLink-root" to="/dashboard/credit-cards">Credit Card</RouterLink>
-              <RouterLink className="FstoLink-root" to="/dashboard/account-titles">Account Titles</RouterLink>
-              <RouterLink className="FstoLink-root" to="/dashboard/payroll-clients">Payroll Clients</RouterLink>
-              <RouterLink className="FstoLink-root" to="/dashboard/payroll-categories">Payroll Categories</RouterLink>
-              <RouterLink className="FstoLink-root" to="/dashboard/banks">Banks</RouterLink>
-              <RouterLink className="FstoLink-root" to="/dashboard/reasons">Reasons</RouterLink>
+          {
+            user?.role === `Administrator` && user?.permissions.includes(0) &&
+            <Accordion>
+              <AccordionSummary>
+                <Masterlist sx={{ mr: 2.5 }} /> Master List
+              </AccordionSummary>
+              <AccordionDetails>
+                <RouterLink className="FstoLink-root" to="/masterlist/users">User Accounts</RouterLink>
+                <RouterLink className="FstoLink-root" to="/masterlist/categories">Categories</RouterLink>
+                <RouterLink className="FstoLink-root" to="/masterlist/document-types">Document Types</RouterLink>
+                <RouterLink className="FstoLink-root" to="/masterlist/companies">Companies</RouterLink>
+                <RouterLink className="FstoLink-root" to="/masterlist/departments">Departments</RouterLink>
+                <RouterLink className="FstoLink-root" to="/masterlist/locations">Locations</RouterLink>
+                <RouterLink className="FstoLink-root" to="/masterlist/references">References</RouterLink>
+                <RouterLink className="FstoLink-root" to="/masterlist/supplier-types">Urgency Types</RouterLink>
+                <RouterLink className="FstoLink-root" to="/masterlist/suppliers">Suppliers</RouterLink>
+                <RouterLink className="FstoLink-root" to="/masterlist/utility-categories">Utility Categories</RouterLink>
+                <RouterLink className="FstoLink-root" to="/masterlist/utility-locations">Utility Locations</RouterLink>
+                <RouterLink className="FstoLink-root" to="/masterlist/account-numbers">Utility Account</RouterLink>
+                <RouterLink className="FstoLink-root" to="/masterlist/credit-cards">Credit Card</RouterLink>
+                <RouterLink className="FstoLink-root" to="/masterlist/account-titles">Account Titles</RouterLink>
+                <RouterLink className="FstoLink-root" to="/masterlist/payroll-clients">Payroll Clients</RouterLink>
+                <RouterLink className="FstoLink-root" to="/masterlist/payroll-categories">Payroll Categories</RouterLink>
+                <RouterLink className="FstoLink-root" to="/masterlist/banks">Banks</RouterLink>
+                <RouterLink className="FstoLink-root" to="/masterlist/reasons">Reasons</RouterLink>
 
-            </AccordionDetails>
-          </Accordion>
-
-          <Accordion>
-            <AccordionSummary>
-              <Request sx={{ mr: 2.5 }} /> Requests
-            </AccordionSummary>
-            <AccordionDetails>
-              <RouterLink className="FstoLink-root" to="/requestor">Creation of Request</RouterLink>
-              <RouterLink className="FstoLink-root" to="/requestor/returned-documents">Returned Requests</RouterLink>
-
-            </AccordionDetails>
-          </Accordion>
+              </AccordionDetails>
+            </Accordion>
+          }
 
           <Accordion>
             <AccordionSummary>
               <Document sx={{ mr: 2.5 }} /> Documents
             </AccordionSummary>
             <AccordionDetails>
-              <RouterLink className="FstoLink-root" to="/documents/tagging">Tagging of Documents</RouterLink>
-              <RouterLink className="FstoLink-root" to="/documents/transmitting">Transmittal of Documents</RouterLink>
-              <RouterLink className="FstoLink-root" to="/documents/returned-documents">Returned Documents</RouterLink>
+              {user?.permissions.includes(1) && <RouterLink className="FstoLink-root" to="/request">Creation of Request</RouterLink>}
+              {user?.permissions.includes(20) && <RouterLink className="FstoLink-root" to="/document/tagging">Tagging of Documents</RouterLink>}
+              {user?.permissions.includes(19) && <RouterLink className="FstoLink-root" to="/document/transmitting">Transmittal of Documents</RouterLink>}
+              <RouterLink className="FstoLink-root" to="/document/returned-documents">Returned Documents</RouterLink>
 
             </AccordionDetails>
           </Accordion>
 
-          <Accordion>
-            <AccordionSummary>
-              <Voucher sx={{ mr: 2.5 }} /> Voucher
-            </AccordionSummary>
-            <AccordionDetails>
-              <RouterLink className="FstoLink-root" to="/vouchering">Creation of Voucher</RouterLink>
+          {
+            (
+              user?.role === `Administrator` ||
+              user?.role === `AP Associate` ||
+              user?.role === `AP Specialist` ||
+              (user?.role === `AP Tagging` && user?.permissions.includes(12))
+            ) &&
+            <Accordion>
+              <AccordionSummary>
+                <Voucher sx={{ mr: 2.5 }} /> Voucher
+              </AccordionSummary>
+              <AccordionDetails>
+                {user?.permissions.includes(12) && <RouterLink className="FstoLink-root" to="/voucher/vouchering">Creation of Voucher</RouterLink>}
+                {user?.permissions.includes(11) && <RouterLink className="FstoLink-root" to="/voucher/filinf">Filing of Voucher</RouterLink>}
 
-            </AccordionDetails>
-          </Accordion>
+              </AccordionDetails>
+            </Accordion>
+          }
 
-          <Accordion>
-            <AccordionSummary>
-              <Cheque sx={{ mr: 2.5 }} /> Cheque
-            </AccordionSummary>
-            <AccordionDetails>
-              <RouterLink className="FstoLink-root" to="/cheque/chequing">Creation of Cheque</RouterLink>
+          {
+            (
+              user?.role === `Administrator` ||
+              user?.role === `Treasury Associate` ||
+              (user?.role === `AP Tagging` && user?.permissions.includes(6)) ||
+              (user?.role === `AP Associate` && user?.permissions.includes(6)) ||
+              (user?.role === `AP Specialist` && user?.permissions.includes(6))
+            ) &&
+            <Accordion>
+              <AccordionSummary>
+                <Cheque sx={{ mr: 2.5 }} /> Cheque
+              </AccordionSummary>
+              <AccordionDetails>
+                {user?.permissions.includes(7) && <RouterLink className="FstoLink-root" to="/cheque/chequing">Creation of Cheque</RouterLink>}
+                {user?.permissions.includes(6) && <RouterLink className="FstoLink-root" to="/cheque/releasing">Releasing of Cheque</RouterLink>}
+                {user?.permissions.includes(8) && <RouterLink className="FstoLink-root" to="/cheque/clearing">Clearing of Cheque</RouterLink>}
 
-            </AccordionDetails>
-          </Accordion>
+              </AccordionDetails>
+            </Accordion>
+          }
 
-          <Accordion>
-            <AccordionSummary>
-              <Approval sx={{ mr: 2.5 }} /> Approval
-            </AccordionSummary>
-            <AccordionDetails>
-              <RouterLink className="FstoLink-root" to="/approval">Transaction Approval</RouterLink>
+          {
+            (
+              user?.role === `Administrator` ||
+              user?.role === `Approver`
+            ) &&
+            <Accordion>
+              <AccordionSummary>
+                <Approval sx={{ mr: 2.5 }} /> Approval
+              </AccordionSummary>
+              <AccordionDetails>
+                {user?.permissions.includes(17) && <RouterLink className="FstoLink-root" to="/approval">Transaction Approval</RouterLink>}
 
-            </AccordionDetails>
-          </Accordion>
+              </AccordionDetails>
+            </Accordion>
+          }
 
-          <Accordion>
-            <AccordionSummary>
-              <Confidential sx={{ mr: 2.5 }} /> Confidential
-            </AccordionSummary>
-            <AccordionDetails>
-              {/* RouterLink here... */}
+          {
+            (
+              user?.role === `Administrator` ||
+              user?.role === `Approver`
+            ) &&
+            <Accordion>
+              <AccordionSummary>
+                <Confidential sx={{ mr: 2.5 }} /> Confidential
+              </AccordionSummary>
+              <AccordionDetails>
+                {/* RouterLink here... */}
 
-            </AccordionDetails>
-          </Accordion>
+              </AccordionDetails>
+            </Accordion>
+          }
 
           <Accordion>
             <AccordionSummary>

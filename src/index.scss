@@ -48,6 +48,14 @@ body {
   display: flex;
   flex-direction: column;
 
+  & .fsto {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+
+    min-height: 100vh;
+  }
+
   @media (min-width: 992px) {
     flex-direction: row;
   }

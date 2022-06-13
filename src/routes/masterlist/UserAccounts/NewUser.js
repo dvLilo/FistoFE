@@ -2,7 +2,7 @@ import React from 'react'
 
 import axios from 'axios'
 
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import {
   Box,
@@ -28,7 +28,10 @@ import Confirm from '../../../components/Confirm'
 
 const NewUser = () => {
 
+  const navigate = useNavigate()
+
   const usernameRef = React.useRef()
+
   const [isSaving, setIsSaving] = React.useState(false)
   const [isFetching, setIsFetching] = React.useState(false)
   const [isValidating, setIsValidating] = React.useState(false)
@@ -826,8 +829,7 @@ const NewUser = () => {
                 className="FstoButtonForm-root"
                 variant="outlined"
                 color="error"
-                to="/dashboard"
-                component={Link}
+                onClick={() => navigate(-1)}
                 disableElevation
               >
                 Back

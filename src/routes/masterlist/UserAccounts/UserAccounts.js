@@ -56,7 +56,7 @@ const UserAccounts = () => {
   const dataUpdateHandler = (data) => {
     const { id } = data
 
-    navigate(`update-user/${id}`)
+    navigate(`/masterlist/update-user/${id}`)
   }
 
   const dataStatusHandler = (data) => {

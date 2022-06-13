@@ -1,0 +1,44 @@
+.FstoAccessDeniedBox-root {
+  background-image: linear-gradient(45deg, #ffffff 0%, #ffffff 40%, rgba(255, 255, 255, 0) 60%, #ffffff 80%, #ffffff 100%);
+  background-size: 150% 100%;
+  background-position: 0% 0%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 100vw;
+  min-height: 100vh;
+
+  animation: AccessDeniedAnimation 1s linear infinite alternate;
+
+  & .FstoLogoImage-root {
+    width: 100%;
+    max-width: 200px;
+    margin-bottom: 3em;
+  }
+
+  & .FstoAccessDeniedTypography-root {
+    color: #131304;
+    font-size: 2.15em;
+    font-weight: 700;
+    margin-bottom: 0.5em;
+  }
+
+  & .FstoAccessDeniedButton-root {
+    margin-top: 3em;
+    padding-left: 3em;
+    padding-right: 3em;
+    border-radius: 25px;
+  }
+}
+
+@keyframes AccessDeniedAnimation {
+  0% {
+    background-position: 0% 0%;
+  }
+
+  100% {
+    background-position: 50% 0%;
+  }
+}

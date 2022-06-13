@@ -17,7 +17,6 @@ import {
 } from '@mui/material'
 
 import Landing from './Landing'
-import Dashboard from './Dashboard'
 
 // Masterlist
 import UserAccounts from './routes/masterlist/UserAccounts/'
@@ -64,7 +63,6 @@ import DocumentTransmitting from './routes/transmitting/DocumentTransmitting'
 import DocumentChequing from './routes/chequing/DocumentChequing'
 
 import NotFound from './exceptions/NotFound'
-import AccessDenied from './exceptions/AccessDenied'
 import Sandbox from './Sandbox'
 
 import FistoProvider from './contexts/FistoContext'
@@ -83,8 +81,8 @@ const App = () => {
     const data = window.localStorage.getItem("user")
 
     if (data) {
-      const decryptedUser = CryptoJS.AES.decrypt(data, "Fistocutie.")
-      dispatch(SET_USER(JSON.parse(decryptedUser.toString(CryptoJS.enc.Utf8))))
+      const decryptedUser = CryptoJS.AES.decrypt(data, process.env.REACT_APP_SECRET_KEY).toString(CryptoJS.enc.Utf8)
+      dispatch(SET_USER(JSON.parse(decryptedUser)))
     }
 
     const color = window.localStorage.getItem("color")
@@ -165,107 +163,125 @@ const App = () => {
         <Router>
           <Routes>
             <Route exact strict path="*" element={<NotFound />} />
-            <Route exact strict path="/403" element={<AccessDenied />} />
 
             <Route exact path="/sandbox" element={<FistoProvider><Sandbox /></FistoProvider>} />
 
             <Route exact path="/" element={<Landing />} />
 
             <Route exact path="/user/change-password" element={<ProtectedRoute />}>
-              <Route exact path="/user/change-password" element={<Dashboard />}>
-                <Route index exact strict element={<ChangePassword />} />
-              </Route>
+              <Route index exact strict element={<ChangePassword />} />
             </Route>
 
-            <Route exact path="/dashboard" element={<ProtectedRoute />}>
-              <Route exact path="/dashboard" element={<Dashboard />}>
-                <Route index exact strict
-                  element={
-                    <PasswordContextProvider>
-                      <UserAccounts />
-                    </PasswordContextProvider>
-                  }
-                />
-                <Route exact strict path="new-user" element={<NewUser />} />
-                <Route exact strict path="update-user/:id" element={<UpdateUser />} />
-                <Route exact strict path="categories" element={<Categories />} />
-                <Route exact strict path="document-types" element={<DocumentTypes />} />
-                <Route exact strict path="companies" element={<Companies />} />
-                <Route exact strict path="departments" element={<Departments />} />
-                <Route exact strict path="locations" element={<Locations />} />
-                <Route exact strict path="references" element={<References />} />
-                <Route exact strict path="supplier-types" element={<SupplierTypes />} />
-                <Route exact strict path="suppliers" element={<Suppliers />} />
-                <Route exact strict path="utility-categories" element={<UtilityCategories />} />
-                <Route exact strict path="utility-locations" element={<UtilityLocations />} />
-                <Route exact strict path="account-numbers" element={<AccountNumbers />} />
-                <Route exact strict path="credit-cards" element={<CreditCards />} />
-                <Route exact strict path="account-titles" element={<AccountTitles />} />
-                <Route exact strict path="payroll-clients" element={<PayrollClients />} />
-                <Route exact strict path="payroll-categories" element={<PayrollCategories />} />
-                <Route exact strict path="banks" element={<Banks />} />
-                <Route exact strict path="reasons" element={<Reasons />} />
-              </Route>
+            <Route exact path="/masterlist" element={<ProtectedRoute permission={0} />}>
+              <Route index exact strict
+                path="users"
+                element={
+                  <PasswordContextProvider>
+                    <UserAccounts />
+                  </PasswordContextProvider>
+                }
+              />
+              <Route exact strict path="new-user" element={<NewUser />} />
+              <Route exact strict path="update-user/:id" element={<UpdateUser />} />
+              <Route exact strict path="categories" element={<Categories />} />
+              <Route exact strict path="document-types" element={<DocumentTypes />} />
+              <Route exact strict path="companies" element={<Companies />} />
+              <Route exact strict path="departments" element={<Departments />} />
+              <Route exact strict path="locations" element={<Locations />} />
+              <Route exact strict path="references" element={<References />} />
+              <Route exact strict path="supplier-types" element={<SupplierTypes />} />
+              <Route exact strict path="suppliers" element={<Suppliers />} />
+              <Route exact strict path="utility-categories" element={<UtilityCategories />} />
+              <Route exact strict path="utility-locations" element={<UtilityLocations />} />
+              <Route exact strict path="account-numbers" element={<AccountNumbers />} />
+              <Route exact strict path="credit-cards" element={<CreditCards />} />
+              <Route exact strict path="account-titles" element={<AccountTitles />} />
+              <Route exact strict path="payroll-clients" element={<PayrollClients />} />
+              <Route exact strict path="payroll-categories" element={<PayrollCategories />} />
+              <Route exact strict path="banks" element={<Banks />} />
+              <Route exact strict path="reasons" element={<Reasons />} />
             </Route>
 
-            <Route exact path="/requestor" element={<ProtectedRoute />}>
-              <Route exact path="/requestor" element={<Dashboard />}>
-                <Route index exact strict
-                  element={
-                    <PasswordContextProvider>
-                      <DocumentRequesting />
-                    </PasswordContextProvider>
-                  }
-                />
-                <Route exact strict path="new-request" element={<NewRequest />} />
-                <Route exact strict path="update-request/:id" element={<UpdateRequest />} />
-                <Route exact strict path="returned-documents" element={<ReturnedDocument />} />
-              </Route>
+            <Route exact path="/request" element={<ProtectedRoute permission={1} />}>
+              <Route index exact strict
+                element={
+                  <PasswordContextProvider>
+                    <DocumentRequesting />
+                  </PasswordContextProvider>
+                }
+              />
+              <Route exact strict path="new-request" element={<NewRequest />} />
+              <Route exact strict path="update-request/:id" element={<UpdateRequest />} />
             </Route>
 
-            <Route exact path="/documents" element={<ProtectedRoute />}>
-              <Route exact path="/documents" element={<Dashboard />}>
-                <Route exact strict
-                  path="tagging"
-                  element={
-                    <PasswordContextProvider>
-                      <DocumentTagging />
-                    </PasswordContextProvider>
-                  }
-                />
-                <Route exact strict path="transmitting" element={<DocumentTransmitting />} />
-              </Route>
+            <Route exact path="/document/returned-document" element={<ProtectedRoute />}>
+              <Route index exact strict
+                element={<ReturnedDocument />}
+              />
             </Route>
 
-            <Route exact path="/vouchering" element={<ProtectedRoute />}>
-              <Route exact path="/vouchering" element={<Dashboard />}>
-                <Route index exact strict element={<DocumentVouchering />} />
-              </Route>
+            <Route exact path="/document/tagging" element={<ProtectedRoute permission={20} />}>
+              <Route index exact strict
+                element={
+                  <PasswordContextProvider>
+                    <DocumentTagging />
+                  </PasswordContextProvider>
+                }
+              />
             </Route>
 
-            <Route exact path="/approval" element={<ProtectedRoute />}>
-              <Route exact path="/approval" element={<Dashboard />}>
-                <Route index exact strict
-                  element={
-                    <PasswordContextProvider>
-                      <DocumentApproving />
-                    </PasswordContextProvider>
-                  }
-                />
-              </Route>
+            <Route exact path="/document/transmitting" element={<ProtectedRoute permission={19} />}>
+              <Route index exact strict
+                element={<DocumentTransmitting />}
+              />
             </Route>
 
-            <Route exact path="/cheque" element={<ProtectedRoute />}>
-              <Route exact path="/cheque" element={<Dashboard />}>
-                <Route exact strict
-                  path="chequing"
-                  element={
-                    <PasswordContextProvider>
-                      <DocumentChequing />
-                    </PasswordContextProvider>
-                  }
-                />
-              </Route>
+            <Route exact path="/voucher/vouchering" element={<ProtectedRoute permission={12} />}>
+              <Route index exact strict
+                element={
+                  <PasswordContextProvider>
+                    <DocumentVouchering />
+                  </PasswordContextProvider>
+                }
+              />
+            </Route>
+
+            <Route exact path="/voucher/filing" element={<ProtectedRoute />}>
+              <Route index exact strict
+                element={<h1>Voucher Filing</h1>}
+              />
+            </Route>
+
+            <Route exact path="/approval" element={<ProtectedRoute permission={17} />}>
+              <Route index exact strict
+                element={
+                  <PasswordContextProvider>
+                    <DocumentApproving />
+                  </PasswordContextProvider>
+                }
+              />
+            </Route>
+
+            <Route exact path="/cheque/chequing" element={<ProtectedRoute permission={7} />}>
+              <Route index exact strict
+                element={
+                  <PasswordContextProvider>
+                    <DocumentChequing />
+                  </PasswordContextProvider>
+                }
+              />
+            </Route>
+
+            <Route exact path="/cheque/clearing" element={<ProtectedRoute />}>
+              <Route index exact strict
+                element={<h1>Cheque Clearing</h1>}
+              />
+            </Route>
+
+            <Route exact path="/cheque/releasing" element={<ProtectedRoute />}>
+              <Route index exact strict
+                element={<h1>Cheque Releasing</h1>}
+              />
             </Route>
           </Routes>
         </Router>

@@ -2,7 +2,7 @@ import React from 'react'
 
 import axios from 'axios'
 
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 import {
   Box,
@@ -20,8 +20,10 @@ import Confirm from '../../components/Confirm'
 const ChangePassword = () => {
 
   const navigate = useNavigate()
+  const location = useLocation()
 
   const [isSaving, setIsSaving] = React.useState(false)
+  const [isChange, setIsChange] = React.useState(false)
 
   const [error, setError] = React.useState({
     status: false,
@@ -70,6 +72,7 @@ const ChangePassword = () => {
           })
             .then(JSON => JSON.data)
 
+          setIsChange(true)
           setToast({
             show: true,
             title: "Success",
@@ -252,7 +255,13 @@ const ChangePassword = () => {
                 className="FstoButtonForm-root"
                 variant="outlined"
                 color="error"
-                onClick={() => navigate(-1)}
+                onClick={() => {
+                  if (location.state) {
+                    if (isChange) return navigate(location.state.previous_pathname)
+                  }
+
+                  navigate(-1)
+                }}
                 disableElevation
               >
                 Back
