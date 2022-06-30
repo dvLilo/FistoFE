@@ -18,11 +18,14 @@ import {
   FormLabel,
   FormGroup,
   Checkbox,
+  Chip,
 } from '@mui/material'
 
 import SyncIcon from '@mui/icons-material/Sync'
 
 import { LoadingButton } from '@mui/lab'
+
+import { createFilterOptions } from '@mui/material/Autocomplete'
 
 import Toast from '../../../components/Toast'
 import Confirm from '../../../components/Confirm'
@@ -33,10 +36,7 @@ const UpdateUser = () => {
   const navigate = useNavigate()
 
   const [isSaving, setIsSaving] = React.useState(false)
-  // eslint-disable-next-line
   const [isFetching, setIsFetching] = React.useState(false)
-  // eslint-disable-next-line
-  const [isValidating, setIsValidating] = React.useState(false)
 
   const [update, setUpdate] = React.useState({
     last_name: true,
@@ -90,10 +90,10 @@ const UpdateUser = () => {
         id: 6,
         name: "Releasing of Cheque"
       },
-      // {
-      //   id: 9,
-      //   name: "Tagged Document Reports"
-      // },
+      {
+        id: 11,
+        name: "Filing of Voucher"
+      },
       {
         id: 12,
         name: "Creation of Voucher"
@@ -122,6 +122,10 @@ const UpdateUser = () => {
       }
     ],
     approver: [
+      {
+        id: 5,
+        name: "Reversal of Cheque"
+      },
       {
         id: 17,
         name: "Approval of Voucher"
@@ -168,9 +172,8 @@ const UpdateUser = () => {
   }
 
   // Dropdown Array
-  // eslint-disable-next-line
   const [dropdown, setDropdown] = React.useState({
-    employees: [],
+    departments: [],
     roles: [
       {
         id: 1,
@@ -208,6 +211,9 @@ const UpdateUser = () => {
     documents: []
   })
 
+  // Department Fixed
+  const [fixedDepartment, setFixedDepartment] = React.useState([])
+
   // Form Data State
   const [user, setUser] = React.useState({
     full_id_no: "",
@@ -217,7 +223,7 @@ const UpdateUser = () => {
     first_name: "",
     middle_name: "",
     suffix_name: "",
-    department: "",
+    department: [],
     position: "",
     username: "",
     role: null,
@@ -225,12 +231,114 @@ const UpdateUser = () => {
     document_types: []
   })
 
+  const filterOptions = createFilterOptions({
+    matchFrom: 'any',
+    limit: 250
+  });
+
   React.useEffect(() => {
 
     fetchSingleEmployee()
     fetchDocumentTypes()
+    fetchDepartments()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const sedarSyncHandler = (ID) => {
+    setConfirm({
+      show: true,
+      loading: false,
+      onConfirm: async () => {
+        setConfirm(currentValue => ({
+          ...currentValue,
+          loading: true,
+          onConfirm: () => { }
+        }))
+
+        let response
+        try {
+          response = await axios.get(`http://localhost:5000/user/${ID}`)
+
+          const {
+            general_info: { first_name, middle_name, last_name, suffix },
+            position_info: { position_name },
+            unit_info: { department_name }
+          } = response.data
+
+          if (
+            user.first_name === first_name &&
+            user.middle_name === middle_name &&
+            user.last_name === last_name &&
+            user.position === position_name &&
+            user.department[0].name === department_name &&
+            ((user.suffix_name === null && suffix === "") || (user.suffix_name === suffix))
+          ) {
+            setToast({
+              show: true,
+              title: "Info",
+              message: "Nothing has changed.",
+              severity: "info"
+            })
+            setConfirm(currentValue => ({
+              ...currentValue,
+              show: false,
+              loading: false
+            }))
+
+            return
+          }
+
+          departmentChangeHandler(department_name)
+
+          setUser(currentValue => ({
+            ...currentValue,
+            last_name: last_name,
+            first_name: first_name,
+            middle_name: middle_name,
+            suffix_name: suffix,
+            position: position_name
+          }))
+          setUpdate({
+            last_name: user.last_name === last_name,
+            first_name: user.first_name === first_name,
+            middle_name: user.middle_name === middle_name,
+            suffix_name: user.suffix_name === null && suffix === "",
+            department: user.department[0].name === department_name,
+            position: user.position === position_name
+          })
+          setToast({
+            show: true,
+            title: "Sync Successfully",
+            message: "Employee details has been fetched from Sedar.",
+            severity: "info"
+          })
+          setConfirm(currentValue => ({
+            ...currentValue,
+            show: false,
+            loading: false
+          }))
+        }
+        catch (error) {
+          if (error.request.status !== 404) {
+            setToast({
+              show: true,
+              title: "Error",
+              message: "Something went wrong whilst fetching employee details from Sedar.",
+              severity: "error"
+            })
+          }
+
+          setConfirm({
+            show: false,
+            loading: false,
+            onConfirm: () => { }
+          })
+
+          console.log("Fisto Error Status", error.request)
+        }
+      }
+    })
+  }
 
   const fetchSingleEmployee = async () => {
     setIsFetching(true)
@@ -254,6 +362,7 @@ const UpdateUser = () => {
         document_types
       } = response.data.result
 
+      setFixedDepartment([department[0]])
       setUser({
         full_id_no: `${id_prefix}-${id_no}`,
         id_prefix,
@@ -265,7 +374,7 @@ const UpdateUser = () => {
         department,
         position,
         username,
-        role: dropdown.roles.find(check => check.name === role),
+        role: dropdown.roles.find((row) => row.name === role),
         permissions,
         document_types
       })
@@ -320,101 +429,34 @@ const UpdateUser = () => {
     }
   }
 
-  const sedarSyncHandler = (ID) => {
-    setConfirm({
-      show: true,
-      loading: false,
-      onConfirm: async () => {
-        setConfirm(currentValue => ({
-          ...currentValue,
-          loading: true,
-          onConfirm: () => { }
-        }))
+  const fetchDepartments = async () => {
+    let response
+    try {
+      response = await axios.get(`/api/admin/dropdown/department?all`)
+      const { departments } = response.data.result
 
-        let response
-        try {
-          response = await axios.get(`http://localhost:5000/user/${ID}`)
-
-          const {
-            general_info: { first_name, middle_name, last_name, suffix },
-            position_info: { position_name },
-            unit_info: { department_name }
-          } = response.data
-
-          if (
-            user.first_name === first_name &&
-            user.middle_name === middle_name &&
-            user.last_name === last_name &&
-            user.position === position_name &&
-            user.department === department_name &&
-            (user.suffix_name === null && suffix === "")
-          ) {
-            setToast({
-              show: true,
-              title: "Info",
-              message: "Nothing has changed.",
-              severity: "info"
-            })
-            setConfirm(currentValue => ({
-              ...currentValue,
-              show: false,
-              loading: false
-            }))
-
-            return
-          }
-
-          departmentChangeHandler(department_name)
-
-          setUser(currentValue => ({
-            ...currentValue,
-            last_name: last_name,
-            first_name: first_name,
-            middle_name: middle_name,
-            suffix_name: suffix,
-            department: department_name,
-            position: position_name
-          }))
-          setUpdate({
-            last_name: user.last_name === last_name,
-            first_name: user.first_name === first_name,
-            middle_name: user.middle_name === middle_name,
-            suffix_name: user.suffix_name === null && suffix === "",
-            department: user.department === department_name,
-            position: user.position === position_name
-          })
-          setToast({
-            show: true,
-            title: "Sync Successfully",
-            message: "Employee details has been fetched from Sedar.",
-            severity: "info"
-          })
-          setConfirm(currentValue => ({
-            ...currentValue,
-            show: false,
-            loading: false
-          }))
-        }
-        catch (error) {
-          if (error.request.status !== 404) {
-            setToast({
-              show: true,
-              title: "Error",
-              message: "Something went wrong whilst fetching employee details from Sedar.",
-              severity: "error"
-            })
-          }
-
-          setConfirm({
-            show: false,
-            loading: false,
-            onConfirm: () => { }
-          })
-
-          console.log("Fisto Error Status", error.request)
-        }
+      setDropdown(currentValue => ({
+        ...currentValue,
+        departments
+      }))
+    }
+    catch (error) {
+      if (error.request.status !== 404) {
+        setToast({
+          show: true,
+          title: "Error",
+          message: "Something went wrong whilst fetching Departments.",
+          severity: "error"
+        })
       }
-    })
+
+      setDropdown(currentValue => ({
+        ...currentValue,
+        departments: []
+      }))
+
+      console.log("Fisto Error Status", error.request)
+    }
   }
 
   const departmentChangeHandler = async (value) => {
@@ -428,6 +470,13 @@ const UpdateUser = () => {
       await axios.post(`/api/users/department-validation`, {
         department: value
       })
+
+      const department = dropdown.departments.filter((department) => department.name === value)
+      setFixedDepartment(department)
+      setUser(currentValue => ({
+        ...currentValue,
+        department
+      }))
     }
     catch (error) {
       if (error.request.status === 404) {
@@ -436,11 +485,23 @@ const UpdateUser = () => {
           result: { error_field }
         } = error.response.data
 
+        const department = [
+          {
+            id: 0,
+            name: value
+          }
+        ]
+
         setError({
           status: true,
           field: error_field,
           message: message
         })
+        setFixedDepartment(department)
+        setUser(currentValue => ({
+          ...currentValue,
+          department
+        }))
       }
 
       if (error.request.status !== 404) {
@@ -535,10 +596,10 @@ const UpdateUser = () => {
       case 2: permissions = [6, 4, 20, 22]
         break
 
-      case 3: permissions = [12, 21]
+      case 3: permissions = [11, 12, 21]
         break
 
-      case 4: permissions = [12, 21]
+      case 4: permissions = [11, 12, 21]
         break
 
       case 5: permissions = [7, 8]
@@ -729,31 +790,70 @@ const UpdateUser = () => {
             fullWidth
           />
 
-          <TextField
-            className="FstoTextfieldForm-root"
-            label="Department"
-            variant="outlined"
-            autoComplete="off"
+          <Autocomplete
+            className="FstoSelectForm-root"
             size="small"
-            color="info"
+            options={dropdown.departments}
             value={user.department}
-            error={error.status && error.field === "department"}
-            helperText={
-              error.status &&
-              error.field === "department" &&
-              <React.Fragment>
-                {error.message} <Link to="/dashboard/departments" state={{ department: user.department }}>Click here</Link> to register.
-              </React.Fragment>
+            filterOptions={filterOptions}
+            renderInput={
+              props =>
+                <TextField
+                  {...props}
+                  variant="outlined"
+                  label="Department"
+                  error={error.status && error.field === "department"}
+                  helperText={
+                    error.status &&
+                    error.field === "department" &&
+                    <React.Fragment>
+                      {error.message} <Link to="/masterlist/departments" state={{ department: user.department[0]?.name }}>Click here</Link> to register.
+                    </React.Fragment>
+                  }
+                  sx={{
+                    textTransform: "none"
+                  }}
+                  focused={!update.department}
+                />
             }
-            InputProps={{
-              readOnly: !update.department
-            }}
-            InputLabelProps={{
-              className: "FstoLabelForm-root"
-            }}
-            focused={!update.department}
-            disabled={update.department}
+            renderTags={
+              (tags, props) =>
+                tags.map(
+                  (option, index) =>
+                    <Chip
+                      {...props({ index })}
+                      key={option.id}
+                      label={option.name}
+                      disabled={fixedDepartment.indexOf(option) !== -1}
+                    />
+                )
+            }
+            PaperComponent={
+              props =>
+                <Paper
+                  {...props}
+                  sx={{ textTransform: 'capitalize' }}
+                />
+            }
+            getOptionLabel={
+              option => option.name
+            }
+            isOptionEqualToValue={
+              (option, value) => option.id === value.id
+            }
+            onChange={(e, value) => setUser(currentValue => ({
+              ...currentValue,
+              department: [
+                ...fixedDepartment,
+                ...value.filter((option) => fixedDepartment.indexOf(option) === -1)
+              ]
+            }))}
             fullWidth
+            freeSolo
+            multiple
+            disablePortal
+            disableClearable
+            disableCloseOnSelect
           />
 
           <TextField
@@ -838,7 +938,7 @@ const UpdateUser = () => {
               !Boolean(user.last_name) ||
               !Boolean(user.first_name) ||
               !Boolean(user.middle_name) ||
-              !Boolean(user.department) ||
+              !Boolean(user.department.length) ||
               !Boolean(user.position) ||
               !Boolean(user.username) ||
               !Boolean(user.role) ||
@@ -1035,7 +1135,7 @@ const UpdateUser = () => {
                     && (
                       user.document_types.some(check => check.id === document.id)
                       && (
-                        <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }} key={index}>
+                        <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px', textTransform: 'capitalize' }} key={index}>
                           <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>{document.type}</FormLabel>
 
                           <FormGroup row={true} sx={{ padding: '10px 35px' }}>

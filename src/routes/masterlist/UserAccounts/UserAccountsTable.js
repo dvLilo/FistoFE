@@ -81,7 +81,7 @@ const UserAccountsTable = (props) => {
                   </TableCell>
 
                   <TableCell className="FstoTableData-root" sx={{ textTransform: "capitalize" }}>
-                    {data.department}
+                    {data.department[0].name}
                   </TableCell>
 
                   <TableCell className="FstoTableData-root">

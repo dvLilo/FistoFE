@@ -37,10 +37,10 @@ const Navbar = () => {
   const open = Boolean(anchorEl)
 
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const user = useSelector(state => state.user)
   const color = useSelector(state => state.color)
-  const dispatch = useDispatch()
 
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
 
@@ -110,13 +110,17 @@ const Navbar = () => {
       </Box>
 
       <Popover
-        className="Hello"
+        className="FstoPopoverNavbar-root"
         open={open}
         elevation={2}
         anchorEl={anchorEl}
         anchorOrigin={{
-          horizontal: -285,
-          vertical: 'bottom'
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
         }}
         PaperProps={{
           className: "FstoNavbar-menu"

@@ -116,6 +116,7 @@ const DocumentChequing = () => {
               <Tab className="FstoTab-root" label="Received" value="receive" disableRipple />
               <Tab className="FstoTab-root" label="Created" value="create" disableRipple />
               <Tab className="FstoTab-root" label="Released" value="release" disableRipple />
+              <Tab className="FstoTab-root" label="Reversed" value="reverse" disableRipple />
               <Tab className="FstoTab-root" label="Held" value="hold" disableRipple />
               <Tab className="FstoTab-root" label="Returned" value="return" disableRipple />
               <Tab className="FstoTab-root" label="Voided" value="void" disableRipple />

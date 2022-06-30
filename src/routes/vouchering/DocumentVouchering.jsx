@@ -35,12 +35,12 @@ import DocumentVoucheringTransaction from './DocumentVoucheringTransaction'
 
 const data = [
   {
-    id: 52,
-    date_requested: "2022-05-12 11:46:28",
-    transaction_id: "MIS076",
+    id: 1,
+    date_requested: "2022-06-29 09:07:37",
+    transaction_id: "MISC001",
     tagged: {
       no: 92101,
-      date: "2022-06-01 11:46:28"
+      date: "2022-06-30 09:07:37"
     },
     document_type: "PAD",
     company: "RDF Corporate Services",

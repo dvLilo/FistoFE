@@ -49,7 +49,7 @@ const Landing = () => {
   React.useEffect(() => {
     const session = window.localStorage.getItem("token")
 
-    if (session) navigate('/dashboard', { replace: true })
+    if (session) navigate('/masterlist/users', { replace: true })
 
     // eslint-disable-next-line
   }, [])

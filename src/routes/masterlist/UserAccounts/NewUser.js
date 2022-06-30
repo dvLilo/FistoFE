@@ -2,7 +2,7 @@ import React from 'react'
 
 import axios from 'axios'
 
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import {
   Box,
@@ -21,7 +21,7 @@ import {
 
 import { LoadingButton } from '@mui/lab'
 
-import { createFilterOptions } from '@mui/material/Autocomplete';
+import { createFilterOptions } from '@mui/material/Autocomplete'
 
 import Toast from '../../../components/Toast'
 import Confirm from '../../../components/Confirm'
@@ -79,10 +79,10 @@ const NewUser = () => {
         id: 6,
         name: "Releasing of Cheque"
       },
-      // {
-      //   id: 9,
-      //   name: "Tagged Document Reports"
-      // },
+      {
+        id: 11,
+        name: "Filing of Voucher"
+      },
       {
         id: 12,
         name: "Creation of Voucher"
@@ -104,13 +104,13 @@ const NewUser = () => {
       {
         id: 3,
         name: "Identifying of Receipt"
-      },
-      {
-        id: 11,
-        name: "Matching of Voucher"
       }
     ],
     approver: [
+      {
+        id: 5,
+        name: "Reversal of Cheque"
+      },
       {
         id: 17,
         name: "Approval of Voucher"
@@ -159,6 +159,7 @@ const NewUser = () => {
   // Dropdown Array
   const [dropdown, setDropdown] = React.useState({
     employees: [],
+    departments: [],
     roles: [
       {
         id: 1,
@@ -207,7 +208,7 @@ const NewUser = () => {
     first_name: "",
     middle_name: "",
     suffix_name: "",
-    department: "",
+    department: [],
     position: "",
     username: "",
     role: null,
@@ -224,6 +225,7 @@ const NewUser = () => {
 
     fetchEmployeesFromSEDAR()
     fetchDocumentTypes()
+    fetchDepartments()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -286,6 +288,36 @@ const NewUser = () => {
     }
   }
 
+  const fetchDepartments = async () => {
+    let response
+    try {
+      response = await axios.get(`/api/admin/dropdown/department?all`)
+      const { departments } = response.data.result
+
+      setDropdown(currentValue => ({
+        ...currentValue,
+        departments
+      }))
+    }
+    catch (error) {
+      if (error.request.status !== 404) {
+        setToast({
+          show: true,
+          title: "Error",
+          message: "Something went wrong whilst fetching Departments.",
+          severity: "error"
+        })
+      }
+
+      setDropdown(currentValue => ({
+        ...currentValue,
+        departments: []
+      }))
+
+      console.log("Fisto Error Status", error.request)
+    }
+  }
+
   const formClearHandler = () => {
     setUserRaw(null)
     setIsValidating(false)
@@ -302,7 +334,7 @@ const NewUser = () => {
       first_name: String(),
       middle_name: String(),
       suffix_name: String(),
-      department: String(),
+      department: [],
       position: String(),
       username: String(),
       role: null,
@@ -402,14 +434,11 @@ const NewUser = () => {
         first_name,
         middle_name,
         suffix_name: suffix,
-        department: department_name,
         position: position_name,
         username: first_name.charAt(0).toLowerCase() + last_name.toLowerCase()
       })
 
-      window.setTimeout(() => {
-        usernameRef.current.focus()
-      }, 50)
+      departmentChangeHandler(department_name)
     }
     catch (error) {
       setIsValidating(false)
@@ -438,6 +467,57 @@ const NewUser = () => {
     }
   }
 
+  const departmentChangeHandler = async (value) => {
+    setError({
+      status: false,
+      field: "",
+      message: ""
+    })
+
+    try {
+      await axios.post(`/api/users/department-validation`, {
+        department: value
+      })
+
+      const department = dropdown.departments.filter((department) => department.name === value)
+      setUser(currentValue => ({
+        ...currentValue,
+        department
+      }))
+
+      window.setTimeout(() => {
+        usernameRef.current.focus()
+      }, 50)
+    }
+    catch (error) {
+      if (error.request.status === 404) {
+        const {
+          message,
+          result: { error_field }
+        } = error.response.data
+
+        setError({
+          status: true,
+          field: error_field,
+          message: message
+        })
+        setUser(currentValue => ({
+          ...currentValue,
+          department: [{ name: value }]
+        }))
+      }
+
+      if (error.request.status !== 404) {
+        setToast({
+          show: true,
+          title: "Error",
+          message: "Something went wrong whilst validating department.",
+          severity: "error"
+        })
+      }
+    }
+  }
+
   const roleSelectHandler = (e, value) => {
 
     let permissions = []
@@ -448,10 +528,10 @@ const NewUser = () => {
       case 2: permissions = [6, 4, 20, 22]
         break
 
-      case 3: permissions = [12, 21]
+      case 3: permissions = [11, 12, 21]
         break
 
-      case 4: permissions = [12, 21]
+      case 4: permissions = [11, 12, 21]
         break
 
       case 5: permissions = [7, 8]
@@ -697,22 +777,55 @@ const NewUser = () => {
             fullWidth
           />
 
-          <TextField
-            className="FstoTextfieldForm-root"
-            label="Department"
-            variant="outlined"
-            autoComplete="off"
+          <Autocomplete
+            className="FstoSelectForm-root"
             size="small"
+            options={dropdown.departments}
             value={user.department}
-            onChange={(e) => setUser({
-              ...user,
-              department: e.target.value
-            })}
-            InputLabelProps={{
-              className: "FstoLabelForm-root"
-            }}
-            disabled
+            disabled={!Boolean(user.full_id_no)}
+            filterOptions={filterOptions}
+            renderInput={
+              props =>
+                <TextField
+                  {...props}
+                  variant="outlined"
+                  label="Department"
+                  error={error.status && error.field === "department"}
+                  helperText={
+                    error.status &&
+                    error.field === "department" &&
+                    <React.Fragment>
+                      {error.message} <Link to="/masterlist/departments" state={{ department: user.department[0]?.name }}>Click here</Link> to register.
+                    </React.Fragment>
+                  }
+                  sx={{
+                    textTransform: "none"
+                  }}
+                />
+            }
+            PaperComponent={
+              props =>
+                <Paper
+                  {...props}
+                  sx={{ textTransform: 'capitalize' }}
+                />
+            }
+            getOptionLabel={
+              option => option.name
+            }
+            isOptionEqualToValue={
+              (option, value) => option.id === value.id
+            }
+            onChange={(e, value) => setUser(currentValue => ({
+              ...currentValue,
+              department: value
+            }))}
             fullWidth
+            freeSolo
+            multiple
+            disablePortal
+            disableClearable
+            disableCloseOnSelect
           />
 
           <TextField
@@ -740,7 +853,7 @@ const NewUser = () => {
             autoComplete="off"
             size="small"
             value={user.username}
-            disabled={!Boolean(user.full_id_no)}
+            disabled={!Boolean(user.full_id_no) || error.field === "department"}
             error={error.status && error.field === "username"}
             helperText={error.status && error.field === "username" && error.message}
             inputRef={usernameRef}
@@ -760,7 +873,7 @@ const NewUser = () => {
             size="small"
             options={dropdown.roles}
             value={user.role}
-            disabled={!Boolean(user.full_id_no)}
+            disabled={!Boolean(user.full_id_no) || error.field === "department"}
             renderInput={
               props =>
                 <TextField
@@ -802,7 +915,7 @@ const NewUser = () => {
               !Boolean(user.last_name) ||
               !Boolean(user.first_name) ||
               !Boolean(user.middle_name) ||
-              !Boolean(user.department) ||
+              !Boolean(user.department.length) ||
               !Boolean(user.position) ||
               !Boolean(user.username) ||
               !Boolean(user.role) ||

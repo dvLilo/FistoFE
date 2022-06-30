@@ -33,7 +33,7 @@
         "position_name": "System Developer"
       },
       "unit_info": {
-        "department_name": "Management Information System"
+        "department_name": "Management Information System Common"
       }
     },
     {
@@ -66,10 +66,10 @@
         "suffix": "JR"
       },
       "position_info": {
-        "position_name": "System Developer"
+        "position_name": "Accounting Associate"
       },
       "unit_info": {
-        "department_name": "Management Information System"
+        "department_name": "Finance Common"
       }
     },
     {
@@ -79,7 +79,7 @@
         "prefix_id": "RDFFLFI",
         "id_number": 10790,
         "first_name": "HERNANIE ROY",
-        "middle_name": "PANGANIBAN",
+        "middle_name": "PANGILINAN",
         "last_name": "PABUSTAN",
         "suffix": ""
       },
@@ -87,7 +87,7 @@
         "position_name": "AP Associate"
       },
       "unit_info": {
-        "department_name": "Finance Common"
+        "department_name": "Corporate Common"
       }
     }
   ],

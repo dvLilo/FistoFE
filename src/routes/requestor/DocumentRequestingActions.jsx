@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { useSelector } from 'react-redux'
+
 import {
   IconButton,
   Menu,
@@ -14,6 +16,8 @@ import {
 } from '@mui/icons-material'
 
 const DocumentRequestingActions = (props) => {
+
+  const user = useSelector(state => state.user)
 
   const {
     state,
@@ -79,6 +83,7 @@ const DocumentRequestingActions = (props) => {
               onUpdate(data)
               actionCloseHandler()
             }}
+            disabled={user?.id !== data.users_id}
           >
             <UpdateIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Edit
           </MenuItem>}
@@ -92,6 +97,7 @@ const DocumentRequestingActions = (props) => {
               onVoid(data)
               actionCloseHandler()
             }}
+            disabled={user?.id !== data.users_id}
           >
             <VoidIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Void
           </MenuItem>}

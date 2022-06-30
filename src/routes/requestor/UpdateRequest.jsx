@@ -190,6 +190,7 @@ const UpdateRequest = () => {
       name: "",
       payment_type: "",
       no: "",
+      capex_no: "",
       from: null,
       to: null,
       date: null,
@@ -247,6 +248,7 @@ const UpdateRequest = () => {
     no: "",
     balance: null,
     amount: null,
+    request_id: null,
     rr_no: []
   })
 
@@ -267,7 +269,6 @@ const UpdateRequest = () => {
           const data = {
             ...item,
             balance: item.previous_balance,
-            batch: true
           }
 
           delete data.previous_balance
@@ -511,8 +512,7 @@ const UpdateRequest = () => {
 
   const isDisabled = () => {
     switch (data.document.id) {
-      case 1:
-      case 5:
+      case 1: // PAD - Post Acquisition Delivery
         return data.document.payment_type
           && data.document.no
           && data.document.date
@@ -586,7 +586,29 @@ const UpdateRequest = () => {
           && (!validate.status || !validate.data.includes('po_no'))
           ? false : true
 
-      case 6:
+      case 5: // Contractor's Billing
+        return data.document.payment_type
+          && data.document.no
+          && data.document.date
+          && data.document.amount
+          && data.document.company
+          && data.document.department
+          && data.document.location
+          && data.document.supplier
+          && data.document.category
+          && data.document.capex_no
+          && data.po_group.length
+          && (
+            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
+            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 1.00
+          )
+          && (!error.status || !Boolean(error.data.document_no))
+          && (!error.status || !Boolean(error.data.po_no))
+          && (!validate.status || !validate.data.includes('document_no'))
+          && (!validate.status || !validate.data.includes('po_no'))
+          ? false : true
+
+      case 6: // Utilities
         return data.document.payment_type
           && data.document.from
           && data.document.to
@@ -602,7 +624,7 @@ const UpdateRequest = () => {
           && data.document.utility.receipt_no
           ? false : true
 
-      case 7:
+      case 7: // Payroll
         return data.document.payment_type
           && data.document.from
           && data.document.to
@@ -616,7 +638,7 @@ const UpdateRequest = () => {
           && data.document.payroll.type
           ? false : true
 
-      case 8:
+      case 8: // PCF - Petty Cash Fund
         return data.document.payment_type
           && data.document.date
           && data.document.amount
@@ -735,6 +757,7 @@ const UpdateRequest = () => {
 
     try {
       await axios.post(`/api/transactions/validate-pcf-name`, {
+        transaction_id: data.transaction.id,
         pcf_name: name
       })
     }
@@ -762,7 +785,8 @@ const UpdateRequest = () => {
       balance: PO.balance,
       amount: PO.amount,
       rr_no: PO.rr_no,
-      batch: PO.batch
+      batch: PO.batch,
+      request_id: PO.request_id
     })
     else setData({
       ...data,
@@ -772,7 +796,8 @@ const UpdateRequest = () => {
           balance: PO.balance,
           amount: PO.amount,
           rr_no: PO.rr_no,
-          batch: PO.batch
+          batch: PO.batch,
+          request_id: PO.request_id
         },
         ...data.po_group,
       ]
@@ -786,6 +811,7 @@ const UpdateRequest = () => {
       no: "",
       balance: NaN,
       amount: NaN,
+      request_id: null,
       rr_no: []
     })
   }
@@ -881,7 +907,7 @@ const UpdateRequest = () => {
   }
 
   const updatePurchaseOrderHandler = (index, props) => {
-    const { no, amount, balance, rr_no, batch } = props
+    const { request_id, no, amount, balance, rr_no, batch } = props
 
     delete error.data.po_no
     setError({
@@ -897,7 +923,8 @@ const UpdateRequest = () => {
       no,
       amount,
       balance,
-      rr_no
+      rr_no,
+      request_id
     })
   }
 
@@ -924,6 +951,10 @@ const UpdateRequest = () => {
       case 1: // PAD - Post Acquisition Delivery
         return {
           requestor: data.requestor,
+          transaction: {
+            no: data.transaction.no,
+            request_id: data.transaction.request_id
+          },
           document: {
             id: data.document.id,
             no: data.document.no,
@@ -946,6 +977,10 @@ const UpdateRequest = () => {
       case 2: // PRM Common - Payment Request Memo Common
         return {
           requestor: data.requestor,
+          transaction: {
+            no: data.transaction.no,
+            request_id: data.transaction.request_id
+          },
           document: {
             id: data.document.id,
             no: data.document.no,
@@ -972,6 +1007,10 @@ const UpdateRequest = () => {
       case 4: // Receipt
         return {
           requestor: data.requestor,
+          transaction: {
+            no: data.transaction.no,
+            request_id: data.transaction.request_id
+          },
           document: {
             id: data.document.id,
             name: data.document.name,
@@ -993,9 +1032,14 @@ const UpdateRequest = () => {
       case 5: // Contractor's Billing
         return {
           requestor: data.requestor,
+          transaction: {
+            no: data.transaction.no,
+            request_id: data.transaction.request_id
+          },
           document: {
             id: data.document.id,
             no: data.document.no,
+            capex_no: data.document.capex_no,
             name: data.document.name,
             payment_type: data.document.payment_type,
             amount: data.document.amount,
@@ -1015,6 +1059,10 @@ const UpdateRequest = () => {
       case 6: // Utilities
         return {
           requestor: data.requestor,
+          transaction: {
+            no: data.transaction.no,
+            request_id: data.transaction.request_id
+          },
           document: {
             id: data.document.id,
             name: data.document.name,
@@ -1037,6 +1085,10 @@ const UpdateRequest = () => {
       case 7: // Payroll
         return {
           requestor: data.requestor,
+          transaction: {
+            no: data.transaction.no,
+            request_id: data.transaction.request_id
+          },
           document: {
             id: data.document.id,
             name: data.document.name,
@@ -1060,6 +1112,10 @@ const UpdateRequest = () => {
       case 8: // PCF - Petty Cash Fund
         return {
           requestor: data.requestor,
+          transaction: {
+            no: data.transaction.no,
+            request_id: data.transaction.request_id
+          },
           document: {
             id: data.document.id,
             name: data.document.name,
@@ -1098,6 +1154,7 @@ const UpdateRequest = () => {
       no: "",
       balance: null,
       amount: null,
+      request_id: null,
       rr_no: []
     })
 
@@ -1171,7 +1228,7 @@ const UpdateRequest = () => {
 
         let response
         try {
-          response = await axios.post(`/api/transactions`, transformData(data.document.id))
+          response = await axios.put(`/api/transactions/${data.transaction.id}`, transformData(data.document.id))
 
           const { message } = response.data
 
@@ -1323,13 +1380,15 @@ const UpdateRequest = () => {
                             ...data,
                             document: {
                               ...data.document,
+                              date: new Date(value.date_created).toISOString().slice(0, 10),
+                              payment_type: "Full",
+                              amount: value.amount,
                               pcf_batch: {
                                 name: value.name,
                                 letter: value.letter,
                                 date: value.date
                               },
-                              payment_type: "Full",
-                              amount: value.amount,
+                              supplier: SUPPLIER_LIST.find(row => row.name.replace(/\s|-/g, '').toLowerCase() === value.branch.replace(/\s|-/g, '').toLowerCase()) || null
                             }
                           })
                           checkPettyCashFundNameHandler(value.name)
@@ -1385,6 +1444,7 @@ const UpdateRequest = () => {
                           }
                         })}
                         fullWidth
+                        disabled
                         disablePortal
                         disableClearable
                       />
@@ -1424,6 +1484,7 @@ const UpdateRequest = () => {
                               />
                           }
                           showToolbar
+                          disabled
                         />
                       </LocalizationProvider>
                     </React.Fragment>
@@ -1587,7 +1648,26 @@ const UpdateRequest = () => {
                   (
                     <LocalizationProvider dateAdapter={DateAdapter}>
                       <DatePicker
+                        value={new Date()}
+                        onChange={(value) => { }}
+                        renderInput={
+                          props =>
+                            <TextField
+                              {...props}
+                              className="FstoTextfieldForm-root"
+                              variant="outlined"
+                              size="small"
+                              label="Request Date"
+                              autoComplete="off"
+                              fullWidth
+                            />
+                        }
+                        readOnly
+                      />
+
+                      <DatePicker
                         value={data.document.date}
+                        disabled={data.document.id === 8}
                         maxDate={new Date()}
                         onChange={(value) => setData({
                           ...data,
@@ -1609,6 +1689,7 @@ const UpdateRequest = () => {
                             />
                         }
                         showToolbar
+                        showTodayButton
                       />
                     </LocalizationProvider>
                   )}
@@ -2500,6 +2581,30 @@ const UpdateRequest = () => {
                     </React.Fragment>
                   )}
 
+                { // CAPEX Number
+                  (data.document.id === 5) &&
+                  (
+                    <TextField
+                      className="FstoTextfieldForm-root"
+                      label="CAPEX"
+                      variant="outlined"
+                      autoComplete="off"
+                      size="small"
+                      value={data.document.capex_no}
+                      onChange={(e) => setData({
+                        ...data,
+                        document: {
+                          ...data.document,
+                          capex_no: e.target.value
+                        }
+                      })}
+                      InputLabelProps={{
+                        className: "FstoLabelForm-root"
+                      }}
+                      fullWidth
+                    />
+                  )}
+
                 <TextField
                   className="FstoTextfieldForm-root"
                   label="Remarks (Optional)"
@@ -2635,7 +2740,6 @@ const UpdateRequest = () => {
                   props =>
                     <TextField
                       {...props}
-                      // className="FstoTextfieldForm-attachment"
                       variant="outlined"
                       label="R.R. Numbers"
                       InputLabelProps={{

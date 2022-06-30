@@ -118,7 +118,7 @@ const DocumentRequesting = () => {
   const onUpdate = (data) => {
     const { id } = data
 
-    navigate(`/requestor/update-request/${id}`)
+    navigate(`/request/update-request/${id}`)
   }
 
   const onVoid = (data) => setReason(currentValue => ({

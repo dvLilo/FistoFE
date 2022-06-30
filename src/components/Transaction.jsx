@@ -274,7 +274,7 @@ const Transaction = (props) => {
               &&
               <Box className="FstoBoxCell-root">
                 Document Number
-                <strong>{data?.document.no}</strong>
+                <strong style={{ textTransform: "uppercase" }}>{data?.document.no} {data?.document.id === 5 && `(CAPEX${data?.document.capex_no})`}</strong>
               </Box>
             }
           </Box>
@@ -494,6 +494,28 @@ const Transaction = (props) => {
             </Box>
           </Box>}
 
+        { // PCF name, PCF Letter, PCF Date
+          (data?.document.id === 8)
+          &&
+          <Box className="FstoBoxRow-root">
+            <Box className="FstoBoxRow-half">
+              <Box className="FstoBoxCell-root">
+                PCF Name
+                <strong>{data?.document.pcf_batch.name}</strong>
+              </Box>
+
+              <Box className="FstoBoxCell-root">
+                PCF Letter
+                <strong>{data?.document.pcf_batch.letter}</strong>
+              </Box>
+
+              <Box className="FstoBoxCell-root">
+                PCF Date
+                <strong>{new Date(data?.document.pcf_batch.date).toLocaleString('default', { month: 'long', year: 'numeric' })}</strong>
+              </Box>
+            </Box>
+          </Box>}
+
         <Box className="FstoBoxRow-root">
           <Box className="FstoBoxRow-half">
             <Box className="FstoBoxCell-root">
@@ -544,13 +566,13 @@ const Transaction = (props) => {
           <Typography className="FstoTypographyTransaction-root" variant="heading">Purchase Order Information</Typography>
 
           <Box className="FstoBoxTable-root">
-            <Box className="FstoBoxRow-root">
+            <Box className="FstoBoxRow-root" sx={{ flexDirection: "row" }}>
               <Box className="FstoBoxCell-root FstoBoxCell-head">
-                <strong>Purchase Order Number</strong>
+                <strong>PO Number</strong>
               </Box>
 
               <Box className="FstoBoxCell-root FstoBoxCell-head">
-                <strong>Receive Receipt Number</strong>
+                <strong>RR Number</strong>
               </Box>
 
               <Box className="FstoBoxCell-root FstoBoxCell-head">
@@ -560,7 +582,7 @@ const Transaction = (props) => {
 
             {
               data?.po_group.map((item, index) => (
-                <Box className="FstoBoxRow-root" key={index}>
+                <Box className="FstoBoxRow-root" key={index} sx={{ flexDirection: "row" }}>
                   <Box className="FstoBoxCell-root" sx={{ borderLeft: 0, borderRight: 0, alignItems: "center" }}>
                     {item.no}
                   </Box>

@@ -36,7 +36,7 @@ const UserAccountsViewer = (props) => {
 
         <Typography variant="subtitle2">Employee ID: {data?.id_prefix}-{data?.id_no}</Typography>
         <Typography variant="subtitle2">Position: {data?.position}</Typography>
-        <Typography variant="subtitle2">Department: {data?.department}</Typography>
+        <Typography variant="subtitle2">Department: {data?.department[0].name}</Typography>
 
         <Divider variant="middle" sx={{ marginY: 3 }} />
 
