@@ -84,12 +84,14 @@ const App = () => {
       const decryptedUser = CryptoJS.AES.decrypt(data, process.env.REACT_APP_SECRET_KEY).toString(CryptoJS.enc.Utf8)
       dispatch(SET_USER(JSON.parse(decryptedUser)))
     }
+    // eslint-disable-next-line
+  }, [])
 
+  React.useEffect(() => {
     const color = window.localStorage.getItem("color")
 
     if (color) dispatch(SET_COLOR(color))
     else window.localStorage.setItem("color", "light")
-
     // eslint-disable-next-line
   }, [])
 
@@ -97,9 +99,11 @@ const App = () => {
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
 
   React.useEffect(() => {
-    document.body.className = colorScheme
-    return () => { document.body.className = '' }
-  });
+    document.body.classList.add(colorScheme)
+    return () => {
+      document.body.classList.remove(colorScheme)
+    }
+  }, [colorScheme])
 
   const theme = React.useMemo(() => createTheme({
     typography: {
@@ -154,6 +158,8 @@ const App = () => {
       snackbar: 1300
     }
   }), [colorScheme, prefersDarkMode]);
+
+  console.log("%c\n███████╗██╗ ██████╗████████╗ █████╗ \n██╔════╝██║██╔════╝╚══██╔══╝██╔══██╗\n%c█████╗  ██║╚█████╗    ██║   ██║  ██║\n██╔══╝  ██║ ╚═══██╗   ██║   ██║  ██║\n%c██║     ██║██████╔╝   ██║   ╚█████╔╝\n╚═╝     ╚═╝╚═════╝    ╚═╝    ╚════╝ \n\n    %cFinancial Statement Online\n\n", "color: #6a4b9f", "color: #543b7e", "color: #47326a", "color: #b9e4f3")
 
   return (
     <ThemeProvider theme={theme}>

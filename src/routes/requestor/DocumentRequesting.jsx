@@ -207,7 +207,7 @@ const DocumentRequesting = () => {
           </Box>
         </Box>
 
-        <TableContainer className="FstoTableContainer-root">
+        {/* <TableContainer className="FstoTableContainer-root">
           <Table size="small">
             <TableHead>
               <TableRow>
@@ -319,6 +319,110 @@ const DocumentRequesting = () => {
                       </TableRow>
                     )
               }
+            </TableBody>
+          </Table>
+        </TableContainer> */}
+
+        <TableContainer className="FstoTableContainer-root">
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell className="FstoTableHead-root">
+                  <TableSortLabel active={false}>TRANSACTION</TableSortLabel>
+                </TableCell>
+
+                <TableCell className="FstoTableHead-root">
+                  <TableSortLabel active={false}>CHARGING</TableSortLabel>
+                </TableCell>
+
+                <TableCell className="FstoTableHead-root">
+                  <TableSortLabel active={false}>AMOUNT DETAILS</TableSortLabel>
+                </TableCell>
+
+                <TableCell className="FstoTableHead-root">
+                  <TableSortLabel active={false}>PO DETAILS</TableSortLabel>
+                </TableCell>
+
+                <TableCell className="FstoTableHead-root">
+                  <TableSortLabel active={false}>STATUS</TableSortLabel>
+                </TableCell>
+
+                <TableCell className="FstoTableHead-root" align="center">ACTIONS</TableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+
+              <TableRow hover sx={{ paddingX: 2 }}>
+                <TableCell className="FstoTableData-root">
+                  <span>MIS117</span><br />
+                  <span>Full Payment</span>
+                  <Typography sx={{ fontSize: "1rem", fontWeight: 700 }}>Payment for MIS Desktop Unit Condor</Typography>
+                  <span style={{ fontSize: "0.8rem" }}>2022-06-30</span>
+                </TableCell>
+
+                <TableCell className="FstoTableData-root">
+                  <span>RDF Corporate Services</span><br />
+                  <span>Management Information System Common</span><br />
+                  <span>Head Office</span>
+                </TableCell>
+
+                <TableCell className="FstoTableData-root">
+                  <span>PAD</span><br />
+                  <span>PAD#10001</span>
+                  <Typography sx={{ fontWeight: 700 }}>&#8369;10,000.00</Typography>
+                </TableCell>
+
+                <TableCell className="FstoTableData-root">
+                  <span>PO#10001</span>
+                  <Typography sx={{ fontWeight: 700 }}>&#8369;10,000.00</Typography>
+                </TableCell>
+
+                <TableCell className="FstoTableData-root">
+                  <span>Pending</span>
+                </TableCell>
+
+                <TableCell className="FstoTableData-root" align="center">
+                  <IconButton>
+                    <Add />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+
+              <TableRow hover>
+                <TableCell className="FstoTableData-root">
+                  <span>MIS117</span><br />
+                  <span>Full Payment</span>
+                  <Typography sx={{ fontSize: "1rem", fontWeight: 700 }}>Payment for MIS Desktop Unit Condor</Typography>
+                  <span style={{ fontSize: "0.8rem" }}>2022-06-30</span>
+                </TableCell>
+
+                <TableCell className="FstoTableData-root">
+                  <span>RDF Corporate Services</span><br />
+                  <span>Management Information System Common</span><br />
+                  <span>Head Office</span>
+                </TableCell>
+
+                <TableCell className="FstoTableData-root">
+                  <span>Utilities</span><br />
+                  <span>&mdash;</span>
+                  <Typography sx={{ fontWeight: 700 }}>&#8369;10,000.00</Typography>
+                </TableCell>
+
+                <TableCell className="FstoTableData-root">
+                  <span>&mdash;</span>
+                </TableCell>
+
+                <TableCell className="FstoTableData-root">
+                  <span>Pending</span>
+                </TableCell>
+
+                <TableCell className="FstoTableData-root" align="center">
+                  <IconButton>
+                    <Add />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
             </TableBody>
           </Table>
         </TableContainer>

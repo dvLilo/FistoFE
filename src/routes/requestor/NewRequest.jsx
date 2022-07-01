@@ -2821,25 +2821,25 @@ const NewRequest = () => {
                     {
                       data.po_group?.map(
                         (data, index) =>
-                          <div className="FstoPurchaseOrder-root" key={index}>
-                            <Stack direction="column" sx={{ flex: "1 1 100%" }}>
+                          <Box className="FstoPurchaseOrder-root" key={index}>
+                            <Stack className="FstoPurchaseOrderStack-root" direction="row">
                               <Typography variant="subtitle2">P.O. Number</Typography>
-                              <Typography variant="h6" sx={{ fontWeight: 700 }}>{data.no}</Typography>
+                              <Typography className="FstoPurchaseOrderTypography-root" variant="h6">{data.no}</Typography>
                             </Stack>
 
-                            <Stack direction="column" sx={{ flex: "1 1 100%" }}>
+                            <Stack className="FstoPurchaseOrderStack-root" direction="row">
                               <Typography variant="subtitle2">P.O. Amount</Typography>
-                              <Typography variant="h6" sx={{ fontWeight: 700 }}>&#8369;{data.amount.toLocaleString()}</Typography>
+                              <Typography className="FstoPurchaseOrderTypography-root" variant="h6">&#8369;{data.amount.toLocaleString()}</Typography>
                             </Stack>
 
-                            <Stack direction="column" sx={{ flex: "1 1 100%" }}>
+                            <Stack className="FstoPurchaseOrderStack-root" direction="row">
                               <Typography variant="subtitle2">P.O. Balance</Typography>
-                              <Typography variant="h6" sx={{ fontWeight: 700 }}>&#8369;{data.balance.toLocaleString()}</Typography>
+                              <Typography className="FstoPurchaseOrderTypography-root" variant="h6">&#8369;{data.balance.toLocaleString()}</Typography>
                             </Stack>
 
-                            <Stack direction="column" sx={{ flex: "1 1 100%", minWidth: 0 }}>
+                            <Stack className="FstoPurchaseOrderStack-root" direction="row">
                               <Typography variant="subtitle2">R.R. Number</Typography>
-                              <Typography variant="h6" sx={{ fontWeight: 700, textOverflow: "ellipsis", whiteSpace: "nowrap", overflow: "hidden" }}>{data.rr_no.join(", ")}</Typography>
+                              <Typography className="FstoPurchaseOrderTypography-root" variant="h6">{data.rr_no.join(", ")}</Typography>
                             </Stack>
 
                             <Stack direction="row" spacing={1}>
@@ -2850,14 +2850,14 @@ const NewRequest = () => {
                                 <Delete />
                               </IconButton>
                             </Stack>
-                          </div>
+                          </Box>
                       )
                     }
                   </Box>
 
                   <Divider variant="middle" sx={{ marginTop: 4, marginBottom: 4 }} />
 
-                  <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
+                  <Box className="FstoPurchaseOrderBox-variance">
                     <Typography sx={{ fontSize: '1em' }}>Total P.O. Balance</Typography>
                     <Typography variant="heading">&#8369;{data.po_group.map((data) => data.balance).reduce((a, b) => a + b).toLocaleString()}</Typography>
                   </Box>
@@ -2865,7 +2865,7 @@ const NewRequest = () => {
                   {
                     data.document.amount && (data.document.id === 1 || data.document.id === 5)
                     &&
-                    <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
+                    <Box className="FstoPurchaseOrderBox-variance">
                       <Typography sx={{ fontSize: '1em' }}>Document Amount</Typography>
                       <Typography variant="heading">&#8369;{data.document.amount.toLocaleString()}</Typography>
                     </Box>
@@ -2874,7 +2874,7 @@ const NewRequest = () => {
                   {
                     data.document.reference.amount && data.document.id === 4
                     &&
-                    <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
+                    <Box className="FstoPurchaseOrderBox-variance">
                       <Typography sx={{ fontSize: '1em' }}>Reference Amount</Typography>
                       <Typography variant="heading">&#8369;{data.document.reference.amount.toLocaleString()}</Typography>
                     </Box>
@@ -2885,7 +2885,7 @@ const NewRequest = () => {
                   {
                     data.document.amount && (data.document.id === 1 || data.document.id === 5)
                     &&
-                    <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
+                    <Box className="FstoPurchaseOrderBox-variance">
                       <Typography variant="heading">Variance</Typography>
                       <Typography variant="heading">
                         &#8369;{(data.po_group.map((data) => data.balance).reduce((a, b) => a + b) - data.document.amount).toLocaleString()}
@@ -2896,7 +2896,7 @@ const NewRequest = () => {
                   {
                     data.document.reference.amount && data.document.id === 4
                     &&
-                    <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 1, width: "100%" }}>
+                    <Box className="FstoPurchaseOrderBox-variance">
                       <Typography variant="heading">Variance</Typography>
                       <Typography variant="heading">
                         &#8369;{(data.po_group.map((data) => data.balance).reduce((a, b) => a + b) - data.document.reference.amount).toLocaleString()}
