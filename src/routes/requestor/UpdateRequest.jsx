@@ -16,7 +16,8 @@ import {
   Chip,
   Stack,
   IconButton,
-  Divider
+  Divider,
+  InputAdornment
 } from '@mui/material'
 
 import {
@@ -48,6 +49,16 @@ import useAccountNumbers from '../../hooks/useAccountNumbers'
 import useUtilityCategories from '../../hooks/useUtilityCategories'
 import useUtilityLocations from '../../hooks/useUtilityLocations'
 
+const REQUEST_TYPES = [
+  {
+    id: 1,
+    label: "Regular"
+  },
+  {
+    id: 2,
+    label: "Confidential"
+  }
+]
 
 const PAYMENT_TYPES = [
   {
@@ -188,6 +199,7 @@ const UpdateRequest = () => {
     document: {
       id: null,
       name: "",
+      request_type: "",
       payment_type: "",
       no: "",
       capex_no: "",
@@ -280,7 +292,8 @@ const UpdateRequest = () => {
           requestor,
           document: {
             ...currentValue.document,
-            ...document
+            ...document,
+            no: document.no?.replace(/pad#|prmc#|cb#/g, "")
           },
           po_group: po_group_new
         }))
@@ -291,6 +304,7 @@ const UpdateRequest = () => {
     // eslint-disable-next-line
   }, [])
 
+  const [user, setUser] = React.useState([])
   const [DOCUMENT_TYPES, setDocumentTypes] = React.useState([])
   React.useEffect(() => {
     (async () => {
@@ -298,8 +312,9 @@ const UpdateRequest = () => {
       try {
         response = await axios.get(`/api/dropdown/current-user`)
 
-        const { document_types } = response.data.result
+        const { document_types, ...user } = response.data.result
 
+        setUser(user)
         setDocumentTypes(document_types)
       }
       catch (error) {
@@ -316,6 +331,19 @@ const UpdateRequest = () => {
 
     // eslint-disable-next-line
   }, [])
+
+  React.useEffect(() => {
+    if (user.id && data.requestor.id && user.id !== data.requestor.id) {
+      truncateData()
+      toast({
+        open: true,
+        severity: "error",
+        title: "Error!",
+        message: "The page you are trying to access has restricted access, you are not authorized to access this page."
+      })
+    }
+    // eslint-disable-next-line
+  }, [user.id, data.requestor.id])
 
   const {
     status: COMPANY_STATUS,
@@ -675,10 +703,28 @@ const UpdateRequest = () => {
       ]
     }))
 
+    let document_prefix
+    switch (data.document.id) {
+      case 1:
+        document_prefix = "pad#"
+        break
+      case 2:
+        document_prefix = "prmc#"
+        break
+      case 3:
+        document_prefix = "prmm#"
+        break
+      case 5:
+        document_prefix = "cb#"
+        break
+      default:
+        document_prefix = null
+    }
+
     try {
       await axios.post(`/api/transactions/validate-document-no`, {
         transaction_id: data.transaction.id,
-        document_no: data.document.no
+        document_no: `${document_prefix}${data.document.no}`
       })
     }
     catch (error) {
@@ -777,31 +823,31 @@ const UpdateRequest = () => {
   }
 
   const addPurchaseOrderHandler = () => {
-    const check = data.po_group.some((data) => data.no === PO.no)
+    const check = data.po_group.some((data) => data.no === `PO#${PO.no}`)
     if (check && !PO.update) return
 
     if (PO.update) data.po_group.splice(PO.index, 1, {
-      no: PO.no,
+      no: `PO#${PO.no}`,
       balance: PO.balance,
       amount: PO.amount,
       rr_no: PO.rr_no,
       batch: PO.batch,
       request_id: PO.request_id
     })
-    else setData({
-      ...data,
+    else setData(currentValue => ({
+      ...currentValue,
       po_group: [
         {
-          no: PO.no,
+          no: `PO#${PO.no}`,
           balance: PO.balance,
           amount: PO.amount,
           rr_no: PO.rr_no,
           batch: PO.batch,
           request_id: PO.request_id
         },
-        ...data.po_group,
+        ...currentValue.po_group,
       ]
-    })
+    }))
 
     setPO({
       update: false,
@@ -851,10 +897,10 @@ const UpdateRequest = () => {
         payment_type: data.document.payment_type,
         company_id: data.document.company.id,
         transaction_id: data.transaction.id,
-        po_no: PO.no
+        po_no: `PO#${PO.no}`
       })
 
-      const check = data.po_group.some((data) => data.no === PO.no)
+      const check = data.po_group.some((data) => data.no === `PO#${PO.no}`)
       if (check && !PO.update)
         return setError({
           status: true,
@@ -877,11 +923,11 @@ const UpdateRequest = () => {
           ]
         }))
 
-        const PODetails = po_group.map((data) => ({ ...data, batch: true })).find((data) => data.no === PO.no)
+        const PODetails = po_group.map((data) => ({ ...data, batch: true })).find((data) => data.no === `PO#${PO.no}`)
         const POIndex = [
           ...data.po_group,
           ...po_group.reverse()
-        ].findIndex((data) => data.no === PO.no)
+        ].findIndex((data) => data.no === `PO#${PO.no}`)
 
         updatePurchaseOrderHandler(POIndex, PODetails)
       }
@@ -920,7 +966,7 @@ const UpdateRequest = () => {
       index,
       batch,
 
-      no,
+      no: no.replace(/PO#/g, ""),
       amount,
       balance,
       rr_no,
@@ -957,7 +1003,7 @@ const UpdateRequest = () => {
           },
           document: {
             id: data.document.id,
-            no: data.document.no,
+            no: `pad#${data.document.no}`,
             name: data.document.name,
             payment_type: data.document.payment_type,
             amount: data.document.amount,
@@ -983,7 +1029,7 @@ const UpdateRequest = () => {
           },
           document: {
             id: data.document.id,
-            no: data.document.no,
+            no: `prmc#${data.document.no}`,
             name: data.document.name,
             payment_type: data.document.payment_type,
             amount: data.document.amount,
@@ -1038,7 +1084,7 @@ const UpdateRequest = () => {
           },
           document: {
             id: data.document.id,
-            no: data.document.no,
+            no: `cb#${data.document.no}`,
             capex_no: data.document.capex_no,
             name: data.document.name,
             payment_type: data.document.payment_type,
@@ -1304,28 +1350,29 @@ const UpdateRequest = () => {
                   label="Select Document Type"
                 />
             }
-            PaperComponent={
-              props =>
-                <Paper
-                  {...props}
-                  sx={{ textTransform: 'capitalize' }}
-                />
-            }
+            // PaperComponent={
+            //   props =>
+            //     <Paper
+            //       {...props}
+            //       sx={{ textTransform: 'capitalize' }}
+            //     />
+            // }
             getOptionLabel={
               option => option.type
             }
-            isOptionEqualToValue={
-              (option, value) => option.id === value.id
-            }
-            onChange={(e, value) => setData({
-              ...data,
-              document: {
-                ...data.document,
-                id: value.id,
-                name: value.type,
-                payment_type: ""
-              }
-            })}
+            // isOptionEqualToValue={
+            //   (option, value) => option.id === value.id
+            // }
+            // onChange={(e, value) => setData({
+            //   ...data,
+            //   document: {
+            //     ...data.document,
+            //     id: value.id,
+            //     name: value.type,
+            //     payment_type: ""
+            //   }
+            // })}
+            readOnly
             fullWidth
             disablePortal
             disableClearable
@@ -1335,6 +1382,85 @@ const UpdateRequest = () => {
             data.document.id &&
             (
               <React.Fragment>
+                { // Request Types
+                  (data.document.id === `confi`) &&
+                  (
+                    <Autocomplete
+                      className="FstoSelectForm-root"
+                      size="small"
+                      options={REQUEST_TYPES}
+                      value={REQUEST_TYPES.find(row => row.label === data.document.request_type) || null}
+                      renderInput={
+                        props =>
+                          <TextField
+                            {...props}
+                            variant="outlined"
+                            label="Request Type"
+                          />
+                      }
+                      PaperComponent={
+                        props =>
+                          <Paper
+                            {...props}
+                            sx={{ textTransform: 'capitalize' }}
+                          />
+                      }
+                      isOptionEqualToValue={
+                        (option, value) => option.label === value.label
+                      }
+                      onChange={(e, value) => setData({
+                        ...data,
+                        document: {
+                          ...data.document,
+                          request_type: value.label
+                        }
+                      })}
+                      fullWidth
+                      disablePortal
+                      disableClearable
+                    />
+                  )}
+
+                <Autocomplete
+                  className="FstoSelectForm-root"
+                  size="small"
+                  options={PAYMENT_TYPES}
+                  value={PAYMENT_TYPES.find(row => row.label === data.document.payment_type) || null}
+                  renderInput={
+                    props =>
+                      <TextField
+                        {...props}
+                        variant="outlined"
+                        label="Payment Type"
+                      />
+                  }
+                  PaperComponent={
+                    props =>
+                      <Paper
+                        {...props}
+                        sx={{ textTransform: 'capitalize' }}
+                      />
+                  }
+                  getOptionDisabled={
+                    option => {
+                      if (data.document.id !== 4 && option.label === "Partial") return true
+                    }
+                  }
+                  isOptionEqualToValue={
+                    (option, value) => option.label === value.label
+                  }
+                  onChange={(e, value) => setData({
+                    ...data,
+                    document: {
+                      ...data.document,
+                      payment_type: value.label
+                    }
+                  })}
+                  fullWidth
+                  disablePortal
+                  disableClearable
+                />
+
                 { // Batch Name, Batch Letter, Batch Date
                   (data.document.id === 8) &&
                   (
@@ -1490,46 +1616,6 @@ const UpdateRequest = () => {
                     </React.Fragment>
                   )}
 
-                <Autocomplete
-                  className="FstoSelectForm-root"
-                  size="small"
-                  options={PAYMENT_TYPES}
-                  value={PAYMENT_TYPES.find(row => row.label === data.document.payment_type) || null}
-                  renderInput={
-                    props =>
-                      <TextField
-                        {...props}
-                        variant="outlined"
-                        label="Payment Type"
-                      />
-                  }
-                  PaperComponent={
-                    props =>
-                      <Paper
-                        {...props}
-                        sx={{ textTransform: 'capitalize' }}
-                      />
-                  }
-                  getOptionDisabled={
-                    option => {
-                      if (data.document.id !== 4 && option.label === "Partial") return true
-                    }
-                  }
-                  isOptionEqualToValue={
-                    (option, value) => option.label === value.label
-                  }
-                  onChange={(e, value) => setData({
-                    ...data,
-                    document: {
-                      ...data.document,
-                      payment_type: value.label
-                    }
-                  })}
-                  fullWidth
-                  disablePortal
-                  disableClearable
-                />
-
                 { // From Date, To Date
                   (data.document.id === 7 || data.document.id === 6) &&
                   (
@@ -1614,6 +1700,7 @@ const UpdateRequest = () => {
                       variant="outlined"
                       autoComplete="off"
                       size="small"
+                      type="number"
                       value={data.document.no}
                       error={
                         error.status
@@ -1628,6 +1715,7 @@ const UpdateRequest = () => {
                           && validate.data.includes('document_no')
                           && "Please wait...")
                       }
+                      onKeyDown={(e) => ["E", "e", ".", "+", "-"].includes(e.key) && e.preventDefault()}
                       onChange={(e) => setData({
                         ...data,
                         document: {
@@ -1636,6 +1724,15 @@ const UpdateRequest = () => {
                         }
                       })}
                       onBlur={checkDocumentNumberHandler}
+                      InputProps={{
+                        startAdornment: data.document.no &&
+                          <InputAdornment className="FstoAdrmentForm-root" position="start">
+                            {data.document.id === 1 && "pad#"}
+                            {data.document.id === 2 && "prmc#"}
+                            {data.document.id === 3 && "prmm#"}
+                            {data.document.id === 5 && "cb#"}
+                          </InputAdornment>
+                      }}
                       InputLabelProps={{
                         className: "FstoLabelForm-root"
                       }}
@@ -1643,7 +1740,7 @@ const UpdateRequest = () => {
                     />
                   )}
 
-                { //Document Date
+                { // Request Date, Document Date
                   (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4 || data.document.id === 5 || data.document.id === 8) &&
                   (
                     <LocalizationProvider dateAdapter={DateAdapter}>
@@ -1960,7 +2057,11 @@ const UpdateRequest = () => {
                       <Autocomplete
                         className="FstoSelectForm-root"
                         size="small"
-                        options={data.document.supplier?.references || []}
+                        options={
+                          SUPPLIER_LIST && data.document.supplier
+                            ? SUPPLIER_LIST.find(row => row.id === data.document.supplier.id).references
+                            : []
+                        }
                         value={data.document.reference.id ? data.document.reference : null}
                         renderInput={
                           props =>
@@ -2667,6 +2768,7 @@ const UpdateRequest = () => {
                 variant="outlined"
                 autoComplete="off"
                 size="small"
+                type="number"
                 value={PO.no}
                 error={
                   error.status
@@ -2681,8 +2783,9 @@ const UpdateRequest = () => {
                     && validate.data.includes('po_no')
                     && "Please wait...")
                 }
-                onBlur={checkPurchaseOrderHandler}
                 onKeyPress={(e) => {
+                  ["E", "e", ".", "+", "-"].includes(e.key) && e.preventDefault()
+
                   if (e.key === "Enter")
                     checkPurchaseOrderHandler(e)
                 }}
@@ -2690,6 +2793,11 @@ const UpdateRequest = () => {
                   ...PO,
                   no: e.target.value
                 })}
+                onBlur={checkPurchaseOrderHandler}
+                InputProps={{
+                  startAdornment: PO.no &&
+                    <InputAdornment className="FstoAdrmentForm-root" position="start">PO#</InputAdornment>
+                }}
                 InputLabelProps={{
                   className: "FstoLabelForm-attachment"
                 }}

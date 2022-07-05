@@ -220,7 +220,7 @@ const App = () => {
               <Route exact strict path="update-request/:id" element={<UpdateRequest />} />
             </Route>
 
-            <Route exact path="/document/returned-document" element={<ProtectedRoute />}>
+            <Route exact path="/document/returned-documents" element={<ProtectedRoute />}>
               <Route index exact strict
                 element={<ReturnedDocument />}
               />

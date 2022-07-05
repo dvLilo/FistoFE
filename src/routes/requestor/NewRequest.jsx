@@ -49,6 +49,16 @@ import useAccountNumbers from '../../hooks/useAccountNumbers'
 import useUtilityCategories from '../../hooks/useUtilityCategories'
 import useUtilityLocations from '../../hooks/useUtilityLocations'
 
+const REQUEST_TYPES = [
+  {
+    id: 1,
+    label: "Regular"
+  },
+  {
+    id: 2,
+    label: "Confidential"
+  }
+]
 
 const PAYMENT_TYPES = [
   {
@@ -58,7 +68,7 @@ const PAYMENT_TYPES = [
   {
     id: 2,
     label: "Partial"
-  },
+  }
 ]
 
 const COVERAGE_MONTH = [
@@ -187,6 +197,7 @@ const NewRequest = () => {
     document: {
       id: null,
       name: "",
+      request_type: "",
       payment_type: "Full",
       no: "",
       capex_no: "",
@@ -810,11 +821,11 @@ const NewRequest = () => {
   }
 
   const addPurchaseOrderHandler = () => {
-    const check = data.po_group.some((data) => data.no === PO.no)
+    const check = data.po_group.some((data) => data.no === `PO#${PO.no}`)
     if (check && !PO.update) return
 
     if (PO.update) data.po_group.splice(PO.index, 1, {
-      no: PO.no,
+      no: `PO#${PO.no}`,
       balance: PO.balance,
       amount: PO.amount,
       rr_no: PO.rr_no,
@@ -824,7 +835,7 @@ const NewRequest = () => {
       ...currentValue,
       po_group: [
         {
-          no: PO.no,
+          no: `PO#${PO.no}`,
           balance: PO.balance,
           amount: PO.amount,
           rr_no: PO.rr_no,
@@ -880,10 +891,10 @@ const NewRequest = () => {
       response = await axios.post(`/api/transactions/validate-po-no`, {
         payment_type: data.document.payment_type,
         company_id: data.document.company.id,
-        po_no: PO.no
+        po_no: `PO#${PO.no}`
       })
 
-      const check = data.po_group.some((data) => data.no === PO.no)
+      const check = data.po_group.some((data) => data.no === `PO#${PO.no}`)
       if (check && !PO.update)
         return setError({
           status: true,
@@ -906,11 +917,11 @@ const NewRequest = () => {
           ]
         }))
 
-        const PODetails = po_group.map((data) => ({ ...data, batch: true })).find((data) => data.no === PO.no)
+        const PODetails = po_group.map((data) => ({ ...data, batch: true })).find((data) => data.no === `PO#${PO.no}`)
         const POIndex = [
           ...data.po_group,
           ...po_group.reverse()
-        ].findIndex((data) => data.no === PO.no)
+        ].findIndex((data) => data.no === `PO#${PO.no}`)
 
         updatePurchaseOrderHandler(POIndex, PODetails)
       }
@@ -949,7 +960,7 @@ const NewRequest = () => {
       index,
       batch,
 
-      no,
+      no: no.replace(/PO#/g, ""),
       amount,
       balance,
       rr_no
@@ -1335,6 +1346,85 @@ const NewRequest = () => {
             data.document.id &&
             (
               <React.Fragment>
+                { // Request Types
+                  (data.document.id === `confi`) &&
+                  (
+                    <Autocomplete
+                      className="FstoSelectForm-root"
+                      size="small"
+                      options={REQUEST_TYPES}
+                      value={REQUEST_TYPES.find(row => row.label === data.document.request_type) || null}
+                      renderInput={
+                        props =>
+                          <TextField
+                            {...props}
+                            variant="outlined"
+                            label="Request Type"
+                          />
+                      }
+                      PaperComponent={
+                        props =>
+                          <Paper
+                            {...props}
+                            sx={{ textTransform: 'capitalize' }}
+                          />
+                      }
+                      isOptionEqualToValue={
+                        (option, value) => option.label === value.label
+                      }
+                      onChange={(e, value) => setData({
+                        ...data,
+                        document: {
+                          ...data.document,
+                          request_type: value.label
+                        }
+                      })}
+                      fullWidth
+                      disablePortal
+                      disableClearable
+                    />
+                  )}
+
+                <Autocomplete // Payment Types
+                  className="FstoSelectForm-root"
+                  size="small"
+                  options={PAYMENT_TYPES}
+                  value={PAYMENT_TYPES.find(row => row.label === data.document.payment_type) || null}
+                  renderInput={
+                    props =>
+                      <TextField
+                        {...props}
+                        variant="outlined"
+                        label="Payment Type"
+                      />
+                  }
+                  PaperComponent={
+                    props =>
+                      <Paper
+                        {...props}
+                        sx={{ textTransform: 'capitalize' }}
+                      />
+                  }
+                  getOptionDisabled={
+                    option => {
+                      if (data.document.id !== 4 && option.label === "Partial") return true
+                    }
+                  }
+                  isOptionEqualToValue={
+                    (option, value) => option.label === value.label
+                  }
+                  onChange={(e, value) => setData({
+                    ...data,
+                    document: {
+                      ...data.document,
+                      payment_type: value.label
+                    }
+                  })}
+                  fullWidth
+                  disablePortal
+                  disableClearable
+                />
+
                 { // Batch Name, Batch Letter, Batch Date
                   (data.document.id === 8) &&
                   (
@@ -1489,46 +1579,6 @@ const NewRequest = () => {
                       </LocalizationProvider>
                     </React.Fragment>
                   )}
-
-                <Autocomplete // Payment Types
-                  className="FstoSelectForm-root"
-                  size="small"
-                  options={PAYMENT_TYPES}
-                  value={PAYMENT_TYPES.find(row => row.label === data.document.payment_type) || null}
-                  renderInput={
-                    props =>
-                      <TextField
-                        {...props}
-                        variant="outlined"
-                        label="Payment Type"
-                      />
-                  }
-                  PaperComponent={
-                    props =>
-                      <Paper
-                        {...props}
-                        sx={{ textTransform: 'capitalize' }}
-                      />
-                  }
-                  getOptionDisabled={
-                    option => {
-                      if (data.document.id !== 4 && option.label === "Partial") return true
-                    }
-                  }
-                  isOptionEqualToValue={
-                    (option, value) => option.label === value.label
-                  }
-                  onChange={(e, value) => setData({
-                    ...data,
-                    document: {
-                      ...data.document,
-                      payment_type: value.label
-                    }
-                  })}
-                  fullWidth
-                  disablePortal
-                  disableClearable
-                />
 
                 { // From Date, To Date
                   (data.document.id === 7 || data.document.id === 6) &&

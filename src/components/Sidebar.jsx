@@ -174,7 +174,7 @@ const Sidebar = () => {
               </AccordionSummary>
               <AccordionDetails>
                 {user?.permissions.includes(12) && <RouterLink className="FstoLink-root" to="/voucher/vouchering">Creation of Voucher</RouterLink>}
-                {user?.permissions.includes(11) && <RouterLink className="FstoLink-root" to="/voucher/filinf">Filing of Voucher</RouterLink>}
+                {user?.permissions.includes(11) && <RouterLink className="FstoLink-root" to="/voucher/filing">Filing of Voucher</RouterLink>}
 
               </AccordionDetails>
             </Accordion>

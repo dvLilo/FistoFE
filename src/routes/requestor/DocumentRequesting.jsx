@@ -207,7 +207,7 @@ const DocumentRequesting = () => {
           </Box>
         </Box>
 
-        {/* <TableContainer className="FstoTableContainer-root">
+        <TableContainer className="FstoTableContainer-root">
           <Table size="small">
             <TableHead>
               <TableRow>
@@ -321,8 +321,9 @@ const DocumentRequesting = () => {
               }
             </TableBody>
           </Table>
-        </TableContainer> */}
+        </TableContainer>
 
+        {/* 
         <TableContainer className="FstoTableContainer-root">
           <Table size="small">
             <TableHead>
@@ -352,7 +353,6 @@ const DocumentRequesting = () => {
             </TableHead>
 
             <TableBody>
-
               <TableRow hover sx={{ paddingX: 2 }}>
                 <TableCell className="FstoTableData-root">
                   <span>MIS117</span><br />
@@ -426,6 +426,7 @@ const DocumentRequesting = () => {
             </TableBody>
           </Table>
         </TableContainer>
+        */}
 
         <TablePagination
           className="FstoTablePagination-root"
