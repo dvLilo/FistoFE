@@ -120,7 +120,7 @@ const Suppliers = () => {
           />
         </Box>
 
-        <TableContainer className="FstoTableContainer-root">
+        <TableContainer className="FstoTableContainerMasterlist-root">
           <SuppliersTable
             fetching={fetching}
             data={data}

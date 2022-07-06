@@ -116,7 +116,7 @@ const Reasons = () => {
           />
         </Box>
 
-        <TableContainer className="FstoTableContainer-root">
+        <TableContainer className="FstoTableContainerMasterlist-root">
           <ReasonsTable
             fetching={fetching}
             data={data}

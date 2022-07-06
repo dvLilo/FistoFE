@@ -114,7 +114,7 @@ const UtilityCategories = () => {
           />
         </Box>
 
-        <TableContainer className="FstoTableContainer-root">
+        <TableContainer className="FstoTableContainerMasterlist-root">
           <UtilityCategoriesTable
             fetching={fetching}
             data={data}

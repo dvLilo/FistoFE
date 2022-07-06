@@ -117,7 +117,7 @@ const CreditCards = () => {
           />
         </Box>
 
-        <TableContainer className="FstoTableContainer-root">
+        <TableContainer className="FstoTableContainerMasterlist-root">
           <CreditCardsTable
             fetching={fetching}
             data={data}

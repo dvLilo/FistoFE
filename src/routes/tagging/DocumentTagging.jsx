@@ -1,5 +1,7 @@
 import React from 'react'
 
+import moment from 'moment'
+
 import {
   Box,
   Paper,
@@ -17,7 +19,8 @@ import {
   TablePagination,
   Tabs,
   Tab,
-  Stack
+  Stack,
+  Chip
 } from '@mui/material'
 
 import {
@@ -27,30 +30,62 @@ import {
 
 import useConfirm from '../../hooks/useConfirm'
 
-import Preloader from '../../components/Preloader'
-
 import DocumentTaggingFilter from './DocumentTaggingFilter'
 import DocumentTaggingActions from './DocumentTaggingActions'
 import DocumentTaggingTransaction from './DocumentTaggingTransaction'
 
 const data = [
   {
-    id: 1,
-    date_requested: "2022-06-29 09:07:37",
-    transaction_id: "MISC001",
-    tagged: {
-      no: 92101,
-      date: "2022-06-30 09:07:37"
+    "id": 1,
+    "users_id": 2,
+    "request_id": 1,
+    "document_id": 1,
+    "transaction_id": "MISC001",
+    "tag_id": "1000159",
+    "document_type": "PAD",
+    "payment_type": "Full",
+    "supplier": "1st Advenue Advertising",
+    "remarks": "Fisto test transaction.",
+    "date_requested": "2022-06-29 09:07:37",
+    "company": "RDF Corporate Services",
+    "department": "Management Information System Common",
+    "location": "Common",
+    "document_no": "pad#11001",
+    "document_amount": 50000,
+    "referrence_no": null,
+    "referrence_amount": null,
+    "status": "Pending",
+    "users": {
+      "id": 2,
+      "first_name": "VINCENT LOUIE",
+      "middle_name": "LAYNES",
+      "last_name": "ABAD",
+      "position": "System Developer",
+      "department": [
+        {
+          "id": 12,
+          "name": "Management Information System Common"
+        },
+        {
+          "id": 3,
+          "name": "Management Information System"
+        }
+      ]
     },
-    document_type: "PAD",
-    company: "RDF Corporate Services",
-    supplier: "1ST ADVENUE ADVERTISING",
-    po_total_amount: 10000,
-    referrence_total_amount: null,
-    referrence_amount: null,
-    document_amount: 10000,
-    payment_type: "Full",
-    status: "Pending"
+    "po_details": [
+      {
+        "id": 50,
+        "request_id": 1,
+        "po_no": "PO#11002",
+        "po_total_amount": 50000
+      },
+      {
+        "id": 51,
+        "request_id": 1,
+        "po_no": "PO#11001",
+        "po_total_amount": 50000
+      }
+    ]
   }
 ]
 
@@ -155,142 +190,112 @@ const DocumentTagging = () => {
         </Box>
 
         <TableContainer className="FstoTableContainer-root">
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                {
-                  state !== `tag`
-                  &&
-                  <React.Fragment>
-                    <TableCell className="FstoTableHead-root">
-                      <TableSortLabel>DATE REQUESTED</TableSortLabel>
-                    </TableCell>
-                  </React.Fragment>
-                }
-
-                {
-                  state === `tag`
-                  &&
-                  <React.Fragment>
-                    <TableCell className="FstoTableHead-root">
-                      <TableSortLabel>DATE TAGGED</TableSortLabel>
-                    </TableCell>
-
-                    <TableCell className="FstoTableHead-root">
-                      <TableSortLabel>TAG NO.</TableSortLabel>
-                    </TableCell>
-                  </React.Fragment>
-                }
-
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel>TRANSACTION NO.</TableSortLabel>
+          <Table className="FstoTable-root" size="small">
+            <TableHead className="FstoTableHead-root">
+              <TableRow className="FstoTableRow-root">
+                <TableCell className="FstoTableCell-root FstoTableCell-head">
+                  <TableSortLabel active={false}>TRANSACTION</TableSortLabel>
                 </TableCell>
 
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel>DOCUMENT</TableSortLabel>
+                <TableCell className="FstoTableCell-root FstoTableCell-head">
+                  <TableSortLabel active={false}>REQUESTOR</TableSortLabel>
                 </TableCell>
 
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel>PAYMENT</TableSortLabel>
+                <TableCell className="FstoTableCell-root FstoTableCell-head">
+                  <TableSortLabel active={false}>CHARGING</TableSortLabel>
                 </TableCell>
 
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel>COMPANY</TableSortLabel>
+                <TableCell className="FstoTableCell-root FstoTableCell-head">
+                  <TableSortLabel active={false}>AMOUNT DETAILS</TableSortLabel>
                 </TableCell>
 
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel>SUPPLIER</TableSortLabel>
+                <TableCell className="FstoTableCell-root FstoTableCell-head">
+                  <TableSortLabel active={false}>PO DETAILS</TableSortLabel>
                 </TableCell>
 
-                <TableCell className="FstoTableHead-root" align="right">
-                  <TableSortLabel>REF AMOUNT</TableSortLabel>
-                </TableCell>
+                <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">STATUS</TableCell>
 
-                <TableCell className="FstoTableHead-root" align="right">
-                  <TableSortLabel>AMOUNT</TableSortLabel>
-                </TableCell>
-
-                <TableCell className="FstoTableHead-root" align="center">ACTIONS</TableCell>
+                <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">ACTIONS</TableCell>
               </TableRow>
             </TableHead>
 
-            <TableBody>
+            <TableBody className="FstoTableBody-root">
               {
-                !Boolean(data.length)
-                  ? <Preloader row={5} col={10} />
-                  : data.map((item, index) => (
-                    <TableRow hover key={index}>
-                      {
-                        state !== `tag`
-                        &&
-                        <React.Fragment>
-                          <TableCell className="FstoTableData-root">
-                            {item.date_requested}
-                          </TableCell>
-                        </React.Fragment>
-                      }
-
-                      {
-                        state === `tag`
-                        &&
-                        <React.Fragment>
-                          <TableCell className="FstoTableData-root">
-                            {item.tagged.date}
-                          </TableCell>
-
-                          <TableCell className="FstoTableData-root">
-                            {item.tagged.no}
-                          </TableCell>
-                        </React.Fragment>
-                      }
-
-                      <TableCell className="FstoTableData-root">
-                        {item.transaction_id}
-                      </TableCell>
-
-                      <TableCell className="FstoTableData-root">
+                data.map((item, index) => (
+                  <TableRow className="FstoTableRow-root" key={index} hover>
+                    <TableCell className="FstoTableCell-root FstoTableCell-body">
+                      <Typography variant="button" sx={{ display: `flex`, alignItems: `center`, fontWeight: 700, lineHeight: 1.25 }}>
+                        {
+                          state === `tag` ? `TAG#${item.tag_id}` : item.transaction_id
+                        }
+                        &nbsp;&mdash;&nbsp;
                         {item.document_type}
-                      </TableCell>
-
-                      <TableCell className="FstoTableData-root">
-                        {item.payment_type}
-                      </TableCell>
-
-                      <TableCell className="FstoTableData-root">
-                        {item.company}
-                      </TableCell>
-
-                      <TableCell className="FstoTableData-root">
-                        {item.supplier}
-                      </TableCell>
-
-                      <TableCell className="FstoTableData-root" align="right">
                         {
-                          item.referrence_amount
-                            ? <>&#8369;{item.referrence_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</>
-                            : <>&mdash;</>
+                          item.document_id === 4 && item.payment_type === `Partial` &&
+                          <Chip label={item.payment_type} size="small" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
                         }
-                      </TableCell>
-
-                      <TableCell className="FstoTableData-root" align="right">
+                      </Typography>
+                      <Typography variant="caption" sx={{ fontSize: `1.25em`, textTransform: `uppercase`, lineHeight: 1.55 }}>{item.supplier}</Typography>
+                      <Typography variant="h6" sx={{ marginTop: `5px`, fontWeight: 700, lineHeight: 1 }}>
                         {
-                          item.document_amount
-                            ? <>&#8369;{item.document_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</>
-                            : <>&mdash;</>
+                          item.remarks
+                            ? item.remarks
+                            : <React.Fragment>&mdash;</React.Fragment>
                         }
-                      </TableCell>
+                      </Typography>
+                      <Typography variant="caption" sx={{ lineHeight: 1.65 }}>{moment(item.date_requested).format("YYYY-MM-DD hh:mm A")}</Typography>
+                    </TableCell>
 
-                      <TableCell className="FstoTableData-root" align="center">
-                        <DocumentTaggingActions
-                          data={item}
-                          state={state}
-                          onReceive={onReceive}
-                          onManage={onManage}
-                          onView={onView}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))
+                    <TableCell className="FstoTableCell-root FstoTableCell-body">
+                      <Typography variant="subtitle1" sx={{ textTransform: `capitalize` }}>{item.users.first_name.toLowerCase()} {item.users.middle_name.toLowerCase()} {item.users.last_name.toLowerCase()}</Typography>
+                      <Typography variant="subtitle2">{item.users.department[0].name}</Typography>
+                      <Typography variant="subtitle2">{item.users.position}</Typography>
+                    </TableCell>
+
+                    <TableCell className="FstoTableCell-root FstoTableCell-body">
+                      <Typography variant="subtitle1">{item.company}</Typography>
+                      <Typography variant="subtitle2">{item.department}</Typography>
+                      <Typography variant="subtitle2">{item.location}</Typography>
+                    </TableCell>
+
+                    <TableCell className="FstoTableCell-root FstoTableCell-body">
+                      <Typography variant="caption" sx={{ fontWeight: 500 }}>
+                        {item.document_id !== 4 && item.document_no?.toUpperCase()}
+                        {item.document_id === 4 && item.referrence_no?.toUpperCase()}
+                      </Typography>
+                      <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                        &#8369;
+                        {item.document_id !== 4 && item.document_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                        {item.document_id === 4 && item.referrence_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell className="FstoTableCell-root FstoTableCell-body">
+                      {
+                        item.po_details.length
+                          ? <React.Fragment>
+                            <Typography variant="caption" sx={{ fontWeight: 500 }}>{item.po_details[0].po_no.toUpperCase()}{item.po_details.length > 1 && '...'}</Typography>
+                            <Typography variant="h6" sx={{ fontWeight: 700 }}>&#8369;{item.po_details[0].po_total_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</Typography>
+                          </React.Fragment>
+                          : <React.Fragment>&mdash;</React.Fragment>
+                      }
+                    </TableCell>
+
+                    <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
+                      <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.status}</Typography>
+                    </TableCell>
+
+                    <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
+                      <DocumentTaggingActions
+                        data={item}
+                        state={state}
+                        onReceive={onReceive}
+                        onManage={onManage}
+                        onView={onView}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))
               }
             </TableBody>
           </Table>

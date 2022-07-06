@@ -122,7 +122,7 @@ const Banks = () => {
           />
         </Box>
 
-        <TableContainer className="FstoTableContainer-root">
+        <TableContainer className="FstoTableContainerMasterlist-root">
           <BanksTable
             fetching={fetching}
             data={data}

@@ -118,22 +118,22 @@
 //         })}>Use Confirm</Mui.Button>
 
 
-//         <Mui.Typography variant="h1" title="h1">Fisto cutie.</Mui.Typography>
-//         <Mui.Typography variant="h2" title="h2">Fisto cutie.</Mui.Typography>
-//         <Mui.Typography variant="h3" title="h3">Fisto cutie.</Mui.Typography>
-//         <Mui.Typography variant="h4" title="h4">Fisto cutie.</Mui.Typography>
-//         <Mui.Typography variant="h5" title="h5">Fisto cutie.</Mui.Typography>
-//         <Mui.Typography variant="h6" title="h6">Fisto cutie.</Mui.Typography>
-//         <Mui.Typography variant="subtitle1" title="subtitle1">Fisto cutie.</Mui.Typography>
-//         <Mui.Typography variant="subtitle2" title="subtitle2">Fisto cutie.</Mui.Typography>
-//         <Mui.Typography variant="body1" title="body1">Fisto cutie.</Mui.Typography>
-//         <Mui.Typography variant="body2" title="body2">Fisto cutie.</Mui.Typography>
-//         <Mui.Typography variant="button" title="button">Fisto cutie.</Mui.Typography>
-//         <Mui.Typography variant="caption" title="caption">Fisto cutie.</Mui.Typography>
-//         <Mui.Typography variant="overline" title="overline">Fisto cutie.</Mui.Typography>
+//         <Mui.Typography variant="h1" title="h1">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="h2" title="h2">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="h3" title="h3">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="h4" title="h4">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="h5" title="h5">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="h6" title="h6">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="subtitle1" title="subtitle1">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="subtitle2" title="subtitle2">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="body1" title="body1">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="body2" title="body2">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="button" title="button">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="caption" title="caption">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="overline" title="overline">Fisto Typography.</Mui.Typography>
 //         <Mui.Divider variant="middle" flexItem />
-//         <Mui.Typography variant="heading" title="heading">Fisto cutie.</Mui.Typography>
-//         <Mui.Typography variant="permission" title="permission">Fisto cutie.</Mui.Typography>
+//         <Mui.Typography variant="heading" title="heading">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="permission" title="permission">Fisto Typography.</Mui.Typography>
 //         <Mui.Divider variant="middle" flexItem />
 
 //       </Mui.Box>
@@ -203,7 +203,7 @@ const Sandbox = () => {
 
   const {
     status, data
-  } = useTransaction(72)
+  } = useTransaction(1)
 
   return ReactDOM.createPortal(
     <React.Fragment>
@@ -221,6 +221,23 @@ const Sandbox = () => {
         }
 
         <Mui.Divider flexItem variant="middle" sx={{ marginY: 2 }} />
+
+        <Mui.Typography variant="h1" title="h1">Fisto Typography.</Mui.Typography>
+        <Mui.Typography variant="h2" title="h2">Fisto Typography.</Mui.Typography>
+        <Mui.Typography variant="h3" title="h3">Fisto Typography.</Mui.Typography>
+        <Mui.Typography variant="h4" title="h4">Fisto Typography.</Mui.Typography>
+        <Mui.Typography variant="h5" title="h5">Fisto Typography.</Mui.Typography>
+        <Mui.Typography variant="h6" title="h6">Fisto Typography.</Mui.Typography>
+        <Mui.Typography variant="subtitle1" title="subtitle1">Fisto Typography.</Mui.Typography>
+        <Mui.Typography variant="subtitle2" title="subtitle2">Fisto Typography.</Mui.Typography>
+        <Mui.Typography variant="body1" title="body1">Fisto Typography.</Mui.Typography>
+        <Mui.Typography variant="body2" title="body2">Fisto Typography.</Mui.Typography>
+        <Mui.Typography variant="button" title="button">Fisto Typography.</Mui.Typography>
+        <Mui.Typography variant="caption" title="caption">Fisto Typography.</Mui.Typography>
+        <Mui.Typography variant="overline" title="overline">Fisto Typography.</Mui.Typography>
+        <Mui.Divider variant="middle" flexItem />
+        <Mui.Typography variant="heading" title="heading">Fisto Typography.</Mui.Typography>
+        <Mui.Typography variant="permission" title="permission">Fisto Typography.</Mui.Typography>
 
       </Mui.Box>
     </React.Fragment>,

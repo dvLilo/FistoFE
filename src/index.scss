@@ -223,6 +223,65 @@ body {
 
 .FstoTableContainer-root {
   flex-grow: 1;
+  padding: 10px;
+
+  & .FstoTable-root {
+    border-collapse: separate;
+    border-spacing: 0 5px;
+  }
+
+  & .FstoTableCell-root.FstoTableCell-head {
+    padding: 6px 10px;
+    border: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.55em;
+    font-weight: 300;
+  }
+
+  & .FstoTableCell-root.FstoTableCell-body {
+    // max-width: 0;
+    padding: 6px 10px;
+    border-top: 1px solid rgb(224, 224, 224);
+    border-bottom: 1px solid rgba(224, 224, 224);
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.75em;
+    font-weight: 400;
+    // white-space: nowrap;
+    // text-overflow: ellipsis;
+    // overflow: hidden;
+  }
+
+  & .FstoTableCell-root.FstoTableCell-body:first-of-type {
+    border-radius: 4px 0 0 4px;
+    border-left: 1px solid rgba(224, 224, 224);
+  }
+
+  & .FstoTableCell-root.FstoTableCell-body:last-of-type {
+    border-radius: 0 4px 4px 0;
+    border-right: 1px solid rgba(224, 224, 224);
+  }
+}
+
+.FstoTableContainerMasterlist-root {
+  flex-grow: 1;
+
+  & .FstoTableCellMasterlist-root.FstoTableCellMasterlist-head {
+    padding: 6px 10px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.55em;
+    font-weight: 300;
+  }
+
+  & .FstoTableCellMasterlist-root.FstoTableCellMasterlist-body {
+    // max-width: 0;
+    padding: 6px 10px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.75em;
+    font-weight: 400;
+    // white-space: nowrap;
+    // text-overflow: ellipsis;
+    // overflow: hidden;
+  }
 }
 
 .FstoPaperForm-root {
@@ -245,26 +304,6 @@ body {
   padding-top: 4em;
   overflow-x: auto;
   overflow-y: hidden;
-}
-
-.FstoTableHead-root.MuiTableCell-root {
-  padding: 6px 10px;
-  // color: #000;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.55em;
-  font-weight: 300;
-}
-
-.FstoTableData-root.MuiTableCell-root {
-  // max-width: 0;
-  padding: 6px 10px;
-  // color: #000;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 0.75em;
-  font-weight: 400;
-  // white-space: nowrap;
-  // text-overflow: ellipsis;
-  // overflow: hidden;
 }
 
 .FstoButtonForm-root.MuiButton-root {

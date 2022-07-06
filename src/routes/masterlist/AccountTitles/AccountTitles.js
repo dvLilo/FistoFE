@@ -118,7 +118,7 @@ const AccountTitles = () => {
           />
         </Box>
 
-        <TableContainer className="FstoTableContainer-root">
+        <TableContainer className="FstoTableContainerMasterlist-root">
           <AccountTitlesTable
             fetching={fetching}
             data={data}

@@ -1278,7 +1278,7 @@ const UpdateRequest = () => {
 
           const { message } = response.data
 
-          truncateData()
+          navigate(-1)
           toast({
             message,
             open: true,
@@ -1350,28 +1350,28 @@ const UpdateRequest = () => {
                   label="Select Document Type"
                 />
             }
-            // PaperComponent={
-            //   props =>
-            //     <Paper
-            //       {...props}
-            //       sx={{ textTransform: 'capitalize' }}
-            //     />
-            // }
+            PaperComponent={
+              props =>
+                <Paper
+                  {...props}
+                  sx={{ textTransform: 'capitalize' }}
+                />
+            }
             getOptionLabel={
               option => option.type
             }
-            // isOptionEqualToValue={
-            //   (option, value) => option.id === value.id
-            // }
-            // onChange={(e, value) => setData({
-            //   ...data,
-            //   document: {
-            //     ...data.document,
-            //     id: value.id,
-            //     name: value.type,
-            //     payment_type: ""
-            //   }
-            // })}
+            isOptionEqualToValue={
+              (option, value) => option.id === value.id
+            }
+            onChange={(e, value) => setData({
+              ...data,
+              document: {
+                ...data.document,
+                id: value.id,
+                name: value.type,
+                payment_type: ""
+              }
+            })}
             readOnly
             fullWidth
             disablePortal

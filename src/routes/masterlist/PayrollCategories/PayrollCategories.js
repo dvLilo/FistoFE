@@ -114,7 +114,7 @@ const PayrollCategories = () => {
           />
         </Box>
 
-        <TableContainer className="FstoTableContainer-root">
+        <TableContainer className="FstoTableContainerMasterlist-root">
           <PayrollCategoriesTable
             fetching={fetching}
             data={data}

@@ -152,7 +152,7 @@ const UserAccounts = () => {
           />
         </Box>
 
-        <TableContainer className="FstoTableContainer-root">
+        <TableContainer className="FstoTableContainerMasterlist-root">
           <UserAccountsTable
             fetching={fetching}
             data={data}

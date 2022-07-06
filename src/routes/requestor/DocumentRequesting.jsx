@@ -2,6 +2,8 @@ import React from 'react'
 
 import axios from 'axios'
 
+import moment from 'moment'
+
 import { Link, useNavigate } from 'react-router-dom'
 
 import {
@@ -22,7 +24,8 @@ import {
   TablePagination,
   Tabs,
   Tab,
-  Stack
+  Stack,
+  Chip
 } from '@mui/material'
 
 import {
@@ -34,7 +37,7 @@ import {
 import useToast from '../../hooks/useToast'
 import useTransactions from '../../hooks/useTransactions'
 
-import Preloader from '../../components/Preloader'
+import TablePreloader from '../../components/TablePreloader'
 import ReasonDialog from '../../components/ReasonDialog'
 
 import DocumentRequestingActions from './DocumentRequestingActions'
@@ -208,101 +211,103 @@ const DocumentRequesting = () => {
         </Box>
 
         <TableContainer className="FstoTableContainer-root">
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={false}>DATE REQUESTED</TableSortLabel>
+          <Table className="FstoTable-root" size="small">
+            <TableHead className="FstoTableHead-root">
+              <TableRow className="FstoTableRow-root">
+                <TableCell className="FstoTableCell-root FstoTableCell-head">
+                  <TableSortLabel active={false}>TRANSACTION</TableSortLabel>
                 </TableCell>
 
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={false}>TRANSACTION NO.</TableSortLabel>
+                <TableCell className="FstoTableCell-root FstoTableCell-head">
+                  <TableSortLabel active={false}>REQUESTOR</TableSortLabel>
                 </TableCell>
 
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={false}>DOCUMENT</TableSortLabel>
+                <TableCell className="FstoTableCell-root FstoTableCell-head">
+                  <TableSortLabel active={false}>CHARGING</TableSortLabel>
                 </TableCell>
 
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={false}>COMPANY</TableSortLabel>
+                <TableCell className="FstoTableCell-root FstoTableCell-head">
+                  <TableSortLabel active={false}>AMOUNT DETAILS</TableSortLabel>
                 </TableCell>
 
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={false}>SUPPLIER</TableSortLabel>
+                <TableCell className="FstoTableCell-root FstoTableCell-head">
+                  <TableSortLabel active={false}>PO DETAILS</TableSortLabel>
                 </TableCell>
 
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={false}>REF AMOUNT</TableSortLabel>
-                </TableCell>
+                <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">STATUS</TableCell>
 
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={false}>AMOUNT</TableSortLabel>
-                </TableCell>
-
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={false}>PAYMENT</TableSortLabel>
-                </TableCell>
-
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={false}>STATUS</TableSortLabel>
-                </TableCell>
-
-                <TableCell className="FstoTableHead-root" align="center">ACTIONS</TableCell>
+                <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">ACTIONS</TableCell>
               </TableRow>
             </TableHead>
 
-            <TableBody>
+            <TableBody className="FstoTableBody-root">
               {
                 status === 'loading'
-                  ? <Preloader row={5} col={10} />
+                  ? <TablePreloader row={3} />
                   : data
                     ? data.data.map((data, index) => (
-                      <TableRow hover key={index}>
-                        <TableCell className="FstoTableData-root">
-                          {data.date_requested}
+                      <TableRow className="FstoTableRow-root" key={index} hover>
+                        <TableCell className="FstoTableCell-root FstoTableCell-body">
+                          <Typography variant="button" sx={{ display: `flex`, alignItems: `center`, fontWeight: 700, lineHeight: 1.25 }}>
+                            {data.transaction_id}
+                            &nbsp;&mdash;&nbsp;
+                            {data.document_type}
+                            {
+                              data.document_id === 4 && data.payment_type === `Partial` &&
+                              <Chip label={data.payment_type} size="small" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
+                            }
+                          </Typography>
+                          <Typography variant="caption" sx={{ fontSize: `1.25em`, textTransform: `uppercase`, lineHeight: 1.55 }}>{data.supplier}</Typography>
+                          <Typography variant="h6" sx={{ marginTop: `5px`, fontWeight: 700, lineHeight: 1 }}>
+                            {
+                              data.remarks
+                                ? data.remarks
+                                : <React.Fragment>&mdash;</React.Fragment>
+                            }
+                          </Typography>
+                          <Typography variant="caption" sx={{ lineHeight: 1.65 }}>{moment(data.date_requested).format("YYYY-MM-DD hh:mm A")}</Typography>
                         </TableCell>
 
-                        <TableCell className="FstoTableData-root">
-                          {data.transaction_id}
+                        <TableCell className="FstoTableCell-root FstoTableCell-body">
+                          <Typography variant="subtitle1" sx={{ textTransform: `capitalize` }}>{data.users.first_name.toLowerCase()} {data.users.middle_name.toLowerCase()} {data.users.last_name.toLowerCase()}</Typography>
+                          <Typography variant="subtitle2">{data.users.department[0].name}</Typography>
+                          <Typography variant="subtitle2">{data.users.position}</Typography>
                         </TableCell>
 
-                        <TableCell className="FstoTableData-root">
-                          {data.document_type}
+                        <TableCell className="FstoTableCell-root FstoTableCell-body">
+                          <Typography variant="subtitle1">{data.company}</Typography>
+                          <Typography variant="subtitle2">{data.department}</Typography>
+                          <Typography variant="subtitle2">{data.location}</Typography>
                         </TableCell>
 
-                        <TableCell className="FstoTableData-root">
-                          {data.company}
+                        <TableCell className="FstoTableCell-root FstoTableCell-body">
+                          <Typography variant="caption" sx={{ fontWeight: 500 }}>
+                            {data.document_id !== 4 && data.document_no?.toUpperCase()}
+                            {data.document_id === 4 && data.referrence_no?.toUpperCase()}
+                          </Typography>
+                          <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                            &#8369;
+                            {data.document_id !== 4 && data.document_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                            {data.document_id === 4 && data.referrence_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                          </Typography>
                         </TableCell>
 
-                        <TableCell className="FstoTableData-root">
-                          {data.supplier}
-                        </TableCell>
-
-                        <TableCell className="FstoTableData-root">
+                        <TableCell className="FstoTableCell-root FstoTableCell-body">
                           {
-                            data.referrence_amount
-                              ? <>&#8369;{data.referrence_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</>
-                              : <>&mdash;</>
+                            data.po_details.length
+                              ? <React.Fragment>
+                                <Typography variant="caption" sx={{ fontWeight: 500 }}>{data.po_details[0].po_no.toUpperCase()}{data.po_details.length > 1 && '...'}</Typography>
+                                <Typography variant="h6" sx={{ fontWeight: 700 }}>&#8369;{data.po_details[0].po_total_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</Typography>
+                              </React.Fragment>
+                              : <React.Fragment>&mdash;</React.Fragment>
                           }
                         </TableCell>
 
-                        <TableCell className="FstoTableData-root">
-                          {
-                            data.document_amount
-                              ? <>&#8369;{data.document_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</>
-                              : <>&mdash;</>
-                          }
+                        <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
+                          <Typography variant="body2" sx={{ fontWeight: 700 }}>{data.status}</Typography>
                         </TableCell>
 
-                        <TableCell className="FstoTableData-root" sx={{ textTransform: "capitalize" }}>
-                          {data.payment_type}
-                        </TableCell>
-
-                        <TableCell className="FstoTableData-root">
-                          {data.status}
-                        </TableCell>
-
-                        <TableCell className="FstoTableData-root" align="center">
+                        <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
                           <DocumentRequestingActions
                             state={state}
                             data={data}
@@ -315,7 +320,7 @@ const DocumentRequesting = () => {
                     ))
                     : (
                       <TableRow>
-                        <TableCell align="center" colSpan={11}>NO RECORDS FOUND</TableCell>
+                        <TableCell align="center" colSpan={7}>NO RECORDS FOUND</TableCell>
                       </TableRow>
                     )
               }
@@ -323,110 +328,6 @@ const DocumentRequesting = () => {
           </Table>
         </TableContainer>
 
-        {/* 
-        <TableContainer className="FstoTableContainer-root">
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={false}>TRANSACTION</TableSortLabel>
-                </TableCell>
-
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={false}>CHARGING</TableSortLabel>
-                </TableCell>
-
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={false}>AMOUNT DETAILS</TableSortLabel>
-                </TableCell>
-
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={false}>PO DETAILS</TableSortLabel>
-                </TableCell>
-
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel active={false}>STATUS</TableSortLabel>
-                </TableCell>
-
-                <TableCell className="FstoTableHead-root" align="center">ACTIONS</TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              <TableRow hover sx={{ paddingX: 2 }}>
-                <TableCell className="FstoTableData-root">
-                  <span>MIS117</span><br />
-                  <span>Full Payment</span>
-                  <Typography sx={{ fontSize: "1rem", fontWeight: 700 }}>Payment for MIS Desktop Unit Condor</Typography>
-                  <span style={{ fontSize: "0.8rem" }}>2022-06-30</span>
-                </TableCell>
-
-                <TableCell className="FstoTableData-root">
-                  <span>RDF Corporate Services</span><br />
-                  <span>Management Information System Common</span><br />
-                  <span>Head Office</span>
-                </TableCell>
-
-                <TableCell className="FstoTableData-root">
-                  <span>PAD</span><br />
-                  <span>PAD#10001</span>
-                  <Typography sx={{ fontWeight: 700 }}>&#8369;10,000.00</Typography>
-                </TableCell>
-
-                <TableCell className="FstoTableData-root">
-                  <span>PO#10001</span>
-                  <Typography sx={{ fontWeight: 700 }}>&#8369;10,000.00</Typography>
-                </TableCell>
-
-                <TableCell className="FstoTableData-root">
-                  <span>Pending</span>
-                </TableCell>
-
-                <TableCell className="FstoTableData-root" align="center">
-                  <IconButton>
-                    <Add />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-
-              <TableRow hover>
-                <TableCell className="FstoTableData-root">
-                  <span>MIS117</span><br />
-                  <span>Full Payment</span>
-                  <Typography sx={{ fontSize: "1rem", fontWeight: 700 }}>Payment for MIS Desktop Unit Condor</Typography>
-                  <span style={{ fontSize: "0.8rem" }}>2022-06-30</span>
-                </TableCell>
-
-                <TableCell className="FstoTableData-root">
-                  <span>RDF Corporate Services</span><br />
-                  <span>Management Information System Common</span><br />
-                  <span>Head Office</span>
-                </TableCell>
-
-                <TableCell className="FstoTableData-root">
-                  <span>Utilities</span><br />
-                  <span>&mdash;</span>
-                  <Typography sx={{ fontWeight: 700 }}>&#8369;10,000.00</Typography>
-                </TableCell>
-
-                <TableCell className="FstoTableData-root">
-                  <span>&mdash;</span>
-                </TableCell>
-
-                <TableCell className="FstoTableData-root">
-                  <span>Pending</span>
-                </TableCell>
-
-                <TableCell className="FstoTableData-root" align="center">
-                  <IconButton>
-                    <Add />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-        */}
 
         <TablePagination
           className="FstoTablePagination-root"

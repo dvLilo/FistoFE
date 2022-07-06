@@ -116,7 +116,7 @@ const DocumentTypes = () => {
           />
         </Box>
 
-        <TableContainer className="FstoTableContainer-root">
+        <TableContainer className="FstoTableContainerMasterlist-root">
           <DocumentTypesTable
             fetching={fetching}
             data={data}

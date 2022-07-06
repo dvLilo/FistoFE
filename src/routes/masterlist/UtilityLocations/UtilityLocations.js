@@ -114,7 +114,7 @@ const UtilityLocations = () => {
           />
         </Box>
 
-        <TableContainer className="FstoTableContainer-root">
+        <TableContainer className="FstoTableContainerMasterlist-root">
           <UtilityLocationsTable
             fetching={fetching}
             data={data}

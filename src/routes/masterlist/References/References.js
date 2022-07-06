@@ -115,7 +115,7 @@ const References = () => {
           />
         </Box>
 
-        <TableContainer className="FstoTableContainer-root">
+        <TableContainer className="FstoTableContainerMasterlist-root">
           <ReferencesTable
             fetching={fetching}
             data={data}
