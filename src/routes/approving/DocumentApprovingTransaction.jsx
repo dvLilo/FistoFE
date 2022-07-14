@@ -10,7 +10,8 @@ import {
   Paper,
   TextField,
   Box,
-  Button
+  Button,
+  Divider
 } from '@mui/material'
 
 import CloseIcon from '@mui/icons-material/Close'
@@ -43,8 +44,7 @@ const DocumentApprovingTransaction = (props) => {
     }))
   })
 
-  const onSubmit = (e) => {
-    e.preventDefault()
+  const submitApproveHandler = () => {
     onClose()
 
     confirm({
@@ -121,32 +121,36 @@ const DocumentApprovingTransaction = (props) => {
           {
             (state === `receive` || state === `approve`) &&
             <React.Fragment>
-              <Box className="FstoBoxTransaction-root">
-                <Autocomplete
-                  className="FstoSelectForm-root"
-                  size="small"
-                  options={[]}
-                  value={null}
-                  renderInput={
-                    props =>
-                      <TextField
-                        {...props}
-                        variant="outlined"
-                        label="Distribute To..."
-                      />
-                  }
-                  PaperComponent={
-                    props =>
-                      <Paper
-                        {...props}
-                        sx={{ textTransform: 'capitalize' }}
-                      />
-                  }
-                  sx={{ marginX: `10px` }}
-                  onChange={(e, value) => console.log(value)}
-                  disablePortal
-                  disableClearable
-                />
+              <Divider className="FstoDividerTransaction-root" variant="middle" />
+
+              <Box className="FstoBoxTransactionForm-root">
+                <Box className="FstoBoxTransactionForm-content">
+                  <Autocomplete
+                    className="FstoSelectForm-root"
+                    size="small"
+                    options={[]}
+                    value={null}
+                    renderInput={
+                      props =>
+                        <TextField
+                          {...props}
+                          variant="outlined"
+                          label="Distribute To..."
+                        />
+                    }
+                    PaperComponent={
+                      props =>
+                        <Paper
+                          {...props}
+                          sx={{ textTransform: 'capitalize' }}
+                        />
+                    }
+                    sx={{ marginX: `10px` }}
+                    onChange={(e, value) => console.log(value)}
+                    disablePortal
+                    disableClearable
+                  />
+                </Box>
               </Box>
             </React.Fragment>
           }
@@ -159,8 +163,7 @@ const DocumentApprovingTransaction = (props) => {
               (state === `receive` || state === `approve`) &&
               <Button
                 variant="contained"
-                size="large"
-                onClick={onSubmit}
+                onClick={submitApproveHandler}
                 disableElevation
               > {state === `receive` ? "Approve" : "Save"}
               </Button>
@@ -170,7 +173,6 @@ const DocumentApprovingTransaction = (props) => {
               state === `hold` &&
               <Button
                 variant="contained"
-                size="large"
                 onClick={submitUnholdHandler}
                 disableElevation
               > Unhold
@@ -181,7 +183,6 @@ const DocumentApprovingTransaction = (props) => {
               state !== `hold` &&
               <Button
                 variant="outlined"
-                size="large"
                 color="error"
                 onClick={submitHoldHandler}
                 disableElevation
@@ -191,7 +192,6 @@ const DocumentApprovingTransaction = (props) => {
 
             <Button
               variant="outlined"
-              size="large"
               color="error"
               onClick={submitReturnHandler}
               disableElevation

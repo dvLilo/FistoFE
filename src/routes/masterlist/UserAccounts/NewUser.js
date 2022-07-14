@@ -88,6 +88,10 @@ const NewUser = () => {
         name: "Creation of Voucher"
       },
       {
+        id: 19,
+        name: "Transmittal of Document"
+      },
+      {
         id: 20,
         name: "Tagging of Document"
       },
@@ -97,7 +101,7 @@ const NewUser = () => {
       },
       {
         id: 22,
-        name: "Counter Receipt Report"
+        name: "Monitoring of Counter Receipt"
       }
     ],
     GAS: [
@@ -107,10 +111,10 @@ const NewUser = () => {
       }
     ],
     approver: [
-      {
-        id: 5,
-        name: "Reversal of Cheque"
-      },
+      // {
+      //   id: 5,
+      //   name: "Reversal of Cheque"
+      // },
       {
         id: 17,
         name: "Approval of Voucher"

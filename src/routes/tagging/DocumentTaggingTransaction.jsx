@@ -10,7 +10,8 @@ import {
   Paper,
   TextField,
   Box,
-  Button
+  Button,
+  Divider
 } from '@mui/material'
 
 import CloseIcon from '@mui/icons-material/Close'
@@ -30,8 +31,7 @@ const DocumentTaggingTransaction = (props) => {
     onClose = () => { }
   } = props
 
-  const submitTagHandler = (e) => {
-    e.preventDefault()
+  const submitTagHandler = () => {
     onClose()
 
     confirm({
@@ -95,7 +95,7 @@ const DocumentTaggingTransaction = (props) => {
       disablePortal
     >
       <DialogTitle className="FstoDialogTransaction-title">
-        Transaction
+        Transaction Details
         <IconButton size="large" onClick={onClose}>
           <CloseIcon />
         </IconButton>
@@ -106,35 +106,39 @@ const DocumentTaggingTransaction = (props) => {
 
         {
           (state === `receive` || state === `tag`) &&
-          <form id="FstoFormTransaction" onSubmit={submitTagHandler}>
-            <Box className="FstoBoxTransaction-root">
-              <Autocomplete
-                className="FstoSelectForm-root"
-                size="small"
-                options={[]}
-                value={null}
-                renderInput={
-                  props =>
-                    <TextField
-                      {...props}
-                      variant="outlined"
-                      label="Distribute To..."
-                    />
-                }
-                PaperComponent={
-                  props =>
-                    <Paper
-                      {...props}
-                      sx={{ textTransform: 'capitalize' }}
-                    />
-                }
-                sx={{ marginX: `10px` }}
-                onChange={(e, value) => console.log(value)}
-                disablePortal
-                disableClearable
-              />
+          <React.Fragment>
+            <Divider className="FstoDividerTransaction-root" variant="middle" />
+
+            <Box className="FstoBoxTransactionForm-root">
+              <Box className="FstoBoxTransactionForm-content">
+                <Autocomplete
+                  className="FstoSelectForm-root"
+                  size="small"
+                  options={[]}
+                  value={null}
+                  renderInput={
+                    props =>
+                      <TextField
+                        {...props}
+                        variant="outlined"
+                        label="Distribute To..."
+                      />
+                  }
+                  PaperComponent={
+                    props =>
+                      <Paper
+                        {...props}
+                        sx={{ textTransform: 'capitalize' }}
+                      />
+                  }
+                  sx={{ marginX: `10px` }}
+                  onChange={(e, value) => console.log(value)}
+                  disablePortal
+                  disableClearable
+                />
+              </Box>
             </Box>
-          </form>
+          </React.Fragment>
         }
       </DialogContent>
 
@@ -145,9 +149,7 @@ const DocumentTaggingTransaction = (props) => {
             (state === `receive` || state === `tag`) &&
             <Button
               variant="contained"
-              size="large"
-              type="submit"
-              form="FstoFormTransaction"
+              onClick={submitTagHandler}
               disableElevation
             > {state === `receive` ? "Tag" : "Save"}
             </Button>
@@ -157,7 +159,6 @@ const DocumentTaggingTransaction = (props) => {
             state === `hold` &&
             <Button
               variant="contained"
-              size="large"
               onClick={submitUnholdHandler}
               disableElevation
             > Unhold
@@ -168,7 +169,6 @@ const DocumentTaggingTransaction = (props) => {
             state !== `hold` &&
             <Button
               variant="outlined"
-              size="large"
               color="error"
               onClick={submitHoldHandler}
               disableElevation
@@ -178,7 +178,6 @@ const DocumentTaggingTransaction = (props) => {
 
           <Button
             variant="outlined"
-            size="large"
             color="error"
             onClick={submitReturnHandler}
             disableElevation
@@ -187,7 +186,6 @@ const DocumentTaggingTransaction = (props) => {
 
           <Button
             variant="outlined"
-            size="large"
             color="error"
             onClick={submitVoidHandler}
             disableElevation

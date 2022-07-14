@@ -1,6 +1,96 @@
 {
   "user": [
     {
+      "id": 10001,
+      "general_info": {
+        "full_id_number": "RDFFLFI-10001",
+        "prefix_id": "RDFFLFI",
+        "id_number": 10001,
+        "first_name": "Mary Ann",
+        "middle_name": "Tabalu",
+        "last_name": "Tiglao",
+        "suffix": ""
+      },
+      "position_info": {
+        "position_name": "Accounting Associate"
+      },
+      "unit_info": {
+        "department_name": "Finance Common"
+      }
+    },
+    {
+      "id": 10002,
+      "general_info": {
+        "full_id_number": "RDFFLFI-10002",
+        "prefix_id": "RDFFLFI",
+        "id_number": 10002,
+        "first_name": "Lorenzo",
+        "middle_name": "Tabalu",
+        "last_name": "Yumul",
+        "suffix": ""
+      },
+      "position_info": {
+        "position_name": "Accounting Associate"
+      },
+      "unit_info": {
+        "department_name": "Finance Common"
+      }
+    },
+    {
+      "id": 10003,
+      "general_info": {
+        "full_id_number": "RDFFLFI-10003",
+        "prefix_id": "RDFFLFI",
+        "id_number": 10003,
+        "first_name": "Daisy",
+        "middle_name": "Tabalu",
+        "last_name": "Batas",
+        "suffix": ""
+      },
+      "position_info": {
+        "position_name": "Accounting Associate"
+      },
+      "unit_info": {
+        "department_name": "Finance Common"
+      }
+    },
+    {
+      "id": 10004,
+      "general_info": {
+        "full_id_number": "RDFFLFI-10004",
+        "prefix_id": "RDFFLFI",
+        "id_number": 10004,
+        "first_name": "Reden",
+        "middle_name": "Tabalu",
+        "last_name": "Cunanan",
+        "suffix": ""
+      },
+      "position_info": {
+        "position_name": "Supervisor"
+      },
+      "unit_info": {
+        "department_name": "Finance Common"
+      }
+    },
+    {
+      "id": 10005,
+      "general_info": {
+        "full_id_number": "RDFFLFI-10005",
+        "prefix_id": "RDFFLFI",
+        "id_number": 10005,
+        "first_name": "Mrinel",
+        "middle_name": "Tabalu",
+        "last_name": "Policarpio",
+        "suffix": ""
+      },
+      "position_info": {
+        "position_name": "Treasury Associate"
+      },
+      "unit_info": {
+        "department_name": "Treasury Common"
+      }
+    },
+    {
       "id": 10791,
       "general_info": {
         "full_id_number": "RDFFLFI-10791",

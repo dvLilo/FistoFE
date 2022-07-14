@@ -24,34 +24,82 @@ const UserAccountsTable = (props) => {
     onView
   } = props
 
+  const [order, setOrder] = React.useState('asc')
+  const [orderBy, setOrderBy] = React.useState('id')
+
+  const descendingComparator = (a, b, orderBy) => {
+    if (b[orderBy] < a[orderBy]) {
+      return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+      return 1;
+    }
+    return 0;
+  }
+
+  const comparator = (order, orderBy) => {
+    return order === 'desc'
+      ? (a, b) => descendingComparator(a, b, orderBy)
+      : (a, b) => -descendingComparator(a, b, orderBy)
+  }
+
+  const onSort = (property) => {
+    const isAsc = orderBy === property && order === 'asc'
+    setOrder(isAsc ? 'desc' : 'asc')
+    setOrderBy(property)
+  }
+
   return (
     <Table className="FstoTableMasterlist-root" size="small">
       <TableHead className="FstoTableHeadMasterlist-root">
         <TableRow className="FstoTableRowMasterlist-root">
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head" align="center">
-            <TableSortLabel active={false}>ID NO.</TableSortLabel>
+            <TableSortLabel
+              active={orderBy === `id`}
+              direction={orderBy === `id` ? order : `asc`}
+              onClick={() => onSort(`id`)}
+            > ID NO.
+            </TableSortLabel>
           </TableCell>
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">
-            <TableSortLabel active={false}>USERNAME</TableSortLabel>
+            <TableSortLabel
+              active={orderBy === `username`}
+              direction={orderBy === `username` ? order : `asc`}
+              onClick={() => onSort(`username`)}
+            > USERNAME
+            </TableSortLabel>
           </TableCell>
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">
-            <TableSortLabel active={false}>FULLNAME</TableSortLabel>
+            <TableSortLabel
+              active={orderBy === `last_name`}
+              direction={orderBy === `last_name` ? order : `asc`}
+              onClick={() => onSort(`last_name`)}
+            > FULLNAME
+            </TableSortLabel>
           </TableCell>
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">
-            <TableSortLabel active={false}>ROLE</TableSortLabel>
+            <TableSortLabel
+              active={orderBy === `role`}
+              direction={orderBy === `role` ? order : `asc`}
+              onClick={() => onSort(`role`)}
+            > ROLE
+            </TableSortLabel>
           </TableCell>
 
-          <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">
-            <TableSortLabel active={false}>DEPARTMENT</TableSortLabel>
-          </TableCell>
+          <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">DEPARTMENT</TableCell>
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">STATUS</TableCell>
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">
-            <TableSortLabel active={false}>LAST MODIFIED</TableSortLabel>
+            <TableSortLabel
+              active={orderBy === `updated_at`}
+              direction={orderBy === `updated_at` ? order : `asc`}
+              onClick={() => onSort(`updated_at`)}
+            > LAST MODIFIED
+            </TableSortLabel>
           </TableCell>
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head" align="center">ACTIONS</TableCell>
@@ -62,7 +110,7 @@ const UserAccountsTable = (props) => {
           fetching
             ? <Preloader row={5} col={8} />
             : data
-              ? data.map((data, index) => (
+              ? data.sort(comparator(order, orderBy)).map((data, index) => (
                 <TableRow className="FstoTableRowMasterlist-root" key={index}>
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body" align="center">
                     {data.id}

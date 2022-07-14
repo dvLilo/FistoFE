@@ -616,6 +616,11 @@ body {
     align-items: center;
   }
 
+  & .FstoDialogTransaction-content {
+    padding-left: 70px;
+    padding-right: 70px;
+  }
+
   & .FstoDialogTransaction-actions {
     padding: 2em;
   }
@@ -624,11 +629,9 @@ body {
     min-height: 85vh;
   }
 
-  & .FstoBoxTransaction-root {
-    display: grid;
-    grid-template-columns: repeat(3, 33.33%);
-    padding-left: 10px;
-    padding-right: 10px;
+  & .FstoDividerTransaction-root {
+    margin-top: 40px;
+    margin-bottom: 40px;
   }
 }
 

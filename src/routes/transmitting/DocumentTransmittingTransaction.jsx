@@ -67,15 +67,12 @@ const DocumentTransmittingTransaction = (props) => {
         open={open}
         scroll="body"
         maxWidth="lg"
-        PaperProps={{
-          className: "FstoPaperTransaction-root"
-        }}
         onClose={onClose}
         fullWidth
         disablePortal
       >
         <DialogTitle className="FstoDialogTransaction-title">
-          Transaction
+          Transaction Details
           <IconButton size="large" onClick={onClose}>
             <CloseIcon />
           </IconButton>
@@ -90,7 +87,6 @@ const DocumentTransmittingTransaction = (props) => {
           <DialogActions className="FstoDialogTransaction-actions">
             <Button
               variant="contained"
-              size="large"
               onClick={submitTransmitHandler}
               disableElevation
             > Transmit

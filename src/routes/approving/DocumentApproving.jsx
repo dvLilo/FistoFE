@@ -35,7 +35,7 @@ import DocumentApprovingTransaction from './DocumentApprovingTransaction'
 
 const data = [
   {
-    id: 52,
+    id: 1,
     date_requested: "2022-05-12 11:46:28",
     transaction_id: "MIS076",
     tagged: {

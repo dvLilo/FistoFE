@@ -767,8 +767,8 @@ const NewRequest = () => {
 
     try {
       await axios.post(`/api/transactions/validate-reference-no`, {
-        reference_no: data.document.reference.no,
-        company_id: data.document.company.id
+        company_id: data.document.company.id,
+        reference_no: `ref#${data.document.reference.no}`
       })
     }
     catch (error) {
@@ -1043,7 +1043,12 @@ const NewRequest = () => {
             department: data.document.department,
             location: data.document.location,
             supplier: data.document.supplier,
-            reference: data.document.reference,
+
+            reference: {
+              ...data.document.reference,
+              no: `ref#${data.document.reference.no}`
+            },
+
             category: data.document.category,
 
             remarks: data.document.remarks
@@ -2092,6 +2097,10 @@ const NewRequest = () => {
                           }
                         })}
                         onBlur={checkReferenceNumberHandler}
+                        InputProps={{
+                          startAdornment: data.document.reference.no &&
+                            <InputAdornment className="FstoAdrmentForm-root" position="start">ref#</InputAdornment>
+                        }}
                         InputLabelProps={{
                           className: "FstoLabelForm-root"
                         }}

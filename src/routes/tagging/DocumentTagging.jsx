@@ -231,7 +231,8 @@ const DocumentTagging = () => {
                         &nbsp;&mdash;&nbsp;
                         {item.document_type}
                         {
-                          item.document_id === 4 && item.payment_type === `Partial` &&
+                          item.document_id === 4 &&
+                          item.payment_type.toLowerCase() === `partial` &&
                           <Chip label={item.payment_type} size="small" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
                         }
                       </Typography>

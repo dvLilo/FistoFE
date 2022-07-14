@@ -191,19 +191,136 @@
 
 // export default Sandbox
 
+
+
+
+
+// import React from 'react'
+
+// import ReactDOM from 'react-dom'
+
+// import * as Mui from '@mui/material'
+
+// import useTransaction from './hooks/useTransaction'
+
+// const Sandbox = () => {
+
+//   const {
+//     status, data
+//   } = useTransaction(1)
+
+//   return ReactDOM.createPortal(
+//     <React.Fragment>
+//       <Mui.Box sx={{
+//         backgroundColor: '#eee',
+//         display: 'flex',
+//         flexDirection: 'column',
+//         alignItems: 'center',
+//         minHeight: '100vh',
+//         padding: 5
+//       }}>
+//         {
+//           status === 'loading' ? "Please wait..." :
+//             <span>{data.document.no}</span>
+//         }
+
+//         <Mui.Divider flexItem variant="middle" sx={{ marginY: 2 }} />
+
+//         <Mui.Typography variant="h1" title="h1">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="h2" title="h2">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="h3" title="h3">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="h4" title="h4">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="h5" title="h5">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="h6" title="h6">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="subtitle1" title="subtitle1">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="subtitle2" title="subtitle2">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="body1" title="body1">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="body2" title="body2">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="button" title="button">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="caption" title="caption">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="overline" title="overline">Fisto Typography.</Mui.Typography>
+//         <Mui.Divider variant="middle" flexItem />
+//         <Mui.Typography variant="heading" title="heading">Fisto Typography.</Mui.Typography>
+//         <Mui.Typography variant="permission" title="permission">Fisto Typography.</Mui.Typography>
+//       </Mui.Box>
+//     </React.Fragment>,
+//     document.getElementById("sandbox")
+//   )
+// }
+
+// export default Sandbox
+
+
+
+
+
 import React from 'react'
 
 import ReactDOM from 'react-dom'
 
 import * as Mui from '@mui/material'
 
-import useTransaction from './hooks/useTransaction'
-
 const Sandbox = () => {
+  const data = [
+    {
+      id: 3,
+      name: "Limay Ducut",
+      email: "limay@email.com"
+    },
+    {
+      id: 2,
+      name: "Vilo Abad",
+      email: "vilo@email.com"
+    }
+  ]
 
-  const {
-    status, data
-  } = useTransaction(1)
+  const [selected, setSelected] = React.useState([]);
+  const [order, setOrder] = React.useState('asc');
+  const [orderBy, setOrderBy] = React.useState('id');
+
+  function descendingComparator(a, b, orderBy) {
+    if (b[orderBy] < a[orderBy]) {
+      return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+      return 1;
+    }
+    return 0;
+  }
+
+  function getComparator(order, orderBy) {
+    return order === 'desc'
+      ? (a, b) => descendingComparator(a, b, orderBy)
+      : (a, b) => -descendingComparator(a, b, orderBy)
+  }
+
+  const handleRequestSort = (property) => {
+    const isAsc = orderBy === property && order === 'asc'
+    setOrder(isAsc ? 'desc' : 'asc')
+    setOrderBy(property)
+  }
+
+  const handleClick = (e, id) => {
+    const check = selected.includes(id)
+    if (check)
+      setSelected(currentValue => {
+        return currentValue.filter((item) => item !== id)
+      })
+    else
+      setSelected(currentValue => {
+        return [...currentValue, id]
+      })
+  }
+
+  const handleSelectAllClick = (e) => {
+    if (e.target.checked) {
+      const newSelecteds = data.map((item) => item.id)
+      setSelected(newSelecteds)
+      return
+    }
+
+    setSelected([])
+  }
 
   return ReactDOM.createPortal(
     <React.Fragment>
@@ -215,30 +332,79 @@ const Sandbox = () => {
         minHeight: '100vh',
         padding: 5
       }}>
-        {
-          status === 'loading' ? "Please wait..." :
-            <span>{data.document.no}</span>
-        }
+        <Mui.TableContainer sx={{ maxWidth: 1000 }}>
+          <Mui.Table>
+            <Mui.TableHead>
+              <Mui.TableRow>
+                <Mui.TableCell padding="checkbox">
+                  <Mui.Checkbox
+                    onChange={handleSelectAllClick}
+                    indeterminate={selected.length > 0 && data.length > selected.length}
+                    checked={data.length > 0 && data.length === selected.length}
+                  />
+                </Mui.TableCell>
 
-        <Mui.Divider flexItem variant="middle" sx={{ marginY: 2 }} />
+                <Mui.TableCell>
+                  <Mui.TableSortLabel
+                    active={orderBy === `id`}
+                    direction={orderBy === `id` ? order : 'asc'}
+                    onClick={() => handleRequestSort("id")}
+                  >
+                    <Mui.Typography variant="button">ID No.</Mui.Typography>
+                  </Mui.TableSortLabel>
+                </Mui.TableCell>
 
-        <Mui.Typography variant="h1" title="h1">Fisto Typography.</Mui.Typography>
-        <Mui.Typography variant="h2" title="h2">Fisto Typography.</Mui.Typography>
-        <Mui.Typography variant="h3" title="h3">Fisto Typography.</Mui.Typography>
-        <Mui.Typography variant="h4" title="h4">Fisto Typography.</Mui.Typography>
-        <Mui.Typography variant="h5" title="h5">Fisto Typography.</Mui.Typography>
-        <Mui.Typography variant="h6" title="h6">Fisto Typography.</Mui.Typography>
-        <Mui.Typography variant="subtitle1" title="subtitle1">Fisto Typography.</Mui.Typography>
-        <Mui.Typography variant="subtitle2" title="subtitle2">Fisto Typography.</Mui.Typography>
-        <Mui.Typography variant="body1" title="body1">Fisto Typography.</Mui.Typography>
-        <Mui.Typography variant="body2" title="body2">Fisto Typography.</Mui.Typography>
-        <Mui.Typography variant="button" title="button">Fisto Typography.</Mui.Typography>
-        <Mui.Typography variant="caption" title="caption">Fisto Typography.</Mui.Typography>
-        <Mui.Typography variant="overline" title="overline">Fisto Typography.</Mui.Typography>
-        <Mui.Divider variant="middle" flexItem />
-        <Mui.Typography variant="heading" title="heading">Fisto Typography.</Mui.Typography>
-        <Mui.Typography variant="permission" title="permission">Fisto Typography.</Mui.Typography>
+                <Mui.TableCell>
+                  <Mui.TableSortLabel
+                    active={orderBy === `name`}
+                    direction={orderBy === `name` ? order : 'asc'}
+                    onClick={() => handleRequestSort("name")}
+                  >
+                    <Mui.Typography variant="button">Fullname</Mui.Typography>
+                  </Mui.TableSortLabel>
+                </Mui.TableCell>
 
+                <Mui.TableCell>
+                  <Mui.TableSortLabel
+                    active={orderBy === `email`}
+                    direction={orderBy === `email` ? order : 'asc'}
+                    onClick={() => handleRequestSort("email")}
+                  >
+                    <Mui.Typography variant="button">Email Address</Mui.Typography>
+                  </Mui.TableSortLabel>
+                </Mui.TableCell>
+              </Mui.TableRow>
+            </Mui.TableHead>
+
+            <Mui.TableBody>
+              {
+                data.sort(getComparator(order, orderBy)).map((item, index) => {
+                  const isSelected = selected.includes(item.id)
+
+                  return (
+                    <Mui.TableRow key={index} selected={isSelected} onClick={(e) => handleClick(e, item.id)}>
+                      <Mui.TableCell padding="checkbox">
+                        <Mui.Checkbox checked={isSelected} />
+                      </Mui.TableCell>
+
+                      <Mui.TableCell>
+                        {item.id}
+                      </Mui.TableCell>
+
+                      <Mui.TableCell>
+                        {item.name}
+                      </Mui.TableCell>
+
+                      <Mui.TableCell>
+                        {item.email}
+                      </Mui.TableCell>
+                    </Mui.TableRow>
+                  )
+                })
+              }
+            </Mui.TableBody>
+          </Mui.Table>
+        </Mui.TableContainer>
       </Mui.Box>
     </React.Fragment>,
     document.getElementById("sandbox")

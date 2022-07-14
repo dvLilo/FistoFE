@@ -1,156 +1,60 @@
-.FstoAlertTransaction-root {
+.FstoAlertTransactionDetails-root {
   margin-bottom: 3em;
 
-  & .FstoAlertTransaction-icon {
+  & .FstoAlertTransactionDetails-icon {
     font-size: 2em;
   }
 
-  & .FstoAlertTransaction-title {
+  & .FstoAlertTransactionDetails-title {
     margin: 0;
     font-size: 1.5em;
+    line-height: 1.4;
   }
 }
 
-.FstoBoxTable-root {
-  margin-bottom: 5em;
-}
-
-.FstoBoxRow-root {
+.FstoBoxTransactionDetails-root {
   display: flex;
-  flex-direction: column;
+  gap: 70px;
 
-  & .FstoBoxRow-half:first-of-type {
-    border-left: 0;
+  & .FstoBoxTransactionDetails-content {
+    flex-basis: 0%;
+    flex-grow: 1;
+    flex-shrink: 1;
   }
 
-  & .FstoBoxRow-half:last-of-type {
-    border-right: 0;
+  & .FstoDividerTransactionDetails-root:before {
+    width: 0;
   }
 
-  & .FstoBoxRow-half:nth-of-type(1) {
-    border-right: 0;
+  & .FstoListTransactionDetails-root {
+    margin-bottom: 10px;
   }
 
-  & .FstoBoxRow-half .FstoBoxCell-root:first-child {
-    border-left: 0;
+  & .FstoListItemTransactionDetails-root {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    align-items: start;
+    padding-top: 0;
+    padding-bottom: 0;
   }
 
-  & .FstoBoxRow-half .FstoBoxCell-root:last-child {
-    border-right: 0;
-  }
-
-  & .FstoBoxRow-half .FstoBoxCell-root:nth-of-type(1) {
-    border-right: 0;
-  }
-
-  & .FstoBoxRow-half .FstoBoxCell-root:nth-of-type(2) {
-    border-right: 0;
-  }
-
-  &:last-of-type {
-    border-bottom: 3px solid #707070;
-  }
-
-  @media (min-width: 992px) {
-    flex-direction: row;
-
-    & .FstoBoxRow-half {
-      border: 1px solid #707070;
-      border-top: 0;
-      border-bottom: 0;
-    }
-  }
-
-  @media (min-width: 576px) {
-    & .FstoBoxRow-half {
-      flex-direction: row;
-    }
-
-    & .FstoBoxRow-half .FstoBoxCell-root {
-      border: 1px solid #707070;
-    }
-  }
-}
-
-.FstoBoxRow-half {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  border: 0;
-}
-
-.FstoBoxCell-root {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  margin-bottom: -1px;
-  padding: 10px;
-  border: 1px solid #707070;
-  border-left: 0;
-  border-right: 0;
-
-  & strong {
+  & .FstoListItemTransactionDetails-root strong {
     text-transform: capitalize;
   }
-}
 
-.FstoBoxRow-alt {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-
-  &:last-of-type {
-    border-bottom: 3px solid #707070;
-  }
-
-  @media (min-width: 576px) {
-    & .FstoBoxCell-alt {
-      width: 33.33%;
-      border: 1px solid #707070;
-    }
-
-    & .FstoBoxCell-alt:nth-child(1),
-    & .FstoBoxCell-alt:nth-child(4),
-    & .FstoBoxCell-alt:nth-child(7) {
-      border-left: 0;
-    }
-
-    & .FstoBoxCell-alt:nth-child(2),
-    & .FstoBoxCell-alt:nth-child(5) {
-      border-left: 0;
-      border-right: 0;
-    }
-
-    & .FstoBoxCell-alt:nth-child(3),
-    & .FstoBoxCell-alt:nth-child(6) {
-      border-right: 0;
-    }
+  & .FstoListItemTransactionDetails-alt {
+    padding-top: 16px;
+    padding-bottom: 16px;
   }
 }
 
-.FstoBoxCell-alt {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  margin-bottom: -1px;
-  padding: 10px;
-  border-top: 1px solid #707070;
-  border-bottom: 1px solid #707070;
+.FstoBoxTransactionForm-root {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 100px;
 
-  & strong {
-    text-transform: capitalize;
+  & .FstoBoxTransactionForm-content {
+    padding-left: 25px;
+    padding-right: 25px;
   }
-}
-
-.FstoBoxCell-head {
-  background: #CED4D9;
-  justify-content: center;
-  align-items: center;
-  border-left: 0;
-  border-right: 0;
-}
-
-.FstoTypographyTransaction-root {
-  display: flex;
-  justify-content: center;
 }

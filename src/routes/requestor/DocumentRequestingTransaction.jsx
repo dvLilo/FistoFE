@@ -24,6 +24,7 @@ const DocumentRequestingTransaction = (props) => {
       className="FstoDialogTransaction-root"
       open={open}
       maxWidth="lg"
+      scroll="body"
       PaperProps={{
         className: "FstoPaperTransaction-root"
       }}
@@ -32,7 +33,7 @@ const DocumentRequestingTransaction = (props) => {
       disablePortal
     >
       <DialogTitle className="FstoDialogTransaction-title">
-        Transaction
+        Transaction Details
         <IconButton size="large" onClick={onClose}>
           <CloseIcon />
         </IconButton>

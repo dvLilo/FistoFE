@@ -3,6 +3,7 @@ import React from 'react'
 import axios from 'axios'
 
 import moment from 'moment'
+import business from 'moment-business'
 
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -31,7 +32,8 @@ import {
 import {
   Search,
   Close,
-  Add
+  Add,
+  Error
 } from '@mui/icons-material'
 
 import useToast from '../../hooks/useToast'
@@ -105,7 +107,8 @@ const DocumentRequesting = () => {
         if (error.request.status !== 404)
           toast({
             title: "Error!",
-            message: "Something went wrong whilst validation user department."
+            message: "Something went wrong whilst validation user department.",
+            severity: "error"
           })
       }
     })()
@@ -245,79 +248,103 @@ const DocumentRequesting = () => {
                 status === 'loading'
                   ? <TablePreloader row={3} />
                   : data
-                    ? data.data.map((data, index) => (
-                      <TableRow className="FstoTableRow-root" key={index} hover>
-                        <TableCell className="FstoTableCell-root FstoTableCell-body">
-                          <Typography variant="button" sx={{ display: `flex`, alignItems: `center`, fontWeight: 700, lineHeight: 1.25 }}>
-                            {data.transaction_id}
-                            &nbsp;&mdash;&nbsp;
-                            {data.document_type}
+                    ? data.data.map((data, index) => {
+
+                      const currentDate = moment()
+                      const estimatedReleaseDate = business.addWeekDays(moment(data.date_requested), data.supplier.supplier_type.transaction_days)
+
+                      return (
+                        <TableRow className="FstoTableRow-root" key={index} hover>
+                          <TableCell className="FstoTableCell-root FstoTableCell-body">
+                            <Typography variant="button" sx={{ display: `flex`, alignItems: `center`, marginBottom: `5px`, fontWeight: 700, lineHeight: 1.25 }}>
+                              {data.transaction_id}
+                              &nbsp;&mdash;&nbsp;
+                              {data.document_type}
+                              {
+                                data.document_id === 4 && data.payment_type === `Partial` &&
+                                <React.Fragment>
+                                  <Chip label={data.payment_type} size="small" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
+                                  {/* <Chip label="Latest" size="small" color="primary" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} /> */}
+                                </React.Fragment>
+                              }
+                            </Typography>
+                            <Typography variant="caption" sx={{ display: `flex`, alignItems: `center`, fontSize: `1.25em`, textTransform: `uppercase`, lineHeight: 1.55 }}>
+                              {data.supplier.name}
+                              {
+                                data.supplier.supplier_type.id === 1 &&
+                                <Chip label={data.supplier.supplier_type.name} size="small" color="primary" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
+                              }
+                            </Typography>
+                            <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1 }}>
+                              {
+                                data.remarks
+                                  ? data.remarks
+                                  : <React.Fragment>&mdash;</React.Fragment>
+                              }
+                            </Typography>
+                            <Typography variant="caption" sx={{ display: `flex`, alignItems: `center`, lineHeight: 1.65 }}>
+                              Estimated Release Date:&nbsp;
+                              <strong>
+                                {estimatedReleaseDate.format("MMMM DD, YYYY")}
+                              </strong>&nbsp;
+                              <i>
+                                {currentDate.to(estimatedReleaseDate)}
+                              </i>
+                              {currentDate.to(estimatedReleaseDate).match(/ago/gi) && <Error color="error" fontSize="small" sx={{ marginLeft: `3px` }} />}
+                            </Typography>
+                          </TableCell>
+
+                          <TableCell className="FstoTableCell-root FstoTableCell-body">
+                            <Typography variant="subtitle1" sx={{ textTransform: `capitalize` }}>{data.users.first_name.toLowerCase()} {data.users.middle_name.toLowerCase()} {data.users.last_name.toLowerCase()}</Typography>
+                            <Typography variant="subtitle2">{data.users.department[0].name}</Typography>
+                            <Typography variant="subtitle2">{data.users.position}</Typography>
+                          </TableCell>
+
+                          <TableCell className="FstoTableCell-root FstoTableCell-body">
+                            <Typography variant="subtitle1">{data.company}</Typography>
+                            <Typography variant="subtitle2">{data.department}</Typography>
+                            <Typography variant="subtitle2">{data.location}</Typography>
+                          </TableCell>
+
+                          <TableCell className="FstoTableCell-root FstoTableCell-body">
+                            <Typography variant="caption" sx={{ fontWeight: 500 }}>
+                              {data.document_id !== 4 && data.document_no?.toUpperCase()}
+                              {data.document_id === 4 && data.referrence_no?.toUpperCase()}
+                            </Typography>
+                            <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                              &#8369;
+                              {data.document_id !== 4 && data.document_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                              {data.document_id === 4 && data.referrence_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                            </Typography>
+                          </TableCell>
+
+                          <TableCell className="FstoTableCell-root FstoTableCell-body">
                             {
-                              data.document_id === 4 && data.payment_type === `Partial` &&
-                              <Chip label={data.payment_type} size="small" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
-                            }
-                          </Typography>
-                          <Typography variant="caption" sx={{ fontSize: `1.25em`, textTransform: `uppercase`, lineHeight: 1.55 }}>{data.supplier}</Typography>
-                          <Typography variant="h6" sx={{ marginTop: `5px`, fontWeight: 700, lineHeight: 1 }}>
-                            {
-                              data.remarks
-                                ? data.remarks
+                              data.po_details.length
+                                ? <React.Fragment>
+                                  <Typography variant="caption" sx={{ fontWeight: 500 }}>{data.po_details[0].po_no.toUpperCase()}{data.po_details.length > 1 && '...'}</Typography>
+                                  <Typography variant="h6" sx={{ fontWeight: 700 }}>&#8369;{data.po_details[0].po_total_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</Typography>
+                                </React.Fragment>
                                 : <React.Fragment>&mdash;</React.Fragment>
                             }
-                          </Typography>
-                          <Typography variant="caption" sx={{ lineHeight: 1.65 }}>{moment(data.date_requested).format("YYYY-MM-DD hh:mm A")}</Typography>
-                        </TableCell>
+                          </TableCell>
 
-                        <TableCell className="FstoTableCell-root FstoTableCell-body">
-                          <Typography variant="subtitle1" sx={{ textTransform: `capitalize` }}>{data.users.first_name.toLowerCase()} {data.users.middle_name.toLowerCase()} {data.users.last_name.toLowerCase()}</Typography>
-                          <Typography variant="subtitle2">{data.users.department[0].name}</Typography>
-                          <Typography variant="subtitle2">{data.users.position}</Typography>
-                        </TableCell>
+                          <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
+                            <Chip label={data.status} size="small" color="warning" sx={{ textTransform: `capitalize`, fontWeight: 500 }} />
+                          </TableCell>
 
-                        <TableCell className="FstoTableCell-root FstoTableCell-body">
-                          <Typography variant="subtitle1">{data.company}</Typography>
-                          <Typography variant="subtitle2">{data.department}</Typography>
-                          <Typography variant="subtitle2">{data.location}</Typography>
-                        </TableCell>
-
-                        <TableCell className="FstoTableCell-root FstoTableCell-body">
-                          <Typography variant="caption" sx={{ fontWeight: 500 }}>
-                            {data.document_id !== 4 && data.document_no?.toUpperCase()}
-                            {data.document_id === 4 && data.referrence_no?.toUpperCase()}
-                          </Typography>
-                          <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                            &#8369;
-                            {data.document_id !== 4 && data.document_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
-                            {data.document_id === 4 && data.referrence_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
-                          </Typography>
-                        </TableCell>
-
-                        <TableCell className="FstoTableCell-root FstoTableCell-body">
-                          {
-                            data.po_details.length
-                              ? <React.Fragment>
-                                <Typography variant="caption" sx={{ fontWeight: 500 }}>{data.po_details[0].po_no.toUpperCase()}{data.po_details.length > 1 && '...'}</Typography>
-                                <Typography variant="h6" sx={{ fontWeight: 700 }}>&#8369;{data.po_details[0].po_total_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</Typography>
-                              </React.Fragment>
-                              : <React.Fragment>&mdash;</React.Fragment>
-                          }
-                        </TableCell>
-
-                        <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                          <Typography variant="body2" sx={{ fontWeight: 700 }}>{data.status}</Typography>
-                        </TableCell>
-
-                        <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                          <DocumentRequestingActions
-                            state={state}
-                            data={data}
-                            onView={onView}
-                            onUpdate={onUpdate}
-                            onVoid={onVoid}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    ))
+                          <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
+                            <DocumentRequestingActions
+                              state={state}
+                              data={data}
+                              onView={onView}
+                              onUpdate={onUpdate}
+                              onVoid={onVoid}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })
                     : (
                       <TableRow>
                         <TableCell align="center" colSpan={7}>NO RECORDS FOUND</TableCell>

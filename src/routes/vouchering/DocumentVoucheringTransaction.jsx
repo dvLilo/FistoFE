@@ -141,7 +141,7 @@ const DocumentVoucheringTransaction = (props) => {
         disablePortal
       >
         <DialogTitle className="FstoDialogTransaction-title">
-          Transaction
+          Transaction Details
           <IconButton size="large" onClick={onClose}>
             <CloseIcon />
           </IconButton>
@@ -153,121 +153,119 @@ const DocumentVoucheringTransaction = (props) => {
           {
             (state === `receive` || state === `approve`) &&
             <React.Fragment>
-              <Box className="FstoBoxTransaction-root">
-                <Autocomplete
-                  className="FstoSelectForm-root"
-                  size="small"
-                  options={RECEIPT_TYPE_LIST}
-                  value={null}
-                  renderInput={
-                    props =>
-                      <TextField
-                        {...props}
-                        variant="outlined"
-                        label="Type of Receipt"
-                      />
-                  }
-                  PaperComponent={
-                    props =>
-                      <Paper
-                        {...props}
-                        sx={{ textTransform: 'capitalize' }}
-                      />
-                  }
-                  getOptionLabel={
-                    option => option.name
-                  }
-                  sx={{ marginX: `10px` }}
-                  onChange={(e, value) => console.log(value)}
-                  disablePortal
-                  disableClearable
-                />
-              </Box>
+              <Divider className="FstoDividerTransaction-root" variant="middle" />
 
-              <Box className="FstoBoxTransaction-root">
-                <TextField
-                  className="FstoTextfieldForm-root"
-                  label="Net of Amount"
-                  variant="outlined"
-                  autoComplete="off"
-                  size="small"
-                  onChange={(e) => console.log(e.target.value)}
-                  sx={{ marginX: `10px` }}
-                />
+              <Box className="FstoBoxTransactionForm-root">
+                <Box className="FstoBoxTransactionForm-content">
+                  <Autocomplete
+                    className="FstoSelectForm-root"
+                    size="small"
+                    options={RECEIPT_TYPE_LIST}
+                    value={null}
+                    renderInput={
+                      props =>
+                        <TextField
+                          {...props}
+                          variant="outlined"
+                          label="Type of Receipt"
+                        />
+                    }
+                    PaperComponent={
+                      props =>
+                        <Paper
+                          {...props}
+                          sx={{ textTransform: 'capitalize' }}
+                        />
+                    }
+                    getOptionLabel={
+                      option => option.name
+                    }
+                    onChange={(e, value) => console.log(value)}
+                    fullWidth
+                    disablePortal
+                    disableClearable
+                  />
 
-                <TextField
-                  className="FstoTextfieldForm-root"
-                  label="Withholding Tax"
-                  variant="outlined"
-                  autoComplete="off"
-                  size="small"
-                  onChange={(e) => console.log(e.target.value)}
-                  sx={{ marginX: `10px` }}
-                />
+                  <TextField
+                    className="FstoTextfieldForm-root"
+                    label="Net of Amount"
+                    variant="outlined"
+                    autoComplete="off"
+                    size="small"
+                    onChange={(e) => console.log(e.target.value)}
+                    fullWidth
+                  />
 
-                <TextField
-                  className="FstoTextfieldForm-root"
-                  label="Percentage Tax"
-                  variant="outlined"
-                  autoComplete="off"
-                  size="small"
-                  onChange={(e) => console.log(e.target.value)}
-                  sx={{ marginX: `10px` }}
-                />
-              </Box>
+                  <TextField
+                    className="FstoTextfieldForm-root"
+                    label="Withholding Tax"
+                    variant="outlined"
+                    autoComplete="off"
+                    size="small"
+                    onChange={(e) => console.log(e.target.value)}
+                    fullWidth
+                  />
 
-              <Divider variant="middle" sx={{ margin: "1.25em" }} />
+                  <TextField
+                    className="FstoTextfieldForm-root"
+                    label="Percentage Tax"
+                    variant="outlined"
+                    autoComplete="off"
+                    size="small"
+                    onChange={(e) => console.log(e.target.value)}
+                    fullWidth
+                  />
+                </Box>
 
-              <Box className="FstoBoxTransaction-root">
-                <TextField
-                  className="FstoTextfieldForm-root"
-                  label="Voucher Month"
-                  variant="outlined"
-                  autoComplete="off"
-                  size="small"
-                  onChange={(e) => console.log(e.target.value)}
-                  sx={{ marginX: `10px` }}
-                />
+                <Box className="FstoBoxTransactionForm-content">
+                  <TextField
+                    className="FstoTextfieldForm-root"
+                    label="Voucher Month"
+                    variant="outlined"
+                    autoComplete="off"
+                    size="small"
+                    onChange={(e) => console.log(e.target.value)}
+                    fullWidth
+                  />
 
-                <TextField
-                  className="FstoTextfieldForm-root"
-                  label="Voucher Number"
-                  variant="outlined"
-                  autoComplete="off"
-                  size="small"
-                  onChange={(e) => console.log(e.target.value)}
-                  sx={{ marginX: `10px` }}
-                />
-              </Box>
+                  <TextField
+                    className="FstoTextfieldForm-root"
+                    label="Voucher Number"
+                    variant="outlined"
+                    autoComplete="off"
+                    size="small"
+                    onChange={(e) => console.log(e.target.value)}
+                    fullWidth
+                  />
 
-              <Divider variant="middle" sx={{ margin: "1.25em" }} />
+                  <Divider variant="middle" sx={{ margin: "1.25em" }} />
 
-              <Box className="FstoBoxTransaction-root">
-                <Autocomplete
-                  className="FstoSelectForm-root"
-                  size="small"
-                  options={[]}
-                  value={null}
-                  renderInput={
-                    props =>
-                      <TextField
-                        {...props}
-                        variant="outlined"
-                        label="Approver"
-                      />
-                  }
-                  PaperComponent={
-                    props =>
-                      <Paper
-                        {...props}
-                        sx={{ textTransform: 'capitalize' }}
-                      />
-                  }
-                  sx={{ marginX: `10px` }}
-                  onChange={(e, value) => console.log(value)}
-                  disablePortal
-                  disableClearable
-                />
+                  <Autocomplete
+                    className="FstoSelectForm-root"
+                    size="small"
+                    options={[]}
+                    value={null}
+                    renderInput={
+                      props =>
+                        <TextField
+                          {...props}
+                          variant="outlined"
+                          label="Approver"
+                        />
+                    }
+                    PaperComponent={
+                      props =>
+                        <Paper
+                          {...props}
+                          sx={{ textTransform: 'capitalize' }}
+                        />
+                    }
+                    onChange={(e, value) => console.log(value)}
+                    fullWidth
+                    disablePortal
+                    disableClearable
+                  />
+                </Box>
               </Box>
             </React.Fragment>
           }
@@ -280,7 +278,6 @@ const DocumentVoucheringTransaction = (props) => {
               (state === `receive` || state === `approve`) &&
               <Button
                 variant="contained"
-                size="large"
                 onClick={onAccountTitleManage}
                 disableElevation
               > {state === `receive` ? "Approve" : "Save"}
@@ -291,7 +288,6 @@ const DocumentVoucheringTransaction = (props) => {
               state === `hold` &&
               <Button
                 variant="contained"
-                size="large"
                 onClick={submitUnholdHandler}
                 disableElevation
               > Unhold
@@ -302,7 +298,6 @@ const DocumentVoucheringTransaction = (props) => {
               state !== `hold` &&
               <Button
                 variant="outlined"
-                size="large"
                 color="error"
                 onClick={submitHoldHandler}
                 disableElevation
@@ -312,7 +307,6 @@ const DocumentVoucheringTransaction = (props) => {
 
             <Button
               variant="outlined"
-              size="large"
               color="error"
               onClick={submitReturnHandler}
               disableElevation
@@ -321,7 +315,6 @@ const DocumentVoucheringTransaction = (props) => {
 
             <Button
               variant="outlined"
-              size="large"
               color="error"
               onClick={submitVoidHandler}
               disableElevation
