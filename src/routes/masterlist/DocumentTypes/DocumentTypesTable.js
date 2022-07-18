@@ -90,20 +90,60 @@ const DocumentTypesTable = (props) => {
     onUpdateChange
   } = props
 
+  const [order, setOrder] = React.useState('desc')
+  const [orderBy, setOrderBy] = React.useState('updated_at')
+
+  const descendingComparator = (a, b, orderBy) => {
+    if (b[orderBy] < a[orderBy]) {
+      return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+      return 1;
+    }
+    return 0;
+  }
+
+  const comparator = (order, orderBy) => {
+    return order === 'desc'
+      ? (a, b) => descendingComparator(a, b, orderBy)
+      : (a, b) => -descendingComparator(a, b, orderBy)
+  }
+
+  const onSort = (property) => {
+    const isAsc = orderBy === property && order === 'asc'
+    setOrder(isAsc ? 'desc' : 'asc')
+    setOrderBy(property)
+  }
+
   return (
     <Table className="FstoTableMasterlist-root" size="small">
       <TableHead className="FstoTableHeadMasterlist-root">
         <TableRow className="FstoTableRowMasterlist-root">
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head" align="center">
-            <TableSortLabel active={false}>ID NO.</TableSortLabel>
+            <TableSortLabel
+              active={orderBy === `id`}
+              direction={orderBy === `id` ? order : `asc`}
+              onClick={() => onSort(`id`)}
+            > ID NO.
+            </TableSortLabel>
           </TableCell>
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">
-            <TableSortLabel active={false}>TYPE</TableSortLabel>
+            <TableSortLabel
+              active={orderBy === `type`}
+              direction={orderBy === `type` ? order : `asc`}
+              onClick={() => onSort(`type`)}
+            > TYPE
+            </TableSortLabel>
           </TableCell>
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">
-            <TableSortLabel active={false}>DESCRIPTION</TableSortLabel>
+            <TableSortLabel
+              active={orderBy === `description`}
+              direction={orderBy === `description` ? order : `asc`}
+              onClick={() => onSort(`description`)}
+            > DESCRIPTION
+            </TableSortLabel>
           </TableCell>
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">CATEGORIES</TableCell>
@@ -111,7 +151,12 @@ const DocumentTypesTable = (props) => {
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">STATUS</TableCell>
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">
-            <TableSortLabel active={false}>LAST MODIFIED</TableSortLabel>
+            <TableSortLabel
+              active={orderBy === `updated_at`}
+              direction={orderBy === `updated_at` ? order : `asc`}
+              onClick={() => onSort(`updated_at`)}
+            > LAST MODIFIED
+            </TableSortLabel>
           </TableCell>
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head" align="center">ACTIONS</TableCell>
@@ -122,7 +167,7 @@ const DocumentTypesTable = (props) => {
           fetching
             ? <Preloader row={5} col={7} />
             : data
-              ? data.map((data, index) => (
+              ? data.sort(comparator(order, orderBy)).map((data, index) => (
                 <TableRow className="FstoTableRowMasterlist-root" key={index}>
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body" align="center">
                     {data.id}

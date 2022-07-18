@@ -4,7 +4,7 @@ import CryptoJS from 'crypto-js'
 
 import { useNavigate } from 'react-router-dom'
 
-import { useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { SET_AUTH, SET_USER } from './actions'
 
 import FistoLogo from './assets/img/logo_s.png'
@@ -46,16 +46,40 @@ const Landing = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
+  const user = useSelector((state) => state.user)
+
   React.useEffect(() => {
     const session = window.localStorage.getItem("token")
 
-    if (session) navigate('/masterlist/users', { replace: true })
+    if (session && user) {
+      const REDIRECT = handleRedirect(user.role)
+      navigate(REDIRECT, { replace: true })
+    }
 
     // eslint-disable-next-line
-  }, [])
+  }, [user])
 
-  const handleVisibility = () => {
-    setVisibility(!visibility)
+  const handleRedirect = (role) => {
+    switch (role.toLowerCase()) {
+      case 'requestor':
+        return `/request`
+
+      case 'ap tagging':
+        return `/document/tagging`
+
+      case 'ap associate':
+      case 'ap specialist':
+        return `/voucher/vouchering`
+
+      case 'treasury associate':
+        return `/cheque/chequing`
+
+      case 'approver':
+        return `/approval`
+
+      default:
+        return `/masterlist/users`
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -72,43 +96,16 @@ const Landing = () => {
       window.localStorage.setItem('token', JSON.stringify(token))
       window.localStorage.setItem('user', encryptedUser)
 
-      dispatch(SET_AUTH())
-      dispatch(SET_USER(user))
-
-      let REDIRECT
-      switch (user.role) {
-        case 'Requestor':
-          REDIRECT = '/request'
-          break
-
-        case 'AP Tagging':
-          REDIRECT = '/document/tagging'
-          break
-
-        case 'AP Associate':
-        case 'AP Specialist':
-          REDIRECT = '/voucher/vouchering'
-          break
-
-        case 'Treasury Associate':
-          REDIRECT = '/cheque/chequing'
-          break
-
-        case 'Approver':
-          REDIRECT = '/approval'
-          break
-
-        default:
-          REDIRECT = '/masterlist/users'
-      }
-
       // Redirect to Dashboard
+      const REDIRECT = handleRedirect(user.role)
       navigate(REDIRECT, {
         state: {
           default_password: credential.username === credential.password ? true : false
         }
       })
 
+      dispatch(SET_AUTH())
+      dispatch(SET_USER(user))
     }
     catch (error) {
       if (error.request.status === 401) {
@@ -143,7 +140,7 @@ const Landing = () => {
               size="small"
               label="Username"
               value={credential.username}
-              onChange={$event => setCredential({ ...credential, username: $event.target.value })}
+              onChange={(e) => setCredential({ ...credential, username: e.target.value })}
               InputProps={{
                 sx: { paddingLeft: 1 }
               }}
@@ -163,14 +160,14 @@ const Landing = () => {
               label="Password"
               type={visibility ? "text" : "password"}
               value={credential.password}
-              onChange={$event => setCredential({ ...credential, password: $event.target.value })}
+              onChange={(e) => setCredential({ ...credential, password: e.target.value })}
               InputProps={{
                 sx: { paddingLeft: 1 },
                 endAdornment: (
                   <InputAdornment position="start">
                     <IconButton
                       edge="end"
-                      onClick={handleVisibility}
+                      onClick={() => setVisibility(!visibility)}
                       sx={{
                         '&:hover': {
                           background: 'none'

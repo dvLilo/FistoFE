@@ -21,26 +21,71 @@ const ReasonsTable = (props) => {
     onUpdateChange
   } = props
 
+  const [order, setOrder] = React.useState('desc')
+  const [orderBy, setOrderBy] = React.useState('updated_at')
+
+  const descendingComparator = (a, b, orderBy) => {
+    if (b[orderBy] < a[orderBy]) {
+      return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+      return 1;
+    }
+    return 0;
+  }
+
+  const comparator = (order, orderBy) => {
+    return order === 'desc'
+      ? (a, b) => descendingComparator(a, b, orderBy)
+      : (a, b) => -descendingComparator(a, b, orderBy)
+  }
+
+  const onSort = (property) => {
+    const isAsc = orderBy === property && order === 'asc'
+    setOrder(isAsc ? 'desc' : 'asc')
+    setOrderBy(property)
+  }
+
   return (
     <Table className="FstoTableMasterlist-root" size="small">
       <TableHead className="FstoTableHeadMasterlist-root">
         <TableRow className="FstoTableRowMasterlist-root">
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head" align="center">
-            <TableSortLabel active={false}>ID NO.</TableSortLabel>
+            <TableSortLabel
+              active={orderBy === `id`}
+              direction={orderBy === `id` ? order : `asc`}
+              onClick={() => onSort(`id`)}
+            > ID NO.
+            </TableSortLabel>
           </TableCell>
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">
-            <TableSortLabel active={false}>REASON</TableSortLabel>
+            <TableSortLabel
+              active={orderBy === `reason`}
+              direction={orderBy === `reason` ? order : `asc`}
+              onClick={() => onSort(`reason`)}
+            > REASON
+            </TableSortLabel>
           </TableCell>
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">
-            <TableSortLabel active={false}>REMARKS</TableSortLabel>
+            <TableSortLabel
+              active={orderBy === `remarks`}
+              direction={orderBy === `remarks` ? order : `asc`}
+              onClick={() => onSort(`remarks`)}
+            > REMARKS
+            </TableSortLabel>
           </TableCell>
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">STATUS</TableCell>
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">
-            <TableSortLabel active={false}>LAST MODIFIED</TableSortLabel>
+            <TableSortLabel
+              active={orderBy === `updated_at`}
+              direction={orderBy === `updated_at` ? order : `asc`}
+              onClick={() => onSort(`updated_at`)}
+            > LAST MODIFIED
+            </TableSortLabel>
           </TableCell>
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head" align="center">ACTIONS</TableCell>
@@ -51,7 +96,7 @@ const ReasonsTable = (props) => {
           fetching
             ? <Preloader row={5} col={6} />
             : data
-              ? data.map((data, index) => (
+              ? data.sort(comparator(order, orderBy)).map((data, index) => (
                 <TableRow className="FstoTableRowMasterlist-root" key={index}>
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body" align="center">
                     {data.id}

@@ -24,8 +24,8 @@ const UserAccountsTable = (props) => {
     onView
   } = props
 
-  const [order, setOrder] = React.useState('asc')
-  const [orderBy, setOrderBy] = React.useState('id')
+  const [order, setOrder] = React.useState('desc')
+  const [orderBy, setOrderBy] = React.useState('updated_at')
 
   const descendingComparator = (a, b, orderBy) => {
     if (b[orderBy] < a[orderBy]) {
