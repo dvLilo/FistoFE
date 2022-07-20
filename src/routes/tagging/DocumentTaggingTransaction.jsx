@@ -20,6 +20,25 @@ import useConfirm from '../../hooks/useConfirm'
 
 import Transaction from '../../components/Transaction'
 
+const ASSOCIATES = [
+  {
+    id: 1,
+    label: "Lorenzo Yumul"
+  },
+  {
+    id: 2,
+    label: "Ruth Santos"
+  },
+  {
+    id: 3,
+    label: "Carlo Lorenzo"
+  },
+  {
+    id: 4,
+    label: "Ira Pingca"
+  }
+]
+
 const DocumentTaggingTransaction = (props) => {
 
   const confirm = useConfirm()
@@ -114,7 +133,7 @@ const DocumentTaggingTransaction = (props) => {
                 <Autocomplete
                   className="FstoSelectForm-root"
                   size="small"
-                  options={[]}
+                  options={ASSOCIATES}
                   value={null}
                   renderInput={
                     props =>

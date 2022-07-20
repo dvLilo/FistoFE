@@ -262,10 +262,11 @@ const DocumentRequesting = () => {
                               {data.document_type}
                               {
                                 data.document_id === 4 && data.payment_type === `Partial` &&
-                                <React.Fragment>
-                                  <Chip label={data.payment_type} size="small" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
-                                  {/* <Chip label="Latest" size="small" color="primary" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} /> */}
-                                </React.Fragment>
+                                <Chip label={data.payment_type} size="small" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
+                              }
+                              {
+                                Boolean(data.is_latest_transaction) &&
+                                <Chip label="Latest" size="small" color="primary" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
                               }
                             </Typography>
                             <Typography variant="caption" sx={{ display: `flex`, alignItems: `center`, fontSize: `1.25em`, textTransform: `uppercase`, lineHeight: 1.55 }}>

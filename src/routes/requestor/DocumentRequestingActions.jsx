@@ -83,7 +83,7 @@ const DocumentRequestingActions = (props) => {
               onUpdate(data)
               actionCloseHandler()
             }}
-            disabled={user?.id !== data.users_id}
+            disabled={user?.id !== data.users_id || !data.is_latest_transaction}
           >
             <UpdateIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Edit
           </MenuItem>}
@@ -97,7 +97,7 @@ const DocumentRequestingActions = (props) => {
               onVoid(data)
               actionCloseHandler()
             }}
-            disabled={user?.id !== data.users_id}
+            disabled={user?.id !== data.users_id || !data.is_latest_transaction}
           >
             <VoidIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Void
           </MenuItem>}

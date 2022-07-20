@@ -233,7 +233,9 @@ const DocumentTagging = () => {
                         {
                           item.document_id === 4 &&
                           item.payment_type.toLowerCase() === `partial` &&
-                          <Chip label={item.payment_type} size="small" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
+                          <Chip label={item.payment_type} size="small" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} /> &&
+                          item.is_latest_transaction &&
+                          <Chip label="Latest" size="small" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
                         }
                       </Typography>
                       <Typography variant="caption" sx={{ fontSize: `1.25em`, textTransform: `uppercase`, lineHeight: 1.55 }}>{item.supplier}</Typography>

@@ -280,9 +280,11 @@ const UpdateRequest = () => {
         const po_group_new = po_group.map((item) => {
           const data = {
             ...item,
+            batch: !item.is_add,
             balance: item.previous_balance,
           }
 
+          delete data.is_add
           delete data.previous_balance
           return data
         })

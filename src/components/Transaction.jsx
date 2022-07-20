@@ -487,11 +487,24 @@ const Transaction = (props) => {
               </ListItem>
             </List>}
           {
-            status === `success` && Boolean(data.po_group.length) &&
+            status === `success` && Boolean(data.po_group.length) && data.document.payment_type.toLowerCase() === `partial` &&
             <List dense>
               <ListItem className="FstoListItemTransactionDetails-root" dense>
                 <span>Balance:</span>
-                <strong>&#8369;{data.po_group.map((data) => data.balance).reduce((a, b) => a + b).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                <strong>&#8369;{data.po_group[0].balance.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+              </ListItem>
+
+              <ListItem className="FstoListItemTransactionDetails-root" dense>
+                <span>Total Amount:</span>
+                <strong>&#8369;{data.po_group.map((data) => data.amount).reduce((a, b) => a + b).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+              </ListItem>
+            </List>}
+          {
+            status === `success` && Boolean(data.po_group.length) && data.document.payment_type.toLowerCase() === `full` &&
+            <List dense>
+              <ListItem className="FstoListItemTransactionDetails-root" dense>
+                <span>Balance:</span>
+                <strong>&#8369;{(data.po_group.map((data) => data.amount).reduce((a, b) => a + b) - (data.document.amount || data.document.reference.amount)).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
               </ListItem>
 
               <ListItem className="FstoListItemTransactionDetails-root" dense>
@@ -569,10 +582,19 @@ const Transaction = (props) => {
                   return (
                     <ListItem className="FstoListItemTransactionDetails-root FstoListItemTransactionDetails-alt" key={index} dense divider>
                       <span>PO No.:</span>
-                      <strong>{item.no.toUpperCase()}</strong>
+                      <strong style={{ display: `flex`, alignItems: `center` }}>
+                        {item.no.toUpperCase()}
+                        {
+                          item.amount === item.previous_balance &&
+                          <Chip label="New" size="small" color="primary" sx={{ height: `20px`, marginLeft: `5px`, fontWeight: 500 }} />
+                        }
+                      </strong>
 
                       <span>PO Amount.:</span>
                       <strong>&#8369;{item.amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+
+                      <span>PO Balance.:</span>
+                      <strong>&#8369;{item.previous_balance.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
 
                       <span>RR No.:</span>
                       <strong>
