@@ -4,28 +4,21 @@ import { useQuery } from 'react-query'
 
 import useToast from './useToast'
 
-const useReasons = () => {
+const useDistribute = () => {
 
   const toast = useToast()
 
-  const fetchReasonsList = async () => {
-    return await axios.get(`/api/dropdown/reason`, {
-      params: {
-        status: 1,
-        paginate: 0
-      }
-    })
+  const fetchDistributeList = async () => {
+    return await axios.get(`/api/dropdown/associate`)
   }
 
   const {
-    refetch,
     status,
     data,
     error
-  } = useQuery("REASONS", fetchReasonsList, {
-    enabled: false,
+  } = useQuery(["DISTRIBUTE"], fetchDistributeList, {
     refetchOnWindowFocus: false,
-    select: (response) => response.data.result.reasons,
+    select: (response) => response.data.result.associates,
     onError: (error) => {
       if (error.request.status !== 404)
         toast({
@@ -37,7 +30,7 @@ const useReasons = () => {
     }
   })
 
-  return { refetch, status, data, error }
+  return { status, data, error }
 }
 
-export default useReasons
+export default useDistribute

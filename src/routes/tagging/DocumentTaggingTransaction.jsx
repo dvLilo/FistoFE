@@ -1,5 +1,7 @@
 import React from 'react'
 
+import axios from 'axios'
+
 import {
   Autocomplete,
   Dialog,
@@ -16,37 +18,33 @@ import {
 
 import CloseIcon from '@mui/icons-material/Close'
 
+import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
+import useDistribute from '../../hooks/useDistribute'
 
 import Transaction from '../../components/Transaction'
 
-const ASSOCIATES = [
-  {
-    id: 1,
-    label: "Lorenzo Yumul"
-  },
-  {
-    id: 2,
-    label: "Ruth Santos"
-  },
-  {
-    id: 3,
-    label: "Carlo Lorenzo"
-  },
-  {
-    id: 4,
-    label: "Ira Pingca"
-  }
-]
-
 const DocumentTaggingTransaction = (props) => {
 
+  const [tag, setTag] = React.useState({
+    process: "tag",
+    subprocess: "tag",
+    distributed_to: null
+  })
+
+  const toast = useToast()
   const confirm = useConfirm()
+  const {
+    data: DISTUBUTE_LIST,
+    status: DISTRIBUTE_STATUS
+  } = useDistribute()
 
   const {
     state,
     data,
     open = false,
+    refetchData,
+    onHold = () => { },
     onClose = () => { }
   } = props
 
@@ -56,7 +54,23 @@ const DocumentTaggingTransaction = (props) => {
     confirm({
       open: true,
       wait: true,
-      onConfirm: () => console.log(`${data.transaction_id} has been tagged/saved.`)
+      onConfirm: async () => {
+
+        let response
+        try {
+          response = await axios.post(`/api/transactions/flow/update-transaction/${data.id}`, tag)
+
+          const { message } = response.data
+
+          refetchData()
+          toast({
+            message,
+            title: "Success!"
+          })
+        } catch (error) {
+
+        }
+      }
     })
   }
 
@@ -72,12 +86,7 @@ const DocumentTaggingTransaction = (props) => {
 
   const submitHoldHandler = () => {
     onClose()
-
-    confirm({
-      open: true,
-      wait: true,
-      onConfirm: () => console.log(`${data.transaction_id} has been held.`)
-    })
+    onHold(data)
   }
 
   const submitReturnHandler = () => {
@@ -124,7 +133,7 @@ const DocumentTaggingTransaction = (props) => {
         <Transaction data={data} />
 
         {
-          (state === `receive` || state === `tag`) &&
+          (state === `tag-receive` || state === `tag-tag`) &&
           <React.Fragment>
             <Divider className="FstoDividerTransaction-root" variant="middle" />
 
@@ -133,8 +142,11 @@ const DocumentTaggingTransaction = (props) => {
                 <Autocomplete
                   className="FstoSelectForm-root"
                   size="small"
-                  options={ASSOCIATES}
+                  options={DISTUBUTE_LIST}
                   value={null}
+                  loading={
+                    DISTRIBUTE_STATUS === 'loading'
+                  }
                   renderInput={
                     props =>
                       <TextField
@@ -150,8 +162,17 @@ const DocumentTaggingTransaction = (props) => {
                         sx={{ textTransform: 'capitalize' }}
                       />
                   }
+                  getOptionLabel={
+                    option => option.name
+                  }
+                  isOptionEqualToValue={
+                    (option, value) => option.id === value.id
+                  }
                   sx={{ marginX: `10px` }}
-                  onChange={(e, value) => console.log(value)}
+                  onChange={(e, value) => setTag(currentValue => ({
+                    ...currentValue,
+                    distributed_to: value
+                  }))}
                   disablePortal
                   disableClearable
                 />
@@ -162,20 +183,20 @@ const DocumentTaggingTransaction = (props) => {
       </DialogContent>
 
       {
-        (state === `receive` || state === `tag` || state === `hold`) &&
+        (state === `tag-receive` || state === `tag-tag` || state === `tag-hold`) &&
         <DialogActions className="FstoDialogTransaction-actions">
           {
-            (state === `receive` || state === `tag`) &&
+            (state === `tag-receive` || state === `tag-tag`) &&
             <Button
               variant="contained"
               onClick={submitTagHandler}
               disableElevation
-            > {state === `receive` ? "Tag" : "Save"}
+            > {state === `tag-receive` ? "Tag" : "Save"}
             </Button>
           }
 
           {
-            state === `hold` &&
+            state === `tag-hold` &&
             <Button
               variant="contained"
               onClick={submitUnholdHandler}
@@ -185,7 +206,7 @@ const DocumentTaggingTransaction = (props) => {
           }
 
           {
-            state !== `hold` &&
+            state !== `tag-hold` &&
             <Button
               variant="outlined"
               color="error"

@@ -64,7 +64,7 @@ const DocumentRequesting = () => {
   const toast = useToast()
 
   const [active, setActive] = React.useState(true)
-  const [state, setState] = React.useState("request")
+  const [state, setState] = React.useState("pending")
   const [search, setSearch] = React.useState("")
 
   const [view, setView] = React.useState({
@@ -167,8 +167,8 @@ const DocumentRequesting = () => {
                 children: <span className="FstoTabsIndicator-root" />
               }}
             >
-              <Tab className="FstoTab-root" label="Requested" value="request" disableRipple />
-              <Tab className="FstoTab-root" label="Voided" value="void" disableRipple />
+              <Tab className="FstoTab-root" label="Requested" value="pending" disableRipple />
+              <Tab className="FstoTab-root" label="Voided" value="requestor-void" disableRipple />
             </Tabs>
 
             <Stack className="FstoStackToolbar-root" direction="row">
@@ -261,7 +261,7 @@ const DocumentRequesting = () => {
                               &nbsp;&mdash;&nbsp;
                               {data.document_type}
                               {
-                                data.document_id === 4 && data.payment_type === `Partial` &&
+                                data.document_id === 4 && data.payment_type.toLowerCase() === `partial` &&
                                 <Chip label={data.payment_type} size="small" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
                               }
                               {

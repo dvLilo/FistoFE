@@ -1752,28 +1752,30 @@ const UpdateRequest = () => {
                     />
                   )}
 
+                <LocalizationProvider dateAdapter={DateAdapter}>
+                  <DatePicker
+                    value={data.transaction.date_requested}
+                    onChange={(value) => { }}
+                    renderInput={
+                      props =>
+                        <TextField
+                          {...props}
+                          className="FstoTextfieldForm-root"
+                          variant="outlined"
+                          size="small"
+                          label="Request Date"
+                          autoComplete="off"
+                          fullWidth
+                        />
+                    }
+                    readOnly
+                  />
+                </LocalizationProvider>
+
                 { // Request Date, Document Date
-                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4 || data.document.id === 5 || data.document.id === 8) &&
+                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 4 || data.document.id === 5 || data.document.id === 8) &&
                   (
                     <LocalizationProvider dateAdapter={DateAdapter}>
-                      <DatePicker
-                        value={new Date()}
-                        onChange={(value) => { }}
-                        renderInput={
-                          props =>
-                            <TextField
-                              {...props}
-                              className="FstoTextfieldForm-root"
-                              variant="outlined"
-                              size="small"
-                              label="Request Date"
-                              autoComplete="off"
-                              fullWidth
-                            />
-                        }
-                        readOnly
-                      />
-
                       <DatePicker
                         value={data.document.date}
                         disabled={data.document.id === 8}

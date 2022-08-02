@@ -11,7 +11,7 @@ const useTransactions = (URL) => {
   const toast = useToast()
 
   const [params, setParams] = React.useState({
-    state: "request",
+    state: "pending",
     page: 1,
     rows: 10,
     search: null,

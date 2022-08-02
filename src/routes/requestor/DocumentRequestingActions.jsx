@@ -62,7 +62,7 @@ const DocumentRequestingActions = (props) => {
         disablePortal
       >
         {
-          (state === `request` || state === `return` || state === `hold` || state === `void`)
+          (state === `pending` || state === `requestor-void`)
           &&
           <MenuItem dense
             sx={{ fontWeight: 500 }}
@@ -75,7 +75,7 @@ const DocumentRequestingActions = (props) => {
           </MenuItem>}
 
         {
-          (state === `request` || state === `return`)
+          (state === `pending`)
           &&
           <MenuItem dense
             sx={{ fontWeight: 500 }}
@@ -83,13 +83,13 @@ const DocumentRequestingActions = (props) => {
               onUpdate(data)
               actionCloseHandler()
             }}
-            disabled={user?.id !== data.users_id || !data.is_latest_transaction}
+            disabled={user?.id !== data.users_id || (data.document_id === 4 && data.payment_type === `partial` && !data.is_latest_transaction)}
           >
             <UpdateIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Edit
           </MenuItem>}
 
         {
-          (state === `request` || state === `return`)
+          (state === `pending`)
           &&
           <MenuItem dense
             sx={{ fontWeight: 500 }}
@@ -97,7 +97,7 @@ const DocumentRequestingActions = (props) => {
               onVoid(data)
               actionCloseHandler()
             }}
-            disabled={user?.id !== data.users_id || !data.is_latest_transaction}
+            disabled={user?.id !== data.users_id || (data.document_id === 4 && data.payment_type === `partial` && !data.is_latest_transaction)}
           >
             <VoidIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Void
           </MenuItem>}

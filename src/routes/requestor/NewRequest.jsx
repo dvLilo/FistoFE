@@ -23,7 +23,8 @@ import {
 import {
   Add,
   Edit,
-  Delete
+  Delete,
+  UploadFile
 } from '@mui/icons-material'
 
 import {
@@ -69,34 +70,6 @@ const PAYMENT_TYPES = [
     id: 2,
     label: "Partial"
   }
-]
-
-const COVERAGE_MONTH = [
-  {
-    id: 1,
-    label: "3 Months",
-    value: 3.0
-  },
-  {
-    id: 2,
-    label: "6 Months",
-    value: 6.0
-  },
-  {
-    id: 3,
-    label: "12 Months",
-    value: 12.0
-  },
-  {
-    id: 4,
-    label: "24 Months",
-    value: 24.0
-  },
-  {
-    id: 5,
-    label: "36 Months",
-    value: 36.0
-  },
 ]
 
 const BATCH_LETTERS = [
@@ -206,8 +179,9 @@ const NewRequest = () => {
       date: null,
       amount: null,
 
-      payment_date: null,
-      coverage: null,
+      needed_date: null,
+      release_date: null,
+      batch_no: null,
 
       category: null,
 
@@ -330,7 +304,7 @@ const NewRequest = () => {
         if (error.request.status !== 404)
           toast({
             title: "Error!",
-            message: "Something went wrong whilst validation user department."
+            message: "Something went wrong whilst validating user department."
           })
       }
     })()
@@ -1182,8 +1156,9 @@ const NewRequest = () => {
         date: null,
         amount: null,
 
-        payment_date: null,
-        coverage: null,
+        needed_date: null,
+        release_date: null,
+        batch_no: null,
 
         category: null,
 
@@ -1708,7 +1683,7 @@ const NewRequest = () => {
                     />
                   )}
 
-                { // Request Date, Document Date
+                { // Request Date
                   (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4 || data.document.id === 5 || data.document.id === 8) &&
                   (
                     <LocalizationProvider dateAdapter={DateAdapter}>
@@ -1729,7 +1704,13 @@ const NewRequest = () => {
                         }
                         readOnly
                       />
+                    </LocalizationProvider>
+                  )}
 
+                { // Document Date
+                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 4 || data.document.id === 5 || data.document.id === 8) &&
+                  (
+                    <LocalizationProvider dateAdapter={DateAdapter}>
                       <DatePicker
                         value={data.document.date}
                         disabled={data.document.id === 8}
@@ -2158,8 +2139,7 @@ const NewRequest = () => {
                         fullWidth
                       />
                     </React.Fragment>
-                  )
-                }
+                  )}
 
                 { // Category
                   (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4 || data.document.id === 5) &&
@@ -2204,18 +2184,18 @@ const NewRequest = () => {
                     />
                   )}
 
-                { // Payment Date, Coverage Month
-                  (data.document.id === 3) &&
+                { // Release Date, Batch Number
+                  (data.document.id === 3 && data.document.category && data.document.category.name.toLowerCase() === "loans & leasing") &&
                   (
                     <React.Fragment>
                       <LocalizationProvider dateAdapter={DateAdapter}>
                         <DatePicker
-                          value={data.document.payment_date}
+                          value={data.document.release_date}
                           onChange={(value) => setData({
                             ...data,
                             document: {
                               ...data.document,
-                              payment_date: value
+                              release_date: value
                             }
                           })}
                           renderInput={
@@ -2225,46 +2205,37 @@ const NewRequest = () => {
                                 className="FstoTextfieldForm-root"
                                 variant="outlined"
                                 size="small"
-                                label="Payment Date"
+                                label="Release Date"
                                 fullWidth
                               />
                           }
                         />
                       </LocalizationProvider>
 
-                      <Autocomplete
-                        className="FstoSelectForm-root"
+                      <TextField
+                        className="FstoTextfieldForm-root"
+                        label="Batch Number"
+                        variant="outlined"
+                        autoComplete="off"
                         size="small"
-                        options={COVERAGE_MONTH}
-                        value={COVERAGE_MONTH.find(row => row.value === data.document.coverage) || null}
-                        renderInput={
-                          props =>
-                            <TextField
-                              {...props}
-                              variant="outlined"
-                              label="Coverage Month"
-                            />
-                        }
-                        PaperComponent={
-                          props =>
-                            <Paper
-                              {...props}
-                              sx={{ textTransform: 'capitalize' }}
-                            />
-                        }
-                        isOptionEqualToValue={
-                          (option, value) => option.id === value.id
-                        }
-                        onChange={(e, value) => setData({
+                        type="number"
+                        value={data.document.batch_no}
+                        onKeyDown={(e) => ["E", "e", ".", "+", "-"].includes(e.key) && e.preventDefault()}
+                        onChange={(e) => setData({
                           ...data,
                           document: {
                             ...data.document,
-                            coverage: value.value
+                            batch_no: e.target.value
                           }
                         })}
+                        InputProps={{
+                          startAdornment: data.document.batch_no &&
+                            <InputAdornment className="FstoAdrmentForm-root" position="start">batch#</InputAdornment>
+                        }}
+                        InputLabelProps={{
+                          className: "FstoLabelForm-root"
+                        }}
                         fullWidth
-                        disablePortal
-                        disableClearable
                       />
                     </React.Fragment>
                   )}
@@ -2965,6 +2936,29 @@ const NewRequest = () => {
                 </React.Fragment>
               )
             }
+          </Paper>
+        )
+      }
+
+
+      {
+        (data.document.id === 3) &&
+        (
+          <Paper className="FstoPaperAttachment-root" elevation={1}>
+            <Box className="FstoBoxHeadeing" sx={{ display: 'flex', alignItems: 'center', gap: 2, marginBottom: 3 }}>
+              <Typography variant="heading">Attachment</Typography>
+              <LoadingButton
+                className="FstoButtonImport-root"
+                variant="contained"
+                component="label"
+                loadingPosition="start"
+                // loading={isImporting}
+                startIcon={<UploadFile />}
+                disableElevation
+              > Import
+                <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden />
+              </LoadingButton>
+            </Box>
           </Paper>
         )
       }

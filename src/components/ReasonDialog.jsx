@@ -1,5 +1,7 @@
 import React from 'react'
 
+import axios from 'axios'
+
 import {
   Box,
   TextField,
@@ -14,26 +16,37 @@ import {
 
 import { LoadingButton } from '@mui/lab'
 
-import {
-  CloseRounded as CloseIcon,
-  WarningAmberRounded as WarningIcon
-} from '@mui/icons-material'
+import CloseIcon from '@mui/icons-material/CloseRounded'
+import WarningIcon from '@mui/icons-material/WarningAmberRounded'
 
 import useToast from '../hooks/useToast'
 import useReasons from '../hooks/useReasons'
 
 import '../assets/css/styles.reason.scss'
-import axios from 'axios'
 
 
-const ReasonDialog = ({ open = false, data = null, onSuccess = () => { }, onClose = () => { } }) => {
-
-  const toast = useToast()
+const ReasonDialog = (props) => {
 
   const {
+    data,
+    process,
+    subprocess,
+    open = false,
+    onSuccess = () => { },
+    onClose = () => { }
+  } = props
+
+  const toast = useToast()
+  const {
+    refetch: fetchReasons,
     status: REASON_STATUS,
-    data: REASON_LIST
+    data: REASON_LIST,
   } = useReasons()
+
+  React.useEffect(() => {
+    if (open && !REASON_LIST) fetchReasons()
+    // eslint-disable-next-line
+  }, [open])
 
   const [isSaving, setIsSaving] = React.useState(false)
   const [reason, setReason] = React.useState({
@@ -43,12 +56,12 @@ const ReasonDialog = ({ open = false, data = null, onSuccess = () => { }, onClos
   })
 
   const reasonCloseHandler = () => {
+    onClose()
     setReason({
       id: null,
       description: "",
       remarks: ""
     })
-    onClose()
   }
 
   const reasonSubmitHandler = async () => {
@@ -56,17 +69,19 @@ const ReasonDialog = ({ open = false, data = null, onSuccess = () => { }, onClos
 
     let response
     try {
-      response = await axios.post(`/api/transactions/void/${data.id}`, reason)
+      response = await axios.post(`/api/transactions/flow/update-transaction/${data.id}`, {
+        process: process,
+        subprocess: subprocess,
+        reason: reason
+      })
 
       const { message } = response.data
 
       onSuccess()
       reasonCloseHandler()
       toast({
-        message,
-        open: true,
-        severity: "success",
-        title: "Success!"
+        title: "Success!",
+        message
       })
     }
     catch (error) {
@@ -74,7 +89,7 @@ const ReasonDialog = ({ open = false, data = null, onSuccess = () => { }, onClos
         open: true,
         severity: "error",
         title: "Error!",
-        message: "Something went wrong whilst trying to void this transaction. Please try again later."
+        message: `Something went wrong whilst trying to ${subprocess} this transaction. Please try again later.`
       })
     }
 

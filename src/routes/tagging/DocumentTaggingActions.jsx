@@ -50,7 +50,7 @@ const DocumentTaggingActions = ({ data, state, onReceive, onManage, onView }) =>
         disablePortal
       >
         {
-          state === `request` &&
+          state === `pending` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -63,7 +63,7 @@ const DocumentTaggingActions = ({ data, state, onReceive, onManage, onView }) =>
           </MenuItem>}
 
         {
-          state === `receive` &&
+          state === `tag-receive` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -76,7 +76,7 @@ const DocumentTaggingActions = ({ data, state, onReceive, onManage, onView }) =>
           </MenuItem>}
 
         {
-          (state === `tag` || state === `hold` || state === `void`) &&
+          (state === `tag-tag` || state === `tag-hold` || state === `tag-void`) &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
