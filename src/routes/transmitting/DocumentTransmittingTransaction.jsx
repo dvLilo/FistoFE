@@ -13,7 +13,7 @@ import CloseIcon from '@mui/icons-material/Close'
 
 import useConfirm from '../../hooks/useConfirm'
 
-import Transaction from '../../components/Transaction'
+import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitle from '../../components/AccountTitle'
 
 const DocumentTransmittingTransaction = (props) => {
@@ -79,7 +79,7 @@ const DocumentTransmittingTransaction = (props) => {
         </DialogTitle>
 
         <DialogContent className="FstoDialogTransaction-content">
-          <Transaction data={data} onView={onAccountTitleView} />
+          <TransactionDialog data={data} onView={onAccountTitleView} />
         </DialogContent>
 
         {

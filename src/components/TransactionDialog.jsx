@@ -19,12 +19,22 @@ import ReportIcon from '@mui/icons-material/ReportOutlined'
 
 import useTransaction from '../hooks/useTransaction'
 
-const Transaction = (props) => {
+const TransactionDialog = (props) => {
 
   const {
     status,
     data
   } = useTransaction(props.data.id)
+
+  React.useEffect(() => {
+    if (status === `success` && props.callback !== undefined)
+      props.callback(currentValue => ({
+        ...currentValue,
+        distributed_to: data.tag.distributed_to
+      }))
+
+    // eslint-disable-next-line
+  }, [status])
 
   return (
     <React.Fragment>
@@ -183,10 +193,10 @@ const Transaction = (props) => {
             status === `success` &&
             <List className="FstoListTransactionDetails-root" dense>
               {
-                data.transaction.tag_no &&
+                data.tag.no &&
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Tag No:</span>
-                  <strong>{data.transaction.tag_no}</strong>
+                  <strong>{data.tag.no}</strong>
                 </ListItem>}
 
               <ListItem className="FstoListItemTransactionDetails-root" dense>
@@ -610,4 +620,4 @@ const Transaction = (props) => {
   )
 }
 
-export default Transaction
+export default TransactionDialog

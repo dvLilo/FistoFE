@@ -10,10 +10,11 @@ import {
   MoreHoriz as MoreIcon,
   TaskOutlined as ReceiveIcon,
   VisibilityOutlined as ViewIcon,
-  DescriptionOutlined as ManageIcon
+  DescriptionOutlined as ManageIcon,
+  ReplyOutlined as CancelIcon
 } from '@mui/icons-material'
 
-const DocumentTaggingActions = ({ data, state, onReceive, onManage, onView }) => {
+const DocumentTaggingActions = ({ data, state, onReceive, onManage, onView, onCancel }) => {
 
   const [anchor, setAnchor] = React.useState(null)
 
@@ -76,7 +77,7 @@ const DocumentTaggingActions = ({ data, state, onReceive, onManage, onView }) =>
           </MenuItem>}
 
         {
-          (state === `tag-tag` || state === `tag-hold` || state === `tag-void`) &&
+          (state === `tag-tag` || state === `tag-hold` || state === `tag-return` || state === `tag-void`) &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -86,6 +87,19 @@ const DocumentTaggingActions = ({ data, state, onReceive, onManage, onView }) =>
             dense
           >
             <ViewIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> View
+          </MenuItem>}
+
+        {
+          state === `tag-return` &&
+          <MenuItem
+            sx={{ fontWeight: 500 }}
+            onClick={() => {
+              onCancel(data.id)
+              actionCloseHandler()
+            }}
+            dense
+          >
+            <CancelIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Cancel
           </MenuItem>}
       </Menu>
     </React.Fragment>

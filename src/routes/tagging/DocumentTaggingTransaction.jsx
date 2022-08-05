@@ -22,9 +22,21 @@ import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
 import useDistribute from '../../hooks/useDistribute'
 
-import Transaction from '../../components/Transaction'
+import TransactionDialog from '../../components/TransactionDialog'
 
 const DocumentTaggingTransaction = (props) => {
+
+  const {
+    state,
+    data,
+    open = false,
+    refetchData,
+    onHold = () => { },
+    onUnhold = () => { },
+    onReturn = () => { },
+    onVoid = () => { },
+    onClose = () => { }
+  } = props
 
   const [tag, setTag] = React.useState({
     process: "tag",
@@ -37,16 +49,18 @@ const DocumentTaggingTransaction = (props) => {
   const {
     data: DISTUBUTE_LIST,
     status: DISTRIBUTE_STATUS
-  } = useDistribute()
+  } = useDistribute(data?.company_id)
 
-  const {
-    state,
-    data,
-    open = false,
-    refetchData,
-    onHold = () => { },
-    onClose = () => { }
-  } = props
+  React.useEffect(() => {
+    if (open && (DISTRIBUTE_STATUS === `idle` || DISTRIBUTE_STATUS === `success`) && DISTUBUTE_LIST.length) {
+      setTag(currentValue => ({
+        ...currentValue,
+        distributed_to: DISTUBUTE_LIST[0]
+      }))
+    }
+
+    // eslint-disable-next-line
+  }, [open, DISTRIBUTE_STATUS])
 
   const submitTagHandler = () => {
     onClose()
@@ -76,12 +90,7 @@ const DocumentTaggingTransaction = (props) => {
 
   const submitUnholdHandler = () => {
     onClose()
-
-    confirm({
-      open: true,
-      wait: true,
-      onConfirm: () => console.log(`${data.transaction_id} has been unhold.`)
-    })
+    onUnhold(data.id)
   }
 
   const submitHoldHandler = () => {
@@ -91,22 +100,12 @@ const DocumentTaggingTransaction = (props) => {
 
   const submitReturnHandler = () => {
     onClose()
-
-    confirm({
-      open: true,
-      wait: true,
-      onConfirm: () => console.log(`${data.transaction_id} has been return.`)
-    })
+    onReturn(data)
   }
 
   const submitVoidHandler = () => {
     onClose()
-
-    confirm({
-      open: true,
-      wait: true,
-      onConfirm: () => console.log(`${data.transaction_id} has been voided.`)
-    })
+    onVoid(data)
   }
 
   return (
@@ -130,7 +129,7 @@ const DocumentTaggingTransaction = (props) => {
       </DialogTitle>
 
       <DialogContent className="FstoDialogTransaction-content">
-        <Transaction data={data} />
+        <TransactionDialog data={data} callback={setTag} />
 
         {
           (state === `tag-receive` || state === `tag-tag`) &&
@@ -142,8 +141,8 @@ const DocumentTaggingTransaction = (props) => {
                 <Autocomplete
                   className="FstoSelectForm-root"
                   size="small"
-                  options={DISTUBUTE_LIST}
-                  value={null}
+                  options={DISTUBUTE_LIST || []}
+                  value={tag.distributed_to}
                   loading={
                     DISTRIBUTE_STATUS === 'loading'
                   }
@@ -190,6 +189,9 @@ const DocumentTaggingTransaction = (props) => {
             <Button
               variant="contained"
               onClick={submitTagHandler}
+              disabled={
+                Boolean(!tag.distributed_to)
+              }
               disableElevation
             > {state === `tag-receive` ? "Tag" : "Save"}
             </Button>

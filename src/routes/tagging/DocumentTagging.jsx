@@ -34,6 +34,16 @@ import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
 import useTransactions from '../../hooks/useTransactions'
 
+import {
+  TAG,
+  RECEIVE,
+  HOLD,
+  UNHOLD,
+  RETURN,
+  UNRETURN,
+  VOID
+} from '../../constants'
+
 import ReasonDialog from '../../components/ReasonDialog'
 import TablePreloader from '../../components/TablePreloader'
 
@@ -88,8 +98,8 @@ const DocumentTagging = () => {
         let response
         try {
           response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
-            process: "tag",
-            subprocess: "receive"
+            process: TAG,
+            subprocess: RECEIVE
           })
 
           const { message } = response.data
@@ -132,8 +142,92 @@ const DocumentTagging = () => {
     setReason(currentValue => ({
       ...currentValue,
       open: true,
-      process: "tag",
-      subprocess: "hold",
+      process: TAG,
+      subprocess: HOLD,
+      data,
+    }))
+  }
+
+  const onUnhold = (ID) => {
+    confirm({
+      open: true,
+      wait: true,
+      onConfirm: async () => {
+        let response
+        try {
+          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
+            process: TAG,
+            subprocess: UNHOLD
+          })
+
+          const { message } = response.data
+
+          refetchData()
+          toast({
+            message,
+            title: "Success!"
+          })
+        } catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to unhold transaction. Please try again later."
+          })
+        }
+      }
+    })
+  }
+
+  const onReturn = (data) => {
+    setReason(currentValue => ({
+      ...currentValue,
+      open: true,
+      process: TAG,
+      subprocess: RETURN,
+      data,
+    }))
+  }
+
+  const onCancel = (ID) => {
+    confirm({
+      open: true,
+      wait: true,
+      onConfirm: async () => {
+        let response
+        try {
+          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
+            process: TAG,
+            subprocess: UNRETURN
+          })
+
+          const { message } = response.data
+
+          refetchData()
+          toast({
+            message,
+            title: "Success!"
+          })
+        } catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to cancel return transaction. Please try again later."
+          })
+        }
+      }
+    })
+  }
+
+  const onVoid = (data) => {
+    setReason(currentValue => ({
+      ...currentValue,
+      open: true,
+      process: TAG,
+      subprocess: VOID,
       data,
     }))
   }
@@ -163,6 +257,7 @@ const DocumentTagging = () => {
               <Tab className="FstoTab-root" label="Received" value="tag-receive" disableRipple />
               <Tab className="FstoTab-root" label="Tagged" value="tag-tag" disableRipple />
               <Tab className="FstoTab-root" label="Held" value="tag-hold" disableRipple />
+              <Tab className="FstoTab-root" label="Returned" value="tag-return" disableRipple />
               <Tab className="FstoTab-root" label="Voided" value="tag-void" disableRipple />
             </Tabs>
 
@@ -241,101 +336,125 @@ const DocumentTagging = () => {
             <TableBody className="FstoTableBody-root">
               {
                 status === 'loading'
-                  ? <TablePreloader row={3} />
-                  : data
-                    ? data.data.map((item, index) => (
-                      <TableRow className="FstoTableRow-root" key={index} hover>
-                        <TableCell className="FstoTableCell-root FstoTableCell-body">
-                          <Typography variant="button" sx={{ display: `flex`, alignItems: `center`, fontWeight: 700, lineHeight: 1.25 }}>
-                            {
-                              state === `tag-tag` ? `TAG#${item.tag_no}` : item.transaction_id
-                            }
-                            &nbsp;&mdash;&nbsp;
-                            {item.document_type}
-                            {
-                              item.document_id === 4 && item.payment_type.toLowerCase() === `partial` &&
-                              <Chip label={item.payment_type} size="small" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
-                            }
-                            {
-                              Boolean(item.is_latest_transaction) &&
-                              <Chip label="Latest" size="small" color="primary" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
-                            }
-                          </Typography>
-                          <Typography variant="caption" sx={{ fontSize: `1.25em`, textTransform: `uppercase`, lineHeight: 1.55 }}>
-                            {item.supplier.name}
-                            {
-                              item.supplier.supplier_type.id === 1 &&
-                              <Chip label={item.supplier.supplier_type.name} size="small" color="primary" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
-                            }
-                          </Typography>
-                          <Typography variant="h6" sx={{ marginTop: `5px`, fontWeight: 700, lineHeight: 1 }}>
-                            {
-                              item.remarks
-                                ? item.remarks
-                                : <React.Fragment>&mdash;</React.Fragment>
-                            }
-                          </Typography>
-                          <Typography variant="caption" sx={{ lineHeight: 1.65 }}>{moment(item.date_requested).format("YYYY-MM-DD hh:mm A")}</Typography>
-                        </TableCell>
+                && <TablePreloader row={3} />}
 
-                        <TableCell className="FstoTableCell-root FstoTableCell-body">
-                          <Typography variant="subtitle1" sx={{ textTransform: `capitalize` }}>{item.users.first_name.toLowerCase()} {item.users.middle_name.toLowerCase()} {item.users.last_name.toLowerCase()}</Typography>
-                          <Typography variant="subtitle2">{item.users.department[0].name}</Typography>
-                          <Typography variant="subtitle2">{item.users.position}</Typography>
-                        </TableCell>
+              {
+                status === 'error'
+                && <TableRow><TableCell align="center" colSpan={7}>NO RECORDS FOUND</TableCell></TableRow>}
 
-                        <TableCell className="FstoTableCell-root FstoTableCell-body">
-                          <Typography variant="subtitle1">{item.company}</Typography>
-                          <Typography variant="subtitle2">{item.department}</Typography>
-                          <Typography variant="subtitle2">{item.location}</Typography>
-                        </TableCell>
+              {
+                status === 'success'
+                && data.data.map((item, index) => {
+                  let statusColor
+                  switch (item.status) {
+                    case `tag`:
+                      statusColor = `#3a2fa7`
+                      break;
 
-                        <TableCell className="FstoTableCell-root FstoTableCell-body">
-                          <Typography variant="caption" sx={{ fontWeight: 500 }}>
-                            {item.document_id !== 4 && item.document_no?.toUpperCase()}
-                            {item.document_id === 4 && item.referrence_no?.toUpperCase()}
-                          </Typography>
-                          <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                            &#8369;
-                            {item.document_id !== 4 && item.document_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
-                            {item.document_id === 4 && item.referrence_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
-                          </Typography>
-                        </TableCell>
+                    case `receive`:
+                      statusColor = `#949494`
+                      break;
 
-                        <TableCell className="FstoTableCell-root FstoTableCell-body">
+                    case `hold`:
+                    case `return`:
+                    case `void`:
+                      statusColor = `#ff5252`
+                      break;
+
+                    default:
+                      statusColor = `#ed6c02`
+                  }
+
+                  return (
+                    <TableRow className="FstoTableRow-root" key={index} hover>
+                      <TableCell className="FstoTableCell-root FstoTableCell-body">
+                        <Typography variant="button" sx={{ display: `flex`, alignItems: `center`, fontWeight: 700, lineHeight: 1.25 }}>
                           {
-                            item.po_details.length
-                              ? <React.Fragment>
-                                <Typography variant="caption" sx={{ fontWeight: 500 }}>{item.po_details[0].po_no.toUpperCase()}{item.po_details.length > 1 && `...`}</Typography>
-                                <Typography variant="h6" sx={{ fontWeight: 700 }}>&#8369;{item.po_details[0].po_total_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</Typography>
-                              </React.Fragment>
-                              : <React.Fragment>
-                                &mdash;
-                              </React.Fragment>
+                            state === `tag-tag` ? `TAG#${item.tag_no}` : item.transaction_id
                           }
-                        </TableCell>
+                          &nbsp;&mdash;&nbsp;
+                          {item.document_type}
+                          {
+                            item.document_id === 4 && item.payment_type.toLowerCase() === `partial` &&
+                            <Chip label={item.payment_type} size="small" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
+                          }
+                          {
+                            Boolean(item.is_latest_transaction) &&
+                            <Chip label="Latest" size="small" color="primary" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
+                          }
+                        </Typography>
+                        <Typography variant="caption" sx={{ fontSize: `1.25em`, textTransform: `uppercase`, lineHeight: 1.55 }}>
+                          {item.supplier.name}
+                          {
+                            item.supplier.supplier_type.id === 1 &&
+                            <Chip label={item.supplier.supplier_type.name} size="small" color="primary" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
+                          }
+                        </Typography>
+                        <Typography variant="h6" sx={{ marginTop: `5px`, fontWeight: 700, lineHeight: 1 }}>
+                          {
+                            item.remarks
+                              ? item.remarks
+                              : <React.Fragment>&mdash;</React.Fragment>
+                          }
+                        </Typography>
+                        <Typography variant="caption" sx={{ lineHeight: 1.65 }}>{moment(item.date_requested).format("YYYY-MM-DD hh:mm A")}</Typography>
+                      </TableCell>
 
-                        <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                          <Chip label={item.status} size="small" color="warning" sx={{ textTransform: `capitalize`, fontWeight: 500 }} />
-                        </TableCell>
+                      <TableCell className="FstoTableCell-root FstoTableCell-body">
+                        <Typography variant="subtitle1" sx={{ textTransform: `capitalize` }}>{item.users.first_name.toLowerCase()} {item.users.middle_name.toLowerCase()} {item.users.last_name.toLowerCase()}</Typography>
+                        <Typography variant="subtitle2">{item.users.department[0].name}</Typography>
+                        <Typography variant="subtitle2">{item.users.position}</Typography>
+                      </TableCell>
 
-                        <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                          <DocumentTaggingActions
-                            data={item}
-                            state={state}
-                            onReceive={onReceive}
-                            onManage={onManage}
-                            onView={onView}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    ))
-                    : (
-                      <TableRow>
-                        <TableCell align="center" colSpan={7}>NO RECORDS FOUND</TableCell>
-                      </TableRow>
-                    )
-              }
+                      <TableCell className="FstoTableCell-root FstoTableCell-body">
+                        <Typography variant="subtitle1">{item.company}</Typography>
+                        <Typography variant="subtitle2">{item.department}</Typography>
+                        <Typography variant="subtitle2">{item.location}</Typography>
+                      </TableCell>
+
+                      <TableCell className="FstoTableCell-root FstoTableCell-body">
+                        <Typography variant="caption" sx={{ fontWeight: 500 }}>
+                          {item.document_id !== 4 && item.document_no?.toUpperCase()}
+                          {item.document_id === 4 && item.referrence_no?.toUpperCase()}
+                        </Typography>
+                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                          &#8369;
+                          {item.document_id !== 4 && item.document_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                          {item.document_id === 4 && item.referrence_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                        </Typography>
+                      </TableCell>
+
+                      <TableCell className="FstoTableCell-root FstoTableCell-body">
+                        {
+                          item.po_details.length
+                            ? <React.Fragment>
+                              <Typography variant="caption" sx={{ fontWeight: 500 }}>{item.po_details[0].po_no.toUpperCase()}{item.po_details.length > 1 && `...`}</Typography>
+                              <Typography variant="h6" sx={{ fontWeight: 700 }}>&#8369;{item.po_details[0].po_total_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</Typography>
+                            </React.Fragment>
+                            : <React.Fragment>
+                              &mdash;
+                            </React.Fragment>
+                        }
+                      </TableCell>
+
+                      <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
+                        <Chip label={item.status} size="small" sx={{ backgroundColor: statusColor, minWidth: 60, color: `#fff`, textTransform: `capitalize`, fontWeight: 500 }} />
+                      </TableCell>
+
+                      <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
+                        <DocumentTaggingActions
+                          data={item}
+                          state={state}
+                          onReceive={onReceive}
+                          onCancel={onCancel}
+                          onManage={onManage}
+                          onView={onView}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+
             </TableBody>
           </Table>
         </TableContainer>
@@ -353,7 +472,7 @@ const DocumentTagging = () => {
           showLastButton
         />
 
-        <DocumentTaggingTransaction state={state} refetchData={refetchData} onHold={onHold} {...manage} />
+        <DocumentTaggingTransaction state={state} refetchData={refetchData} onHold={onHold} onUnhold={onUnhold} onReturn={onReturn} onVoid={onVoid} {...manage} />
 
         <ReasonDialog onSuccess={refetchData} {...reason} />
       </Paper>

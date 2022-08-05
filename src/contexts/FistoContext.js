@@ -43,7 +43,7 @@ const FistoProvider = ({ children }) => {
       ...currentValue,
       open: false,
       loading: false,
-      await: false
+      wait: false
     }))
   }
 

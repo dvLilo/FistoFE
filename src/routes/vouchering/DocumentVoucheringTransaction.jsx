@@ -18,7 +18,7 @@ import CloseIcon from '@mui/icons-material/Close'
 
 import useConfirm from '../../hooks/useConfirm'
 
-import Transaction from '../../components/Transaction'
+import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitle from '../../components/AccountTitle'
 
 const RECEIPT_TYPE_LIST = [
@@ -148,7 +148,7 @@ const DocumentVoucheringTransaction = (props) => {
         </DialogTitle>
 
         <DialogContent className="FstoDialogTransaction-content">
-          <Transaction data={data} onView={onAccountTitleView} />
+          <TransactionDialog data={data} onView={onAccountTitleView} />
 
           {
             (state === `receive` || state === `approve`) &&

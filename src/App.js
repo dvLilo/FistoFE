@@ -66,6 +66,7 @@ import NotFound from './exceptions/NotFound'
 import Sandbox from './Sandbox'
 
 import FistoProvider from './contexts/FistoContext'
+import ReasonContextProvider from './contexts/ReasonContext'
 import PasswordContextProvider from './contexts/PasswordContext'
 
 import { QueryClient, QueryClientProvider } from 'react-query'
@@ -170,7 +171,7 @@ const App = () => {
           <Routes>
             <Route exact strict path="*" element={<NotFound />} />
 
-            <Route exact path="/sandbox" element={<FistoProvider><Sandbox /></FistoProvider>} />
+            <Route exact path="/sandbox" element={<FistoProvider><ReasonContextProvider><Sandbox /></ReasonContextProvider></FistoProvider>} />
 
             <Route exact path="/" element={<Landing />} />
 

@@ -4,19 +4,23 @@ import { useQuery } from 'react-query'
 
 import useToast from './useToast'
 
-const useDistribute = () => {
+const useDistribute = (ID) => {
 
   const toast = useToast()
 
   const fetchDistributeList = async () => {
-    return await axios.get(`/api/dropdown/associate`)
+    return await axios.get(`/api/dropdown/associate`, {
+      params: {
+        company_id: ID
+      }
+    })
   }
 
   const {
     status,
     data,
     error
-  } = useQuery(["DISTRIBUTE"], fetchDistributeList, {
+  } = useQuery(["DISTRIBUTE", ID], fetchDistributeList, {
     refetchOnWindowFocus: false,
     select: (response) => response.data.result.associates,
     onError: (error) => {

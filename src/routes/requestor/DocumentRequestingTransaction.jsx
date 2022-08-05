@@ -9,7 +9,7 @@ import {
 
 import CloseIcon from '@mui/icons-material/Close'
 
-import Transaction from '../../components/Transaction'
+import TransactionDialog from '../../components/TransactionDialog'
 
 const DocumentRequestingTransaction = (props) => {
 
@@ -40,7 +40,7 @@ const DocumentRequestingTransaction = (props) => {
       </DialogTitle>
 
       <DialogContent className="FstoDialogTransaction-content">
-        <Transaction data={data} />
+        <TransactionDialog data={data} />
       </DialogContent>
     </Dialog>
   )

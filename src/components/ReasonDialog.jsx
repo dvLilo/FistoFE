@@ -70,9 +70,9 @@ const ReasonDialog = (props) => {
     let response
     try {
       response = await axios.post(`/api/transactions/flow/update-transaction/${data.id}`, {
-        process: process,
-        subprocess: subprocess,
-        reason: reason
+        process,
+        subprocess,
+        reason
       })
 
       const { message } = response.data
@@ -115,7 +115,7 @@ const ReasonDialog = (props) => {
       <DialogContent className="FstoDialogContentReason-root">
         <Box className="FstoDialogContentReason-box">
           <WarningIcon className="FstoDialogContentReason-icon" />
-          Are you sure you want to void this transaction?
+          Are you sure you want to {subprocess} this transaction?
         </Box>
 
         <form className="FstoDialogContentReason-form" >
