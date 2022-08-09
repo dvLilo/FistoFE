@@ -81,7 +81,8 @@ const DocumentTaggingTransaction = (props) => {
             message,
             title: "Success!"
           })
-        } catch (error) {
+        }
+        catch (error) {
 
         }
       }

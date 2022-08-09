@@ -77,7 +77,7 @@ const DocumentVoucheringActions = ({ data, state, onReceive, onManage, onView, o
           </MenuItem>}
 
         {
-          (state === `voucher-approve` || state === `voucher-hold` || state === `voucher-return` || state === `voucher-void`) &&
+          (state === `voucher-voucher` || state === `voucher-hold` || state === `voucher-return` || state === `voucher-void`) &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {

@@ -24,10 +24,12 @@ import {
   Divider,
 } from '@mui/material'
 
-import CloseIcon from '@mui/icons-material/Close'
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
+import CloseIcon from '@mui/icons-material/Close'
 import DeleteIcon from '@mui/icons-material/Delete'
+
+import useAccountTitles from '../hooks/useAccountTitles'
 
 const NumberField = React.forwardRef(function NumberField(props, ref) {
   const { onChange, ...rest } = props
@@ -63,17 +65,17 @@ const ENTRY_LIST = [
   }
 ]
 
-const ACCOUNT_TITLE_STATUS = `success`
-const ACCOUNT_TITLE_LIST = [
-  {
-    id: 34,
-    name: "SE - Salaries Expense"
-  },
-  {
-    id: 33,
-    name: "Accounts Payable"
-  }
-]
+// const ACCOUNT_TITLE_STATUS = `success`
+// const ACCOUNT_TITLE_LIST = [
+//   {
+//     id: 34,
+//     name: "SE - Salaries Expense"
+//   },
+//   {
+//     id: 33,
+//     name: "Accounts Payable"
+//   }
+// ]
 
 const AccountTitleDialog = (props) => {
 
@@ -85,6 +87,19 @@ const AccountTitleDialog = (props) => {
     onSubmit = () => { }
   } = props
 
+  const {
+    refetch: fetchAccountTitles,
+    data: ACCOUNT_TITLE_LIST,
+    status: ACCOUNT_TITLE_STATUS
+  } = useAccountTitles()
+
+  React.useEffect(() => {
+    if (open && !ACCOUNT_TITLE_LIST) fetchAccountTitles()
+    // eslint-disable-next-line
+  }, [open])
+
+  const [accountsData, setAccountsData] = React.useState([])
+
   const [AT, setAT] = React.useState({
     update: false,
     index: null,
@@ -95,32 +110,63 @@ const AccountTitleDialog = (props) => {
     remarks: ""
   })
 
-  const [accountsData, setAccountsData] = React.useState([])
+
 
   const addAccountTitleHandler = () => {
-    setAccountsData(currentValue => ([
-      ...currentValue,
-      {
-        entry: AT.entry,
-        account_title: AT.account_title,
-        amount: AT.amount,
-        remarks: AT.remarks
-      }
-    ]))
+    if (!AT.update)
+      setAccountsData(currentValue => ([
+        ...currentValue,
+        {
+          entry: AT.entry,
+          account_title: AT.account_title,
+          amount: AT.amount,
+          remarks: AT.remarks
+        }
+      ]))
+
+    if (!!AT.update)
+      setAccountsData(currentValue => {
+        return currentValue.map((item, index) => {
+          if (AT.index === index)
+            return {
+              entry: AT.entry,
+              account_title: AT.account_title,
+              amount: AT.amount,
+              remarks: AT.remarks
+            }
+
+          return item
+        })
+      })
 
     setAT({
       update: false,
       index: null,
       entry: null,
       account_title: null,
-      amount: null,
+      amount: "",
       remarks: ""
     })
   }
 
+  const editAccountTitleHandler = (item, index) => {
+    setAT({
+      update: true,
+      index,
+      ...item
+    })
+  }
+
+  const removeAccountTitleHandler = (e) => {
+    setAccountsData(currentValue => {
+      return currentValue.filter((item, index) => index !== e)
+    })
+  }
+
+
   const submitAccountTitleHandler = () => {
     onClose()
-    onSubmit(data)
+    onSubmit(accountsData)
   }
 
   const backAccountTitleHandler = () => {
@@ -189,6 +235,9 @@ const AccountTitleDialog = (props) => {
             getOptionLabel={
               (option) => option.name
             }
+            getOptionDisabled={
+              (option) => accountsData.some((item) => item.account_title.id === option.id)
+            }
             isOptionEqualToValue={
               (option, value) => option.id === value.id
             }
@@ -212,7 +261,7 @@ const AccountTitleDialog = (props) => {
             }}
             onChange={(e) => setAT(currentValue => ({
               ...currentValue,
-              amount: e.target.value
+              amount: parseFloat(e.target.value)
             }))}
           />
 
@@ -239,65 +288,94 @@ const AccountTitleDialog = (props) => {
           </Button>
         </Box>
 
-        <TableContainer sx={{ marginY: 5 }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Account Title</TableCell>
-                <TableCell className="FstoTabelCellAccountTitle-root" align="right">Debit</TableCell>
-                <TableCell>Credit</TableCell>
-                <TableCell align="right">Action</TableCell>
-              </TableRow>
-            </TableHead>
+        {
+          Boolean(accountsData.length) &&
+          <React.Fragment>
+            <TableContainer sx={{ marginY: 5 }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Account Title</TableCell>
+                    <TableCell className="FstoTabelCellAccountTitle-root" align="right">Debit</TableCell>
+                    <TableCell>Credit</TableCell>
+                    <TableCell align="right">Action</TableCell>
+                  </TableRow>
+                </TableHead>
 
-            <TableBody className="FstoTableBodyAccountTitle-root">
-              <TableRow>
-                <TableCell size="small"><strong>SE - Depr - Equipment, Furniture & Fixtures</strong><br /><i>Payment for chairset in Corporate Common. Payment for chairset in Corporate Common.</i></TableCell>
-                <TableCell className="FstoTabelCellAccountTitle-root" align="right" size="small">₱100,000.00</TableCell>
-                <TableCell size="small">&mdash;</TableCell>
-                <TableCell align="right" size="small">
-                  <IconButton>
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton>
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
+                <TableBody className="FstoTableBodyAccountTitle-root">
+                  {
+                    accountsData.map((item, index) => (
+                      <TableRow key={index}>
+                        <TableCell size="small">
+                          <strong>{item.account_title.name}</strong>
+                          {
+                            item.remarks && <React.Fragment><br /><i>{item.remarks}</i></React.Fragment>
+                          }
+                        </TableCell>
 
-              <TableRow>
-                <TableCell size="small">Accounts Payable</TableCell>
-                <TableCell className="FstoTabelCellAccountTitle-root" align="right" size="small">&mdash;</TableCell>
-                <TableCell size="small">₱100,000.00</TableCell>
-                <TableCell align="right" size="small">
-                  <IconButton>
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton>
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
+                        <TableCell className="FstoTabelCellAccountTitle-root" align="right" size="small">
+                          {
+                            item.entry === `Debit`
+                              ? <React.Fragment>&#8369;{item.amount.toLocaleString()}</React.Fragment>
+                              : <React.Fragment>&mdash;</React.Fragment>
+                          }
+                        </TableCell>
 
-        <Stack className="FstoStackAccountTitle-root" direction="row">
-          <Typography variant="body1" sx={{ flex: 1 }}>Total Credit Amount</Typography>
-          <Typography variant="h6">₱100,000.00</Typography>
-        </Stack>
+                        <TableCell size="small">
+                          {
+                            item.entry === `Credit`
+                              ? <React.Fragment>&#8369;{item.amount.toLocaleString()}</React.Fragment>
+                              : <React.Fragment>&mdash;</React.Fragment>
+                          }
+                        </TableCell>
 
-        <Stack className="FstoStackAccountTitle-root" direction="row">
-          <Typography variant="body1" sx={{ flex: 1 }}>Total Debit Amount</Typography>
-          <Typography variant="h6">₱100,000.00</Typography>
-        </Stack>
+                        <TableCell align="right" size="small">
+                          <IconButton onClick={() => editAccountTitleHandler(item, index)}>
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton onClick={() => removeAccountTitleHandler(index)}>
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  }
+                </TableBody>
+              </Table>
+            </TableContainer>
 
-        <Divider variant="middle" sx={{ marginY: 2 }} />
+            {
+              accountsData.some((item) => item.entry === `Credit`) &&
+              <Stack className="FstoStackAccountTitle-root" direction="row">
+                <Typography variant="body1" sx={{ flex: 1 }}>Total Credit Amount</Typography>
+                <Typography variant="h6">
+                  &#8369;{accountsData.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0).toLocaleString()}
+                </Typography>
+              </Stack>}
 
-        <Stack className="FstoStackAccountTitle-root" direction="row">
-          <Typography variant="body1" sx={{ flex: 1 }}>Variance</Typography>
-          <Typography variant="h6">₱0.00</Typography>
-        </Stack>
+
+
+            {
+              accountsData.some((item) => item.entry === `Debit`) &&
+              <Stack className="FstoStackAccountTitle-root" direction="row">
+                <Typography variant="body1" sx={{ flex: 1 }}>Total Debit Amount</Typography>
+                <Typography variant="h6">
+                  &#8369;{accountsData.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0).toLocaleString()}
+                </Typography>
+              </Stack>}
+
+            <Divider variant="middle" sx={{ marginY: 2 }} />
+
+            <Stack className="FstoStackAccountTitle-root" direction="row">
+              <Typography variant="body1" sx={{ flex: 1 }}>Variance</Typography>
+              <Typography variant="h6">
+                &#8369;
+                {((accountsData.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0)) - (accountsData.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0))).toLocaleString()}
+              </Typography>
+            </Stack>
+
+          </React.Fragment>
+        }
       </DialogContent>
 
       <DialogActions className="FstoDialogAccountTitle-actions">

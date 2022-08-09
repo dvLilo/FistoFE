@@ -193,7 +193,7 @@ const TransactionDialog = (props) => {
             status === `success` &&
             <List className="FstoListTransactionDetails-root" dense>
               {
-                data.tag.no &&
+                Boolean(data.tag.no) &&
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Tag No:</span>
                   <strong>{data.tag.no}</strong>
@@ -357,7 +357,7 @@ const TransactionDialog = (props) => {
               }
 
               {
-                Boolean(data.voucher) &&
+                Boolean(data.voucher) && Boolean(data.voucher.receipt_type) &&
                 <React.Fragment>
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Type of Receipt:</span>
@@ -366,17 +366,17 @@ const TransactionDialog = (props) => {
 
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Withholding Tax:</span>
-                    <strong>&#8369;{data.voucher.witholding_tax.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                    <strong>&#8369;{data.voucher.witholding_tax?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
                   </ListItem>
 
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Percentage Tax:</span>
-                    <strong>&#8369;{data.voucher.percentage_tax.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                    <strong>&#8369;{data.voucher.percentage_tax?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
                   </ListItem>
 
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Net of Amount:</span>
-                    <strong>&#8369;{data.voucher.gross_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                    <strong>&#8369;{data.voucher.gross_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
                   </ListItem>
                 </React.Fragment>
               }
@@ -395,7 +395,7 @@ const TransactionDialog = (props) => {
 
 
           {
-            Boolean(data?.voucher) &&
+            Boolean(data?.voucher) && Boolean(data.voucher.no) && Boolean(data.voucher.month) &&
             <React.Fragment>
               <Divider className="FstoDividerTransactionDetails-root" textAlign="left">
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>Voucher</Typography>
@@ -404,12 +404,12 @@ const TransactionDialog = (props) => {
               <List className="FstoListTransactionDetails-root" dense>
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Voucher No.:</span>
-                  <strong>F0-1001-9898</strong>
+                  <strong>{data.voucher.no}</strong>
                 </ListItem>
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Voucher Month:</span>
-                  <strong>2207</strong>
+                  <strong>{data.voucher.month}</strong>
                 </ListItem>
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
@@ -616,7 +616,7 @@ const TransactionDialog = (props) => {
             </List>}
         </Box>
       </Box>
-    </React.Fragment>
+    </React.Fragment >
   )
 }
 

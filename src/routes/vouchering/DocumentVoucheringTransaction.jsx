@@ -1,5 +1,7 @@
 import React from 'react'
 
+import moment from 'moment'
+
 import NumberFormat from 'react-number-format'
 
 import DateAdapter from '@mui/lab/AdapterDateFns'
@@ -25,12 +27,13 @@ import {
 
 import CloseIcon from '@mui/icons-material/Close'
 
-// import useToast from '../../hooks/useToast'
+import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
 import useApprover from '../../hooks/useApprover'
 
 import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
+import axios from 'axios'
 
 const NumberField = React.forwardRef(function NumberField(props, ref) {
   const { onChange, ...rest } = props
@@ -72,6 +75,7 @@ const DocumentVoucheringTransaction = (props) => {
     state,
     data,
     open = false,
+    refetchData,
     onHold = () => { },
     onUnhold = () => { },
     onReturn = () => { },
@@ -79,7 +83,7 @@ const DocumentVoucheringTransaction = (props) => {
     onClose = () => { }
   } = props
 
-  // const toast = useToast()
+  const toast = useToast()
   const confirm = useConfirm()
   const {
     data: APPROVER_LIST,
@@ -113,11 +117,36 @@ const DocumentVoucheringTransaction = (props) => {
     }))
   })
 
-  const onSubmit = () => {
+  const onSubmit = (accountsData) => {
+    const postData = {
+      ...voucherData,
+      accounts: accountsData,
+      voucher: {
+        ...voucherData.voucher,
+        month: moment(voucherData.voucher.month).format("YYMM")
+      }
+    }
+
     confirm({
       open: true,
       wait: true,
-      onConfirm: () => console.log(`${data.transaction_id} has been submitted.`)
+      onConfirm: async () => {
+        let response
+        try {
+          response = await axios.post(`/api/transactions/flow/update-transaction/${data.id}`, postData)
+
+          const { message } = response.data
+
+          refetchData()
+          toast({
+            message,
+            title: "Success!"
+          })
+        }
+        catch (error) {
+
+        }
+      }
     })
   }
 
@@ -382,15 +411,15 @@ const DocumentVoucheringTransaction = (props) => {
               <Button
                 variant="contained"
                 onClick={onAccountTitleManage}
-                // disabled={
-                //   !Boolean(voucherData.approver) ||
-                //   !Boolean(voucherData.tax.receipt_type) ||
-                //   (voucherData.tax.receipt_type === `Official` && !Boolean(voucherData.tax.net_amount)) ||
-                //   (voucherData.tax.receipt_type === `Official` && !Boolean(voucherData.tax.percentage_tax)) ||
-                //   (voucherData.tax.receipt_type === `Official` && !Boolean(voucherData.tax.withholding_tax)) ||
-                //   !Boolean(voucherData.voucher.no) ||
-                //   !Boolean(voucherData.voucher.month)
-                // }
+                disabled={
+                  !Boolean(voucherData.approver) ||
+                  !Boolean(voucherData.tax.receipt_type) ||
+                  (voucherData.tax.receipt_type === `Official` && !Boolean(voucherData.tax.net_amount)) ||
+                  (voucherData.tax.receipt_type === `Official` && !Boolean(voucherData.tax.percentage_tax)) ||
+                  (voucherData.tax.receipt_type === `Official` && !Boolean(voucherData.tax.withholding_tax)) ||
+                  !Boolean(voucherData.voucher.no) ||
+                  !Boolean(voucherData.voucher.month)
+                }
                 disableElevation
               > {state === `voucher-receive` ? "Approve" : "Save"}
               </Button>

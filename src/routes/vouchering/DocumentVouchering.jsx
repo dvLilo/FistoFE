@@ -477,6 +477,7 @@ const DocumentVouchering = () => {
         <DocumentVoucheringTransaction
           {...manage}
           state={state}
+          refetchData={refetchData}
           onHold={onHold}
           onUnhold={onUnhold}
           onReturn={onReturn}
