@@ -14,7 +14,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import useConfirm from '../../hooks/useConfirm'
 
 import TransactionDialog from '../../components/TransactionDialog'
-import AccountTitle from '../../components/AccountTitle'
+import AccountTitleDialog from '../../components/AccountTitleDialog'
 
 const DocumentTransmittingTransaction = (props) => {
 
@@ -95,7 +95,7 @@ const DocumentTransmittingTransaction = (props) => {
         }
       </Dialog>
 
-      <AccountTitle {...viewAccountTitle} />
+      <AccountTitleDialog {...viewAccountTitle} />
     </React.Fragment>
   )
 }

@@ -52,7 +52,7 @@ const DocumentTaggingTransaction = (props) => {
   } = useDistribute(data?.company_id)
 
   React.useEffect(() => {
-    if (open && (DISTRIBUTE_STATUS === `idle` || DISTRIBUTE_STATUS === `success`) && DISTUBUTE_LIST.length) {
+    if (open && DISTRIBUTE_STATUS === `success`) {
       setTag(currentValue => ({
         ...currentValue,
         distributed_to: DISTUBUTE_LIST[0]
@@ -60,7 +60,7 @@ const DocumentTaggingTransaction = (props) => {
     }
 
     // eslint-disable-next-line
-  }, [open, DISTRIBUTE_STATUS])
+  }, [DISTRIBUTE_STATUS])
 
   const submitTagHandler = () => {
     onClose()

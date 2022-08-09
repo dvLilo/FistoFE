@@ -14,7 +14,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import useConfirm from '../../hooks/useConfirm'
 
 import TransactionDialog from '../../components/TransactionDialog'
-import AccountTitle from '../../components/AccountTitle'
+import AccountTitleDialog from '../../components/AccountTitleDialog'
 import ChequeEntry from '../../components/ChequeEntry'
 
 const DocumentChequingTransaction = (props) => {
@@ -236,7 +236,7 @@ const DocumentChequingTransaction = (props) => {
         }
       </Dialog>
 
-      <AccountTitle {...manageAccountTitle} />
+      <AccountTitleDialog {...manageAccountTitle} />
 
       <ChequeEntry {...manageCheque} />
     </React.Fragment>

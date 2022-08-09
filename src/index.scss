@@ -647,6 +647,10 @@ body {
     overflow: initial;
   }
 
+  & .FstoDialogAccountTitle-actions {
+    padding: 2em;
+  }
+
   & .FstoPaperAccountTitle-root {
     max-width: 1100px;
     min-height: 75vh;

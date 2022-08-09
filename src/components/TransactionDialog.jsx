@@ -27,7 +27,7 @@ const TransactionDialog = (props) => {
   } = useTransaction(props.data.id)
 
   React.useEffect(() => {
-    if (status === `success` && props.callback !== undefined)
+    if (status === `success` && data.tag.distributed_to && props.callback !== undefined)
       props.callback(currentValue => ({
         ...currentValue,
         distributed_to: data.tag.distributed_to

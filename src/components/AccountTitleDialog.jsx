@@ -1,5 +1,7 @@
 import React from 'react'
 
+import NumberFormat from 'react-number-format'
+
 import {
   Autocomplete,
   Dialog,
@@ -27,7 +29,53 @@ import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 
-const AccountTitle = (props) => {
+const NumberField = React.forwardRef(function NumberField(props, ref) {
+  const { onChange, ...rest } = props
+
+  return (
+    <NumberFormat
+      {...rest}
+      getInputRef={ref}
+      onValueChange={(values) => {
+        onChange({
+          target: {
+            name: props.name,
+            value: values.value,
+          }
+        })
+      }}
+      prefix="₱"
+      allowNegative={false}
+      thousandSeparator
+      isNumericString
+    />
+  )
+})
+
+const ENTRY_LIST = [
+  {
+    id: 1,
+    name: "Debit"
+  },
+  {
+    id: 2,
+    name: "Credit"
+  }
+]
+
+const ACCOUNT_TITLE_STATUS = `success`
+const ACCOUNT_TITLE_LIST = [
+  {
+    id: 34,
+    name: "SE - Salaries Expense"
+  },
+  {
+    id: 33,
+    name: "Accounts Payable"
+  }
+]
+
+const AccountTitleDialog = (props) => {
 
   const {
     data,
@@ -36,6 +84,39 @@ const AccountTitle = (props) => {
     onClose = () => { },
     onSubmit = () => { }
   } = props
+
+  const [AT, setAT] = React.useState({
+    update: false,
+    index: null,
+
+    entry: null,
+    account_title: null,
+    amount: null,
+    remarks: ""
+  })
+
+  const [accountsData, setAccountsData] = React.useState([])
+
+  const addAccountTitleHandler = () => {
+    setAccountsData(currentValue => ([
+      ...currentValue,
+      {
+        entry: AT.entry,
+        account_title: AT.account_title,
+        amount: AT.amount,
+        remarks: AT.remarks
+      }
+    ]))
+
+    setAT({
+      update: false,
+      index: null,
+      entry: null,
+      account_title: null,
+      amount: null,
+      remarks: ""
+    })
+  }
 
   const submitAccountTitleHandler = () => {
     onClose()
@@ -69,24 +150,24 @@ const AccountTitle = (props) => {
           <Autocomplete
             className="FstoSelectForm-root"
             size="small"
-            options={[]}
-            value={null}
+            options={ENTRY_LIST}
+            value={ENTRY_LIST.find((row) => row.name === AT.entry) || null}
             renderInput={
-              props =>
-                <TextField
-                  {...props}
-                  variant="outlined"
-                  label="Entry"
-                />
+              (props) => <TextField {...props} label="Entry" variant="outlined" />
             }
             PaperComponent={
-              props =>
-                <Paper
-                  {...props}
-                  sx={{ textTransform: 'capitalize' }}
-                />
+              (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
             }
-            onChange={(e, value) => console.log(value)}
+            getOptionLabel={
+              (option) => option.name
+            }
+            isOptionEqualToValue={
+              (option, value) => option.id === value.id
+            }
+            onChange={(e, value) => setAT(currentValue => ({
+              ...currentValue,
+              entry: value.name
+            }))}
             disablePortal
             disableClearable
           />
@@ -94,24 +175,27 @@ const AccountTitle = (props) => {
           <Autocomplete
             className="FstoSelectForm-root"
             size="small"
-            options={[]}
-            value={null}
+            options={ACCOUNT_TITLE_LIST || []}
+            value={AT.account_title}
+            loading={
+              ACCOUNT_TITLE_STATUS === 'loading'
+            }
             renderInput={
-              props =>
-                <TextField
-                  {...props}
-                  variant="outlined"
-                  label="Account Title"
-                />
+              (props) => <TextField {...props} label="Account Title" variant="outlined" />
             }
             PaperComponent={
-              props =>
-                <Paper
-                  {...props}
-                  sx={{ textTransform: 'capitalize' }}
-                />
+              (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
             }
-            onChange={(e, value) => console.log(value)}
+            getOptionLabel={
+              (option) => option.name
+            }
+            isOptionEqualToValue={
+              (option, value) => option.id === value.id
+            }
+            onChange={(e, value) => setAT(currentValue => ({
+              ...currentValue,
+              account_title: value
+            }))}
             disablePortal
             disableClearable
           />
@@ -122,7 +206,14 @@ const AccountTitle = (props) => {
             variant="outlined"
             autoComplete="off"
             size="small"
-            onChange={() => { }}
+            value={AT.amount}
+            InputProps={{
+              inputComponent: NumberField
+            }}
+            onChange={(e) => setAT(currentValue => ({
+              ...currentValue,
+              amount: e.target.value
+            }))}
           />
 
           <TextField
@@ -131,13 +222,18 @@ const AccountTitle = (props) => {
             variant="outlined"
             autoComplete="off"
             size="small"
-            onChange={() => { }}
+            value={AT.remarks}
+            onChange={(e) => setAT(currentValue => ({
+              ...currentValue,
+              remarks: e.target.value
+            }))}
           />
 
           <Button
             className=""
             variant="contained"
             startIcon={<AddIcon />}
+            onClick={addAccountTitleHandler}
             disableElevation
           > Add
           </Button>
@@ -208,7 +304,6 @@ const AccountTitle = (props) => {
         <Button
           variant="outlined"
           color="info"
-          size="large"
           onClick={backAccountTitleHandler}
           disableElevation
         > Back
@@ -216,7 +311,6 @@ const AccountTitle = (props) => {
 
         <Button
           variant="contained"
-          size="large"
           onClick={submitAccountTitleHandler}
           disableElevation
         > Submit
@@ -226,4 +320,4 @@ const AccountTitle = (props) => {
   )
 }
 
-export default AccountTitle
+export default AccountTitleDialog
