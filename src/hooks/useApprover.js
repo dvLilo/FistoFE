@@ -13,10 +13,12 @@ const useApprover = () => {
   }
 
   const {
+    refetch,
     status,
     data,
     error
   } = useQuery("APPROVER", fetchApproverList, {
+    enabled: false,
     refetchOnWindowFocus: false,
     select: (response) => response.data.result.approvers,
     onError: (error) => {
@@ -30,7 +32,7 @@ const useApprover = () => {
     }
   })
 
-  return { status, data, error }
+  return { refetch, status, data, error }
 }
 
 export default useApprover

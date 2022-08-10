@@ -1,5 +1,7 @@
 import React from 'react'
 
+import moment from 'moment'
+
 import {
   Alert,
   AlertTitle,
@@ -206,7 +208,7 @@ const TransactionDialog = (props) => {
 
               <ListItem className="FstoListItemTransactionDetails-root" dense>
                 <span>Date Requested:</span>
-                <strong>{data.transaction.date_requested}</strong>
+                <strong>{moment(data.transaction.date_requested).format("MM/DD/YYYY")}</strong>
               </ListItem>
 
               <ListItem className="FstoListItemTransactionDetails-root" dense>
@@ -237,7 +239,7 @@ const TransactionDialog = (props) => {
                 data.document.from && data.document.to &&
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Coverage Date:</span>
-                  <strong>{data.document.from} - {data.document.to}</strong>
+                  <strong>{moment(data.document.from).format("MM/DD/YYYY")} - {moment(data.document.to).format("MM/DD/YYYY")}</strong>
                 </ListItem>}
 
               {
@@ -251,7 +253,7 @@ const TransactionDialog = (props) => {
                 data.document.date &&
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Document Date:</span>
-                  <strong>{data.document.date}</strong>
+                  <strong>{moment(data.document.date).format("MM/DD/YYYY")}</strong>
                 </ListItem>}
 
               {
@@ -414,7 +416,7 @@ const TransactionDialog = (props) => {
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Date Vouchered:</span>
-                  <strong>07/12/2022</strong>
+                  <strong>{data.voucher.date}</strong>
                 </ListItem>
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
@@ -429,7 +431,7 @@ const TransactionDialog = (props) => {
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Vouchered By:</span>
-                  <strong>Lorenzo Yumul</strong>
+                  <strong>{data.tag.distributed_to.name}</strong>
                 </ListItem>
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>

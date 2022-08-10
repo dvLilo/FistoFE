@@ -86,16 +86,51 @@ const DocumentVoucheringTransaction = (props) => {
   const toast = useToast()
   const confirm = useConfirm()
   const {
+    refetch: fetchApprover,
     data: APPROVER_LIST,
     status: APPROVER_STATUS
   } = useApprover()
 
+  React.useEffect(() => {
+    if (open && !APPROVER_LIST) fetchApprover()
+
+    // eslint-disable-next-line
+  }, [open])
+
+  React.useEffect(() => {
+    if (open && APPROVER_STATUS === `success`) {
+      if (data.document_amount <= 500000.00 || data.referrence_amount <= 500000.00) {
+        setVoucherData(currentValue => ({
+          ...currentValue,
+          approver: APPROVER_LIST.find((item) => item.position.toLowerCase() === `supervisor`)
+        }))
+      }
+
+      if ((data.document_amount >= 500001.00 && data.document_amount <= 1000000.00) || (data.referrence_amount >= 500001.00 && data.referrence_amount <= 1000000.00)) {
+        setVoucherData(currentValue => ({
+          ...currentValue,
+          approver: APPROVER_LIST.find((item) => item.position.toLowerCase() === `manager`)
+        }))
+      }
+
+      if (data.document_amount >= 1000001.00 || data.referrence_amount >= 1000001.00) {
+        setVoucherData(currentValue => ({
+          ...currentValue,
+          approver: APPROVER_LIST.find((item) => item.position.toLowerCase() === `director`)
+        }))
+      }
+    }
+
+    // eslint-disable-next-line
+  }, [open, APPROVER_STATUS])
+
+  const [accountsData, setAccountsData] = React.useState([])
   const [voucherData, setVoucherData] = React.useState({
     process: "voucher",
     subprocess: "voucher",
     tax: {
-      receipt_type: null,
-      percentage_tax: null,
+      receipt_type: "",
+      percentage_tax: "",
       withholding_tax: null,
       net_amount: null
     },
@@ -117,7 +152,7 @@ const DocumentVoucheringTransaction = (props) => {
     }))
   })
 
-  const onSubmit = (accountsData) => {
+  const onSubmit = () => {
     const postData = {
       ...voucherData,
       accounts: accountsData,
@@ -138,6 +173,7 @@ const DocumentVoucheringTransaction = (props) => {
           const { message } = response.data
 
           refetchData()
+          clearHandler()
           toast({
             message,
             title: "Success!"
@@ -148,6 +184,29 @@ const DocumentVoucheringTransaction = (props) => {
         }
       }
     })
+  }
+
+  const clearHandler = () => {
+    setAccountsData([])
+    setVoucherData(currentValue => ({
+      ...currentValue,
+      tax: {
+        receipt_type: "",
+        percentage_tax: "",
+        withholding_tax: null,
+        net_amount: null
+      },
+      voucher: {
+        no: "",
+        month: null,
+      },
+      approver: null
+    }))
+  }
+
+  const closeHandler = () => {
+    onClose()
+    clearHandler()
   }
 
   const submitHoldHandler = () => {
@@ -175,6 +234,7 @@ const DocumentVoucheringTransaction = (props) => {
     })
   }
 
+
   const onAccountTitleManage = () => {
     onClose()
 
@@ -199,6 +259,30 @@ const DocumentVoucheringTransaction = (props) => {
     }))
   }
 
+  const onAccountTitleInsert = (data) => {
+    setAccountsData(currentValue => ([
+      ...currentValue,
+      data
+    ]))
+  }
+
+  const onAccountTitleUpdate = (data, index) => {
+    setAccountsData(currentValue => ([
+      ...currentValue.map((item, itemIndex) => {
+        if (itemIndex === index) return data
+        return item
+      })
+    ]))
+  }
+
+  const onAccountTitleRemove = (index) => {
+    setAccountsData(currentValue => ([
+      ...currentValue.filter((item, itemIndex) => {
+        return itemIndex !== index
+      })
+    ]))
+  }
+
   return (
     <React.Fragment>
       <Dialog
@@ -214,7 +298,7 @@ const DocumentVoucheringTransaction = (props) => {
       >
         <DialogTitle className="FstoDialogTransaction-title">
           Transaction Details
-          <IconButton size="large" onClick={onClose}>
+          <IconButton size="large" onClick={closeHandler}>
             <CloseIcon />
           </IconButton>
         </DialogTitle>
@@ -267,13 +351,14 @@ const DocumentVoucheringTransaction = (props) => {
                     variant="outlined"
                     autoComplete="off"
                     size="small"
+                    type="number"
                     value={voucherData.tax.percentage_tax}
                     disabled={
                       !Boolean(voucherData.tax.receipt_type) || voucherData.tax.receipt_type === `Unofficial`
                     }
-                    InputProps={{
-                      inputComponent: NumberField
-                    }}
+                    onKeyPress={
+                      (e) => ["E", "e", ".", "+", "-"].includes(e.key) && e.preventDefault()
+                    }
                     onChange={(e) => setVoucherData(currentValue => ({
                       ...currentValue,
                       tax: {
@@ -465,7 +550,13 @@ const DocumentVoucheringTransaction = (props) => {
         }
       </Dialog>
 
-      <AccountTitleDialog {...manageAccountTitle} />
+      <AccountTitleDialog
+        {...manageAccountTitle}
+        accounts={accountsData}
+        onInsert={onAccountTitleInsert}
+        onUpdate={onAccountTitleUpdate}
+        onRemove={onAccountTitleRemove}
+      />
     </React.Fragment>
   )
 }

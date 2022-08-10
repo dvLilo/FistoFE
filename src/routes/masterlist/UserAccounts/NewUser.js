@@ -240,10 +240,10 @@ const NewUser = () => {
     try {
       response = await axios.get(`http://localhost:5000/user`).then(JSON => JSON.data)
 
-      setDropdown({
-        ...dropdown,
+      setDropdown(currentValue => ({
+        ...currentValue,
         employees: response.length ? response : null
-      })
+      }))
     }
     catch (error) {
       if (error.request.status !== 404) {

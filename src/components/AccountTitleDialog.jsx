@@ -65,23 +65,15 @@ const ENTRY_LIST = [
   }
 ]
 
-// const ACCOUNT_TITLE_STATUS = `success`
-// const ACCOUNT_TITLE_LIST = [
-//   {
-//     id: 34,
-//     name: "SE - Salaries Expense"
-//   },
-//   {
-//     id: 33,
-//     name: "Accounts Payable"
-//   }
-// ]
-
 const AccountTitleDialog = (props) => {
 
   const {
     data,
+    accounts,
     open = false,
+    onInsert = () => { },
+    onUpdate = () => { },
+    onRemove = () => { },
     onBack = () => { },
     onClose = () => { },
     onSubmit = () => { }
@@ -98,55 +90,41 @@ const AccountTitleDialog = (props) => {
     // eslint-disable-next-line
   }, [open])
 
-  const [accountsData, setAccountsData] = React.useState([])
-
   const [AT, setAT] = React.useState({
     update: false,
     index: null,
 
     entry: null,
     account_title: null,
-    amount: null,
+    amount: "",
     remarks: ""
   })
 
 
-
   const addAccountTitleHandler = () => {
     if (!AT.update)
-      setAccountsData(currentValue => ([
-        ...currentValue,
-        {
-          entry: AT.entry,
-          account_title: AT.account_title,
-          amount: AT.amount,
-          remarks: AT.remarks
-        }
-      ]))
-
-    if (!!AT.update)
-      setAccountsData(currentValue => {
-        return currentValue.map((item, index) => {
-          if (AT.index === index)
-            return {
-              entry: AT.entry,
-              account_title: AT.account_title,
-              amount: AT.amount,
-              remarks: AT.remarks
-            }
-
-          return item
-        })
+      onInsert({
+        entry: AT.entry,
+        amount: AT.amount,
+        remarks: AT.remarks,
+        account_title: AT.account_title
       })
 
-    setAT({
-      update: false,
-      index: null,
+    if (!!AT.update)
+      onUpdate({
+        entry: AT.entry,
+        amount: AT.amount,
+        remarks: AT.remarks,
+        account_title: AT.account_title
+      }, AT.index)
+
+    setAT(currentValue => ({
+      ...currentValue,
       entry: null,
       account_title: null,
       amount: "",
       remarks: ""
-    })
+    }))
   }
 
   const editAccountTitleHandler = (item, index) => {
@@ -157,16 +135,14 @@ const AccountTitleDialog = (props) => {
     })
   }
 
-  const removeAccountTitleHandler = (e) => {
-    setAccountsData(currentValue => {
-      return currentValue.filter((item, index) => index !== e)
-    })
+  const removeAccountTitleHandler = (index) => {
+    onRemove(index)
   }
 
 
   const submitAccountTitleHandler = () => {
     onClose()
-    onSubmit(accountsData)
+    onSubmit()
   }
 
   const backAccountTitleHandler = () => {
@@ -236,7 +212,7 @@ const AccountTitleDialog = (props) => {
               (option) => option.name
             }
             getOptionDisabled={
-              (option) => accountsData.some((item) => item.account_title.id === option.id)
+              (option) => accounts.some((item) => item.account_title.id === option.id)
             }
             isOptionEqualToValue={
               (option, value) => option.id === value.id
@@ -281,15 +257,17 @@ const AccountTitleDialog = (props) => {
           <Button
             className=""
             variant="contained"
-            startIcon={<AddIcon />}
+            startIcon={
+              AT.update ? <AddIcon /> : <EditIcon />
+            }
             onClick={addAccountTitleHandler}
             disableElevation
-          > Add
+          > {AT.update ? "Update" : "Add"}
           </Button>
         </Box>
 
         {
-          Boolean(accountsData.length) &&
+          Boolean(accounts.length) &&
           <React.Fragment>
             <TableContainer sx={{ marginY: 5 }}>
               <Table>
@@ -304,7 +282,7 @@ const AccountTitleDialog = (props) => {
 
                 <TableBody className="FstoTableBodyAccountTitle-root">
                   {
-                    accountsData.map((item, index) => (
+                    accounts.map((item, index) => (
                       <TableRow key={index}>
                         <TableCell size="small">
                           <strong>{item.account_title.name}</strong>
@@ -345,22 +323,22 @@ const AccountTitleDialog = (props) => {
             </TableContainer>
 
             {
-              accountsData.some((item) => item.entry === `Credit`) &&
+              accounts.some((item) => item.entry === `Credit`) &&
               <Stack className="FstoStackAccountTitle-root" direction="row">
                 <Typography variant="body1" sx={{ flex: 1 }}>Total Credit Amount</Typography>
                 <Typography variant="h6">
-                  &#8369;{accountsData.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0).toLocaleString()}
+                  &#8369;{accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0).toLocaleString()}
                 </Typography>
               </Stack>}
 
 
 
             {
-              accountsData.some((item) => item.entry === `Debit`) &&
+              accounts.some((item) => item.entry === `Debit`) &&
               <Stack className="FstoStackAccountTitle-root" direction="row">
                 <Typography variant="body1" sx={{ flex: 1 }}>Total Debit Amount</Typography>
                 <Typography variant="h6">
-                  &#8369;{accountsData.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0).toLocaleString()}
+                  &#8369;{accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0).toLocaleString()}
                 </Typography>
               </Stack>}
 
@@ -370,7 +348,7 @@ const AccountTitleDialog = (props) => {
               <Typography variant="body1" sx={{ flex: 1 }}>Variance</Typography>
               <Typography variant="h6">
                 &#8369;
-                {((accountsData.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0)) - (accountsData.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0))).toLocaleString()}
+                {((accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0)) - (accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0))).toLocaleString()}
               </Typography>
             </Stack>
 

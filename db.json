@@ -73,6 +73,42 @@
       }
     },
     {
+      "id": 20004,
+      "general_info": {
+        "full_id_number": "RDFFLFI-20004",
+        "prefix_id": "RDFFLFI",
+        "id_number": 20004,
+        "first_name": "Marlon",
+        "middle_name": "Tabalu",
+        "last_name": "Aguas",
+        "suffix": ""
+      },
+      "position_info": {
+        "position_name": "Manager"
+      },
+      "unit_info": {
+        "department_name": "Finance Common"
+      }
+    },
+    {
+      "id": 30004,
+      "general_info": {
+        "full_id_number": "RDFFLFI-30004",
+        "prefix_id": "RDFFLFI",
+        "id_number": 30004,
+        "first_name": "Maribel",
+        "middle_name": "Tabalu",
+        "last_name": "Salonga",
+        "suffix": ""
+      },
+      "position_info": {
+        "position_name": "Director"
+      },
+      "unit_info": {
+        "department_name": "Finance Common"
+      }
+    },
+    {
       "id": 10005,
       "general_info": {
         "full_id_number": "RDFFLFI-10005",
