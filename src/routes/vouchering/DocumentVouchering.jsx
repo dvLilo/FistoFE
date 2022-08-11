@@ -92,6 +92,24 @@ const DocumentVouchering = () => {
     }))
   })
 
+  const onManage = (data) => {
+    setManage(currentValue => ({
+      ...currentValue,
+      data,
+      open: true,
+      onBack: onManage
+    }))
+  }
+
+  const onView = (data) => {
+    setManage(currentValue => ({
+      ...currentValue,
+      data,
+      open: true,
+      onBack: onManage
+    }))
+  }
+
   const onReceive = (ID) => {
     confirm({
       open: true,
@@ -122,24 +140,6 @@ const DocumentVouchering = () => {
         }
       }
     })
-  }
-
-  const onManage = (data) => {
-    setManage(currentValue => ({
-      ...currentValue,
-      data,
-      open: true,
-      onBack: onManage
-    }))
-  }
-
-  const onView = (data) => {
-    setManage(currentValue => ({
-      ...currentValue,
-      data,
-      open: true,
-      onBack: onManage
-    }))
   }
 
   const onHold = (data) => {

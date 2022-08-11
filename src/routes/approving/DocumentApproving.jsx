@@ -1,5 +1,9 @@
 import React from 'react'
 
+import axios from 'axios'
+
+import moment from 'moment'
+
 import {
   Box,
   Paper,
@@ -17,7 +21,8 @@ import {
   TablePagination,
   Tabs,
   Tab,
-  Stack
+  Stack,
+  Chip
 } from '@mui/material'
 
 import {
@@ -25,40 +30,57 @@ import {
   Close
 } from '@mui/icons-material'
 
+import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
+import useTransactions from '../../hooks/useTransactions'
 
-import Preloader from '../../components/Preloader'
+import {
+  APPROVAL,
+  RECEIVE,
+  HOLD,
+  UNHOLD,
+  RETURN,
+  UNRETURN,
+  VOID
+} from '../../constants'
+
+import ReasonDialog from '../../components/ReasonDialog'
+import TablePreloader from '../../components/TablePreloader'
 
 import DocumentApprovingFilter from './DocumentApprovingFilter'
 import DocumentApprovingActions from './DocumentApprovingActions'
 import DocumentApprovingTransaction from './DocumentApprovingTransaction'
 
-const data = [
-  {
-    id: 1,
-    date_requested: "2022-05-12 11:46:28",
-    transaction_id: "MIS076",
-    tagged: {
-      no: 92101,
-      date: "2022-06-01 11:46:28"
-    },
-    document_type: "PAD",
-    company: "RDF Corporate Services",
-    supplier: "1ST ADVENUE ADVERTISING",
-    po_total_amount: 10000,
-    referrence_total_amount: null,
-    referrence_amount: null,
-    document_amount: 10000,
-    payment_type: "Full",
-    status: "Pending"
-  }
-]
+const DocumentApproving = () => {
 
-const DocumentApproving = (props) => {
+  const {
+    status,
+    data,
+    refetchData,
+    searchData,
+    filterData,
+    changeStatus,
+    changePage,
+    changeRows
+  } = useTransactions("/api/transactions")
 
+  const toast = useToast()
   const confirm = useConfirm()
 
-  const [state, setState] = React.useState("pending")
+  const [search, setSearch] = React.useState("")
+  const [state, setState] = React.useState("voucher-voucher")
+
+  const [reason, setReason] = React.useState({
+    open: false,
+    data: null,
+    process: null,
+    subprocess: null,
+    onSuccess: refetchData,
+    onClose: () => setReason(currentValue => ({
+      ...currentValue,
+      open: false
+    }))
+  })
 
   const [manage, setManage] = React.useState({
     data: null,
@@ -69,13 +91,6 @@ const DocumentApproving = (props) => {
       open: false
     }))
   })
-
-  const onReceive = (ID) => {
-    confirm({
-      open: true,
-      onConfirm: () => console.log("Transaction", ID, "has been received.")
-    })
-  }
 
   const onManage = (data) => {
     setManage(currentValue => ({
@@ -94,6 +109,132 @@ const DocumentApproving = (props) => {
     }))
   }
 
+  const onReceive = (ID) => {
+    confirm({
+      open: true,
+      wait: true,
+      onConfirm: async () => {
+        let response
+        try {
+          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
+            process: APPROVAL,
+            subprocess: RECEIVE
+          })
+
+          const { message } = response.data
+
+          refetchData()
+          toast({
+            message,
+            title: "Success!"
+          })
+        } catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to receive transaction. Please try again later."
+          })
+        }
+      }
+    })
+  }
+
+  const onHold = (data) => {
+    setReason(currentValue => ({
+      ...currentValue,
+      open: true,
+      process: APPROVAL,
+      subprocess: HOLD,
+      data,
+    }))
+  }
+
+  const onUnhold = (ID) => {
+    confirm({
+      open: true,
+      wait: true,
+      onConfirm: async () => {
+        let response
+        try {
+          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
+            process: APPROVAL,
+            subprocess: UNHOLD
+          })
+
+          const { message } = response.data
+
+          refetchData()
+          toast({
+            message,
+            title: "Success!"
+          })
+        } catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to unhold transaction. Please try again later."
+          })
+        }
+      }
+    })
+  }
+
+  const onReturn = (data) => {
+    setReason(currentValue => ({
+      ...currentValue,
+      open: true,
+      process: APPROVAL,
+      subprocess: RETURN,
+      data,
+    }))
+  }
+
+  const onUnreturn = (ID) => {
+    confirm({
+      open: true,
+      wait: true,
+      onConfirm: async () => {
+        let response
+        try {
+          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
+            process: APPROVAL,
+            subprocess: UNRETURN
+          })
+
+          const { message } = response.data
+
+          refetchData()
+          toast({
+            message,
+            title: "Success!"
+          })
+        } catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to cancel return transaction. Please try again later."
+          })
+        }
+      }
+    })
+  }
+
+  const onVoid = (data) => {
+    setReason(currentValue => ({
+      ...currentValue,
+      open: true,
+      process: APPROVAL,
+      subprocess: VOID,
+      data,
+    }))
+  }
+
   return (
     <Box className="FstoBox-root">
       <Paper className="FstoPaperTable-root" elevation={1}>
@@ -106,17 +247,20 @@ const DocumentApproving = (props) => {
             <Tabs
               className="FstoTabsToolbar-root"
               value={state}
-              onChange={(e, value) => setState(value)}
+              onChange={(e, value) => {
+                setState(value)
+                changeStatus(value)
+              }}
               TabIndicatorProps={{
                 className: "FstoTabsIndicator-root",
                 children: <span className="FstoTabsIndicator-root" />
               }}
             >
-              <Tab className="FstoTab-root" label="Pending" value="pending" disableRipple />
-              <Tab className="FstoTab-root" label="Received" value="receive" disableRipple />
-              <Tab className="FstoTab-root" label="Approved" value="approve" disableRipple />
-              <Tab className="FstoTab-root" label="Held" value="hold" disableRipple />
-              <Tab className="FstoTab-root" label="Returned" value="return" disableRipple />
+              <Tab className="FstoTab-root" label="Pending" value="voucher-voucher" disableRipple />
+              <Tab className="FstoTab-root" label="Received" value="approve-receive" disableRipple />
+              <Tab className="FstoTab-root" label="Approved" value="approve-approve" disableRipple />
+              <Tab className="FstoTab-root" label="Held" value="approve-hold" disableRipple />
+              <Tab className="FstoTab-root" label="Returned" value="approve-return" disableRipple />
             </Tabs>
 
             <Stack className="FstoStackToolbar-root" direction="row">
@@ -126,6 +270,7 @@ const DocumentApproving = (props) => {
                 size="small"
                 autoComplete="off"
                 placeholder="Search"
+                value={search}
                 InputProps={{
                   className: "FstoTextfieldSearch-root",
                   startAdornment: (
@@ -138,130 +283,177 @@ const DocumentApproving = (props) => {
                       <IconButton
                         edge="end"
                         size="small"
-                        onClick={() => { }}
+                        disabled={!Boolean(search)}
+                        onClick={() => {
+                          setSearch("")
+                          searchData(null)
+                        }}
                       >
                         <Close fontSize="small" />
                       </IconButton>
                     </InputAdornment>
                   )
                 }}
-                onChange={(e) => console.log(e.target.value)}
+                onChange={(e) => setSearch(e.target.value)}
                 onKeyPress={(e) => {
-                  if (e.key === "Enter") console.log(e.target.value)
+                  if (e.key === "Enter") searchData(e.target.value)
                 }}
               />
 
-              <DocumentApprovingFilter />
+              <DocumentApprovingFilter filterData={filterData} />
             </Stack>
           </Box>
         </Box>
 
         <TableContainer className="FstoTableContainer-root">
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel>DATE VOUCHERED</TableSortLabel>
+          <Table className="FstoTable-root" size="small">
+            <TableHead className="FstoTableHead-root">
+              <TableRow className="FstoTableRow-root">
+                <TableCell className="FstoTableCell-root FstoTableCell-head">
+                  <TableSortLabel active={false}>TRANSACTION</TableSortLabel>
                 </TableCell>
 
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel>TAG NO.</TableSortLabel>
+                <TableCell className="FstoTableCell-root FstoTableCell-head">
+                  <TableSortLabel active={false}>REQUESTOR</TableSortLabel>
                 </TableCell>
 
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel>TRANSACTION NO.</TableSortLabel>
+                <TableCell className="FstoTableCell-root FstoTableCell-head">
+                  <TableSortLabel active={false}>CHARGING</TableSortLabel>
                 </TableCell>
 
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel>DOCUMENT</TableSortLabel>
+                <TableCell className="FstoTableCell-root FstoTableCell-head">
+                  <TableSortLabel active={false}>AMOUNT DETAILS</TableSortLabel>
                 </TableCell>
 
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel>PAYMENT</TableSortLabel>
+                <TableCell className="FstoTableCell-root FstoTableCell-head">
+                  <TableSortLabel active={false}>PO DETAILS</TableSortLabel>
                 </TableCell>
 
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel>COMPANY</TableSortLabel>
-                </TableCell>
+                <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">STATUS</TableCell>
 
-                <TableCell className="FstoTableHead-root">
-                  <TableSortLabel>SUPPLIER</TableSortLabel>
-                </TableCell>
-
-                <TableCell className="FstoTableHead-root" align="right">
-                  <TableSortLabel>REF AMOUNT</TableSortLabel>
-                </TableCell>
-
-                <TableCell className="FstoTableHead-root" align="right">
-                  <TableSortLabel>AMOUNT</TableSortLabel>
-                </TableCell>
-
-                <TableCell className="FstoTableHead-root" align="center">ACTIONS</TableCell>
+                <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">ACTIONS</TableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
               {
-                !Boolean(data.length)
-                  ? <Preloader row={5} col={10} />
-                  : data.map((item, index) => (
-                    <TableRow hover key={index}>
-                      <TableCell className="FstoTableData-root">
-                        {item.tagged.date}
+                status === 'loading'
+                && <TablePreloader row={3} />}
+
+              {
+                status === 'error'
+                && <TableRow><TableCell align="center" colSpan={7}>NO RECORDS FOUND</TableCell></TableRow>}
+
+              {
+                status === 'success'
+                && data.data.map((item, index) => {
+                  let statusColor
+                  switch (item.status) {
+                    case `tag`:
+                      statusColor = `#3a2fa7`
+                      break;
+
+                    case `receive`:
+                      statusColor = `#949494`
+                      break;
+
+                    case `hold`:
+                    case `return`:
+                    case `void`:
+                      statusColor = `#ff5252`
+                      break;
+
+                    default:
+                      statusColor = `#ed6c02`
+                  }
+
+                  return (
+                    <TableRow className="FstoTableRow-root" key={index} hover>
+                      <TableCell className="FstoTableCell-root FstoTableCell-body">
+                        <Typography variant="button" sx={{ display: `flex`, alignItems: `center`, fontWeight: 700, lineHeight: 1.25 }}>
+                          TAG#{item.tag_no}
+                          &nbsp;&mdash;&nbsp;
+                          {item.document_type}
+                          {
+                            item.document_id === 4 && item.payment_type.toLowerCase() === `partial` &&
+                            <Chip label={item.payment_type} size="small" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
+                          }
+                          {
+                            Boolean(item.is_latest_transaction) &&
+                            <Chip label="Latest" size="small" color="primary" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
+                          }
+                        </Typography>
+                        <Typography variant="caption" sx={{ fontSize: `1.25em`, textTransform: `uppercase`, lineHeight: 1.55 }}>
+                          {item.supplier.name}
+                          {
+                            item.supplier.supplier_type.id === 1 &&
+                            <Chip label={item.supplier.supplier_type.name} size="small" color="primary" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
+                          }
+                        </Typography>
+                        <Typography variant="h6" sx={{ marginTop: `4px`, marginBottom: `4px`, fontSize: `1.35em`, fontWeight: 700, lineHeight: 1 }}>
+                          {
+                            item.remarks
+                              ? item.remarks
+                              : <React.Fragment>&mdash;</React.Fragment>
+                          }
+                        </Typography>
+                        <Typography variant="caption" sx={{ lineHeight: 1.65 }}>{moment(item.date_requested).format("YYYY-MM-DD hh:mm A")}</Typography>
                       </TableCell>
 
-                      <TableCell className="FstoTableData-root">
-                        {item.tagged.no}
+                      <TableCell className="FstoTableCell-root FstoTableCell-body">
+                        <Typography variant="subtitle1" sx={{ textTransform: `capitalize` }}>{item.users.first_name.toLowerCase()} {item.users.middle_name.toLowerCase()} {item.users.last_name.toLowerCase()}</Typography>
+                        <Typography variant="subtitle2">{item.users.department[0].name}</Typography>
+                        <Typography variant="subtitle2">{item.users.position}</Typography>
                       </TableCell>
 
-                      <TableCell className="FstoTableData-root">
-                        {item.transaction_id}
+                      <TableCell className="FstoTableCell-root FstoTableCell-body">
+                        <Typography variant="subtitle1">{item.company}</Typography>
+                        <Typography variant="subtitle2">{item.department}</Typography>
+                        <Typography variant="subtitle2">{item.location}</Typography>
                       </TableCell>
 
-                      <TableCell className="FstoTableData-root">
-                        {item.document_type}
+                      <TableCell className="FstoTableCell-root FstoTableCell-body">
+                        <Typography variant="caption" sx={{ fontWeight: 500 }}>
+                          {item.document_id !== 4 && item.document_no?.toUpperCase()}
+                          {item.document_id === 4 && item.referrence_no?.toUpperCase()}
+                        </Typography>
+                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                          &#8369;
+                          {item.document_id !== 4 && item.document_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                          {item.document_id === 4 && item.referrence_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                        </Typography>
                       </TableCell>
 
-                      <TableCell className="FstoTableData-root">
-                        {item.payment_type}
-                      </TableCell>
-
-                      <TableCell className="FstoTableData-root">
-                        {item.company}
-                      </TableCell>
-
-                      <TableCell className="FstoTableData-root">
-                        {item.supplier}
-                      </TableCell>
-
-                      <TableCell className="FstoTableData-root" align="right">
+                      <TableCell className="FstoTableCell-root FstoTableCell-body">
                         {
-                          item.referrence_amount
-                            ? <>&#8369;{item.referrence_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</>
-                            : <>&mdash;</>
+                          item.po_details.length
+                            ? <React.Fragment>
+                              <Typography variant="caption" sx={{ fontWeight: 500 }}>{item.po_details[0].po_no.toUpperCase()}{item.po_details.length > 1 && `...`}</Typography>
+                              <Typography variant="h6" sx={{ fontWeight: 700 }}>&#8369;{item.po_details[0].po_total_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</Typography>
+                            </React.Fragment>
+                            : <React.Fragment>
+                              &mdash;
+                            </React.Fragment>
                         }
                       </TableCell>
 
-                      <TableCell className="FstoTableData-root" align="right">
-                        {
-                          item.document_amount
-                            ? <>&#8369;{item.document_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</>
-                            : <>&mdash;</>
-                        }
+                      <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
+                        <Chip label={item.status} size="small" sx={{ backgroundColor: statusColor, minWidth: 60, color: `#fff`, textTransform: `capitalize`, fontWeight: 500 }} />
                       </TableCell>
 
-                      <TableCell className="FstoTableData-root" align="center">
+                      <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
                         <DocumentApprovingActions
                           data={item}
                           state={state}
                           onReceive={onReceive}
+                          onCancel={onUnreturn}
                           onManage={onManage}
                           onView={onView}
                         />
                       </TableCell>
                     </TableRow>
-                  ))
-              }
+                  )
+                })}
             </TableBody>
           </Table>
         </TableContainer>
@@ -269,17 +461,27 @@ const DocumentApproving = (props) => {
         <TablePagination
           className="FstoTablePagination-root"
           component="div"
-          count={0}
-          page={0}
-          rowsPerPage={10}
-          onPageChange={(e, page) => console.log(page)}
-          onRowsPerPageChange={(e) => console.log(e.target.value)}
+          count={data ? data.total : 0}
+          page={data ? data.current_page - 1 : 0}
+          rowsPerPage={data ? data.per_page : 10}
+          onPageChange={(e, page) => changePage(page)}
+          onRowsPerPageChange={(e) => changeRows(e.target.value)}
           rowsPerPageOptions={[10, 20, 50, 100]}
           showFirstButton
           showLastButton
         />
 
-        <DocumentApprovingTransaction state={state} {...manage} />
+        <DocumentApprovingTransaction
+          {...manage}
+          state={state}
+          refetchData={refetchData}
+          onHold={onHold}
+          onUnhold={onUnhold}
+          onReturn={onReturn}
+          onVoid={onVoid}
+        />
+
+        <ReasonDialog {...reason} />
       </Paper>
     </Box>
   )

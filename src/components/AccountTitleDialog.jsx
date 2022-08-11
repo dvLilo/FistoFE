@@ -69,12 +69,13 @@ const AccountTitleDialog = (props) => {
 
   const {
     data,
-    accounts,
     open = false,
+    accounts = [],
     onInsert = () => { },
     onUpdate = () => { },
     onRemove = () => { },
     onBack = () => { },
+    onClear = () => { },
     onClose = () => { },
     onSubmit = () => { }
   } = props
@@ -118,13 +119,15 @@ const AccountTitleDialog = (props) => {
         account_title: AT.account_title
       }, AT.index)
 
-    setAT(currentValue => ({
-      ...currentValue,
+    setAT({
+      update: false,
+      index: null,
+
       entry: null,
       account_title: null,
       amount: "",
       remarks: ""
-    }))
+    })
   }
 
   const editAccountTitleHandler = (item, index) => {
@@ -150,6 +153,16 @@ const AccountTitleDialog = (props) => {
     onBack(data)
   }
 
+  const closeAccountTitleHandler = () => {
+    onClear()
+    onClose()
+  }
+
+  // const isDisabled = () => {
+  //   if (accounts.length && accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0)) return false
+  //   return true
+  // }
+
   return (
     <Dialog
       className="FstoDialogAccountTitle-root"
@@ -162,7 +175,7 @@ const AccountTitleDialog = (props) => {
     >
       <DialogTitle className="FstoDialogAccountTitle-title">
         Account Title Entry
-        <IconButton size="large" onClick={onClose}>
+        <IconButton size="large" onClick={closeAccountTitleHandler}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
@@ -261,6 +274,11 @@ const AccountTitleDialog = (props) => {
               AT.update ? <AddIcon /> : <EditIcon />
             }
             onClick={addAccountTitleHandler}
+            disabled={
+              !Boolean(AT.entry) ||
+              !Boolean(AT.account_title) ||
+              !Boolean(AT.amount)
+            }
             disableElevation
           > {AT.update ? "Update" : "Add"}
           </Button>
@@ -368,11 +386,19 @@ const AccountTitleDialog = (props) => {
         <Button
           variant="contained"
           onClick={submitAccountTitleHandler}
+          disabled={
+            !Boolean(accounts.length) ||
+            !accounts.some((item) => item.entry.toLowerCase() === `debit`) ||
+            !accounts.some((item) => item.entry.toLowerCase() === `credit`) ||
+            !(accounts.filter((item) => item.entry.toLowerCase() === `debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === (data?.document_amount || data?.referrence_amount)) ||
+            !(accounts.filter((item) => item.entry.toLowerCase() === `credit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === (data?.document_amount || data?.referrence_amount)) ||
+            !(accounts.filter((item) => item.entry.toLowerCase() === `debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === accounts.filter((item) => item.entry.toLowerCase() === `credit`).map((item) => item.amount).reduce((a, b) => a + b, 0))
+          }
           disableElevation
         > Submit
         </Button>
       </DialogActions>
-    </Dialog>
+    </Dialog >
   )
 }
 

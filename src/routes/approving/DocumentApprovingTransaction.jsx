@@ -17,13 +17,12 @@ import {
 import CloseIcon from '@mui/icons-material/Close'
 
 import useConfirm from '../../hooks/useConfirm'
+import useDistribute from '../../hooks/useDistribute'
 
 import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
 
 const DocumentApprovingTransaction = (props) => {
-
-  const confirm = useConfirm()
 
   const {
     state,
@@ -32,6 +31,19 @@ const DocumentApprovingTransaction = (props) => {
     onBack = () => { },
     onClose = () => { }
   } = props
+
+  const confirm = useConfirm()
+  const {
+    data: DISTUBUTE_LIST,
+    status: DISTRIBUTE_STATUS
+  } = useDistribute(data?.company_id)
+
+  const [accountsData, setAccountsData] = React.useState([])
+  const [approvalData, setApprovalData] = React.useState({
+    process: "approve",
+    subprocess: "approve",
+    distributed_to: null
+  })
 
   const [viewAccountTitle, setViewAccountTitle] = React.useState({
     data: null,
@@ -116,10 +128,10 @@ const DocumentApprovingTransaction = (props) => {
         </DialogTitle>
 
         <DialogContent className="FstoDialogTransaction-content">
-          <TransactionDialog data={data} onView={onAccountTitleView} />
+          <TransactionDialog data={data} onView={onAccountTitleView} setAccountsData={setAccountsData} />
 
           {
-            (state === `receive` || state === `approve`) &&
+            (state === `approve-receive` || state === `approve-approve`) &&
             <React.Fragment>
               <Divider className="FstoDividerTransaction-root" variant="middle" />
 
@@ -128,25 +140,27 @@ const DocumentApprovingTransaction = (props) => {
                   <Autocomplete
                     className="FstoSelectForm-root"
                     size="small"
-                    options={[]}
-                    value={null}
+                    options={DISTUBUTE_LIST || []}
+                    value={approvalData.distributed_to}
+                    loading={
+                      DISTRIBUTE_STATUS === 'loading'
+                    }
                     renderInput={
-                      props =>
-                        <TextField
-                          {...props}
-                          variant="outlined"
-                          label="Distribute To..."
-                        />
+                      (props) => <TextField {...props} label="Distribute To..." variant="outlined" />
                     }
                     PaperComponent={
-                      props =>
-                        <Paper
-                          {...props}
-                          sx={{ textTransform: 'capitalize' }}
-                        />
+                      (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
                     }
-                    sx={{ marginX: `10px` }}
-                    onChange={(e, value) => console.log(value)}
+                    getOptionLabel={
+                      (option) => option.name
+                    }
+                    isOptionEqualToValue={
+                      (option, value) => option.id === value.id
+                    }
+                    onChange={(e, value) => setApprovalData(currentValue => ({
+                      ...currentValue,
+                      distributed_to: value
+                    }))}
                     disablePortal
                     disableClearable
                   />
@@ -157,20 +171,20 @@ const DocumentApprovingTransaction = (props) => {
         </DialogContent>
 
         {
-          (state === `receive` || state === `approve` || state === `hold`) &&
+          (state === `approve-receive` || state === `approve-approve` || state === `approve-hold`) &&
           <DialogActions className="FstoDialogTransaction-actions">
             {
-              (state === `receive` || state === `approve`) &&
+              (state === `approve-receive` || state === `approve-approve`) &&
               <Button
                 variant="contained"
                 onClick={submitApproveHandler}
                 disableElevation
-              > {state === `receive` ? "Approve" : "Save"}
+              > {state === `approve-receive` ? "Approve" : "Save"}
               </Button>
             }
 
             {
-              state === `hold` &&
+              state === `approve-hold` &&
               <Button
                 variant="contained"
                 onClick={submitUnholdHandler}
@@ -180,7 +194,7 @@ const DocumentApprovingTransaction = (props) => {
             }
 
             {
-              state !== `hold` &&
+              state !== `approve-hold` &&
               <Button
                 variant="outlined"
                 color="error"
@@ -201,7 +215,10 @@ const DocumentApprovingTransaction = (props) => {
         }
       </Dialog>
 
-      <AccountTitleDialog {...viewAccountTitle} />
+      <AccountTitleDialog
+        {...viewAccountTitle}
+        accounts={accountsData}
+      />
     </React.Fragment>
   )
 }

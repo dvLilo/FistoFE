@@ -79,6 +79,7 @@ const DocumentVoucheringTransaction = (props) => {
     onHold = () => { },
     onUnhold = () => { },
     onReturn = () => { },
+    onVoid = () => { },
     onBack = () => { },
     onClose = () => { }
   } = props
@@ -98,7 +99,7 @@ const DocumentVoucheringTransaction = (props) => {
   }, [open])
 
   React.useEffect(() => {
-    if (open && APPROVER_STATUS === `success`) {
+    if (open && state === `voucher-receive` && APPROVER_STATUS === `success`) {
       if (data.document_amount <= 500000.00 || data.referrence_amount <= 500000.00) {
         setVoucherData(currentValue => ({
           ...currentValue,
@@ -155,11 +156,7 @@ const DocumentVoucheringTransaction = (props) => {
   const onSubmit = () => {
     const postData = {
       ...voucherData,
-      accounts: accountsData,
-      voucher: {
-        ...voucherData.voucher,
-        month: moment(voucherData.voucher.month).format("YYMM")
-      }
+      accounts: accountsData
     }
 
     confirm({
@@ -168,7 +165,7 @@ const DocumentVoucheringTransaction = (props) => {
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${data.id}`, postData)
+          response = await axios.post(`/api/transactions/flow/update-transaction/DELETE-ME-LATER/${data.id}`, postData)
 
           const { message } = response.data
 
@@ -180,7 +177,13 @@ const DocumentVoucheringTransaction = (props) => {
           })
         }
         catch (error) {
+          console.log("Fisto Error Status", error.request)
 
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to save the voucher details. Please try again."
+          })
         }
       }
     })
@@ -226,12 +229,7 @@ const DocumentVoucheringTransaction = (props) => {
 
   const submitVoidHandler = () => {
     onClose()
-
-    confirm({
-      open: true,
-      wait: true,
-      onConfirm: () => console.log(`${data.transaction_id} has been voided.`)
-    })
+    onVoid(data)
   }
 
 
@@ -304,7 +302,7 @@ const DocumentVoucheringTransaction = (props) => {
         </DialogTitle>
 
         <DialogContent className="FstoDialogTransaction-content">
-          <TransactionDialog data={data} onView={onAccountTitleView} />
+          <TransactionDialog data={data} onView={onAccountTitleView} setVoucherData={setVoucherData} setAccountsData={setAccountsData} />
 
           {
             (state === `voucher-receive` || state === `voucher-voucher`) &&
@@ -428,7 +426,7 @@ const DocumentVoucheringTransaction = (props) => {
                         ...currentValue,
                         voucher: {
                           ...currentValue.voucher,
-                          month: value
+                          month: moment(value).format("YYYY-DD-MM")
                         }
                       }))}
                       showToolbar
@@ -553,6 +551,7 @@ const DocumentVoucheringTransaction = (props) => {
       <AccountTitleDialog
         {...manageAccountTitle}
         accounts={accountsData}
+        onClear={clearHandler}
         onInsert={onAccountTitleInsert}
         onUpdate={onAccountTitleUpdate}
         onRemove={onAccountTitleRemove}

@@ -63,7 +63,7 @@ const DocumentApprovingActions = ({ data, state, onReceive, onManage, onView }) 
           </MenuItem>}
 
         {
-          state === `receive` &&
+          state === `approve-receive` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -76,7 +76,7 @@ const DocumentApprovingActions = ({ data, state, onReceive, onManage, onView }) 
           </MenuItem>}
 
         {
-          (state === `approve` || state === `hold` || state === `return` || state === `void`) &&
+          (state === `approve-approve` || state === `approve-hold` || state === `approve-return` || state === `approve-void`) &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {

@@ -24,6 +24,10 @@ import useTransaction from '../hooks/useTransaction'
 const TransactionDialog = (props) => {
 
   const {
+    onView = () => { }
+  } = props
+
+  const {
     status,
     data
   } = useTransaction(props.data.id)
@@ -34,6 +38,29 @@ const TransactionDialog = (props) => {
         ...currentValue,
         distributed_to: data.tag.distributed_to
       }))
+
+    // eslint-disable-next-line
+  }, [status])
+
+  React.useEffect(() => {
+    if (status === `success` && data.voucher && data.voucher.status === `voucher-voucher` && props.setVoucherData !== undefined && props.setAccountsData !== undefined) {
+      props.setVoucherData(currentValue => ({
+        ...currentValue,
+        tax: {
+          receipt_type: data.voucher.tax.receipt_type,
+          percentage_tax: data.voucher.tax.percentage_tax,
+          withholding_tax: data.voucher.tax.witholding_tax,
+          net_amount: data.voucher.tax.net_amount
+        },
+        voucher: {
+          no: data.voucher.no,
+          month: data.voucher.month,
+        },
+        approver: data.voucher.approver
+      }))
+
+      props.setAccountsData(data.voucher.account_title[0])
+    }
 
     // eslint-disable-next-line
   }, [status])
@@ -411,7 +438,7 @@ const TransactionDialog = (props) => {
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Voucher Month:</span>
-                  <strong>{data.voucher.month}</strong>
+                  <strong>{moment(data.voucher.month).format("MMMM YYYY")}</strong>
                 </ListItem>
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
@@ -419,14 +446,16 @@ const TransactionDialog = (props) => {
                   <strong>{data.voucher.date}</strong>
                 </ListItem>
 
-                <ListItem className="FstoListItemTransactionDetails-root" dense>
-                  <span>Date Filed:</span>
-                  <strong>07/12/2022</strong>
-                </ListItem>
+                {
+                  data.file &&
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Date Filed:</span>
+                    <strong>{moment(data.file.date).format("MM/DD/YYYY")}</strong>
+                  </ListItem>}
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Account Title Details:</span>
-                  <strong style={{ color: `blue` }}>View</strong>
+                  <strong style={{ color: `blue`, cursor: `pointer` }} onClick={onView}>View</strong>
                 </ListItem>
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
@@ -434,10 +463,12 @@ const TransactionDialog = (props) => {
                   <strong>{data.tag.distributed_to.name}</strong>
                 </ListItem>
 
-                <ListItem className="FstoListItemTransactionDetails-root" dense>
-                  <span>Approved By:</span>
-                  <strong>Reden Cunanan</strong>
-                </ListItem>
+                {
+                  data.approval &&
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Approved By:</span>
+                    <strong>{data.approval.approver.name}</strong>
+                  </ListItem>}
               </List>
             </React.Fragment>}
 

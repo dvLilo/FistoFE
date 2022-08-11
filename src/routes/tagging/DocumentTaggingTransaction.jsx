@@ -148,27 +148,17 @@ const DocumentTaggingTransaction = (props) => {
                     DISTRIBUTE_STATUS === 'loading'
                   }
                   renderInput={
-                    props =>
-                      <TextField
-                        {...props}
-                        variant="outlined"
-                        label="Distribute To..."
-                      />
+                    (props) => <TextField {...props} label="Distribute To..." variant="outlined" />
                   }
                   PaperComponent={
-                    props =>
-                      <Paper
-                        {...props}
-                        sx={{ textTransform: 'capitalize' }}
-                      />
+                    (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
                   }
                   getOptionLabel={
-                    option => option.name
+                    (option) => option.name
                   }
                   isOptionEqualToValue={
                     (option, value) => option.id === value.id
                   }
-                  sx={{ marginX: `10px` }}
                   onChange={(e, value) => setTag(currentValue => ({
                     ...currentValue,
                     distributed_to: value
