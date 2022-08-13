@@ -83,8 +83,8 @@ const DocumentVouchering = () => {
   })
 
   const [manage, setManage] = React.useState({
-    data: null,
     open: false,
+    transaction: null,
     onBack: undefined,
     onClose: () => setManage(currentValue => ({
       ...currentValue,
@@ -92,19 +92,19 @@ const DocumentVouchering = () => {
     }))
   })
 
-  const onManage = (data) => {
+  const onManage = (transaction) => {
     setManage(currentValue => ({
       ...currentValue,
-      data,
+      transaction,
       open: true,
       onBack: onManage
     }))
   }
 
-  const onView = (data) => {
+  const onView = (transaction) => {
     setManage(currentValue => ({
       ...currentValue,
-      data,
+      transaction,
       open: true,
       onBack: onManage
     }))

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import moment from 'moment'
+import axios from 'axios'
 
 import NumberFormat from 'react-number-format'
 
@@ -30,10 +30,10 @@ import CloseIcon from '@mui/icons-material/Close'
 import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
 import useApprover from '../../hooks/useApprover'
+import useTransaction from '../../hooks/useTransaction'
 
 import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
-import axios from 'axios'
 
 const NumberField = React.forwardRef(function NumberField(props, ref) {
   const { onChange, ...rest } = props
@@ -73,9 +73,9 @@ const DocumentVoucheringTransaction = (props) => {
 
   const {
     state,
-    data,
     open = false,
-    refetchData,
+    transaction = null,
+    refetchData = () => { },
     onHold = () => { },
     onUnhold = () => { },
     onReturn = () => { },
@@ -86,6 +86,13 @@ const DocumentVoucheringTransaction = (props) => {
 
   const toast = useToast()
   const confirm = useConfirm()
+
+  const {
+    data,
+    status,
+    refetch: fetchTransaction
+  } = useTransaction(transaction?.id)
+
   const {
     refetch: fetchApprover,
     data: APPROVER_LIST,
@@ -93,28 +100,29 @@ const DocumentVoucheringTransaction = (props) => {
   } = useApprover()
 
   React.useEffect(() => {
-    if (open && !APPROVER_LIST) fetchApprover()
+    if (open) fetchTransaction()
 
+    if (open && !APPROVER_LIST) fetchApprover()
     // eslint-disable-next-line
   }, [open])
 
   React.useEffect(() => {
     if (open && state === `voucher-receive` && APPROVER_STATUS === `success`) {
-      if (data.document_amount <= 500000.00 || data.referrence_amount <= 500000.00) {
+      if (transaction.document_amount <= 500000.00 || transaction.referrence_amount <= 500000.00) {
         setVoucherData(currentValue => ({
           ...currentValue,
           approver: APPROVER_LIST.find((item) => item.position.toLowerCase() === `supervisor`)
         }))
       }
 
-      if ((data.document_amount >= 500001.00 && data.document_amount <= 1000000.00) || (data.referrence_amount >= 500001.00 && data.referrence_amount <= 1000000.00)) {
+      if ((transaction.document_amount >= 500001.00 && transaction.document_amount <= 1000000.00) || (transaction.referrence_amount >= 500001.00 && transaction.referrence_amount <= 1000000.00)) {
         setVoucherData(currentValue => ({
           ...currentValue,
           approver: APPROVER_LIST.find((item) => item.position.toLowerCase() === `manager`)
         }))
       }
 
-      if (data.document_amount >= 1000001.00 || data.referrence_amount >= 1000001.00) {
+      if (transaction.document_amount >= 1000001.00 || transaction.referrence_amount >= 1000001.00) {
         setVoucherData(currentValue => ({
           ...currentValue,
           approver: APPROVER_LIST.find((item) => item.position.toLowerCase() === `director`)
@@ -125,7 +133,28 @@ const DocumentVoucheringTransaction = (props) => {
     // eslint-disable-next-line
   }, [open, APPROVER_STATUS])
 
-  const [accountsData, setAccountsData] = React.useState([])
+  React.useEffect(() => {
+    if (open && state === `voucher-voucher` && status === `success`) {
+      setVoucherData(currentValue => ({
+        ...currentValue,
+        tax: {
+          receipt_type: data.voucher.tax.receipt_type,
+          percentage_tax: data.voucher.tax.percentage_tax,
+          withholding_tax: data.voucher.tax.witholding_tax,
+          net_amount: data.voucher.tax.net_amount
+        },
+        voucher: {
+          no: data.voucher.no,
+          month: data.voucher.month
+        },
+        approver: data.voucher.approver,
+        accounts: data.voucher.account_title[0]
+      }))
+    }
+
+    // eslint-disable-next-line
+  }, [open, status])
+
   const [voucherData, setVoucherData] = React.useState({
     process: "voucher",
     subprocess: "voucher",
@@ -139,33 +168,53 @@ const DocumentVoucheringTransaction = (props) => {
       no: "",
       month: null,
     },
-    approver: null
+    approver: null,
+    accounts: []
   })
 
   const [manageAccountTitle, setManageAccountTitle] = React.useState({
-    data: null,
     open: false,
+    state: null,
+    transaction: null,
     onBack: undefined,
-    onSubmit: undefined,
     onClose: () => setManageAccountTitle(currentValue => ({
       ...currentValue,
       open: false
     }))
   })
 
-  const onSubmit = () => {
-    const postData = {
-      ...voucherData,
-      accounts: accountsData
-    }
+  const clearHandler = () => {
+    setVoucherData(currentValue => ({
+      ...currentValue,
+      tax: {
+        receipt_type: "",
+        percentage_tax: "",
+        withholding_tax: null,
+        net_amount: null
+      },
+      voucher: {
+        no: "",
+        month: null,
+      },
+      approver: null,
+      accounts: []
+    }))
+  }
 
+  const closeHandler = () => {
+    onClose()
+    clearHandler()
+  }
+
+  const submitVoucherHandler = () => {
+    onClose()
     confirm({
       open: true,
       wait: true,
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/DELETE-ME-LATER/${data.id}`, postData)
+          response = await axios.post(`/api/transactions/flow/update-transaction/DELETE-ME-LATER/${transaction.id}`, voucherData)
 
           const { message } = response.data
 
@@ -189,59 +238,35 @@ const DocumentVoucheringTransaction = (props) => {
     })
   }
 
-  const clearHandler = () => {
-    setAccountsData([])
-    setVoucherData(currentValue => ({
-      ...currentValue,
-      tax: {
-        receipt_type: "",
-        percentage_tax: "",
-        withholding_tax: null,
-        net_amount: null
-      },
-      voucher: {
-        no: "",
-        month: null,
-      },
-      approver: null
-    }))
-  }
-
-  const closeHandler = () => {
-    onClose()
-    clearHandler()
-  }
-
   const submitHoldHandler = () => {
     onClose()
-    onHold(data)
+    onHold(transaction)
   }
 
   const submitUnholdHandler = () => {
     onClose()
-    onUnhold(data.id)
+    onUnhold(transaction.id)
   }
 
   const submitReturnHandler = () => {
     onClose()
-    onReturn(data)
+    onReturn(transaction)
   }
 
   const submitVoidHandler = () => {
     onClose()
-    onVoid(data)
+    onVoid(transaction)
   }
-
 
   const onAccountTitleManage = () => {
     onClose()
 
     setManageAccountTitle(currentValue => ({
       ...currentValue,
-      data: data,
+      state,
+      transaction,
       open: true,
-      onBack: onBack,
-      onSubmit: onSubmit
+      onBack: onBack
     }))
   }
 
@@ -250,35 +275,44 @@ const DocumentVoucheringTransaction = (props) => {
 
     setManageAccountTitle(currentValue => ({
       ...currentValue,
-      data: data,
+      state,
+      transaction,
       open: true,
-      onBack: onBack,
-      onSubmit: onSubmit
+      onBack: onBack
     }))
   }
 
   const onAccountTitleInsert = (data) => {
-    setAccountsData(currentValue => ([
+    setVoucherData(currentValue => ({
       ...currentValue,
-      data
-    ]))
+      accounts: [
+        ...currentValue.accounts,
+        data
+      ]
+    }))
   }
 
   const onAccountTitleUpdate = (data, index) => {
-    setAccountsData(currentValue => ([
-      ...currentValue.map((item, itemIndex) => {
-        if (itemIndex === index) return data
-        return item
-      })
-    ]))
+    setVoucherData(currentValue => ({
+      ...currentValue,
+      accounts: [
+        ...currentValue.accounts.map((item, itemIndex) => {
+          if (itemIndex === index) return data
+          return item
+        })
+      ]
+    }))
   }
 
   const onAccountTitleRemove = (index) => {
-    setAccountsData(currentValue => ([
-      ...currentValue.filter((item, itemIndex) => {
-        return itemIndex !== index
-      })
-    ]))
+    setVoucherData(currentValue => ({
+      ...currentValue,
+      accounts: [
+        ...currentValue.accounts.filter((item, itemIndex) => {
+          return itemIndex !== index
+        })
+      ]
+    }))
   }
 
   return (
@@ -302,7 +336,7 @@ const DocumentVoucheringTransaction = (props) => {
         </DialogTitle>
 
         <DialogContent className="FstoDialogTransaction-content">
-          <TransactionDialog data={data} onView={onAccountTitleView} setVoucherData={setVoucherData} setAccountsData={setAccountsData} />
+          <TransactionDialog data={data} status={status} onView={onAccountTitleView} />
 
           {
             (state === `voucher-receive` || state === `voucher-voucher`) &&
@@ -426,7 +460,7 @@ const DocumentVoucheringTransaction = (props) => {
                         ...currentValue,
                         voucher: {
                           ...currentValue.voucher,
-                          month: moment(value).format("YYYY-DD-MM")
+                          month: value
                         }
                       }))}
                       showToolbar
@@ -493,15 +527,19 @@ const DocumentVoucheringTransaction = (props) => {
               (state === `voucher-receive` || state === `voucher-voucher`) &&
               <Button
                 variant="contained"
-                onClick={onAccountTitleManage}
+                onClick={
+                  state === `voucher-voucher`
+                    ? submitVoucherHandler
+                    : onAccountTitleManage
+                }
                 disabled={
                   !Boolean(voucherData.approver) ||
                   !Boolean(voucherData.tax.receipt_type) ||
+                  !Boolean(voucherData.voucher.no) ||
+                  !Boolean(voucherData.voucher.month) ||
                   (voucherData.tax.receipt_type === `Official` && !Boolean(voucherData.tax.net_amount)) ||
                   (voucherData.tax.receipt_type === `Official` && !Boolean(voucherData.tax.percentage_tax)) ||
-                  (voucherData.tax.receipt_type === `Official` && !Boolean(voucherData.tax.withholding_tax)) ||
-                  !Boolean(voucherData.voucher.no) ||
-                  !Boolean(voucherData.voucher.month)
+                  (voucherData.tax.receipt_type === `Official` && !Boolean(voucherData.tax.withholding_tax))
                 }
                 disableElevation
               > {state === `voucher-receive` ? "Approve" : "Save"}
@@ -550,8 +588,9 @@ const DocumentVoucheringTransaction = (props) => {
 
       <AccountTitleDialog
         {...manageAccountTitle}
-        accounts={accountsData}
+        accounts={voucherData.accounts}
         onClear={clearHandler}
+        onSubmit={submitVoucherHandler}
         onInsert={onAccountTitleInsert}
         onUpdate={onAccountTitleUpdate}
         onRemove={onAccountTitleRemove}

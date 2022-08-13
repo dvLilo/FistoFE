@@ -1,5 +1,7 @@
 import React from 'react'
 
+import axios from 'axios'
+
 import {
   Autocomplete,
   Dialog,
@@ -16,8 +18,10 @@ import {
 
 import CloseIcon from '@mui/icons-material/Close'
 
+import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
 import useDistribute from '../../hooks/useDistribute'
+import useTransaction from '../../hooks/useTransaction'
 
 import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
@@ -26,19 +30,51 @@ const DocumentApprovingTransaction = (props) => {
 
   const {
     state,
-    data,
     open = false,
+    transaction = null,
+    refetchData = () => { },
+    onHold = () => { },
+    onUnhold = () => { },
+    onReturn = () => { },
     onBack = () => { },
     onClose = () => { }
   } = props
 
+  const toast = useToast()
   const confirm = useConfirm()
+
   const {
+    data,
+    status,
+    refetch: fetchTransaction
+  } = useTransaction(transaction?.id)
+
+  const {
+    refetch: fetchDistribute,
     data: DISTUBUTE_LIST,
     status: DISTRIBUTE_STATUS
-  } = useDistribute(data?.company_id)
+  } = useDistribute(transaction?.company_id)
 
-  const [accountsData, setAccountsData] = React.useState([])
+  React.useEffect(() => {
+    if (open) {
+      fetchTransaction()
+      fetchDistribute()
+    }
+
+    // eslint-disable-next-line
+  }, [open])
+
+  React.useEffect(() => {
+    if (open && status === `success`) {
+      setApprovalData(currentValue => ({
+        ...currentValue,
+        distributed_to: data.tag.distributed_to
+      }))
+    }
+
+    // eslint-disable-next-line
+  }, [open, status])
+
   const [approvalData, setApprovalData] = React.useState({
     process: "approve",
     subprocess: "approve",
@@ -46,54 +82,73 @@ const DocumentApprovingTransaction = (props) => {
   })
 
   const [viewAccountTitle, setViewAccountTitle] = React.useState({
-    data: null,
     open: false,
+    state: null,
+    transaction: null,
     onBack: undefined,
-    onSubmit: undefined,
     onClose: () => setViewAccountTitle(currentValue => ({
       ...currentValue,
       open: false
     }))
   })
 
-  const submitApproveHandler = () => {
-    onClose()
-
-    confirm({
-      open: true,
-      wait: true,
-      onConfirm: () => console.log(`${data.transaction_id} has been approved.`)
-    })
+  const clearHandler = () => {
+    setApprovalData(currentValue => ({
+      ...currentValue,
+      distributed_to: null
+    }))
   }
 
-  const submitUnholdHandler = () => {
+  const closeHandler = () => {
     onClose()
+    clearHandler()
+  }
 
+  const submitApproveHandler = () => {
+    onClose()
     confirm({
       open: true,
       wait: true,
-      onConfirm: () => console.log(`${data.transaction_id} has been unhold.`)
+      onConfirm: async () => {
+        let response
+        try {
+          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, approvalData)
+
+          const { message } = response.data
+
+          refetchData()
+          clearHandler()
+          toast({
+            message,
+            title: "Success!"
+          })
+        }
+        catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to save the approval details. Please try again."
+          })
+        }
+      }
     })
   }
 
   const submitHoldHandler = () => {
     onClose()
+    onHold(transaction)
+  }
 
-    confirm({
-      open: true,
-      wait: true,
-      onConfirm: () => console.log(`${data.transaction_id} has been held.`)
-    })
+  const submitUnholdHandler = () => {
+    onClose()
+    onUnhold(transaction.id)
   }
 
   const submitReturnHandler = () => {
     onClose()
-
-    confirm({
-      open: true,
-      wait: true,
-      onConfirm: () => console.log(`${data.transaction_id} has been returned.`)
-    })
+    onReturn(transaction)
   }
 
   const onAccountTitleView = () => {
@@ -101,7 +156,8 @@ const DocumentApprovingTransaction = (props) => {
 
     setViewAccountTitle(currentValue => ({
       ...currentValue,
-      data: data,
+      state,
+      transaction,
       open: true,
       onBack: onBack
     }))
@@ -122,13 +178,13 @@ const DocumentApprovingTransaction = (props) => {
       >
         <DialogTitle className="FstoDialogTransaction-title">
           Transaction
-          <IconButton size="large" onClick={onClose}>
+          <IconButton size="large" onClick={closeHandler}>
             <CloseIcon />
           </IconButton>
         </DialogTitle>
 
         <DialogContent className="FstoDialogTransaction-content">
-          <TransactionDialog data={data} onView={onAccountTitleView} setAccountsData={setAccountsData} />
+          <TransactionDialog data={data} status={status} onView={onAccountTitleView} />
 
           {
             (state === `approve-receive` || state === `approve-approve`) &&
@@ -217,7 +273,7 @@ const DocumentApprovingTransaction = (props) => {
 
       <AccountTitleDialog
         {...viewAccountTitle}
-        accounts={accountsData}
+        accounts={data?.voucher.account_title[0]}
       />
     </React.Fragment>
   )

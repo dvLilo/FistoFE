@@ -42,8 +42,7 @@ import {
   HOLD,
   UNHOLD,
   RETURN,
-  UNRETURN,
-  VOID
+  UNRETURN
 } from '../../constants'
 
 import ReasonDialog from '../../components/ReasonDialog'
@@ -70,7 +69,7 @@ const DocumentApproving = () => {
   const confirm = useConfirm()
 
   const [search, setSearch] = React.useState("")
-  const [state, setState] = React.useState("voucher-voucher")
+  const [state, setState] = React.useState("pending")
 
   const [reason, setReason] = React.useState({
     open: false,
@@ -85,8 +84,8 @@ const DocumentApproving = () => {
   })
 
   const [manage, setManage] = React.useState({
-    data: null,
     open: false,
+    transaction: null,
     onBack: undefined,
     onClose: () => setManage(currentValue => ({
       ...currentValue,
@@ -94,20 +93,21 @@ const DocumentApproving = () => {
     }))
   })
 
-  const onManage = (data) => {
+  const onManage = (transaction) => {
     setManage(currentValue => ({
       ...currentValue,
-      data,
+      transaction,
       open: true,
       onBack: onManage
     }))
   }
 
-  const onView = (data) => {
+  const onView = (transaction) => {
     setManage(currentValue => ({
       ...currentValue,
-      data,
-      open: true
+      transaction,
+      open: true,
+      onBack: onView
     }))
   }
 
@@ -227,16 +227,6 @@ const DocumentApproving = () => {
     })
   }
 
-  const onVoid = (data) => {
-    setReason(currentValue => ({
-      ...currentValue,
-      open: true,
-      process: APPROVAL,
-      subprocess: VOID,
-      data,
-    }))
-  }
-
   return (
     <Box className="FstoBox-root">
       <Paper className="FstoPaperTable-root" elevation={1}>
@@ -258,7 +248,7 @@ const DocumentApproving = () => {
                 children: <span className="FstoTabsIndicator-root" />
               }}
             >
-              <Tab className="FstoTab-root" label="Pending" value="voucher-voucher" disableRipple />
+              <Tab className="FstoTab-root" label="Pending" value="pending" disableRipple />
               <Tab className="FstoTab-root" label="Received" value="approve-receive" disableRipple />
               <Tab className="FstoTab-root" label="Approved" value="approve-approve" disableRipple />
               <Tab className="FstoTab-root" label="Held" value="approve-hold" disableRipple />
@@ -458,7 +448,6 @@ const DocumentApproving = () => {
           onHold={onHold}
           onUnhold={onUnhold}
           onReturn={onReturn}
-          onVoid={onVoid}
         />
 
         <ReasonDialog {...reason} />

@@ -12,11 +12,12 @@ const useTransaction = (ID) => {
     return await axios.get(`/api/transactions/${ID}`)
   }
 
-  const { status, data, error } = useQuery(
+  const { refetch, status, data, error } = useQuery(
     ["transaction", ID],
     fetchData,
     {
       retry: false,
+      enabled: false,
       refetchOnWindowFocus: false,
       select: (response) => response.data.result,
       onError: (error) => {
@@ -31,7 +32,7 @@ const useTransaction = (ID) => {
     }
   )
 
-  return { status, data, error }
+  return { refetch, status, data, error }
 }
 
 export default useTransaction

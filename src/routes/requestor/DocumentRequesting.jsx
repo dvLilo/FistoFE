@@ -68,8 +68,8 @@ const DocumentRequesting = () => {
   const [search, setSearch] = React.useState("")
 
   const [view, setView] = React.useState({
-    data: null,
     open: false,
+    transaction: null,
     onClose: () => setView(currentValue => ({
       ...currentValue,
       open: false
@@ -115,9 +115,9 @@ const DocumentRequesting = () => {
     // eslint-disable-next-line
   }, [])
 
-  const onView = (data) => setView(currentValue => ({
+  const onView = (transaction) => setView(currentValue => ({
     ...currentValue,
-    data,
+    transaction,
     open: true
   }))
 

@@ -15,55 +15,17 @@ import {
   Typography
 } from '@mui/material'
 
-import '../assets/css/styles.transaction.scss'
-
 import ReportIcon from '@mui/icons-material/ReportOutlined'
 
-import useTransaction from '../hooks/useTransaction'
+import '../assets/css/styles.transaction.scss'
 
 const TransactionDialog = (props) => {
 
   const {
+    data,
+    status,
     onView = () => { }
   } = props
-
-  const {
-    status,
-    data
-  } = useTransaction(props.data.id)
-
-  React.useEffect(() => {
-    if (status === `success` && data.tag.distributed_to && props.callback !== undefined)
-      props.callback(currentValue => ({
-        ...currentValue,
-        distributed_to: data.tag.distributed_to
-      }))
-
-    // eslint-disable-next-line
-  }, [status])
-
-  React.useEffect(() => {
-    if (status === `success` && data.voucher && data.voucher.status === `voucher-voucher` && props.setVoucherData !== undefined && props.setAccountsData !== undefined) {
-      props.setVoucherData(currentValue => ({
-        ...currentValue,
-        tax: {
-          receipt_type: data.voucher.tax.receipt_type,
-          percentage_tax: data.voucher.tax.percentage_tax,
-          withholding_tax: data.voucher.tax.witholding_tax,
-          net_amount: data.voucher.tax.net_amount
-        },
-        voucher: {
-          no: data.voucher.no,
-          month: data.voucher.month,
-        },
-        approver: data.voucher.approver
-      }))
-
-      props.setAccountsData(data.voucher.account_title[0])
-    }
-
-    // eslint-disable-next-line
-  }, [status])
 
   return (
     <React.Fragment>
@@ -222,7 +184,7 @@ const TransactionDialog = (props) => {
             status === `success` &&
             <List className="FstoListTransactionDetails-root" dense>
               {
-                Boolean(data.tag.no) &&
+                Boolean(data.tag) && Boolean(data.tag.no) &&
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Tag No:</span>
                   <strong>{data.tag.no}</strong>
@@ -455,7 +417,9 @@ const TransactionDialog = (props) => {
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Account Title Details:</span>
-                  <strong style={{ color: `blue`, cursor: `pointer` }} onClick={onView}>View</strong>
+                  <strong>
+                    <span style={{ color: `blue`, cursor: `pointer` }} onClick={onView}>View</span>
+                  </strong>
                 </ListItem>
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>

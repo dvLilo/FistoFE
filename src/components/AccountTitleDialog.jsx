@@ -68,8 +68,9 @@ const ENTRY_LIST = [
 const AccountTitleDialog = (props) => {
 
   const {
-    data,
     open = false,
+    state = null,
+    transaction = null,
     accounts = [],
     onInsert = () => { },
     onUpdate = () => { },
@@ -150,18 +151,13 @@ const AccountTitleDialog = (props) => {
 
   const backAccountTitleHandler = () => {
     onClose()
-    onBack(data)
+    onBack(transaction)
   }
 
   const closeAccountTitleHandler = () => {
     onClear()
     onClose()
   }
-
-  // const isDisabled = () => {
-  //   if (accounts.length && accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0)) return false
-  //   return true
-  // }
 
   return (
     <Dialog
@@ -181,120 +177,126 @@ const AccountTitleDialog = (props) => {
       </DialogTitle>
 
       <DialogContent className="FstoDialogAccountTitle-content">
-        <Box className="FstoBoxAccountTitle-root">
-          <Autocomplete
-            className="FstoSelectForm-root"
-            size="small"
-            options={ENTRY_LIST}
-            value={ENTRY_LIST.find((row) => row.name === AT.entry) || null}
-            renderInput={
-              (props) => <TextField {...props} label="Entry" variant="outlined" />
-            }
-            PaperComponent={
-              (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
-            }
-            getOptionLabel={
-              (option) => option.name
-            }
-            isOptionEqualToValue={
-              (option, value) => option.id === value.id
-            }
-            onChange={(e, value) => setAT(currentValue => ({
-              ...currentValue,
-              entry: value.name
-            }))}
-            disablePortal
-            disableClearable
-          />
+        {
+          Boolean(state) && !Boolean(state.match(/approve-.*/)) &&
+          <Box className="FstoBoxAccountTitle-root" sx={{ marginBottom: 5 }}>
+            <Autocomplete
+              className="FstoSelectForm-root"
+              size="small"
+              options={ENTRY_LIST}
+              value={ENTRY_LIST.find((row) => row.name === AT.entry) || null}
+              renderInput={
+                (props) => <TextField {...props} label="Entry" variant="outlined" />
+              }
+              PaperComponent={
+                (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
+              }
+              getOptionLabel={
+                (option) => option.name
+              }
+              isOptionEqualToValue={
+                (option, value) => option.id === value.id
+              }
+              onChange={(e, value) => setAT(currentValue => ({
+                ...currentValue,
+                entry: value.name
+              }))}
+              disablePortal
+              disableClearable
+            />
 
-          <Autocomplete
-            className="FstoSelectForm-root"
-            size="small"
-            options={ACCOUNT_TITLE_LIST || []}
-            value={AT.account_title}
-            loading={
-              ACCOUNT_TITLE_STATUS === 'loading'
-            }
-            renderInput={
-              (props) => <TextField {...props} label="Account Title" variant="outlined" />
-            }
-            PaperComponent={
-              (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
-            }
-            getOptionLabel={
-              (option) => option.name
-            }
-            getOptionDisabled={
-              (option) => accounts.some((item) => item.account_title.id === option.id)
-            }
-            isOptionEqualToValue={
-              (option, value) => option.id === value.id
-            }
-            onChange={(e, value) => setAT(currentValue => ({
-              ...currentValue,
-              account_title: value
-            }))}
-            disablePortal
-            disableClearable
-          />
+            <Autocomplete
+              className="FstoSelectForm-root"
+              size="small"
+              options={ACCOUNT_TITLE_LIST || []}
+              value={AT.account_title}
+              loading={
+                ACCOUNT_TITLE_STATUS === 'loading'
+              }
+              renderInput={
+                (props) => <TextField {...props} label="Account Title" variant="outlined" />
+              }
+              PaperComponent={
+                (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
+              }
+              getOptionLabel={
+                (option) => option.name
+              }
+              getOptionDisabled={
+                (option) => accounts.some((item) => item.account_title.id === option.id)
+              }
+              isOptionEqualToValue={
+                (option, value) => option.id === value.id
+              }
+              onChange={(e, value) => setAT(currentValue => ({
+                ...currentValue,
+                account_title: value
+              }))}
+              disablePortal
+              disableClearable
+            />
 
-          <TextField
-            className="FstoTextfieldForm-root"
-            label="Amount"
-            variant="outlined"
-            autoComplete="off"
-            size="small"
-            value={AT.amount}
-            InputProps={{
-              inputComponent: NumberField
-            }}
-            onChange={(e) => setAT(currentValue => ({
-              ...currentValue,
-              amount: parseFloat(e.target.value)
-            }))}
-          />
+            <TextField
+              className="FstoTextfieldForm-root"
+              label="Amount"
+              variant="outlined"
+              autoComplete="off"
+              size="small"
+              value={AT.amount}
+              InputProps={{
+                inputComponent: NumberField
+              }}
+              onChange={(e) => setAT(currentValue => ({
+                ...currentValue,
+                amount: parseFloat(e.target.value)
+              }))}
+            />
 
-          <TextField
-            className="FstoTextfieldForm-root"
-            label="Remarks (Optional)"
-            variant="outlined"
-            autoComplete="off"
-            size="small"
-            value={AT.remarks}
-            onChange={(e) => setAT(currentValue => ({
-              ...currentValue,
-              remarks: e.target.value
-            }))}
-          />
+            <TextField
+              className="FstoTextfieldForm-root"
+              label="Remarks (Optional)"
+              variant="outlined"
+              autoComplete="off"
+              size="small"
+              value={AT.remarks}
+              onChange={(e) => setAT(currentValue => ({
+                ...currentValue,
+                remarks: e.target.value
+              }))}
+            />
 
-          <Button
-            className=""
-            variant="contained"
-            startIcon={
-              AT.update ? <AddIcon /> : <EditIcon />
-            }
-            onClick={addAccountTitleHandler}
-            disabled={
-              !Boolean(AT.entry) ||
-              !Boolean(AT.account_title) ||
-              !Boolean(AT.amount)
-            }
-            disableElevation
-          > {AT.update ? "Update" : "Add"}
-          </Button>
-        </Box>
+            <Button
+              className=""
+              variant="contained"
+              startIcon={
+                AT.update ? <AddIcon /> : <EditIcon />
+              }
+              onClick={addAccountTitleHandler}
+              disabled={
+                !Boolean(AT.entry) ||
+                !Boolean(AT.account_title) ||
+                !Boolean(AT.amount)
+              }
+              disableElevation
+            > {AT.update ? "Update" : "Add"}
+            </Button>
+          </Box>
+        }
 
         {
           Boolean(accounts.length) &&
           <React.Fragment>
-            <TableContainer sx={{ marginY: 5 }}>
+            <TableContainer sx={{ marginBottom: 5 }}>
               <Table>
                 <TableHead>
                   <TableRow>
                     <TableCell>Account Title</TableCell>
                     <TableCell className="FstoTabelCellAccountTitle-root" align="right">Debit</TableCell>
                     <TableCell>Credit</TableCell>
-                    <TableCell align="right">Action</TableCell>
+                    {
+                      Boolean(state) && !Boolean(state.match(/approve-.*/)) &&
+                      <TableCell align="right">Action</TableCell>
+                    }
                   </TableRow>
                 </TableHead>
 
@@ -325,14 +327,17 @@ const AccountTitleDialog = (props) => {
                           }
                         </TableCell>
 
-                        <TableCell align="right" size="small">
-                          <IconButton onClick={() => editAccountTitleHandler(item, index)}>
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                          <IconButton onClick={() => removeAccountTitleHandler(index)}>
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </TableCell>
+                        {
+                          Boolean(state) && !Boolean(state.match(/approve-.*/)) &&
+                          <TableCell align="right" size="small">
+                            <IconButton onClick={() => editAccountTitleHandler(item, index)}>
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                            <IconButton onClick={() => removeAccountTitleHandler(index)}>
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </TableCell>
+                        }
                       </TableRow>
                     ))
                   }
@@ -348,9 +353,6 @@ const AccountTitleDialog = (props) => {
                   &#8369;{accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0).toLocaleString()}
                 </Typography>
               </Stack>}
-
-
-
             {
               accounts.some((item) => item.entry === `Debit`) &&
               <Stack className="FstoStackAccountTitle-root" direction="row">
@@ -383,20 +385,22 @@ const AccountTitleDialog = (props) => {
         > Back
         </Button>
 
-        <Button
-          variant="contained"
-          onClick={submitAccountTitleHandler}
-          disabled={
-            !Boolean(accounts.length) ||
-            !accounts.some((item) => item.entry.toLowerCase() === `debit`) ||
-            !accounts.some((item) => item.entry.toLowerCase() === `credit`) ||
-            !(accounts.filter((item) => item.entry.toLowerCase() === `debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === (data?.document_amount || data?.referrence_amount)) ||
-            !(accounts.filter((item) => item.entry.toLowerCase() === `credit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === (data?.document_amount || data?.referrence_amount)) ||
-            !(accounts.filter((item) => item.entry.toLowerCase() === `debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === accounts.filter((item) => item.entry.toLowerCase() === `credit`).map((item) => item.amount).reduce((a, b) => a + b, 0))
-          }
-          disableElevation
-        > Submit
-        </Button>
+        {
+          Boolean(state) && !Boolean(state.match(/approve-.*/)) &&
+          <Button
+            variant="contained"
+            onClick={submitAccountTitleHandler}
+            disabled={
+              !Boolean(accounts.length) ||
+              !accounts.some((item) => item.entry.toLowerCase() === `debit`) ||
+              !accounts.some((item) => item.entry.toLowerCase() === `credit`) ||
+              !(accounts.filter((item) => item.entry.toLowerCase() === `debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === (transaction?.document_amount || transaction?.referrence_amount)) ||
+              !(accounts.filter((item) => item.entry.toLowerCase() === `credit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === (transaction?.document_amount || transaction?.referrence_amount)) ||
+              !(accounts.filter((item) => item.entry.toLowerCase() === `debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === accounts.filter((item) => item.entry.toLowerCase() === `credit`).map((item) => item.amount).reduce((a, b) => a + b, 0))
+            }
+            disableElevation
+          > {state.match(/receive.*/) ? "Submit" : "Save"}
+          </Button>}
       </DialogActions>
     </Dialog >
   )

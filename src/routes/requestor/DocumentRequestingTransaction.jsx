@@ -9,15 +9,29 @@ import {
 
 import CloseIcon from '@mui/icons-material/Close'
 
+import useTransaction from '../../hooks/useTransaction'
+
 import TransactionDialog from '../../components/TransactionDialog'
 
 const DocumentRequestingTransaction = (props) => {
 
   const {
-    data,
+    transaction = null,
     open = false,
     onClose = () => { }
   } = props
+
+  const {
+    refetch,
+    data,
+    status
+  } = useTransaction(transaction?.id)
+
+  React.useEffect(() => {
+    if (open) refetch()
+
+    // eslint-disable-next-line
+  }, [open])
 
   return (
     <Dialog
@@ -40,7 +54,7 @@ const DocumentRequestingTransaction = (props) => {
       </DialogTitle>
 
       <DialogContent className="FstoDialogTransaction-content">
-        <TransactionDialog data={data} />
+        <TransactionDialog data={data} status={status} />
       </DialogContent>
     </Dialog>
   )

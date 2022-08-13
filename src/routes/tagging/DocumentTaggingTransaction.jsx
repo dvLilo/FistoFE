@@ -21,6 +21,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
 import useDistribute from '../../hooks/useDistribute'
+import useTransaction from '../../hooks/useTransaction'
 
 import TransactionDialog from '../../components/TransactionDialog'
 
@@ -28,9 +29,9 @@ const DocumentTaggingTransaction = (props) => {
 
   const {
     state,
-    data,
     open = false,
-    refetchData,
+    transaction = null,
+    refetchData = () => { },
     onHold = () => { },
     onUnhold = () => { },
     onReturn = () => { },
@@ -38,29 +39,57 @@ const DocumentTaggingTransaction = (props) => {
     onClose = () => { }
   } = props
 
-  const [tag, setTag] = React.useState({
-    process: "tag",
-    subprocess: "tag",
-    distributed_to: null
-  })
-
   const toast = useToast()
   const confirm = useConfirm()
+
   const {
+    data,
+    status,
+    refetch: fetchTransaction
+  } = useTransaction(transaction?.id)
+
+  const {
+    refetch: fetchDistribute,
     data: DISTUBUTE_LIST,
     status: DISTRIBUTE_STATUS
-  } = useDistribute(data?.company_id)
+  } = useDistribute(transaction?.company_id)
 
   React.useEffect(() => {
-    if (open && DISTRIBUTE_STATUS === `success`) {
-      setTag(currentValue => ({
+    if (open) {
+      fetchTransaction()
+      fetchDistribute()
+    }
+
+    // eslint-disable-next-line
+  }, [open])
+
+  React.useEffect(() => {
+    if (open && state === `tag-receive` && DISTRIBUTE_STATUS === `success`) {
+      setTagData(currentValue => ({
         ...currentValue,
         distributed_to: DISTUBUTE_LIST[0]
       }))
     }
 
     // eslint-disable-next-line
-  }, [DISTRIBUTE_STATUS])
+  }, [open, DISTRIBUTE_STATUS])
+
+  React.useEffect(() => {
+    if (open && state === `tag-tag` && status === `success`) {
+      setTagData(currentValue => ({
+        ...currentValue,
+        distributed_to: data.tag.distributed_to
+      }))
+    }
+
+    // eslint-disable-next-line
+  }, [open, status])
+
+  const [tagData, setTagData] = React.useState({
+    process: "tag",
+    subprocess: "tag",
+    distributed_to: null
+  })
 
   const submitTagHandler = () => {
     onClose()
@@ -69,21 +98,27 @@ const DocumentTaggingTransaction = (props) => {
       open: true,
       wait: true,
       onConfirm: async () => {
-
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${data.id}`, tag)
+          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, tagData)
 
           const { message } = response.data
 
           refetchData()
+          clearHandler()
           toast({
             message,
             title: "Success!"
           })
         }
         catch (error) {
+          console.log("Fisto Error Status", error.request)
 
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to save the tag details. Please try again."
+          })
         }
       }
     })
@@ -91,22 +126,34 @@ const DocumentTaggingTransaction = (props) => {
 
   const submitUnholdHandler = () => {
     onClose()
-    onUnhold(data.id)
+    onUnhold(transaction.id)
   }
 
   const submitHoldHandler = () => {
     onClose()
-    onHold(data)
+    onHold(transaction)
   }
 
   const submitReturnHandler = () => {
     onClose()
-    onReturn(data)
+    onReturn(transaction)
   }
 
   const submitVoidHandler = () => {
     onClose()
-    onVoid(data)
+    onVoid(transaction)
+  }
+
+  const clearHandler = () => {
+    setTagData(currentValue => ({
+      ...currentValue,
+      distributed_to: null
+    }))
+  }
+
+  const closeHandler = () => {
+    onClose()
+    clearHandler()
   }
 
   return (
@@ -118,19 +165,18 @@ const DocumentTaggingTransaction = (props) => {
       PaperProps={{
         className: "FstoPaperTransaction-root"
       }}
-      onClose={onClose}
       fullWidth
       disablePortal
     >
       <DialogTitle className="FstoDialogTransaction-title">
         Transaction Details
-        <IconButton size="large" onClick={onClose}>
+        <IconButton size="large" onClick={closeHandler}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
 
       <DialogContent className="FstoDialogTransaction-content">
-        <TransactionDialog data={data} callback={setTag} />
+        <TransactionDialog data={data} status={status} />
 
         {
           (state === `tag-receive` || state === `tag-tag`) &&
@@ -143,7 +189,7 @@ const DocumentTaggingTransaction = (props) => {
                   className="FstoSelectForm-root"
                   size="small"
                   options={DISTUBUTE_LIST || []}
-                  value={tag.distributed_to}
+                  value={tagData.distributed_to}
                   loading={
                     DISTRIBUTE_STATUS === 'loading'
                   }
@@ -159,7 +205,7 @@ const DocumentTaggingTransaction = (props) => {
                   isOptionEqualToValue={
                     (option, value) => option.id === value.id
                   }
-                  onChange={(e, value) => setTag(currentValue => ({
+                  onChange={(e, value) => setTagData(currentValue => ({
                     ...currentValue,
                     distributed_to: value
                   }))}
@@ -181,7 +227,7 @@ const DocumentTaggingTransaction = (props) => {
               variant="contained"
               onClick={submitTagHandler}
               disabled={
-                Boolean(!tag.distributed_to)
+                Boolean(!tagData.distributed_to)
               }
               disableElevation
             > {state === `tag-receive` ? "Tag" : "Save"}

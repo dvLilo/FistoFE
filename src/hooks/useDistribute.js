@@ -17,10 +17,12 @@ const useDistribute = (ID) => {
   }
 
   const {
+    refetch,
     status,
     data,
     error
   } = useQuery(["DISTRIBUTE", ID], fetchDistributeList, {
+    enabled: false,
     refetchOnWindowFocus: false,
     select: (response) => response.data.result.associates,
     onError: (error) => {
@@ -34,7 +36,7 @@ const useDistribute = (ID) => {
     }
   })
 
-  return { status, data, error }
+  return { refetch, status, data, error }
 }
 
 export default useDistribute
