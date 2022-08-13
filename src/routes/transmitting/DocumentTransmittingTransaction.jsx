@@ -1,105 +1,157 @@
 import React from 'react'
 
-// import {
-//   Dialog,
-//   DialogTitle,
-//   DialogContent,
-//   DialogActions,
-//   IconButton,
-//   Button
-// } from '@mui/material'
+import axios from 'axios'
 
-// import CloseIcon from '@mui/icons-material/Close'
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  Button
+} from '@mui/material'
 
-// import useConfirm from '../../hooks/useConfirm'
+import CloseIcon from '@mui/icons-material/Close'
 
-// import TransactionDialog from '../../components/TransactionDialog'
-// import AccountTitleDialog from '../../components/AccountTitleDialog'
+import useToast from '../../hooks/useToast'
+import useConfirm from '../../hooks/useConfirm'
+import useTransaction from '../../hooks/useTransaction'
+
+import TransactionDialog from '../../components/TransactionDialog'
+import AccountTitleDialog from '../../components/AccountTitleDialog'
 
 const DocumentTransmittingTransaction = (props) => {
 
-  // const confirm = useConfirm()
+  const {
+    state,
+    open = false,
+    transaction = null,
+    refetchData = () => { },
+    onBack = () => { },
+    onClose = () => { }
+  } = props
 
-  // const {
-  //   state,
-  //   data,
-  //   open = false,
-  //   onBack = () => { },
-  //   onClose = () => { }
-  // } = props
+  const toast = useToast()
+  const confirm = useConfirm()
 
-  // const [viewAccountTitle, setViewAccountTitle] = React.useState({
-  //   data: null,
-  //   open: false,
-  //   onBack: undefined,
-  //   onClose: () => setViewAccountTitle(currentValue => ({
-  //     ...currentValue,
-  //     open: false
-  //   }))
-  // })
+  const {
+    data,
+    status,
+    refetch: fetchTransaction
+  } = useTransaction(transaction?.id)
 
-  // const submitTransmitHandler = (e) => {
-  //   e.preventDefault()
-  //   onClose()
+  React.useEffect(() => {
+    if (open) fetchTransaction()
 
-  //   confirm({
-  //     open: true,
-  //     wait: true,
-  //     onConfirm: () => console.log(`${data.transaction_id} has been transmitted.`)
-  //   })
-  // }
+    // eslint-disable-next-line
+  }, [open])
 
-  // const onAccountTitleView = () => {
-  //   onClose()
+  const [transmittalData] = React.useState({
+    process: "transmit",
+    subprocess: "transmit",
+  })
 
-  //   setViewAccountTitle(currentValue => ({
-  //     ...currentValue,
-  //     data: data,
-  //     open: true,
-  //     onBack: onBack
-  //   }))
-  // }
+  const [viewAccountTitle, setViewAccountTitle] = React.useState({
+    open: false,
+    state: null,
+    transaction: null,
+    onBack: undefined,
+    onClose: () => setViewAccountTitle(currentValue => ({
+      ...currentValue,
+      open: false
+    }))
+  })
 
-  // return (
-  //   <React.Fragment>
-  //     <Dialog
-  //       className="FstoDialogTransaction-root"
-  //       open={open}
-  //       scroll="body"
-  //       maxWidth="lg"
-  //       onClose={onClose}
-  //       fullWidth
-  //       disablePortal
-  //     >
-  //       <DialogTitle className="FstoDialogTransaction-title">
-  //         Transaction Details
-  //         <IconButton size="large" onClick={onClose}>
-  //           <CloseIcon />
-  //         </IconButton>
-  //       </DialogTitle>
+  const closeHandler = () => {
+    onClose()
+  }
 
-  //       <DialogContent className="FstoDialogTransaction-content">
-  //         {/* <TransactionDialog data={data} onView={onAccountTitleView} /> */}
-  //       </DialogContent>
+  const submitTransmitHandler = () => {
+    onClose()
+    confirm({
+      open: true,
+      wait: true,
+      onConfirm: async () => {
+        let response
+        try {
+          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, transmittalData)
 
-  //       {
-  //         state === `receive` &&
-  //         <DialogActions className="FstoDialogTransaction-actions">
-  //           <Button
-  //             variant="contained"
-  //             onClick={submitTransmitHandler}
-  //             disableElevation
-  //           > Transmit
-  //           </Button>
-  //         </DialogActions>
-  //       }
-  //     </Dialog>
+          const { message } = response.data
 
-  //     <AccountTitleDialog {...viewAccountTitle} />
-  //   </React.Fragment>
-  // )
+          refetchData()
+          toast({
+            message,
+            title: "Success!"
+          })
+        }
+        catch (error) {
+          console.log("Fisto Error Status", error.request)
 
-  return <h6>Transaction Details</h6>
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to save the transmittal details. Please try again."
+          })
+        }
+      }
+    })
+  }
+
+  const onAccountTitleView = () => {
+    onClose()
+
+    setViewAccountTitle(currentValue => ({
+      ...currentValue,
+      state,
+      transaction,
+      open: true,
+      onBack: onBack
+    }))
+  }
+
+  return (
+    <React.Fragment>
+      <Dialog
+        className="FstoDialogTransaction-root"
+        open={open}
+        scroll="body"
+        maxWidth="lg"
+        PaperProps={{
+          className: "FstoPaperTransaction-root"
+        }}
+        fullWidth
+        disablePortal
+      >
+        <DialogTitle className="FstoDialogTransaction-title">
+          Transaction Details
+          <IconButton size="large" onClick={closeHandler}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent className="FstoDialogTransaction-content">
+          <TransactionDialog data={data} status={status} onView={onAccountTitleView} />
+        </DialogContent>
+
+        {
+          state === `transmit-receive` &&
+          <DialogActions className="FstoDialogTransaction-actions">
+            <Button
+              variant="contained"
+              onClick={submitTransmitHandler}
+              disableElevation
+            > Transmit
+            </Button>
+          </DialogActions>
+        }
+      </Dialog>
+
+      <AccountTitleDialog
+        {...viewAccountTitle}
+        accounts={data?.voucher.account_title[0]}
+      />
+    </React.Fragment>
+  )
 }
 
 export default DocumentTransmittingTransaction

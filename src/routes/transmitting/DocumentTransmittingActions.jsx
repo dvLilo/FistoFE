@@ -63,7 +63,7 @@ const DocumentTransmittingActions = ({ data, state, onReceive, onManage, onView 
           </MenuItem>}
 
         {
-          state === `receive` &&
+          state === `transmit-receive` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -76,7 +76,7 @@ const DocumentTransmittingActions = ({ data, state, onReceive, onManage, onView 
           </MenuItem>}
 
         {
-          state === `transmit` &&
+          state === `transmit-transmit` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {

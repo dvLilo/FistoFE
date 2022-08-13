@@ -177,7 +177,7 @@ const DocumentApprovingTransaction = (props) => {
         disablePortal
       >
         <DialogTitle className="FstoDialogTransaction-title">
-          Transaction
+          Transaction Details
           <IconButton size="large" onClick={closeHandler}>
             <CloseIcon />
           </IconButton>

@@ -178,7 +178,7 @@ const AccountTitleDialog = (props) => {
 
       <DialogContent className="FstoDialogAccountTitle-content">
         {
-          Boolean(state) && !Boolean(state.match(/approve-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/approve-||transmit-.*/)) &&
           <Box className="FstoBoxAccountTitle-root" sx={{ marginBottom: 5 }}>
             <Autocomplete
               className="FstoSelectForm-root"
@@ -294,7 +294,7 @@ const AccountTitleDialog = (props) => {
                     <TableCell className="FstoTabelCellAccountTitle-root" align="right">Debit</TableCell>
                     <TableCell>Credit</TableCell>
                     {
-                      Boolean(state) && !Boolean(state.match(/approve-.*/)) &&
+                      Boolean(state) && !Boolean(state.match(/approve-||transmit-.*/)) &&
                       <TableCell align="right">Action</TableCell>
                     }
                   </TableRow>
@@ -328,7 +328,7 @@ const AccountTitleDialog = (props) => {
                         </TableCell>
 
                         {
-                          Boolean(state) && !Boolean(state.match(/approve-.*/)) &&
+                          Boolean(state) && !Boolean(state.match(/approve-||transmit-.*/)) &&
                           <TableCell align="right" size="small">
                             <IconButton onClick={() => editAccountTitleHandler(item, index)}>
                               <EditIcon fontSize="small" />
@@ -386,7 +386,7 @@ const AccountTitleDialog = (props) => {
         </Button>
 
         {
-          Boolean(state) && !Boolean(state.match(/approve-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/approve-||transmit-.*/)) &&
           <Button
             variant="contained"
             onClick={submitAccountTitleHandler}
