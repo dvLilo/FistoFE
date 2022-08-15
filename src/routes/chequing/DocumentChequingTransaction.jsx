@@ -1,248 +1,351 @@
 import React from 'react'
 
-// import {
-//   Dialog,
-//   DialogTitle,
-//   DialogContent,
-//   DialogActions,
-//   IconButton,
-//   Button
-// } from '@mui/material'
+import axios from 'axios'
 
-// import CloseIcon from '@mui/icons-material/Close'
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  Button
+} from '@mui/material'
 
-// import useConfirm from '../../hooks/useConfirm'
+import CloseIcon from '@mui/icons-material/Close'
 
-// import TransactionDialog from '../../components/TransactionDialog'
-// import AccountTitleDialog from '../../components/AccountTitleDialog'
-// import ChequeEntry from '../../components/ChequeEntry'
+import useToast from '../../hooks/useToast'
+import useConfirm from '../../hooks/useConfirm'
+import useTransaction from '../../hooks/useTransaction'
+
+import TransactionDialog from '../../components/TransactionDialog'
+import ChequeEntryDialog from '../../components/ChequeEntryDialog'
+import AccountTitleDialog from '../../components/AccountTitleDialog'
 
 const DocumentChequingTransaction = (props) => {
 
-  // const confirm = useConfirm()
+  const {
+    state,
+    open = false,
+    transaction = null,
+    refetchData = () => { },
+    onRelease = () => { },
+    onHold = () => { },
+    onUnhold = () => { },
+    onReturn = () => { },
+    onVoid = () => { },
+    onBack = () => { },
+    onClose = () => { }
+  } = props
 
-  // const {
-  //   state,
-  //   data,
-  //   open = false,
-  //   onBack = () => { },
-  //   onClose = () => { }
-  // } = props
+  const toast = useToast()
+  const confirm = useConfirm()
 
-  // const [manageAccountTitle, setManageAccountTitle] = React.useState({
-  //   data: null,
-  //   open: false,
-  //   onBack: undefined,
-  //   onSubmit: undefined,
-  //   onClose: () => setManageAccountTitle(currentValue => ({
-  //     ...currentValue,
-  //     open: false
-  //   }))
-  // })
+  const {
+    data,
+    status,
+    refetch: fetchTransaction
+  } = useTransaction(transaction?.id)
 
-  // const [manageCheque, setManageCheque] = React.useState({
-  //   data: null,
-  //   open: false,
-  //   onBack: undefined,
-  //   onSubmit: undefined,
-  //   onClose: () => setManageCheque(currentValue => ({
-  //     ...currentValue,
-  //     open: false
-  //   }))
-  // })
+  React.useEffect(() => {
+    if (open) fetchTransaction()
 
-  // const onSubmit = () => {
-  //   confirm({
-  //     open: true,
-  //     wait: true,
-  //     onConfirm: () => console.log(`${data.transaction_id} has been created.`)
-  //   })
-  // }
+    // eslint-disable-next-line
+  }, [open])
 
-  // const submitReleaseHandler = () => {
-  //   onClose()
+  React.useEffect(() => {
+    if (open && state === `cheque-receive` && status === `success` && !Boolean(chequeData.accounts.length)) {
+      const accounts = data.voucher.account_title[0].filter((item) => item.entry.toLowerCase() === `credit`).map((item) => ({
+        entry: "Debit",
+        account_title: item.account_title,
+        amount: item.amount,
+        remarks: item.remarks
+      }))
 
-  //   confirm({
-  //     open: true,
-  //     wait: true,
-  //     onConfirm: () => console.log(`${data.transaction_id} has been released.`)
-  //   })
-  // }
+      setChequeData(currentValue => ({
+        ...currentValue,
+        accounts
+      }))
+    }
 
-  // const submitHoldHandler = () => {
-  //   onClose()
+    // eslint-disable-next-line
+  }, [open, status])
 
-  //   confirm({
-  //     open: true,
-  //     wait: true,
-  //     onConfirm: () => console.log(`${data.transaction_id} has been held.`)
-  //   })
-  // }
+  const [chequeData, setChequeData] = React.useState({
+    process: "cheque",
+    subprocess: "cheque",
+    accounts: [],
+    cheques: []
+  })
 
-  // const submitUnholdHandler = () => {
-  //   onClose()
+  const [manageAccountTitle, setManageAccountTitle] = React.useState({
+    open: false,
+    state: null,
+    transaction: null,
+    onBack: undefined,
+    onClose: () => setManageAccountTitle(currentValue => {
+      const { accounts, ...remainingItems } = currentValue
 
-  //   confirm({
-  //     open: true,
-  //     wait: true,
-  //     onConfirm: () => console.log(`${data.transaction_id} has been unhold.`)
-  //   })
-  // }
+      return ({
+        ...remainingItems,
+        open: false
+      })
+    })
+  })
 
-  // const submitReturnHandler = () => {
-  //   onClose()
+  const [manageCheque, setManageCheque] = React.useState({
+    open: false,
+    state: null,
+    transaction: null,
+    onBack: undefined,
+    onClose: () => setManageCheque(currentValue => ({
+      ...currentValue,
+      open: false
+    }))
+  })
 
-  //   confirm({
-  //     open: true,
-  //     wait: true,
-  //     onConfirm: () => console.log(`${data.transaction_id} has been returned.`)
-  //   })
-  // }
+  const clearHandler = () => {
+    setChequeData(currentValue => ({
+      ...currentValue,
+      accounts: [],
+      cheques: []
+    }))
+  }
 
-  // const submitVoidHandler = () => {
-  //   onClose()
+  const closeHandler = () => {
+    onClose()
+    clearHandler()
+  }
 
-  //   confirm({
-  //     open: true,
-  //     wait: true,
-  //     onConfirm: () => console.log(`${data.transaction_id} has been voided.`)
-  //   })
-  // }
+  const submitChequeHandler = () => {
+    onClose()
+    confirm({
+      open: true,
+      wait: true,
+      onConfirm: async () => {
+        let response
+        try {
+          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, chequeData)
 
-  // const onAccountTitleManage = () => {
-  //   onClose()
+          const { message } = response.data
 
-  //   setManageAccountTitle(currentValue => ({
-  //     ...currentValue,
-  //     data: data,
-  //     open: true,
-  //     onBack: onBack,
-  //     onSubmit: onChequeManage
-  //   }))
-  // }
+          refetchData()
+          clearHandler()
+          toast({
+            message,
+            title: "Success!"
+          })
+        }
+        catch (error) {
+          console.log("Fisto Error Status", error.request)
 
-  // const onAccountTitleView = () => {
-  //   onClose()
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to save the cheque details. Please try again."
+          })
+        }
+      }
+    })
+  }
 
-  //   setManageAccountTitle(currentValue => ({
-  //     ...currentValue,
-  //     data: data,
-  //     open: true,
-  //     onBack: onBack
-  //   }))
-  // }
+  const submitReleaseHandler = () => {
+    onClose()
+    onRelease(transaction.id)
+  }
 
-  // const onChequeManage = () => {
-  //   setManageCheque(currentValue => ({
-  //     ...currentValue,
-  //     data: data,
-  //     open: true,
-  //     onBack: onAccountTitleManage,
-  //     onSubmit: onSubmit
-  //   }))
-  // }
+  const submitHoldHandler = () => {
+    onClose()
+    onHold(transaction)
+  }
 
-  // return (
-  //   <React.Fragment>
-  //     <Dialog
-  //       className="FstoDialogTransaction-root"
-  //       open={open}
-  //       scroll="body"
-  //       maxWidth="lg"
-  //       PaperProps={{
-  //         className: "FstoPaperTransaction-root"
-  //       }}
-  //       onClose={onClose}
-  //       fullWidth
-  //       disablePortal
-  //     >
-  //       <DialogTitle className="FstoDialogTransaction-title">
-  //         Transaction
-  //         <IconButton size="large" onClick={onClose}>
-  //           <CloseIcon />
-  //         </IconButton>
-  //       </DialogTitle>
+  const submitUnholdHandler = () => {
+    onClose()
+    onUnhold(transaction.id)
+  }
 
-  //       <DialogContent className="FstoDialogTransaction-content">
-  //         <TransactionDialog data={data} onView={onAccountTitleView} />
-  //       </DialogContent>
+  const submitReturnHandler = () => {
+    onClose()
+    onReturn(transaction)
+  }
 
-  //       {
-  //         (state === `receive` || state === `create`) &&
-  //         <DialogActions className="FstoDialogTransaction-actions">
-  //           {
-  //             state === `receive` &&
-  //             <Button
-  //               variant="contained"
-  //               size="large"
-  //               onClick={onAccountTitleManage}
-  //               disableElevation
-  //             > Create
-  //             </Button>
-  //           }
+  const submitVoidHandler = () => {
+    onClose()
+    onVoid(transaction)
+  }
 
-  //           {
-  //             state === `create` &&
-  //             <Button
-  //               variant="contained"
-  //               size="large"
-  //               onClick={submitReleaseHandler}
-  //               disableElevation
-  //             > Release
-  //             </Button>
-  //           }
+  const onAccountTitleManage = () => {
+    onClose()
 
-  //           {
-  //             state === `hold` &&
-  //             <Button
-  //               variant="contained"
-  //               size="large"
-  //               onClick={submitUnholdHandler}
-  //               disableElevation
-  //             > Unhold
-  //             </Button>
-  //           }
+    setManageAccountTitle(currentValue => ({
+      ...currentValue,
+      state,
+      transaction,
+      open: true,
+      onBack: onBack
+    }))
+  }
 
-  //           {
-  //             state !== `hold` &&
-  //             <Button
-  //               variant="outlined"
-  //               size="large"
-  //               color="error"
-  //               onClick={submitHoldHandler}
-  //               disableElevation
-  //             > Hold
-  //             </Button>
-  //           }
+  const onAccountTitleView = () => {
+    onClose()
 
-  //           <Button
-  //             variant="outlined"
-  //             size="large"
-  //             color="error"
-  //             onClick={submitReturnHandler}
-  //             disableElevation
-  //           > Return
-  //           </Button>
+    setManageAccountTitle(currentValue => ({
+      ...currentValue,
+      transaction,
+      open: true,
+      onBack: onBack,
 
-  //           <Button
-  //             variant="outlined"
-  //             size="large"
-  //             color="error"
-  //             onClick={submitVoidHandler}
-  //             disableElevation
-  //           > Void
-  //           </Button>
-  //         </DialogActions>
-  //       }
-  //     </Dialog>
+      state: "transmit-",
+      accounts: data.voucher.account_title[0]
+    }))
+  }
 
-  //     <AccountTitleDialog {...manageAccountTitle} />
+  const onChequeManage = () => {
+    setManageCheque(currentValue => ({
+      ...currentValue,
+      state,
+      transaction,
+      open: true,
+      onBack: onAccountTitleManage
+    }))
+  }
 
-  //     <ChequeEntry {...manageCheque} />
-  //   </React.Fragment>
-  // )
+  const onAccountTitleInsert = (data) => {
+    setChequeData(currentValue => ({
+      ...currentValue,
+      accounts: [
+        ...currentValue.accounts,
+        data
+      ]
+    }))
+  }
 
-  return <h6>Transaction Details</h6>
+  const onAccountTitleUpdate = (data, index) => {
+    setChequeData(currentValue => ({
+      ...currentValue,
+      accounts: [
+        ...currentValue.accounts.map((item, itemIndex) => {
+          if (itemIndex === index) return data
+          return item
+        })
+      ]
+    }))
+  }
+
+  const onAccountTitleRemove = (index) => {
+    setChequeData(currentValue => ({
+      ...currentValue,
+      accounts: [
+        ...currentValue.accounts.filter((item, itemIndex) => {
+          return itemIndex !== index
+        })
+      ]
+    }))
+  }
+
+  return (
+    <React.Fragment>
+      <Dialog
+        className="FstoDialogTransaction-root"
+        open={open}
+        scroll="body"
+        maxWidth="lg"
+        PaperProps={{
+          className: "FstoPaperTransaction-root"
+        }}
+        fullWidth
+        disablePortal
+      >
+        <DialogTitle className="FstoDialogTransaction-title">
+          Transaction Details
+          <IconButton size="large" onClick={closeHandler}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent className="FstoDialogTransaction-content">
+          <TransactionDialog data={data} status={status} onView={onAccountTitleView} />
+        </DialogContent>
+
+        {
+          (state === `cheque-receive` || state === `cheque-cheque`) &&
+          <DialogActions className="FstoDialogTransaction-actions">
+            {
+              state === `cheque-receive` &&
+              <Button
+                variant="contained"
+                onClick={onAccountTitleManage}
+                disableElevation
+              > Create
+              </Button>
+            }
+
+            {
+              state === `cheque-cheque` &&
+              <Button
+                variant="contained"
+                onClick={submitReleaseHandler}
+                disableElevation
+              > Release
+              </Button>
+            }
+
+            {
+              state === `cheque-hold` &&
+              <Button
+                variant="contained"
+                onClick={submitUnholdHandler}
+                disableElevation
+              > Unhold
+              </Button>
+            }
+
+            {
+              state !== `cheque-hold` &&
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={submitHoldHandler}
+                disableElevation
+              > Hold
+              </Button>
+            }
+
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={submitReturnHandler}
+              disableElevation
+            > Return
+            </Button>
+
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={submitVoidHandler}
+              disableElevation
+            > Void
+            </Button>
+          </DialogActions>
+        }
+      </Dialog>
+
+      <AccountTitleDialog
+        accounts={chequeData.accounts}
+        onClear={clearHandler}
+        onSubmit={onChequeManage}
+        onInsert={onAccountTitleInsert}
+        onUpdate={onAccountTitleUpdate}
+        onRemove={onAccountTitleRemove}
+        {...manageAccountTitle}
+      />
+
+      <ChequeEntryDialog
+        onClear={clearHandler}
+        onSubmit={submitChequeHandler}
+        {...manageCheque}
+      />
+    </React.Fragment>
+  )
 }
 
 export default DocumentChequingTransaction

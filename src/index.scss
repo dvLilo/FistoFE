@@ -706,6 +706,10 @@ body {
     overflow: initial;
   }
 
+  & .FstoDialogCheque-actions {
+    padding: 2em;
+  }
+
   & .FstoPaperCheque-root {
     max-width: 1100px;
     min-height: 75vh;

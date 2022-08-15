@@ -27,24 +27,54 @@ import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 
-const ChequeEntry = (props) => {
+const ChequeEntryDialog = (props) => {
 
   const {
-    data,
     open = false,
+    // state = null,
+    transaction = null,
     onBack = () => { },
+    onClear = () => { },
     onClose = () => { },
     onSubmit = () => { }
   } = props
 
+  const [CQ, setCQ] = React.useState({
+    update: false,
+    index: null,
+
+    bank: null,
+    no: "",
+    amount: "",
+    date: null
+  })
+
   const submitChequehandler = () => {
     onClose()
-    onSubmit(data)
+    onSubmit()
   }
 
   const backChequeHandler = () => {
     onClose()
-    onBack(data)
+    onBack(transaction)
+  }
+
+  const clearChequeHandler = () => {
+    setCQ({
+      update: false,
+      index: null,
+
+      bank: null,
+      date: null,
+      no: "",
+      amount: ""
+    })
+  }
+
+  const closeChequeHandler = () => {
+    onClose()
+    onClear()
+    clearChequeHandler()
   }
 
   return (
@@ -59,7 +89,7 @@ const ChequeEntry = (props) => {
     >
       <DialogTitle className="FstoDialogCheque-title">
         Cheque Details Entry
-        <IconButton size="large" onClick={onClose}>
+        <IconButton size="large" onClick={closeChequeHandler}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
@@ -97,7 +127,11 @@ const ChequeEntry = (props) => {
             variant="outlined"
             autoComplete="off"
             size="small"
-            onChange={() => { }}
+            value={CQ.no}
+            onChange={(e) => setCQ(currentValue => ({
+              ...currentValue,
+              no: e.target.value
+            }))}
           />
 
           <TextField
@@ -180,7 +214,6 @@ const ChequeEntry = (props) => {
         <Button
           variant="outlined"
           color="info"
-          size="large"
           onClick={backChequeHandler}
           disableElevation
         > Back
@@ -188,7 +221,6 @@ const ChequeEntry = (props) => {
 
         <Button
           variant="contained"
-          size="large"
           onClick={submitChequehandler}
           disableElevation
         > Submit
@@ -198,4 +230,4 @@ const ChequeEntry = (props) => {
   )
 }
 
-export default ChequeEntry
+export default ChequeEntryDialog

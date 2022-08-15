@@ -102,6 +102,11 @@ const AccountTitleDialog = (props) => {
     remarks: ""
   })
 
+  React.useEffect(() => {
+    if (!open) clearAccountTitleHandler()
+    // eslint-disable-next-line
+  }, [open])
+
 
   const addAccountTitleHandler = () => {
     if (!AT.update)
@@ -120,15 +125,7 @@ const AccountTitleDialog = (props) => {
         account_title: AT.account_title
       }, AT.index)
 
-    setAT({
-      update: false,
-      index: null,
-
-      entry: null,
-      account_title: null,
-      amount: "",
-      remarks: ""
-    })
+    clearAccountTitleHandler()
   }
 
   const editAccountTitleHandler = (item, index) => {
@@ -154,9 +151,22 @@ const AccountTitleDialog = (props) => {
     onBack(transaction)
   }
 
+  const clearAccountTitleHandler = () => {
+    setAT({
+      update: false,
+      index: null,
+
+      entry: null,
+      account_title: null,
+      amount: "",
+      remarks: ""
+    })
+  }
+
   const closeAccountTitleHandler = () => {
-    onClear()
     onClose()
+    onClear()
+    clearAccountTitleHandler()
   }
 
   return (
@@ -178,7 +188,7 @@ const AccountTitleDialog = (props) => {
 
       <DialogContent className="FstoDialogAccountTitle-content">
         {
-          Boolean(state) && !Boolean(state.match(/approve-||transmit-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/approve-|transmit-.*/)) &&
           <Box className="FstoBoxAccountTitle-root" sx={{ marginBottom: 5 }}>
             <Autocomplete
               className="FstoSelectForm-root"
@@ -294,7 +304,7 @@ const AccountTitleDialog = (props) => {
                     <TableCell className="FstoTabelCellAccountTitle-root" align="right">Debit</TableCell>
                     <TableCell>Credit</TableCell>
                     {
-                      Boolean(state) && !Boolean(state.match(/approve-||transmit-.*/)) &&
+                      Boolean(state) && !Boolean(state.match(/approve-|transmit-.*/)) &&
                       <TableCell align="right">Action</TableCell>
                     }
                   </TableRow>
@@ -328,12 +338,12 @@ const AccountTitleDialog = (props) => {
                         </TableCell>
 
                         {
-                          Boolean(state) && !Boolean(state.match(/approve-||transmit-.*/)) &&
+                          Boolean(state) && !Boolean(state.match(/approve-|transmit-.*/)) &&
                           <TableCell align="right" size="small">
-                            <IconButton onClick={() => editAccountTitleHandler(item, index)}>
+                            <IconButton onClick={() => editAccountTitleHandler(item, index)} disabled={Boolean(state) && Boolean(state.match(/cheque-.*/)) && !Boolean(index)}>
                               <EditIcon fontSize="small" />
                             </IconButton>
-                            <IconButton onClick={() => removeAccountTitleHandler(index)}>
+                            <IconButton onClick={() => removeAccountTitleHandler(index)} disabled={Boolean(state) && Boolean(state.match(/cheque-.*/)) && !Boolean(index)}>
                               <DeleteIcon fontSize="small" />
                             </IconButton>
                           </TableCell>
@@ -386,7 +396,7 @@ const AccountTitleDialog = (props) => {
         </Button>
 
         {
-          Boolean(state) && !Boolean(state.match(/approve-||transmit-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/approve-|transmit-.*/)) &&
           <Button
             variant="contained"
             onClick={submitAccountTitleHandler}
