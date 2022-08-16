@@ -31,6 +31,17 @@ import DeleteIcon from '@mui/icons-material/Delete'
 
 import useAccountTitles from '../hooks/useAccountTitles'
 
+const ENTRY_LIST = [
+  {
+    id: 1,
+    name: "Debit"
+  },
+  {
+    id: 2,
+    name: "Credit"
+  }
+]
+
 const NumberField = React.forwardRef(function NumberField(props, ref) {
   const { onChange, ...rest } = props
 
@@ -53,17 +64,6 @@ const NumberField = React.forwardRef(function NumberField(props, ref) {
     />
   )
 })
-
-const ENTRY_LIST = [
-  {
-    id: 1,
-    name: "Debit"
-  },
-  {
-    id: 2,
-    name: "Credit"
-  }
-]
 
 const AccountTitleDialog = (props) => {
 
@@ -112,7 +112,7 @@ const AccountTitleDialog = (props) => {
     if (!AT.update)
       onInsert({
         entry: AT.entry,
-        amount: AT.amount,
+        amount: parseFloat(AT.amount),
         remarks: AT.remarks,
         account_title: AT.account_title
       })
@@ -120,7 +120,7 @@ const AccountTitleDialog = (props) => {
     if (!!AT.update)
       onUpdate({
         entry: AT.entry,
-        amount: AT.amount,
+        amount: parseFloat(AT.amount),
         remarks: AT.remarks,
         account_title: AT.account_title
       }, AT.index)
@@ -132,7 +132,9 @@ const AccountTitleDialog = (props) => {
     setAT({
       update: true,
       index,
-      ...item
+
+      ...item,
+      amount: item.amount.toString()
     })
   }
 
@@ -204,6 +206,9 @@ const AccountTitleDialog = (props) => {
               getOptionLabel={
                 (option) => option.name
               }
+              getOptionDisabled={
+                (option) => Boolean(state) && Boolean(state.match(/cheque-.*/)) && option.name.toLowerCase() === `debit`
+              }
               isOptionEqualToValue={
                 (option, value) => option.id === value.id
               }
@@ -258,7 +263,7 @@ const AccountTitleDialog = (props) => {
               }}
               onChange={(e) => setAT(currentValue => ({
                 ...currentValue,
-                amount: parseFloat(e.target.value)
+                amount: e.target.value
               }))}
             />
 
@@ -279,7 +284,7 @@ const AccountTitleDialog = (props) => {
               className=""
               variant="contained"
               startIcon={
-                AT.update ? <AddIcon /> : <EditIcon />
+                AT.update ? <EditIcon /> : <AddIcon />
               }
               onClick={addAccountTitleHandler}
               disabled={

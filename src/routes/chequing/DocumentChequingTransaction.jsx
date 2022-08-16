@@ -242,6 +242,39 @@ const DocumentChequingTransaction = (props) => {
     }))
   }
 
+  const onChequeInsert = (data) => {
+    setChequeData(currentValue => ({
+      ...currentValue,
+      cheques: [
+        ...currentValue.cheques,
+        data
+      ]
+    }))
+  }
+
+  const onChequeUpdate = (data, index) => {
+    setChequeData(currentValue => ({
+      ...currentValue,
+      cheques: [
+        ...currentValue.cheques.map((item, itemIndex) => {
+          if (itemIndex === index) return data
+          return item
+        })
+      ]
+    }))
+  }
+
+  const onChequeRemove = (index) => {
+    setChequeData(currentValue => ({
+      ...currentValue,
+      cheques: [
+        ...currentValue.cheques.filter((item, itemIndex) => {
+          return itemIndex !== index
+        })
+      ]
+    }))
+  }
+
   return (
     <React.Fragment>
       <Dialog
@@ -340,8 +373,12 @@ const DocumentChequingTransaction = (props) => {
       />
 
       <ChequeEntryDialog
+        cheques={chequeData.cheques}
         onClear={clearHandler}
         onSubmit={submitChequeHandler}
+        onInsert={onChequeInsert}
+        onUpdate={onChequeUpdate}
+        onRemove={onChequeRemove}
         {...manageCheque}
       />
     </React.Fragment>

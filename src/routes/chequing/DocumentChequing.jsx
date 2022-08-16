@@ -45,7 +45,8 @@ import {
   UNHOLD,
   RETURN,
   UNRETURN,
-  VOID
+  VOID,
+  RELEASE
 } from '../../constants'
 
 import ReasonDialog from '../../components/ReasonDialog'
@@ -124,6 +125,38 @@ const DocumentChequing = () => {
           response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
             process: CHEQUE,
             subprocess: RECEIVE
+          })
+
+          const { message } = response.data
+
+          refetchData()
+          toast({
+            message,
+            title: "Success!"
+          })
+        } catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to receive transaction. Please try again later."
+          })
+        }
+      }
+    })
+  }
+
+  const onRelease = (ID) => {
+    confirm({
+      open: true,
+      wait: true,
+      onConfirm: async () => {
+        let response
+        try {
+          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
+            process: CHEQUE,
+            subprocess: RELEASE
           })
 
           const { message } = response.data
@@ -263,7 +296,7 @@ const DocumentChequing = () => {
             >
               <Tab className="FstoTab-root" label="Pending" value="pending" disableRipple />
               <Tab className="FstoTab-root" label="Received" value="cheque-receive" disableRipple />
-              <Tab className="FstoTab-root" label="Created" value="cheque-create" disableRipple />
+              <Tab className="FstoTab-root" label="Created" value="cheque-cheque" disableRipple />
               <Tab className="FstoTab-root" label="Released" value="cheque-release" disableRipple />
               <Tab className="FstoTab-root" label="Reversed" value="cheque-reverse" disableRipple />
               <Tab className="FstoTab-root" label="Held" value="cheque-hold" disableRipple />
@@ -461,6 +494,7 @@ const DocumentChequing = () => {
           {...manage}
           state={state}
           refetchData={refetchData}
+          onRelease={onRelease}
           onHold={onHold}
           onUnhold={onUnhold}
           onReturn={onReturn}

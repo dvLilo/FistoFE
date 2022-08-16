@@ -1,5 +1,11 @@
 import React from 'react'
 
+import moment from 'moment'
+
+import NumberFormat from 'react-number-format'
+
+import DateAdapter from '@mui/lab/AdapterDateFns'
+
 import {
   Autocomplete,
   Dialog,
@@ -22,10 +28,60 @@ import {
   Divider,
 } from '@mui/material'
 
+import {
+  LocalizationProvider,
+  DatePicker
+} from '@mui/lab'
+
 import CloseIcon from '@mui/icons-material/Close'
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
+
+const TYPE_LIST = [
+  {
+    id: 1,
+    name: "Cheque"
+  },
+  {
+    id: 2,
+    name: "Debit Memo"
+  }
+]
+
+const BANK_LIST = [
+  {
+    id: 1,
+    name: "AUB Angeles Branch"
+  },
+  {
+    id: 2,
+    name: "AUB Telebastagan Branch"
+  }
+]
+
+const NumberField = React.forwardRef(function NumberField(props, ref) {
+  const { onChange, ...rest } = props
+
+  return (
+    <NumberFormat
+      {...rest}
+      getInputRef={ref}
+      onValueChange={(values) => {
+        onChange({
+          target: {
+            name: props.name,
+            value: values.value,
+          }
+        })
+      }}
+      prefix="₱"
+      allowNegative={false}
+      thousandSeparator
+      isNumericString
+    />
+  )
+})
 
 const ChequeEntryDialog = (props) => {
 
@@ -33,6 +89,10 @@ const ChequeEntryDialog = (props) => {
     open = false,
     // state = null,
     transaction = null,
+    cheques = [],
+    onInsert = () => { },
+    onUpdate = () => { },
+    onRemove = () => { },
     onBack = () => { },
     onClear = () => { },
     onClose = () => { },
@@ -44,10 +104,53 @@ const ChequeEntryDialog = (props) => {
     index: null,
 
     bank: null,
+    date: null,
     no: "",
     amount: "",
-    date: null
+    type: ""
   })
+
+  React.useEffect(() => {
+    if (!open) clearChequeHandler()
+    // eslint-disable-next-line
+  }, [open])
+
+
+  const addChequeHandler = () => {
+    if (!CQ.update)
+      onInsert({
+        type: CQ.type,
+        bank: CQ.bank,
+        no: CQ.no,
+        date: CQ.date,
+        amount: parseFloat(CQ.amount)
+      })
+
+    if (!!CQ.update)
+      onUpdate({
+        type: CQ.type,
+        bank: CQ.bank,
+        no: CQ.no,
+        date: CQ.date,
+        amount: parseFloat(CQ.amount)
+      }, CQ.index)
+
+    clearChequeHandler()
+  }
+
+  const editChequeHandler = (item, index) => {
+    setCQ({
+      update: true,
+      index,
+
+      ...item,
+      amount: item.amount.toString()
+    })
+  }
+
+  const removeChequeHandler = (index) => {
+    onRemove(index)
+  }
 
   const submitChequehandler = () => {
     onClose()
@@ -67,7 +170,8 @@ const ChequeEntryDialog = (props) => {
       bank: null,
       date: null,
       no: "",
-      amount: ""
+      amount: "",
+      type: ""
     })
   }
 
@@ -95,28 +199,53 @@ const ChequeEntryDialog = (props) => {
       </DialogTitle>
 
       <DialogContent className="FstoDialogCheque-content">
-        <Box className="FstoBoxCheque-root">
+        <Box className="FstoBoxCheque-root" sx={{ marginBottom: 5 }}>
           <Autocomplete
             className="FstoSelectForm-root"
             size="small"
-            options={[]}
-            value={null}
+            options={TYPE_LIST}
+            value={TYPE_LIST.find((row) => row.name === CQ.type) || null}
             renderInput={
-              props =>
-                <TextField
-                  {...props}
-                  variant="outlined"
-                  label="Bank"
-                />
+              (props) => <TextField {...props} label="Type" variant="outlined" />
             }
             PaperComponent={
-              props =>
-                <Paper
-                  {...props}
-                  sx={{ textTransform: 'capitalize' }}
-                />
+              (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
             }
-            onChange={(e, value) => console.log(value)}
+            getOptionLabel={
+              (option) => option.name
+            }
+            isOptionEqualToValue={
+              (option, value) => option.id === value.id
+            }
+            onChange={(e, value) => setCQ(currentValue => ({
+              ...currentValue,
+              type: value.name
+            }))}
+            disablePortal
+            disableClearable
+          />
+
+          <Autocomplete
+            className="FstoSelectForm-root"
+            size="small"
+            options={BANK_LIST || []}
+            value={CQ.bank}
+            renderInput={
+              (props) => <TextField {...props} label="Bank" variant="outlined" />
+            }
+            PaperComponent={
+              (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
+            }
+            getOptionLabel={
+              (option) => option.name
+            }
+            isOptionEqualToValue={
+              (option, value) => option.id === value.id
+            }
+            onChange={(e, value) => setCQ(currentValue => ({
+              ...currentValue,
+              bank: value
+            }))}
             disablePortal
             disableClearable
           />
@@ -134,14 +263,19 @@ const ChequeEntryDialog = (props) => {
             }))}
           />
 
-          <TextField
-            className="FstoTextfieldForm-root"
-            label="Cheque Date"
-            variant="outlined"
-            autoComplete="off"
-            size="small"
-            onChange={() => { }}
-          />
+          <LocalizationProvider dateAdapter={DateAdapter}>
+            <DatePicker
+              value={CQ.date}
+              renderInput={
+                (props) => <TextField {...props} className="FstoTextfieldForm-root" label="Date" variant="outlined" size="small" onKeyPress={(e) => e.preventDefault()} />
+              }
+              onChange={(value) => setCQ(currentValue => ({
+                ...currentValue,
+                date: new Date(value).toISOString()
+              }))}
+              showToolbar
+            />
+          </LocalizationProvider>
 
           <TextField
             className="FstoTextfieldForm-root"
@@ -149,65 +283,109 @@ const ChequeEntryDialog = (props) => {
             variant="outlined"
             autoComplete="off"
             size="small"
-            onChange={() => { }}
+            value={CQ.amount}
+            InputProps={{
+              inputComponent: NumberField
+            }}
+            onChange={(e) => setCQ(currentValue => ({
+              ...currentValue,
+              amount: e.target.value
+            }))}
           />
 
           <Button
             className=""
             variant="contained"
-            startIcon={<AddIcon />}
+            startIcon={
+              CQ.update ? <EditIcon /> : <AddIcon />
+            }
+            onClick={addChequeHandler}
+            disabled={
+              !Boolean(CQ.no) ||
+              !Boolean(CQ.type) ||
+              !Boolean(CQ.bank) ||
+              !Boolean(CQ.date) ||
+              !Boolean(CQ.amount)
+            }
             disableElevation
-          > Add
+          > {CQ.update ? "Update" : "Add"}
           </Button>
         </Box>
 
-        <TableContainer sx={{ marginY: 5 }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Bank</TableCell>
-                <TableCell>Cheque Number</TableCell>
-                <TableCell className="FstoTabelCellCheque-root">Date</TableCell>
-                <TableCell>Amount</TableCell>
-                <TableCell align="right">Action</TableCell>
-              </TableRow>
-            </TableHead>
+        {
+          Boolean(cheques.length) &&
+          <React.Fragment>
+            <TableContainer sx={{ marginBottom: 5 }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Bank</TableCell>
+                    <TableCell>Cheque Number</TableCell>
+                    <TableCell className="FstoTabelCellCheque-root">Date</TableCell>
+                    <TableCell>Amount</TableCell>
+                    <TableCell align="right">Action</TableCell>
+                  </TableRow>
+                </TableHead>
 
-            <TableBody className="FstoTableBodyCheque-root">
-              <TableRow>
-                <TableCell size="small">AUB Angeles Branch</TableCell>
-                <TableCell size="small">203-4024-424</TableCell>
-                <TableCell className="FstoTabelCellCheque-root" size="small">11/27/2021</TableCell>
-                <TableCell size="small">₱100,000.00</TableCell>
-                <TableCell align="right" size="small">
-                  <IconButton>
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton>
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
+                <TableBody className="FstoTableBodyCheque-root">
+                  {
+                    cheques.map((item, index) => (
+                      <TableRow key={index}>
+                        <TableCell size="small">
+                          {item.bank.name}
+                        </TableCell>
 
-        <Stack className="FstoDialogCheque-root" direction="row">
-          <Typography variant="body1" sx={{ flex: 1 }}>Total Cheque Amount</Typography>
-          <Typography variant="h6">₱100,000.00</Typography>
-        </Stack>
+                        <TableCell size="small">
+                          {item.no}
+                        </TableCell>
 
-        <Stack className="FstoDialogCheque-root" direction="row">
-          <Typography variant="body1" sx={{ flex: 1 }}>Document Amount</Typography>
-          <Typography variant="h6">₱100,000.00</Typography>
-        </Stack>
+                        <TableCell className="FstoTabelCellCheque-root" size="small">
+                          {moment(item.date).format("MM/DD/YYYY")}
+                        </TableCell>
 
-        <Divider variant="middle" sx={{ marginY: 2 }} />
+                        <TableCell size="small">
+                          &#8369;{item.amount.toLocaleString()}
+                        </TableCell>
 
-        <Stack className="FstoDialogCheque-root" direction="row">
-          <Typography variant="body1" sx={{ flex: 1 }}>Variance</Typography>
-          <Typography variant="h6">₱0.00</Typography>
-        </Stack>
+                        <TableCell align="right" size="small">
+                          <IconButton onClick={() => editChequeHandler(item, index)}>
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton onClick={() => removeChequeHandler(index)}>
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  }
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            <Stack className="FstoDialogCheque-root" direction="row">
+              <Typography variant="body1" sx={{ flex: 1 }}>Total Cheque Amount</Typography>
+              <Typography variant="h6">
+                &#8369;{cheques.map((item) => item.amount).reduce((a, b) => a + b, 0).toLocaleString()}
+              </Typography>
+            </Stack>
+
+            <Stack className="FstoDialogCheque-root" direction="row">
+              <Typography variant="body1" sx={{ flex: 1 }}>Document Amount</Typography>
+              <Typography variant="h6">
+                &#8369;{(transaction.document_amount || transaction.referrence_amount).toLocaleString()}
+              </Typography>
+            </Stack>
+
+            <Divider variant="middle" sx={{ marginY: 2 }} />
+
+            <Stack className="FstoDialogCheque-root" direction="row">
+              <Typography variant="body1" sx={{ flex: 1 }}>Variance</Typography>
+              <Typography variant="h6">
+                &#8369;{(cheques.map((item) => item.amount).reduce((a, b) => a + b, 0) - (transaction.document_amount || transaction.referrence_amount)).toLocaleString()}
+              </Typography>
+            </Stack>
+          </React.Fragment>
+        }
       </DialogContent>
 
       <DialogActions className="FstoDialogCheque-actions">
@@ -222,6 +400,10 @@ const ChequeEntryDialog = (props) => {
         <Button
           variant="contained"
           onClick={submitChequehandler}
+          disabled={
+            !Boolean(cheques.length) ||
+            !(cheques.map((item) => item.amount).reduce((a, b) => a + b, 0) === (transaction.document_amount || transaction.referrence_amount))
+          }
           disableElevation
         > Submit
         </Button>
