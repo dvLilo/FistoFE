@@ -24,7 +24,8 @@ const TransactionDialog = (props) => {
   const {
     data,
     status,
-    onView = () => { }
+    onAccountTitleView = () => { },
+    onChequeView = () => { }
   } = props
 
   return (
@@ -418,7 +419,7 @@ const TransactionDialog = (props) => {
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Account Title Details:</span>
                   <strong>
-                    <span style={{ color: `blue`, cursor: `pointer` }} onClick={onView}>View</span>
+                    <span style={{ color: `blue`, cursor: `pointer` }} onClick={onAccountTitleView}>View</span>
                   </strong>
                 </ListItem>
 
@@ -431,7 +432,7 @@ const TransactionDialog = (props) => {
                   data.approval &&
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Approved By:</span>
-                    <strong>{data.approval.approver.name}</strong>
+                    <strong>{data.voucher.approver.name}</strong>
                   </ListItem>}
               </List>
             </React.Fragment>}
@@ -440,7 +441,7 @@ const TransactionDialog = (props) => {
 
 
           {
-            Boolean(data?.cheque) &&
+            Boolean(data?.cheque) && Boolean(data.cheque.cheques) && Boolean(data.cheque.account_title) &&
             <React.Fragment>
               <Divider className="FstoDividerTransactionDetails-root" textAlign="left">
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>Cheque</Typography>
@@ -449,22 +450,28 @@ const TransactionDialog = (props) => {
               <List className="FstoListTransactionDetails-root" dense>
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Bank Name:</span>
-                  <strong>Asia United Bank</strong>
+                  <strong>
+                    {data.cheque.cheques.length <= 1 ? data.cheque.cheques[0].bank.name : `${data.cheque.cheques[0].bank.name}...`}
+                  </strong>
                 </ListItem>
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Cheque No.:</span>
-                  <strong>203-4024-425</strong>
+                  <strong>
+                    {data.cheque.cheques.length <= 1 ? data.cheque.cheques[0].no : `${data.cheque.cheques[0].no}...`}
+                  </strong>
                 </ListItem>
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Cheque Details:</span>
-                  <strong style={{ color: `blue` }}>View</strong>
+                  <strong>
+                    <span style={{ color: `blue`, cursor: `pointer` }} onClick={onChequeView}>View</span>
+                  </strong>
                 </ListItem>
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Date Created:</span>
-                  <strong>07/12/2022</strong>
+                  <strong>{data.cheque.date}</strong>
                 </ListItem>
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>

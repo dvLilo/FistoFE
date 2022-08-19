@@ -15,11 +15,12 @@ import CloseIcon from '@mui/icons-material/Close'
 
 import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
-import useTransaction from '../../hooks/useTransaction'
+// import useTransaction from '../../hooks/useTransaction'
 
 import TransactionDialog from '../../components/TransactionDialog'
 import ChequeEntryDialog from '../../components/ChequeEntryDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
+import ReverseDialog from '../../components/ReverseDialog'
 
 const DocumentChequingTransaction = (props) => {
 
@@ -37,20 +38,210 @@ const DocumentChequingTransaction = (props) => {
     onClose = () => { }
   } = props
 
+  const status = 'success'
+  const data = {
+    transaction: {
+      id: 1,
+      is_latest_transaction: 1,
+      request_id: 1,
+      no: "MISC001",
+      date_requested: "2022-06-29 09:07:37",
+      status: "approve-approve",
+      state: "approve"
+    },
+    reason: {
+      id: null,
+      description: null,
+      remarks: null
+    },
+    requestor: {
+      id: 2,
+      id_prefix: "RDFFLFI",
+      id_no: 10185,
+      role: "Requestor",
+      position: "System Developer",
+      first_name: "VINCENT LOUIE",
+      middle_name: "LAYNES",
+      last_name: "ABAD",
+      suffix: null,
+      department: "Management Information System Common"
+    },
+    document: {
+      id: 1,
+      name: "PAD",
+      no: "pad#11001",
+      date: "2022-06-29 00:00:00",
+      payment_type: "Full",
+      amount: 50000,
+      remarks: "swfattener lara: growing performance form, weekly fattener inventory form",
+      category: {
+        id: 1,
+        name: "general"
+      },
+      company: {
+        id: 1,
+        name: "RDF Corporate Services"
+      },
+      department: {
+        id: 12,
+        name: "Management Information System Common"
+      },
+      location: {
+        id: 5,
+        name: "Common"
+      },
+      supplier: {
+        id: 30,
+        name: "1st Advenue Advertising"
+      }
+    },
+    po_group: [
+      {
+        id: 50,
+        no: "PO#11002",
+        amount: 25000,
+        rr_no: [
+          "123",
+          "456",
+          "789"
+        ],
+        request_id: 1,
+        is_editable: 1,
+        previous_balance: 25000
+      },
+      {
+        id: 51,
+        no: "PO#11001",
+        amount: 25000,
+        rr_no: [
+          "123",
+          "456",
+          "789"
+        ],
+        request_id: 1,
+        is_editable: 1,
+        previous_balance: 25000
+      }
+    ],
+    tag: {
+      status: "tag-tag",
+      no: 2,
+      date: "2022-08-09",
+      distributed_to: {
+        id: 7,
+        name: "Daisy Batas"
+      },
+      reason: null
+    },
+    voucher: {
+      status: "voucher-voucher",
+      date: "2022-08-11",
+      no: "ABC123",
+      month: "2022-08-01 00:00:00",
+      tax: {
+        receipt_type: "Official",
+        percentage_tax: 12,
+        witholding_tax: 6000,
+        net_amount: 44000
+      },
+      account_title: [
+        [
+          {
+            id: 10,
+            entry: "Debit",
+            account_title: {
+              id: 34,
+              name: "SE - Salaries Expense"
+            },
+            amount: 50000,
+            remarks: "Lorem ipsum..."
+          },
+          {
+            id: 10,
+            entry: "Credit",
+            account_title: {
+              id: 33,
+              name: "Accounts Payable"
+            },
+            amount: 50000,
+            remarks: "Lorem emit.."
+          }
+        ]
+      ],
+      approver: {
+        id: 8,
+        name: "Reden Cunanan"
+      },
+      reason: null
+    },
+    approval: {
+      status: "approve-approve",
+      date: "2022-08-11",
+      reason: null
+    },
+    ...(state === `cheque-receive` && {
+      cheque: {
+        status: "cheque-receive",
+        date: "2022-08-11"
+      }
+    }),
+    ...(state === `cheque-cheque` && {
+      cheque: {
+        status: `cheque-cheque`,
+        date: "2022-08-11",
+        cheques: [
+          {
+            bank: {
+              id: 1,
+              name: "Asia United Bank"
+            },
+            no: "ABC123TEST",
+            date: "2022-08-31",
+            amount: 50000
+          }
+        ],
+        account_title: [
+          [
+            {
+              id: 10,
+              entry: "Debit",
+              account_title: {
+                id: 33,
+                name: "Accounts Payable"
+              },
+              amount: 50000,
+              remarks: "Lorem dolor.."
+            },
+            {
+              id: 29,
+              entry: "Credit",
+              account_title: {
+                id: 29,
+                name: "Clearing - AUB"
+              },
+              amount: 50000,
+              remarks: "Lorem sit amet.."
+            }
+          ]
+        ]
+      }
+    })
+  }
+
   const toast = useToast()
   const confirm = useConfirm()
 
-  const {
-    data,
-    status,
-    refetch: fetchTransaction
-  } = useTransaction(transaction?.id)
+  // const {
+  //   data,
+  //   status,
+  //   refetch: fetchTransaction
+  // } = useTransaction(transaction?.id)
 
-  React.useEffect(() => {
-    if (open) fetchTransaction()
+  // React.useEffect(() => {
+  //   if (open) fetchTransaction()
 
-    // eslint-disable-next-line
-  }, [open])
+  //   // eslint-disable-next-line
+  // }, [open])
 
   React.useEffect(() => {
     if (open && state === `cheque-receive` && status === `success` && !Boolean(chequeData.accounts.length)) {
@@ -67,6 +258,14 @@ const DocumentChequingTransaction = (props) => {
       }))
     }
 
+    if (open && state === `cheque-cheque` && status === `success` && !Boolean(chequeData.accounts.length) && !Boolean(chequeData.cheques.length)) {
+      setChequeData(currentValue => ({
+        ...currentValue,
+        accounts: data.cheque.account_title[0],
+        cheques: data.cheque.cheques
+      }))
+    }
+
     // eslint-disable-next-line
   }, [open, status])
 
@@ -75,6 +274,16 @@ const DocumentChequingTransaction = (props) => {
     subprocess: "cheque",
     accounts: [],
     cheques: []
+  })
+
+  const [reversalData, setReversalData] = React.useState({
+    process: "cheque",
+    subprocess: "reverse",
+    reason: {
+      id: null,
+      description: "",
+      remarks: ""
+    }
   })
 
   const [manageAccountTitle, setManageAccountTitle] = React.useState({
@@ -98,6 +307,16 @@ const DocumentChequingTransaction = (props) => {
     transaction: null,
     onBack: undefined,
     onClose: () => setManageCheque(currentValue => ({
+      ...currentValue,
+      open: false
+    }))
+  })
+
+  const [manageReverse, setManageReverse] = React.useState({
+    open: true,
+    state: null,
+    transaction: null,
+    onClose: () => setManageReverse(currentValue => ({
       ...currentValue,
       open: false
     }))
@@ -153,6 +372,10 @@ const DocumentChequingTransaction = (props) => {
     onRelease(transaction.id)
   }
 
+  const submitReverseHandler = () => {
+    onClose()
+  }
+
   const submitHoldHandler = () => {
     onClose()
     onHold(transaction)
@@ -190,12 +413,15 @@ const DocumentChequingTransaction = (props) => {
 
     setManageAccountTitle(currentValue => ({
       ...currentValue,
+      state,
       transaction,
       open: true,
       onBack: onBack,
 
-      state: "transmit-",
-      accounts: data.voucher.account_title[0]
+      ...(Boolean(state.match(/-receive|-release.*/)) && {
+        state: "transmit-",
+        accounts: data.voucher.account_title[0]
+      })
     }))
   }
 
@@ -206,6 +432,18 @@ const DocumentChequingTransaction = (props) => {
       transaction,
       open: true,
       onBack: onAccountTitleManage
+    }))
+  }
+
+  const onChequeView = () => {
+    onClose()
+
+    setManageCheque(currentValue => ({
+      ...currentValue,
+      state,
+      transaction,
+      open: true,
+      onBack: onBack
     }))
   }
 
@@ -275,6 +513,27 @@ const DocumentChequingTransaction = (props) => {
     }))
   }
 
+  const onReversalSelect = (data) => {
+    setReversalData(currentValue => ({
+      ...currentValue,
+      reason: {
+        ...currentValue.reason,
+        id: data.id,
+        description: data.description
+      }
+    }))
+  }
+
+  const onReversalChange = (data) => {
+    setReversalData(currentValue => ({
+      ...currentValue,
+      reason: {
+        ...currentValue.reason,
+        remarks: data
+      }
+    }))
+  }
+
   return (
     <React.Fragment>
       <Dialog
@@ -296,7 +555,7 @@ const DocumentChequingTransaction = (props) => {
         </DialogTitle>
 
         <DialogContent className="FstoDialogTransaction-content">
-          <TransactionDialog data={data} status={status} onView={onAccountTitleView} />
+          <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
         </DialogContent>
 
         {
@@ -314,12 +573,22 @@ const DocumentChequingTransaction = (props) => {
 
             {
               state === `cheque-cheque` &&
-              <Button
-                variant="contained"
-                onClick={submitReleaseHandler}
-                disableElevation
-              > Release
-              </Button>
+              <React.Fragment>
+                <Button
+                  variant="contained"
+                  onClick={submitReleaseHandler}
+                  disableElevation
+                > Release
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  color="error"
+                  onClick={submitReverseHandler}
+                  disableElevation
+                > Reverse
+                </Button>
+              </React.Fragment>
             }
 
             {
@@ -365,7 +634,11 @@ const DocumentChequingTransaction = (props) => {
       <AccountTitleDialog
         accounts={chequeData.accounts}
         onClear={clearHandler}
-        onSubmit={onChequeManage}
+        onSubmit={
+          state.match(/-receive.*/)
+            ? onChequeManage
+            : submitChequeHandler
+        }
         onInsert={onAccountTitleInsert}
         onUpdate={onAccountTitleUpdate}
         onRemove={onAccountTitleRemove}
@@ -380,6 +653,14 @@ const DocumentChequingTransaction = (props) => {
         onUpdate={onChequeUpdate}
         onRemove={onChequeRemove}
         {...manageCheque}
+      />
+
+      <ReverseDialog
+        reverse={reversalData.reason}
+        onSelect={onReversalSelect}
+        onChange={onReversalChange}
+        onSubmit={() => { }}
+        {...manageReverse}
       />
     </React.Fragment>
   )

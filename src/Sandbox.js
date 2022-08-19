@@ -423,23 +423,194 @@
 
 
 
+// import React from 'react'
+
+// import ReactDOM from 'react-dom'
+
+// import * as Mui from '@mui/material'
+
+// import { ReasonContext } from './contexts/ReasonContext'
+
+// const Sandbox = () => {
+
+//   const { reason } = React.useContext(ReasonContext)
+
+//   return ReactDOM.createPortal(
+//     <React.Fragment>
+//       <Mui.Typography variant="h1" align="center">Hello world</Mui.Typography>
+//       <Mui.Box sx={{ display: `flex`, justifyContent: `center`, paddingTop: `3em` }}>
+//         <Mui.Button variant="outlined" onClick={reason}>Reason!</Mui.Button>
+//       </Mui.Box>
+//     </React.Fragment>,
+//     document.getElementById("sandbox")
+//   )
+// }
+
+// export default Sandbox
+
+
+
+
+// import React from 'react'
+
+// import ReactDOM from 'react-dom'
+
+// import * as Mui from '@mui/material'
+
+// import { CSSTransition, TransitionGroup } from 'react-transition-group';
+// import './Sandbox.scss'
+
+// const Sandbox = () => {
+
+//   const [todo, setTodo] = React.useState("")
+
+//   const [todos, setTodos] = React.useState([
+//     'Walk dog',
+//     'Sweep floors',
+//     'Do homework'
+//   ])
+
+//   return ReactDOM.createPortal(
+//     <React.Fragment>
+//       <input type="text" onChange={(e) => setTodo(e.target.value)} />
+//       <input
+//         type="button"
+//         value="Add"
+//         onClick={() => setTodos(currentValue => ([
+//           ...currentValue,
+//           todo
+//         ]))}
+//       />
+
+//       <table>
+//         <thead>
+//           <tr>
+//             <th>To Do</th>
+//             <th>Action</th>
+//           </tr>
+//         </thead>
+//         <TransitionGroup component="tbody">
+//           {todos.map((todo) => (
+//             <CSSTransition key={todo} timeout={500} classNames="item">
+//               <tr>
+//                 <td>{todo}</td>
+//                 <td>
+//                   <button
+//                     onClick={() => {
+//                       setTodos(todos.filter((t) => t !== todo));
+//                     }}
+//                   >
+//                     Delete
+//                   </button>
+//                 </td>
+//               </tr>
+//             </CSSTransition>
+//           ))}
+//         </TransitionGroup>
+//       </table>
+
+//     </React.Fragment >,
+//     document.getElementById("sandbox")
+//   )
+// }
+
+// export default Sandbox
+
+
+
+
+
+
 import React from 'react'
 
 import ReactDOM from 'react-dom'
 
 import * as Mui from '@mui/material'
 
-import { ReasonContext } from './contexts/ReasonContext'
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import './Sandbox.scss'
 
 const Sandbox = () => {
 
-  const { reason } = React.useContext(ReasonContext)
+  const [data, setData] = React.useState([
+    {
+      id: 1,
+      name: "Limay",
+      email: "limay@email.com"
+    },
+    {
+      id: 2,
+      name: "Vilo",
+      email: "vilo@email.com"
+    },
+    {
+      id: 3,
+      name: "Roy",
+      email: "roy@email.com"
+    },
+    {
+      id: 4,
+      name: "Jaypee",
+      email: "jaypee@email.com"
+    }
+  ])
+
+  const onInsert = () => {
+    setData(currentValue => ([
+      ...currentValue,
+      {
+        id: 5,
+        name: "Humer",
+        email: "humer@email.com"
+      }
+    ]))
+  }
 
   return ReactDOM.createPortal(
     <React.Fragment>
-      <Mui.Typography variant="h1" align="center">Hello world</Mui.Typography>
-      <Mui.Box sx={{ display: `flex`, justifyContent: `center`, paddingTop: `3em` }}>
-        <Mui.Button variant="outlined" onClick={reason}>Reason!</Mui.Button>
+      <Mui.Box sx={{ maxWidth: 760, margin: `250px auto` }}>
+        <Mui.Button
+          variant="contained"
+          size="large"
+          onClick={onInsert}
+          sx={{
+            marginBottom: `10px`
+          }}
+          fullWidth
+          disableElevation
+        >
+          Add
+        </Mui.Button>
+
+        <Mui.TableContainer component={Mui.Paper} sx={{ minHeight: `400px`, overflowX: `hidden` }}>
+          <Mui.Table>
+            <Mui.TableHead>
+              <Mui.TableRow>
+                <Mui.TableCell>ID</Mui.TableCell>
+                <Mui.TableCell>NAME</Mui.TableCell>
+                <Mui.TableCell>EMAIL</Mui.TableCell>
+                <Mui.TableCell>ACTION</Mui.TableCell>
+              </Mui.TableRow>
+            </Mui.TableHead>
+
+            <TransitionGroup component={Mui.TableBody}>
+              {
+                data.map((item, index) => (
+                  <CSSTransition classNames="item" key={index} timeout={500}>
+                    <Mui.TableRow>
+                      <Mui.TableCell>{item.id}</Mui.TableCell>
+                      <Mui.TableCell>{item.name}</Mui.TableCell>
+                      <Mui.TableCell>{item.email}</Mui.TableCell>
+                      <Mui.TableCell>
+                        <Mui.Button size="small" onClick={() => setData(data.filter((d) => d.id !== item.id))}>DELETE</Mui.Button>
+                      </Mui.TableCell>
+                    </Mui.TableRow>
+                  </CSSTransition>
+                ))
+              }
+            </TransitionGroup>
+          </Mui.Table>
+        </Mui.TableContainer>
       </Mui.Box>
     </React.Fragment>,
     document.getElementById("sandbox")

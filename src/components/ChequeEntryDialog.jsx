@@ -87,7 +87,7 @@ const ChequeEntryDialog = (props) => {
 
   const {
     open = false,
-    // state = null,
+    state = null,
     transaction = null,
     cheques = [],
     onInsert = () => { },
@@ -372,7 +372,7 @@ const ChequeEntryDialog = (props) => {
             <Stack className="FstoDialogCheque-root" direction="row">
               <Typography variant="body1" sx={{ flex: 1 }}>Document Amount</Typography>
               <Typography variant="h6">
-                &#8369;{(transaction.document_amount || transaction.referrence_amount).toLocaleString()}
+                &#8369;{(transaction?.document_amount || transaction?.referrence_amount)?.toLocaleString()}
               </Typography>
             </Stack>
 
@@ -381,7 +381,7 @@ const ChequeEntryDialog = (props) => {
             <Stack className="FstoDialogCheque-root" direction="row">
               <Typography variant="body1" sx={{ flex: 1 }}>Variance</Typography>
               <Typography variant="h6">
-                &#8369;{(cheques.map((item) => item.amount).reduce((a, b) => a + b, 0) - (transaction.document_amount || transaction.referrence_amount)).toLocaleString()}
+                &#8369;{(cheques.map((item) => item.amount).reduce((a, b) => a + b, 0) - (transaction?.document_amount || transaction?.referrence_amount)).toLocaleString()}
               </Typography>
             </Stack>
           </React.Fragment>
@@ -402,10 +402,10 @@ const ChequeEntryDialog = (props) => {
           onClick={submitChequehandler}
           disabled={
             !Boolean(cheques.length) ||
-            !(cheques.map((item) => item.amount).reduce((a, b) => a + b, 0) === (transaction.document_amount || transaction.referrence_amount))
+            !(cheques.map((item) => item.amount).reduce((a, b) => a + b, 0) === (transaction?.document_amount || transaction?.referrence_amount))
           }
           disableElevation
-        > Submit
+        > {state?.match(/receive.*/) ? "Submit" : "Save"}
         </Button>
       </DialogActions>
     </Dialog>

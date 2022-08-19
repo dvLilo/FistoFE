@@ -31,6 +31,7 @@
     "react-redux": "^7.2.6",
     "react-router-dom": "^6.0.2",
     "react-scripts": "4.0.3",
+    "react-transition-group": "^4.4.5",
     "redux": "^4.1.2",
     "sass": "^1.45.0",
     "web-vitals": "^1.1.2",
@@ -44,7 +45,7 @@
     "eject": "react-scripts eject",
     "client": "react-scripts start",
     "server": "npm start --prefix ../fisto-laravel",
-    "others": "json-server --watch db.json --port 5000 --routes routes.json",
+    "others": "json-server --watch db.json --host localhost --port 5000 --routes routes.json",
     "all": "concurrently --kill-others \"react-scripts start\" \"npm start --prefix ../fisto-laravel\" \"json-server --watch db.json --port 5000\""
   },
   "eslintConfig": {

@@ -1,0 +1,46 @@
+.FstoDialogReverse-root {
+
+  & .FstoPaperReverse-root {
+    max-width: 420px;
+  }
+
+  & .FstoDialogTitleReverse-root {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  & .FstoDialogContentReverse-root {
+    font-size: 1em;
+
+    & .FstoDialogContentReverse-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    & .FstoDialogContentReverse-icon {
+      margin-left: 10px;
+      margin-right: 10px;
+      font-size: 3.5em;
+    }
+
+    & .FstoDialogContentReverse-option {
+      margin-bottom: 10px;
+    }
+
+    & .FstoDialogContentReverse-input {
+      margin-bottom: 10px;
+    }
+  }
+
+  & .FstoDialogActionsReverse-root {
+    padding-top: 20px;
+    padding-bottom: 10px;
+
+    & .FstoDialogActionsReverse-button {
+      text-transform: capitalize;
+    }
+  }
+}

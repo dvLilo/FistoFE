@@ -336,7 +336,7 @@ const DocumentVoucheringTransaction = (props) => {
         </DialogTitle>
 
         <DialogContent className="FstoDialogTransaction-content">
-          <TransactionDialog data={data} status={status} onView={onAccountTitleView} />
+          <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} />
 
           {
             (state === `voucher-receive` || state === `voucher-voucher`) &&
