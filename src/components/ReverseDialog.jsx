@@ -27,7 +27,8 @@ const ReverseDialog = (props) => {
     onSelect = () => { },
     onChange = () => { },
     onSubmit = () => { },
-    onClose = () => { }
+    onClose = () => { },
+    onClear = () => { }
   } = props
 
   const {
@@ -41,6 +42,16 @@ const ReverseDialog = (props) => {
     // eslint-disable-next-line
   }, [open])
 
+  const reverseCloseHandler = () => {
+    onClose()
+    onClear()
+  }
+
+  const reverseSubmitHandler = () => {
+    onClose()
+    onSubmit()
+  }
+
   return (
     <Dialog
       className="FstoDialogReverse-root"
@@ -52,7 +63,7 @@ const ReverseDialog = (props) => {
     >
       <DialogTitle className="FstoDialogTitleReverse-root">
         Confirmation
-        <IconButton onClick={onClose}>
+        <IconButton onClick={reverseCloseHandler}>
           <CloseIcon fontSize="small" />
         </IconButton>
       </DialogTitle>
@@ -107,14 +118,18 @@ const ReverseDialog = (props) => {
         <Button
           className="FstoDialogActionsReverse-button"
           variant="text"
-          onClick={() => { }}
+          onClick={reverseCloseHandler}
         > No
         </Button>
 
         <Button
           className="FstoDialogActionsReverse-button"
           variant="contained"
-          onClick={onSubmit}
+          onClick={reverseSubmitHandler}
+          disabled={
+            !Boolean(reverse.id) &&
+            !Boolean(reverse.description)
+          }
           disableElevation
         > Yes
         </Button>

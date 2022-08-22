@@ -37,24 +37,20 @@ import useConfirm from '../../hooks/useConfirm'
 import useTransactions from '../../hooks/useTransactions'
 
 import {
-  CHEQUE,
+  RELEASE,
   RECEIVE,
-  HOLD,
-  UNHOLD,
   RETURN,
-  UNRETURN,
-  VOID,
-  RELEASE
+  UNRETURN
 } from '../../constants'
 
 import ReasonDialog from '../../components/ReasonDialog'
 import TablePreloader from '../../components/TablePreloader'
 
-import DocumentChequingFilter from './DocumentChequingFilter'
-import DocumentChequingActions from './DocumentChequingActions'
-import DocumentChequingTransaction from './DocumentChequingTransaction'
+import DocumentReleasingFilter from './DocumentReleasingFilter'
+import DocumentReleasingActions from './DocumentReleasingActions'
+import DocumentReleasingTransaction from './DocumentReleasingTransaction'
 
-const DocumentChequing = () => {
+const DocumentReleasing = () => {
 
   const {
     // status,
@@ -121,7 +117,7 @@ const DocumentChequing = () => {
         let response
         try {
           response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
-            process: CHEQUE,
+            process: RELEASE,
             subprocess: RECEIVE
           })
 
@@ -145,85 +141,11 @@ const DocumentChequing = () => {
     })
   }
 
-  const onRelease = (ID) => {
-    confirm({
-      open: true,
-      wait: true,
-      onConfirm: async () => {
-        let response
-        try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
-            process: CHEQUE,
-            subprocess: RELEASE
-          })
-
-          const { message } = response.data
-
-          refetchData()
-          toast({
-            message,
-            title: "Success!"
-          })
-        } catch (error) {
-          console.log("Fisto Error Status", error.request)
-
-          toast({
-            severity: "error",
-            title: "Error!",
-            message: "Something went wrong whilst trying to receive transaction. Please try again later."
-          })
-        }
-      }
-    })
-  }
-
-  const onHold = (data) => {
-    setReason(currentValue => ({
-      ...currentValue,
-      open: true,
-      process: CHEQUE,
-      subprocess: HOLD,
-      data,
-    }))
-  }
-
-  const onUnhold = (ID) => {
-    confirm({
-      open: true,
-      wait: true,
-      onConfirm: async () => {
-        let response
-        try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
-            process: CHEQUE,
-            subprocess: UNHOLD
-          })
-
-          const { message } = response.data
-
-          refetchData()
-          toast({
-            message,
-            title: "Success!"
-          })
-        } catch (error) {
-          console.log("Fisto Error Status", error.request)
-
-          toast({
-            severity: "error",
-            title: "Error!",
-            message: "Something went wrong whilst trying to unhold transaction. Please try again later."
-          })
-        }
-      }
-    })
-  }
-
   const onReturn = (data) => {
     setReason(currentValue => ({
       ...currentValue,
       open: true,
-      process: CHEQUE,
+      process: RELEASE,
       subprocess: RETURN,
       data,
     }))
@@ -237,7 +159,7 @@ const DocumentChequing = () => {
         let response
         try {
           response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
-            process: CHEQUE,
+            process: RELEASE,
             subprocess: UNRETURN
           })
 
@@ -259,16 +181,6 @@ const DocumentChequing = () => {
         }
       }
     })
-  }
-
-  const onVoid = (data) => {
-    setReason(currentValue => ({
-      ...currentValue,
-      open: true,
-      process: CHEQUE,
-      subprocess: VOID,
-      data,
-    }))
   }
 
 
@@ -349,7 +261,7 @@ const DocumentChequing = () => {
       <Paper className="FstoPaperTable-root" elevation={1}>
         <Box className="FstoBoxToolbar2-root">
           <Box className="FstoBoxToolbar-left">
-            <Typography variant="heading">Creation of Cheque</Typography>
+            <Typography variant="heading">Releasing of Cheque</Typography>
           </Box>
 
           <Box className="FstoBoxToolbar-right">
@@ -366,12 +278,9 @@ const DocumentChequing = () => {
               }}
             >
               <Tab className="FstoTab-root" label="Pending" value="pending" disableRipple />
-              <Tab className="FstoTab-root" label="Received" value="cheque-receive" disableRipple />
-              <Tab className="FstoTab-root" label="Created" value="cheque-cheque" disableRipple />
-              <Tab className="FstoTab-root" label="Released" value="cheque-release" disableRipple />
-              <Tab className="FstoTab-root" label="Held" value="cheque-hold" disableRipple />
-              <Tab className="FstoTab-root" label="Returned" value="cheque-return" disableRipple />
-              <Tab className="FstoTab-root" label="Voided" value="cheque-void" disableRipple />
+              <Tab className="FstoTab-root" label="Received" value="release-receive" disableRipple />
+              <Tab className="FstoTab-root" label="Released" value="release-release" disableRipple />
+              <Tab className="FstoTab-root" label="Returned" value="release-return" disableRipple />
             </Tabs>
 
             <Stack className="FstoStackToolbar-root" direction="row">
@@ -411,7 +320,7 @@ const DocumentChequing = () => {
                 }}
               />
 
-              <DocumentChequingFilter filterData={filterData} />
+              <DocumentReleasingFilter filterData={filterData} />
             </Stack>
           </Box>
         </Box>
@@ -532,7 +441,7 @@ const DocumentChequing = () => {
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                      <DocumentChequingActions
+                      <DocumentReleasingActions
                         data={item}
                         state={state}
                         onReceive={onReceive}
@@ -560,15 +469,11 @@ const DocumentChequing = () => {
           showLastButton
         />
 
-        <DocumentChequingTransaction
+        <DocumentReleasingTransaction
           {...manage}
           state={state}
           refetchData={refetchData}
-          onRelease={onRelease}
-          onHold={onHold}
-          onUnhold={onUnhold}
           onReturn={onReturn}
-          onVoid={onVoid}
         />
 
         <ReasonDialog {...reason} />
@@ -577,4 +482,4 @@ const DocumentChequing = () => {
   )
 }
 
-export default DocumentChequing
+export default DocumentReleasing

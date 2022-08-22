@@ -64,7 +64,6 @@ const DOCUMENT_TYPES = [
   }
 ]
 
-
 const DocumentTransmittingFilter = (props) => {
 
 

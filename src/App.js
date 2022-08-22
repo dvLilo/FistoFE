@@ -62,6 +62,9 @@ import DocumentTransmitting from './routes/transmitting/DocumentTransmitting'
 // Chequing
 import DocumentChequing from './routes/chequing/DocumentChequing'
 
+// Releasing
+import DocumentReleasing from './routes/releasing/DocumentReleasing'
+
 import NotFound from './exceptions/NotFound'
 import Sandbox from './Sandbox'
 
@@ -286,7 +289,7 @@ const App = () => {
 
             <Route exact path="/cheque/releasing" element={<ProtectedRoute />}>
               <Route index exact strict
-                element={<h1>Cheque Releasing</h1>}
+                element={<DocumentReleasing />}
               />
             </Route>
           </Routes>

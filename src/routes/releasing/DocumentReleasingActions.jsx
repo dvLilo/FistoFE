@@ -14,7 +14,7 @@ import {
   ReplyOutlined as CancelIcon
 } from '@mui/icons-material'
 
-const DocumentChequingActions = ({ data, state, onReceive, onManage, onView, onCancel }) => {
+const DocumentReleasingActions = ({ data, state, onReceive, onManage, onView, onCancel }) => {
 
   const [anchor, setAnchor] = React.useState(null)
 
@@ -64,7 +64,7 @@ const DocumentChequingActions = ({ data, state, onReceive, onManage, onView, onC
           </MenuItem>}
 
         {
-          (state === `cheque-receive` || state === `cheque-cheque`) &&
+          (state === `release-receive`) &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -77,7 +77,7 @@ const DocumentChequingActions = ({ data, state, onReceive, onManage, onView, onC
           </MenuItem>}
 
         {
-          (state === `cheque-release` || state === `cheque-hold` || state === `cheque-return` || state === `cheque-void`) &&
+          (state === `release-release` || state === `release-return`) &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -90,7 +90,7 @@ const DocumentChequingActions = ({ data, state, onReceive, onManage, onView, onC
           </MenuItem>}
 
         {
-          state === `cheque-return` &&
+          state === `release-return` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -106,4 +106,4 @@ const DocumentChequingActions = ({ data, state, onReceive, onManage, onView, onC
   )
 }
 
-export default DocumentChequingActions
+export default DocumentReleasingActions

@@ -199,118 +199,121 @@ const ChequeEntryDialog = (props) => {
       </DialogTitle>
 
       <DialogContent className="FstoDialogCheque-content">
-        <Box className="FstoBoxCheque-root" sx={{ marginBottom: 5 }}>
-          <Autocomplete
-            className="FstoSelectForm-root"
-            size="small"
-            options={TYPE_LIST}
-            value={TYPE_LIST.find((row) => row.name === CQ.type) || null}
-            renderInput={
-              (props) => <TextField {...props} label="Type" variant="outlined" />
-            }
-            PaperComponent={
-              (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
-            }
-            getOptionLabel={
-              (option) => option.name
-            }
-            isOptionEqualToValue={
-              (option, value) => option.id === value.id
-            }
-            onChange={(e, value) => setCQ(currentValue => ({
-              ...currentValue,
-              type: value.name
-            }))}
-            disablePortal
-            disableClearable
-          />
-
-          <Autocomplete
-            className="FstoSelectForm-root"
-            size="small"
-            options={BANK_LIST || []}
-            value={CQ.bank}
-            renderInput={
-              (props) => <TextField {...props} label="Bank" variant="outlined" />
-            }
-            PaperComponent={
-              (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
-            }
-            getOptionLabel={
-              (option) => option.name
-            }
-            isOptionEqualToValue={
-              (option, value) => option.id === value.id
-            }
-            onChange={(e, value) => setCQ(currentValue => ({
-              ...currentValue,
-              bank: value
-            }))}
-            disablePortal
-            disableClearable
-          />
-
-          <TextField
-            className="FstoTextfieldForm-root"
-            label="Cheque Number"
-            variant="outlined"
-            autoComplete="off"
-            size="small"
-            value={CQ.no}
-            onChange={(e) => setCQ(currentValue => ({
-              ...currentValue,
-              no: e.target.value
-            }))}
-          />
-
-          <LocalizationProvider dateAdapter={DateAdapter}>
-            <DatePicker
-              value={CQ.date}
+        {
+          Boolean(state) && !Boolean(state.match(/-release.*/)) &&
+          <Box className="FstoBoxCheque-root" sx={{ marginBottom: 5 }}>
+            <Autocomplete
+              className="FstoSelectForm-root"
+              size="small"
+              options={TYPE_LIST}
+              value={TYPE_LIST.find((row) => row.name === CQ.type) || null}
               renderInput={
-                (props) => <TextField {...props} className="FstoTextfieldForm-root" label="Date" variant="outlined" size="small" onKeyPress={(e) => e.preventDefault()} />
+                (props) => <TextField {...props} label="Type" variant="outlined" />
               }
-              onChange={(value) => setCQ(currentValue => ({
+              PaperComponent={
+                (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
+              }
+              getOptionLabel={
+                (option) => option.name
+              }
+              isOptionEqualToValue={
+                (option, value) => option.id === value.id
+              }
+              onChange={(e, value) => setCQ(currentValue => ({
                 ...currentValue,
-                date: new Date(value).toISOString()
+                type: value.name
               }))}
-              showToolbar
+              disablePortal
+              disableClearable
             />
-          </LocalizationProvider>
 
-          <TextField
-            className="FstoTextfieldForm-root"
-            label="Amount"
-            variant="outlined"
-            autoComplete="off"
-            size="small"
-            value={CQ.amount}
-            InputProps={{
-              inputComponent: NumberField
-            }}
-            onChange={(e) => setCQ(currentValue => ({
-              ...currentValue,
-              amount: e.target.value
-            }))}
-          />
+            <Autocomplete
+              className="FstoSelectForm-root"
+              size="small"
+              options={BANK_LIST || []}
+              value={CQ.bank}
+              renderInput={
+                (props) => <TextField {...props} label="Bank" variant="outlined" />
+              }
+              PaperComponent={
+                (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
+              }
+              getOptionLabel={
+                (option) => option.name
+              }
+              isOptionEqualToValue={
+                (option, value) => option.id === value.id
+              }
+              onChange={(e, value) => setCQ(currentValue => ({
+                ...currentValue,
+                bank: value
+              }))}
+              disablePortal
+              disableClearable
+            />
 
-          <Button
-            className=""
-            variant="contained"
-            startIcon={
-              CQ.update ? <EditIcon /> : <AddIcon />
-            }
-            onClick={addChequeHandler}
-            disabled={
-              !Boolean(CQ.no) ||
-              !Boolean(CQ.type) ||
-              !Boolean(CQ.bank) ||
-              !Boolean(CQ.date) ||
-              !Boolean(CQ.amount)
-            }
-            disableElevation
-          > {CQ.update ? "Update" : "Add"}
-          </Button>
-        </Box>
+            <TextField
+              className="FstoTextfieldForm-root"
+              label="Cheque Number"
+              variant="outlined"
+              autoComplete="off"
+              size="small"
+              value={CQ.no}
+              onChange={(e) => setCQ(currentValue => ({
+                ...currentValue,
+                no: e.target.value
+              }))}
+            />
+
+            <LocalizationProvider dateAdapter={DateAdapter}>
+              <DatePicker
+                value={CQ.date}
+                renderInput={
+                  (props) => <TextField {...props} className="FstoTextfieldForm-root" label="Date" variant="outlined" size="small" onKeyPress={(e) => e.preventDefault()} />
+                }
+                onChange={(value) => setCQ(currentValue => ({
+                  ...currentValue,
+                  date: new Date(value).toISOString()
+                }))}
+                showToolbar
+              />
+            </LocalizationProvider>
+
+            <TextField
+              className="FstoTextfieldForm-root"
+              label="Amount"
+              variant="outlined"
+              autoComplete="off"
+              size="small"
+              value={CQ.amount}
+              InputProps={{
+                inputComponent: NumberField
+              }}
+              onChange={(e) => setCQ(currentValue => ({
+                ...currentValue,
+                amount: e.target.value
+              }))}
+            />
+
+            <Button
+              className=""
+              variant="contained"
+              startIcon={
+                CQ.update ? <EditIcon /> : <AddIcon />
+              }
+              onClick={addChequeHandler}
+              disabled={
+                !Boolean(CQ.no) ||
+                !Boolean(CQ.type) ||
+                !Boolean(CQ.bank) ||
+                !Boolean(CQ.date) ||
+                !Boolean(CQ.amount)
+              }
+              disableElevation
+            > {CQ.update ? "Update" : "Add"}
+            </Button>
+          </Box>
+        }
 
         {
           Boolean(cheques.length) &&
@@ -319,11 +322,15 @@ const ChequeEntryDialog = (props) => {
               <Table>
                 <TableHead>
                   <TableRow>
+                    <TableCell>Type</TableCell>
                     <TableCell>Bank</TableCell>
                     <TableCell>Cheque Number</TableCell>
                     <TableCell className="FstoTabelCellCheque-root">Date</TableCell>
                     <TableCell>Amount</TableCell>
-                    <TableCell align="right">Action</TableCell>
+                    {
+                      Boolean(state) && !Boolean(state.match(/-release.*/)) &&
+                      <TableCell align="right">Action</TableCell>
+                    }
                   </TableRow>
                 </TableHead>
 
@@ -331,6 +338,10 @@ const ChequeEntryDialog = (props) => {
                   {
                     cheques.map((item, index) => (
                       <TableRow key={index}>
+                        <TableCell size="small">
+                          {item.type}
+                        </TableCell>
+
                         <TableCell size="small">
                           {item.bank.name}
                         </TableCell>
@@ -347,14 +358,17 @@ const ChequeEntryDialog = (props) => {
                           &#8369;{item.amount.toLocaleString()}
                         </TableCell>
 
-                        <TableCell align="right" size="small">
-                          <IconButton onClick={() => editChequeHandler(item, index)}>
-                            <EditIcon fontSize="small" />
-                          </IconButton>
-                          <IconButton onClick={() => removeChequeHandler(index)}>
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </TableCell>
+                        {
+                          Boolean(state) && !Boolean(state.match(/-release.*/)) &&
+                          <TableCell align="right" size="small">
+                            <IconButton onClick={() => editChequeHandler(item, index)}>
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                            <IconButton onClick={() => removeChequeHandler(index)}>
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </TableCell>
+                        }
                       </TableRow>
                     ))
                   }
@@ -397,16 +411,19 @@ const ChequeEntryDialog = (props) => {
         > Back
         </Button>
 
-        <Button
-          variant="contained"
-          onClick={submitChequehandler}
-          disabled={
-            !Boolean(cheques.length) ||
-            !(cheques.map((item) => item.amount).reduce((a, b) => a + b, 0) === (transaction?.document_amount || transaction?.referrence_amount))
-          }
-          disableElevation
-        > {state?.match(/receive.*/) ? "Submit" : "Save"}
-        </Button>
+        {
+          Boolean(state) && !Boolean(state.match(/-release.*/)) &&
+          <Button
+            variant="contained"
+            onClick={submitChequehandler}
+            disabled={
+              !Boolean(cheques.length) ||
+              !(cheques.map((item) => item.amount).reduce((a, b) => a + b, 0) === (transaction?.document_amount || transaction?.referrence_amount))
+            }
+            disableElevation
+          > {state?.match(/receive.*/) ? "Submit" : "Save"}
+          </Button>
+        }
       </DialogActions>
     </Dialog>
   )
