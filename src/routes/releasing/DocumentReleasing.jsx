@@ -220,7 +220,10 @@ const DocumentReleasing = () => {
         document_amount: 50000,
         referrence_no: null,
         referrence_amount: null,
-        status: "approve",
+        status: "pending",
+        ...(Boolean(state.match(/-receive.*/)) && { status: "receive" }),
+        ...(Boolean(state.match(/-release.*/)) && { status: "release" }),
+        ...(Boolean(state.match(/-return.*/)) && { status: "return" }),
         users: {
           id: 2,
           first_name: "VINCENT LOUIE",
