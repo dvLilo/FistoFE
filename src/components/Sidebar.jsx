@@ -166,7 +166,7 @@ const Sidebar = () => {
               user?.role === `Administrator` ||
               user?.role === `AP Associate` ||
               user?.role === `AP Specialist` ||
-              (user?.role === `AP Tagging` && user?.permissions.includes(12))
+              (user?.role === `AP Tagging` && (user?.permissions.includes(10) || user?.permissions.includes(12)))
             ) &&
             <Accordion>
               <AccordionSummary>
@@ -175,6 +175,7 @@ const Sidebar = () => {
               <AccordionDetails>
                 {user?.permissions.includes(12) && <RouterLink className="FstoLink-root" to="/voucher/vouchering">Creation of Voucher</RouterLink>}
                 {user?.permissions.includes(11) && <RouterLink className="FstoLink-root" to="/voucher/filing">Filing of Voucher</RouterLink>}
+                {user?.permissions.includes(10) && <RouterLink className="FstoLink-root" to="/voucher/requesting">Filed Voucher</RouterLink>}
 
               </AccordionDetails>
             </Accordion>

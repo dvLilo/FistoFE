@@ -1,13 +1,9 @@
 import React from 'react'
 
-import CryptoJS from 'crypto-js'
-
-import { useDispatch, useSelector } from 'react-redux'
-import { SET_USER, SET_COLOR } from './actions'
+import { useSelector } from 'react-redux'
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { ProtectedRoute } from './components/ProtectedRoute'
-
 
 import {
   CssBaseline,
@@ -65,6 +61,9 @@ import DocumentChequing from './routes/chequing/DocumentChequing'
 // Releasing
 import DocumentReleasing from './routes/releasing/DocumentReleasing'
 
+// Filing
+import DocumentFiling from './routes/filing/DocumentFiling'
+
 import NotFound from './exceptions/NotFound'
 import Sandbox from './Sandbox'
 
@@ -77,26 +76,6 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 const queryClient = new QueryClient()
 
 const App = () => {
-
-  const dispatch = useDispatch()
-
-  React.useEffect(() => {
-    const data = window.localStorage.getItem("user")
-
-    if (data) {
-      const decryptedUser = CryptoJS.AES.decrypt(data, process.env.REACT_APP_SECRET_KEY).toString(CryptoJS.enc.Utf8)
-      dispatch(SET_USER(JSON.parse(decryptedUser)))
-    }
-    // eslint-disable-next-line
-  }, [])
-
-  React.useEffect(() => {
-    const color = window.localStorage.getItem("color")
-
-    if (color) dispatch(SET_COLOR(color))
-    else window.localStorage.setItem("color", "light")
-    // eslint-disable-next-line
-  }, [])
 
   const colorScheme = useSelector(state => state.color)
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
@@ -257,7 +236,13 @@ const App = () => {
 
             <Route exact path="/voucher/filing" element={<ProtectedRoute />}>
               <Route index exact strict
-                element={<h1>Voucher Filing</h1>}
+                element={<DocumentFiling />}
+              />
+            </Route>
+
+            <Route exact path="/voucher/requesting" element={<ProtectedRoute />}>
+              <Route index exact strict
+                element={<h3>Hello world. Hello Filed Vouchers. ;)</h3>}
               />
             </Route>
 

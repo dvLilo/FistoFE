@@ -3,38 +3,31 @@ import React from 'react'
 import axios from 'axios'
 
 import {
-  Autocomplete,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   IconButton,
-  Paper,
-  TextField,
-  Box,
-  Button,
-  Divider
+  Button
 } from '@mui/material'
 
 import CloseIcon from '@mui/icons-material/Close'
 
 import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
-import useDistribute from '../../hooks/useDistribute'
 // import useTransaction from '../../hooks/useTransaction'
 
 import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
 import ChequeEntryDialog from '../../components/ChequeEntryDialog'
 
-const DocumentReleasingTransaction = (props) => {
+const DocumentFilingTransaction = (props) => {
 
   const {
     state,
     open = false,
     transaction = null,
     refetchData = () => { },
-    onReturn = () => { },
     onBack = () => { },
     onClose = () => { }
   } = props
@@ -47,33 +40,22 @@ const DocumentReleasingTransaction = (props) => {
       request_id: 1,
       no: "MISC001",
       date_requested: "2022-06-29 09:07:37",
-      status: "cheque-release",
+      status: "release-release",
       state: "pending",
       ...(Boolean(state.match(/-receive.*/)) && {
-        status: "release-receive",
+        status: "file-receive",
         state: "receive"
       }),
       ...(Boolean(state.match(/-release.*/)) && {
-        status: "release-release",
-        state: "release"
-      }),
-      ...(Boolean(state.match(/-return.*/)) && {
-        status: "release-return",
-        state: "return"
-      }),
+        status: "file-file",
+        state: "file"
+      })
     },
     reason: {
       id: null,
       description: null,
       remarks: null
     },
-    ...(Boolean(state.match(/-return.*/)) && {
-      reason: {
-        id: 1,
-        description: "Wrong Details",
-        remarks: "Lorem ipsum dolor sit amet.."
-      }
-    }),
     requestor: {
       id: 2,
       id_prefix: "RDFFLFI",
@@ -239,15 +221,19 @@ const DocumentReleasingTransaction = (props) => {
         ]
       ]
     },
+    release: {
+      status: "release-release",
+      date: "2022-08-23"
+    },
     ...(Boolean(state.match(/-receive.*/)) && {
-      release: {
-        status: "release-receive",
+      file: {
+        status: "file-receive",
         date: "2022-08-23"
       }
     }),
-    ...(Boolean(state.match(/-release.*/)) && {
-      release: {
-        status: "release-release",
+    ...(Boolean(state.match(/-file.*/)) && {
+      file: {
+        status: "file-file",
         date: "2022-08-23"
       }
     })
@@ -262,36 +248,15 @@ const DocumentReleasingTransaction = (props) => {
   //   refetch: fetchTransaction
   // } = useTransaction(transaction?.id)
 
-  const {
-    refetch: fetchDistribute,
-    data: DISTUBUTE_LIST,
-    status: DISTRIBUTE_STATUS
-  } = useDistribute(transaction?.company_id)
+  // React.useEffect(() => {
+  //   if (open) fetchTransaction()
 
-  React.useEffect(() => {
-    if (open) {
-      // fetchTransaction()
-      fetchDistribute()
-    }
+  //   // eslint-disable-next-line
+  // }, [open])
 
-    // eslint-disable-next-line
-  }, [open])
-
-  React.useEffect(() => {
-    if (open && status === `success`) {
-      setReleaseData(currentValue => ({
-        ...currentValue,
-        distributed_to: data.tag.distributed_to
-      }))
-    }
-
-    // eslint-disable-next-line
-  }, [open, status])
-
-  const [releaseData, setReleaseData] = React.useState({
+  const [fileData] = React.useState({
     process: "file",
     subprocess: "file",
-    distributed_to: null
   })
 
   const [viewAccountTitle, setViewAccountTitle] = React.useState({
@@ -316,33 +281,23 @@ const DocumentReleasingTransaction = (props) => {
     }))
   })
 
-  const clearHandler = () => {
-    setReleaseData(currentValue => ({
-      ...currentValue,
-      distributed_to: null
-    }))
-  }
-
   const closeHandler = () => {
     onClose()
-    clearHandler()
   }
 
-  const submitReleaseHandler = () => {
+  const submitFileHandler = () => {
     onClose()
-
     confirm({
       open: true,
       wait: true,
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, releaseData)
+          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, fileData)
 
           const { message } = response.data
 
           refetchData()
-          clearHandler()
           toast({
             message,
             title: "Success!"
@@ -359,11 +314,6 @@ const DocumentReleasingTransaction = (props) => {
         }
       }
     })
-  }
-
-  const submitReturnHandler = () => {
-    onClose()
-    onReturn(transaction)
   }
 
   const onAccountTitleView = () => {
@@ -412,69 +362,16 @@ const DocumentReleasingTransaction = (props) => {
 
         <DialogContent className="FstoDialogTransaction-content">
           <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
-
-          {
-            (state === `release-receive` || state === `release-file`) &&
-            <React.Fragment>
-              <Divider className="FstoDividerTransaction-root" variant="middle" />
-
-              <Box className="FstoBoxTransactionForm-root">
-                <Box className="FstoBoxTransactionForm-content">
-                  <Autocomplete
-                    className="FstoSelectForm-root"
-                    size="small"
-                    options={DISTUBUTE_LIST || []}
-                    value={releaseData.distributed_to}
-                    loading={
-                      DISTRIBUTE_STATUS === 'loading'
-                    }
-                    renderInput={
-                      (props) => <TextField {...props} label="Distribute To..." variant="outlined" />
-                    }
-                    PaperComponent={
-                      (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
-                    }
-                    getOptionLabel={
-                      (option) => option.name
-                    }
-                    isOptionEqualToValue={
-                      (option, value) => option.id === value.id
-                    }
-                    onChange={(e, value) => setReleaseData(currentValue => ({
-                      ...currentValue,
-                      distributed_to: value
-                    }))}
-                    disablePortal
-                    disableClearable
-                  />
-                </Box>
-              </Box>
-            </React.Fragment>
-          }
         </DialogContent>
 
         {
-          (state === `release-receive` || state === `release-file`) &&
+          state === `file-receive` &&
           <DialogActions className="FstoDialogTransaction-actions">
-            {
-              (state === `release-receive` || state === `release-file`) &&
-              <Button
-                variant="contained"
-                onClick={submitReleaseHandler}
-                disabled={
-                  Boolean(!releaseData.distributed_to)
-                }
-                disableElevation
-              > {state === `release-receive` ? "Release" : "Save"}
-              </Button>
-            }
-
             <Button
-              variant="outlined"
-              color="error"
-              onClick={submitReturnHandler}
+              variant="contained"
+              onClick={submitFileHandler}
               disableElevation
-            > Return
+            > File
             </Button>
           </DialogActions>
         }
@@ -482,18 +379,15 @@ const DocumentReleasingTransaction = (props) => {
 
       <AccountTitleDialog
         accounts={data.cheque.account_title[0]}
-        onClear={clearHandler}
         {...viewAccountTitle}
       />
 
       <ChequeEntryDialog
         cheques={data.cheque.cheques}
-        onClear={clearHandler}
         {...viewCheque}
       />
-
     </React.Fragment>
   )
 }
 
-export default DocumentReleasingTransaction
+export default DocumentFilingTransaction

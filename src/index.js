@@ -13,8 +13,6 @@ import App from './App'
 import './index.scss'
 
 axios.defaults.withCredentials = true
-// axios.defaults.baseURL = 'https://backend.fisto.ml/public'
-// axios.defaults.baseURL = 'http://localhost:8000'
 axios.defaults.baseURL = 'http://10.10.13.17:8000'
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 axios.interceptors.response.use(

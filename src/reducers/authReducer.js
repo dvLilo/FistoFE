@@ -1,6 +1,7 @@
-const authReducer = (state = false, action) => {
-  switch(action.type)
-  {
+const token = window.localStorage.getItem("token")
+
+const authReducer = (state = Boolean(token), action) => {
+  switch (action.type) {
     case 'SET_AUTH':
       return true
     default:

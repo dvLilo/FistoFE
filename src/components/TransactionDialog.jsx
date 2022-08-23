@@ -406,11 +406,11 @@ const TransactionDialog = (props) => {
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Date Vouchered:</span>
-                  <strong>{data.voucher.date}</strong>
+                  <strong>{moment(data.voucher.date).format("MM/DD/YYYY")}</strong>
                 </ListItem>
 
                 {
-                  data.file &&
+                  data.file && data.file.status === `file-file` &&
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Date Filed:</span>
                     <strong>{moment(data.file.date).format("MM/DD/YYYY")}</strong>
@@ -429,7 +429,7 @@ const TransactionDialog = (props) => {
                 </ListItem>
 
                 {
-                  data.approval &&
+                  data.approval && data.approval.status === `approve-approve` &&
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Approved By:</span>
                     <strong>{data.voucher.approver.name}</strong>

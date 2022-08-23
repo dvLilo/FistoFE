@@ -38,9 +38,11 @@ import useTransactions from '../../hooks/useTransactions'
 
 import {
   TRANSMIT,
-  RECEIVE
+  RECEIVE,
+  TRANSFER
 } from '../../constants'
 
+import TransferDialog from '../../components/TransferDialog'
 import TablePreloader from '../../components/TablePreloader'
 
 import DocumentTransmittingFilter from './DocumentTransmittingFilter'
@@ -65,6 +67,17 @@ const DocumentTransmitting = () => {
 
   const [search, setSearch] = React.useState("")
   const [state, setState] = React.useState("pending")
+
+  const [transfer, setTransfer] = React.useState({
+    open: false,
+    data: null,
+    process: null,
+    subprocess: null,
+    onClose: () => setTransfer(currentValue => ({
+      ...currentValue,
+      open: false
+    }))
+  })
 
   const [manage, setManage] = React.useState({
     open: false,
@@ -124,6 +137,16 @@ const DocumentTransmitting = () => {
         }
       }
     })
+  }
+
+  const onTransfer = (data) => {
+    setTransfer(currentValue => ({
+      ...currentValue,
+      open: true,
+      process: TRANSMIT,
+      subprocess: TRANSFER,
+      data,
+    }))
   }
 
   return (
@@ -314,6 +337,7 @@ const DocumentTransmitting = () => {
                         data={item}
                         state={state}
                         onReceive={onReceive}
+                        onTransfer={onTransfer}
                         onManage={onManage}
                         onView={onView}
                       />
@@ -341,6 +365,11 @@ const DocumentTransmitting = () => {
           {...manage}
           state={state}
           refetchData={refetchData}
+        />
+
+        <TransferDialog
+          {...transfer}
+          onSuccess={refetchData}
         />
       </Paper>
     </Box>

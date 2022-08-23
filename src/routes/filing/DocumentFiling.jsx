@@ -37,29 +37,23 @@ import useConfirm from '../../hooks/useConfirm'
 import useTransactions from '../../hooks/useTransactions'
 
 import {
-  VOUCHER,
+  FILE,
   RECEIVE,
-  HOLD,
-  UNHOLD,
-  RETURN,
-  UNRETURN,
-  VOID,
-  TRANSFER
+  TRANSFER,
 } from '../../constants'
 
-import ReasonDialog from '../../components/ReasonDialog'
 import TransferDialog from '../../components/TransferDialog'
 import TablePreloader from '../../components/TablePreloader'
 
-import DocumentVoucheringFilter from './DocumentVoucheringFilter'
-import DocumentVoucheringActions from './DocumentVoucheringActions'
-import DocumentVoucheringTransaction from './DocumentVoucheringTransaction'
+import DocumentFilingFilter from './DocumentFilingFilter'
+import DocumentFilingActions from './DocumentFilingActions'
+import DocumentFilingTransaction from './DocumentFilingTransaction'
 
-const DocumentVouchering = () => {
+const DocumentFiling = () => {
 
   const {
-    status,
-    data,
+    // status,
+    // data,
     refetchData,
     searchData,
     filterData,
@@ -73,18 +67,6 @@ const DocumentVouchering = () => {
 
   const [search, setSearch] = React.useState("")
   const [state, setState] = React.useState("pending")
-
-  const [reason, setReason] = React.useState({
-    open: false,
-    data: null,
-    process: null,
-    subprocess: null,
-    onSuccess: refetchData,
-    onClose: () => setReason(currentValue => ({
-      ...currentValue,
-      open: false
-    }))
-  })
 
   const [transfer, setTransfer] = React.useState({
     open: false,
@@ -121,7 +103,7 @@ const DocumentVouchering = () => {
       ...currentValue,
       transaction,
       open: true,
-      onBack: onManage
+      onBack: onView
     }))
   }
 
@@ -133,7 +115,7 @@ const DocumentVouchering = () => {
         let response
         try {
           response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
-            process: VOUCHER,
+            process: FILE,
             subprocess: RECEIVE
           })
 
@@ -161,104 +143,85 @@ const DocumentVouchering = () => {
     setTransfer(currentValue => ({
       ...currentValue,
       open: true,
-      process: VOUCHER,
+      process: FILE,
       subprocess: TRANSFER,
       data,
     }))
   }
 
-  const onHold = (data) => {
-    setReason(currentValue => ({
-      ...currentValue,
-      open: true,
-      process: VOUCHER,
-      subprocess: HOLD,
-      data,
-    }))
-  }
 
-  const onUnhold = (ID) => {
-    confirm({
-      open: true,
-      wait: true,
-      onConfirm: async () => {
-        let response
-        try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
-            process: VOUCHER,
-            subprocess: UNHOLD
-          })
-
-          const { message } = response.data
-
-          refetchData()
-          toast({
-            message,
-            title: "Success!"
-          })
-        } catch (error) {
-          console.log("Fisto Error Status", error.request)
-
-          toast({
-            severity: "error",
-            title: "Error!",
-            message: "Something went wrong whilst trying to unhold transaction. Please try again later."
-          })
-        }
+  const status = 'success'
+  const data = {
+    total: 1,
+    per_page: 1,
+    current_page: 1,
+    data: [
+      {
+        id: 1,
+        tag_no: 2,
+        is_latest_transaction: 0,
+        users_id: 2,
+        request_id: 1,
+        supplier_id: 30,
+        document_id: 1,
+        transaction_id: "MISC001",
+        document_type: "PAD",
+        payment_type: "Full",
+        supplier: {
+          id: 30,
+          name: "1ST ADVENUE ADVERTISING",
+          supplier_type: {
+            id: 2,
+            name: "rush",
+            transaction_days: 7
+          }
+        },
+        remarks: "swfattener lara: growing performance form, weekly fattener inventory form",
+        date_requested: "2022-06-29 09:07:37",
+        company_id: 1,
+        company: "RDF Corporate Services",
+        department: "Management Information System Common",
+        location: "Common",
+        document_no: "pad#11001",
+        document_amount: 50000,
+        referrence_no: null,
+        referrence_amount: null,
+        status: "pending",
+        ...(Boolean(state.match(/-receive.*/)) && { status: "receive" }),
+        ...(Boolean(state.match(/-file.*/)) && { status: "file" }),
+        users: {
+          id: 2,
+          first_name: "VINCENT LOUIE",
+          middle_name: "LAYNES",
+          last_name: "ABAD",
+          department: [
+            {
+              id: 12,
+              name: "Management Information System Common"
+            },
+            {
+              id: 3,
+              name: "Management Information System"
+            }
+          ],
+          position: "System Developer"
+        },
+        po_details: [
+          {
+            id: 50,
+            request_id: 1,
+            po_no: "PO#11002",
+            po_total_amount: 50000
+          },
+          {
+            id: 51,
+            request_id: 1,
+            po_no: "PO#11001",
+            po_total_amount: 50000
+          }
+        ]
       }
-    })
-  }
-
-  const onReturn = (data) => {
-    setReason(currentValue => ({
-      ...currentValue,
-      open: true,
-      process: VOUCHER,
-      subprocess: RETURN,
-      data,
-    }))
-  }
-
-  const onUnreturn = (ID) => {
-    confirm({
-      open: true,
-      wait: true,
-      onConfirm: async () => {
-        let response
-        try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
-            process: VOUCHER,
-            subprocess: UNRETURN
-          })
-
-          const { message } = response.data
-
-          refetchData()
-          toast({
-            message,
-            title: "Success!"
-          })
-        } catch (error) {
-          console.log("Fisto Error Status", error.request)
-
-          toast({
-            severity: "error",
-            title: "Error!",
-            message: "Something went wrong whilst trying to cancel return transaction. Please try again later."
-          })
-        }
-      }
-    })
-  }
-
-  const onVoid = (data) => {
-    setReason(currentValue => ({
-      ...currentValue,
-      open: true,
-      process: VOUCHER,
-      subprocess: VOID,
-      data,
-    }))
+    ]
   }
 
   return (
@@ -266,7 +229,7 @@ const DocumentVouchering = () => {
       <Paper className="FstoPaperTable-root" elevation={1}>
         <Box className="FstoBoxToolbar2-root">
           <Box className="FstoBoxToolbar-left">
-            <Typography variant="heading">Creation of Voucher</Typography>
+            <Typography variant="heading">Filing of Voucher</Typography>
           </Box>
 
           <Box className="FstoBoxToolbar-right">
@@ -283,11 +246,8 @@ const DocumentVouchering = () => {
               }}
             >
               <Tab className="FstoTab-root" label="Pending" value="pending" disableRipple />
-              <Tab className="FstoTab-root" label="Received" value="voucher-receive" disableRipple />
-              <Tab className="FstoTab-root" label="Approved" value="voucher-voucher" disableRipple />
-              <Tab className="FstoTab-root" label="Held" value="voucher-hold" disableRipple />
-              <Tab className="FstoTab-root" label="Returned" value="voucher-return" disableRipple />
-              <Tab className="FstoTab-root" label="Voided" value="voucher-void" disableRipple />
+              <Tab className="FstoTab-root" label="Received" value="file-receive" disableRipple />
+              <Tab className="FstoTab-root" label="Filed" value="file-file" disableRipple />
             </Tabs>
 
             <Stack className="FstoStackToolbar-root" direction="row">
@@ -327,7 +287,7 @@ const DocumentVouchering = () => {
                 }}
               />
 
-              <DocumentVoucheringFilter filterData={filterData} />
+              <DocumentFilingFilter filterData={filterData} />
             </Stack>
           </Box>
         </Box>
@@ -362,7 +322,7 @@ const DocumentVouchering = () => {
               </TableRow>
             </TableHead>
 
-            <TableBody className="FstoTableBody-root">
+            <TableBody>
               {
                 status === 'loading'
                 && <TablePreloader row={3} />}
@@ -448,20 +408,17 @@ const DocumentVouchering = () => {
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                      <DocumentVoucheringActions
+                      <DocumentFilingActions
                         data={item}
                         state={state}
                         onReceive={onReceive}
                         onTransfer={onTransfer}
-                        onCancel={onUnreturn}
                         onManage={onManage}
                         onView={onView}
                       />
                     </TableCell>
                   </TableRow>
-                )
-                )}
-
+                ))}
             </TableBody>
           </Table>
         </TableContainer>
@@ -479,19 +436,10 @@ const DocumentVouchering = () => {
           showLastButton
         />
 
-        <DocumentVoucheringTransaction
+        <DocumentFilingTransaction
           {...manage}
           state={state}
           refetchData={refetchData}
-          onHold={onHold}
-          onUnhold={onUnhold}
-          onReturn={onReturn}
-          onVoid={onVoid}
-        />
-
-        <ReasonDialog
-          {...reason}
-          onSuccess={refetchData}
         />
 
         <TransferDialog
@@ -503,4 +451,4 @@ const DocumentVouchering = () => {
   )
 }
 
-export default DocumentVouchering
+export default DocumentFiling

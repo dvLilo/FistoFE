@@ -13,11 +13,10 @@ import {
   TaskOutlined as ReceiveIcon,
   VisibilityOutlined as ViewIcon,
   DescriptionOutlined as ManageIcon,
-  ReplyOutlined as CancelIcon,
   ReplyOutlined as TransferIcon
 } from '@mui/icons-material'
 
-const DocumentVoucheringActions = ({ data, state, onReceive, onManage, onView, onTransfer, onCancel }) => {
+const DocumentFilingActions = ({ data, state, onReceive, onManage, onView, onTransfer }) => {
 
   const user = useSelector(state => state.user)
 
@@ -82,7 +81,7 @@ const DocumentVoucheringActions = ({ data, state, onReceive, onManage, onView, o
           </MenuItem>}
 
         {
-          state === `voucher-receive` &&
+          state === `file-receive` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -95,7 +94,7 @@ const DocumentVoucheringActions = ({ data, state, onReceive, onManage, onView, o
           </MenuItem>}
 
         {
-          (state === `voucher-voucher` || state === `voucher-hold` || state === `voucher-return` || state === `voucher-void`) &&
+          state === `file-file` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -106,22 +105,9 @@ const DocumentVoucheringActions = ({ data, state, onReceive, onManage, onView, o
           >
             <ViewIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> View
           </MenuItem>}
-
-        {
-          state === `voucher-return` &&
-          <MenuItem
-            sx={{ fontWeight: 500 }}
-            onClick={() => {
-              onCancel(data.id)
-              actionCloseHandler()
-            }}
-            dense
-          >
-            <CancelIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Cancel
-          </MenuItem>}
       </Menu>
-    </React.Fragment>
+    </React.Fragment >
   )
 }
 
-export default DocumentVoucheringActions
+export default DocumentFilingActions

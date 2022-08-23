@@ -11,6 +11,7 @@ export const FILE = `file`
 export const PENDING = `pending`
 export const RECEIVE = `receive`
 export const APPROVE = `approve`
+export const TRANSFER = `transfer`
 export const CREATE = `create`
 export const REVERSE = `reverse`
 export const REQUEST = `request`

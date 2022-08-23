@@ -1,0 +1,46 @@
+.FstoDialogTransfer-root {
+
+  & .FstoPaperTransfer-root {
+    max-width: 420px;
+  }
+
+  & .FstoDialogTitleTransfer-root {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  & .FstoDialogContentTransfer-root {
+    font-size: 1em;
+
+    & .FstoDialogContentTransfer-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    & .FstoDialogContentTransfer-icon {
+      margin-left: 10px;
+      margin-right: 10px;
+      font-size: 3.5em;
+    }
+
+    & .FstoDialogContentTransfer-option {
+      margin-bottom: 10px;
+    }
+
+    & .FstoDialogContentTransfer-input {
+      margin-bottom: 10px;
+    }
+  }
+
+  & .FstoDialogActionsTransfer-root {
+    padding-top: 20px;
+    padding-bottom: 10px;
+
+    & .FstoDialogActionsTransfer-button {
+      text-transform: capitalize;
+    }
+  }
+}

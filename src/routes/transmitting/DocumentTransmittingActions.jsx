@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { useSelector } from 'react-redux'
+
 import {
   IconButton,
   Menu,
@@ -10,10 +12,13 @@ import {
   MoreHoriz as MoreIcon,
   TaskOutlined as ReceiveIcon,
   VisibilityOutlined as ViewIcon,
-  DescriptionOutlined as ManageIcon
+  DescriptionOutlined as ManageIcon,
+  ReplyOutlined as TransferIcon
 } from '@mui/icons-material'
 
-const DocumentTransmittingActions = ({ data, state, onReceive, onManage, onView }) => {
+const DocumentTransmittingActions = ({ data, state, onReceive, onManage, onView, onTransfer }) => {
+
+  const user = useSelector(state => state.user)
 
   const [anchor, setAnchor] = React.useState(null)
 
@@ -60,6 +65,19 @@ const DocumentTransmittingActions = ({ data, state, onReceive, onManage, onView 
             dense
           >
             <ReceiveIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Receive
+          </MenuItem>}
+
+        {
+          state === `pending` && user.role === `AP Specialist` &&
+          <MenuItem
+            sx={{ fontWeight: 500 }}
+            onClick={() => {
+              onTransfer(data)
+              actionCloseHandler()
+            }}
+            dense
+          >
+            <TransferIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75, transform: `scaleX(-1)` }} /> Transfer
           </MenuItem>}
 
         {

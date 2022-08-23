@@ -107,7 +107,7 @@ const ReasonDialog = (props) => {
     >
       <DialogTitle className="FstoDialogTitleReason-root">
         Confirmation
-        <IconButton onClick={onClose}>
+        <IconButton onClick={reasonCloseHandler}>
           <CloseIcon fontSize="small" />
         </IconButton>
       </DialogTitle>
