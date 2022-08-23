@@ -69,7 +69,7 @@ const DocumentVoucheringActions = ({ data, state, onReceive, onManage, onView, o
           </MenuItem>}
 
         {
-          state === `pending` && user.role === `AP Specialist` &&
+          state === `pending` && user?.role === `AP Specialist` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {

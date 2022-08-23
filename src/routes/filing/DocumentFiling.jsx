@@ -4,6 +4,8 @@ import axios from 'axios'
 
 import moment from 'moment'
 
+import { useSelector } from 'react-redux'
+
 import {
   Box,
   Paper,
@@ -61,6 +63,8 @@ const DocumentFiling = () => {
     changePage,
     changeRows
   } = useTransactions("/api/transactions")
+
+  const user = useSelector(state => state.user)
 
   const toast = useToast()
   const confirm = useConfirm()
@@ -246,6 +250,10 @@ const DocumentFiling = () => {
               }}
             >
               <Tab className="FstoTab-root" label="Pending" value="pending" disableRipple />
+              {
+                user?.role === `AP Specialist` &&
+                <Tab className="FstoTab-root" label="Transferred" value="file-transfer" disableRipple />
+              }
               <Tab className="FstoTab-root" label="Received" value="file-receive" disableRipple />
               <Tab className="FstoTab-root" label="Filed" value="file-file" disableRipple />
             </Tabs>

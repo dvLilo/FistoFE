@@ -91,6 +91,18 @@ const DocumentTaggingTransaction = (props) => {
     distributed_to: null
   })
 
+  const clearHandler = () => {
+    setTagData(currentValue => ({
+      ...currentValue,
+      distributed_to: null
+    }))
+  }
+
+  const closeHandler = () => {
+    onClose()
+    clearHandler()
+  }
+
   const submitTagHandler = () => {
     onClose()
 
@@ -142,18 +154,6 @@ const DocumentTaggingTransaction = (props) => {
   const submitVoidHandler = () => {
     onClose()
     onVoid(transaction)
-  }
-
-  const clearHandler = () => {
-    setTagData(currentValue => ({
-      ...currentValue,
-      distributed_to: null
-    }))
-  }
-
-  const closeHandler = () => {
-    onClose()
-    clearHandler()
   }
 
   return (

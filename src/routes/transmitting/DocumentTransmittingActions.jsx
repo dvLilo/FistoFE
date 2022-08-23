@@ -68,7 +68,7 @@ const DocumentTransmittingActions = ({ data, state, onReceive, onManage, onView,
           </MenuItem>}
 
         {
-          state === `pending` && user.role === `AP Specialist` &&
+          state === `pending` && user?.role === `AP Specialist` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
