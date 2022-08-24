@@ -337,7 +337,7 @@ const DocumentReleasingTransaction = (props) => {
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, releaseData)
+          response = await axios.post(`/api/transactions/flow/update-transaction/DELETE-ME-LATER/${transaction.id}`, releaseData)
 
           const { message } = response.data
 
@@ -414,7 +414,7 @@ const DocumentReleasingTransaction = (props) => {
           <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
 
           {
-            (state === `release-receive` || state === `release-file`) &&
+            (state === `release-receive` || state === `release-release`) &&
             <React.Fragment>
               <Divider className="FstoDividerTransaction-root" variant="middle" />
 
@@ -454,20 +454,17 @@ const DocumentReleasingTransaction = (props) => {
         </DialogContent>
 
         {
-          (state === `release-receive` || state === `release-file`) &&
+          (state === `release-receive` || state === `release-release`) &&
           <DialogActions className="FstoDialogTransaction-actions">
-            {
-              (state === `release-receive` || state === `release-file`) &&
-              <Button
-                variant="contained"
-                onClick={submitReleaseHandler}
-                disabled={
-                  Boolean(!releaseData.distributed_to)
-                }
-                disableElevation
-              > {state === `release-receive` ? "Release" : "Save"}
-              </Button>
-            }
+            <Button
+              variant="contained"
+              onClick={submitReleaseHandler}
+              disabled={
+                Boolean(!releaseData.distributed_to)
+              }
+              disableElevation
+            > {state === `release-receive` ? "Release" : "Save"}
+            </Button>
 
             <Button
               variant="outlined"

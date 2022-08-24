@@ -1,4 +1,4 @@
-export const SET_USER = (object) => {
+export const SET_USER = (object = null) => {
   return {
     type: 'SET_USER',
     payload: {

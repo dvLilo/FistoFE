@@ -3,7 +3,12 @@ import React from 'react'
 import axios from 'axios'
 
 import { useSelector, useDispatch } from 'react-redux'
-import { TOGGLE_SIDEBAR, SET_COLOR } from '../actions'
+import {
+  TOGGLE_SIDEBAR,
+  SET_COLOR,
+  SET_AUTH,
+  SET_USER
+} from '../actions'
 
 import {
   useNavigate,
@@ -56,14 +61,20 @@ const Navbar = () => {
   const logoutHandler = async () => {
     try {
       await axios.post(`/api/logout`)
+
+      window.localStorage.removeItem("token")
+      window.localStorage.removeItem("user")
+
+      dispatch(SET_AUTH())
+      dispatch(SET_USER())
+
+      navigate("/", {
+        replace: true
+      })
     }
     catch (error) {
       console.log(error.response)
     }
-
-    window.localStorage.removeItem("token")
-    window.localStorage.removeItem("user")
-    navigate("/", { replace: true })
   }
   const toggleColorHandler = () => {
     if (color === "system") {

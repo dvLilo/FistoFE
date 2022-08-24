@@ -47,17 +47,15 @@ const Landing = () => {
   const navigate = useNavigate()
 
   const user = useSelector((state) => state.user)
+  const session = window.localStorage.getItem("token")
 
   React.useEffect(() => {
-    const session = window.localStorage.getItem("token")
-
     if (session && user) {
       const REDIRECT = handleRedirect(user.role)
       navigate(REDIRECT, { replace: true })
     }
-
     // eslint-disable-next-line
-  }, [user])
+  }, [])
 
   const handleRedirect = (role) => {
     switch (role.toLowerCase()) {
@@ -91,21 +89,20 @@ const Landing = () => {
       response = await axios.post(`/api/login`, credential)
       const { token, ...user } = response.data.result
 
+      dispatch(SET_AUTH())
+      dispatch(SET_USER(user))
+
       const encryptedUser = CryptoJS.AES.encrypt(JSON.stringify(user), process.env.REACT_APP_SECRET_KEY).toString()
 
       window.localStorage.setItem('token', JSON.stringify(token))
       window.localStorage.setItem('user', encryptedUser)
 
-      // Redirect to Dashboard
       const REDIRECT = handleRedirect(user.role)
       navigate(REDIRECT, {
         state: {
           default_password: credential.username === credential.password ? true : false
         }
       })
-
-      dispatch(SET_AUTH())
-      dispatch(SET_USER(user))
     }
     catch (error) {
       if (error.request.status === 401) {
