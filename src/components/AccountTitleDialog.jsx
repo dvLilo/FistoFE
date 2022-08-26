@@ -190,7 +190,7 @@ const AccountTitleDialog = (props) => {
 
       <DialogContent className="FstoDialogAccountTitle-content">
         {
-          Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-.*/)) &&
           <Box className="FstoBoxAccountTitle-root" sx={{ marginBottom: 5 }}>
             <Autocomplete
               className="FstoSelectForm-root"
@@ -207,7 +207,7 @@ const AccountTitleDialog = (props) => {
                 (option) => option.name
               }
               getOptionDisabled={
-                (option) => Boolean(state) && Boolean(state.match(/cheque-.*/)) && option.name.toLowerCase() === `debit`
+                (option) => Boolean(state) && Boolean(state.match(/cheque-|clear-.*/)) && option.name.toLowerCase() === `debit`
               }
               isOptionEqualToValue={
                 (option, value) => option.id === value.id
@@ -309,7 +309,7 @@ const AccountTitleDialog = (props) => {
                     <TableCell className="FstoTabelCellAccountTitle-root" align="right">Debit</TableCell>
                     <TableCell>Credit</TableCell>
                     {
-                      Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-.*/)) &&
+                      Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-.*/)) &&
                       <TableCell align="right">Action</TableCell>
                     }
                   </TableRow>
@@ -343,12 +343,12 @@ const AccountTitleDialog = (props) => {
                         </TableCell>
 
                         {
-                          Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-.*/)) &&
+                          Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-.*/)) &&
                           <TableCell align="right" size="small">
-                            <IconButton onClick={() => editAccountTitleHandler(item, index)} disabled={Boolean(state) && Boolean(state.match(/cheque-.*/)) && !Boolean(index)}>
+                            <IconButton onClick={() => editAccountTitleHandler(item, index)} disabled={Boolean(state) && Boolean(state.match(/cheque-|clear-.*/)) && !Boolean(index)}>
                               <EditIcon fontSize="small" />
                             </IconButton>
-                            <IconButton onClick={() => removeAccountTitleHandler(index)} disabled={Boolean(state) && Boolean(state.match(/cheque-.*/)) && !Boolean(index)}>
+                            <IconButton onClick={() => removeAccountTitleHandler(index)} disabled={Boolean(state) && Boolean(state.match(/cheque-|clear-.*/)) && !Boolean(index)}>
                               <DeleteIcon fontSize="small" />
                             </IconButton>
                           </TableCell>
@@ -401,7 +401,7 @@ const AccountTitleDialog = (props) => {
         </Button>
 
         {
-          Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-.*/)) &&
           <Button
             variant="contained"
             onClick={submitAccountTitleHandler}

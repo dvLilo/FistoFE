@@ -67,6 +67,9 @@ import DocumentFiling from './routes/filing/DocumentFiling'
 // Reversal Requesting
 import DocumentReversing from './routes/reversing/DocumentReversing'
 
+// Clearing
+import DocumentClearing from './routes/clearing/DocumentClearing'
+
 import NotFound from './exceptions/NotFound'
 import Sandbox from './Sandbox'
 
@@ -287,7 +290,7 @@ const App = () => {
 
             <Route exact path="/cheque/clearing" element={<ProtectedRoute />}>
               <Route index exact strict
-                element={<h1>Cheque Clearing</h1>}
+                element={<DocumentClearing />}
               />
             </Route>
 

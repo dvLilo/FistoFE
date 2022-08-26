@@ -1,10 +1,8 @@
 import React from 'react'
 
-// import axios from 'axios'
+import axios from 'axios'
 
 import moment from 'moment'
-
-import { useSelector } from 'react-redux'
 
 import {
   Box,
@@ -34,24 +32,22 @@ import {
 
 import statusColor from '../../colors/statusColor'
 
-// import useToast from '../../hooks/useToast'
-// import useConfirm from '../../hooks/useConfirm'
+import useToast from '../../hooks/useToast'
+import useConfirm from '../../hooks/useConfirm'
 import useTransactions from '../../hooks/useTransactions'
 
 import {
-  REVERSE,
-  RETURN
+  CLEAR,
+  RECEIVE
 } from '../../constants'
 
-import ReasonDialog from '../../components/ReasonDialog'
-// import TransferDialog from '../../components/TransferDialog'
 import TablePreloader from '../../components/TablePreloader'
 
-import DocumentReversingFilter from './DocumentReversingFilter'
-import DocumentReversingActions from './DocumentReversingActions'
-import DocumentReversingTransaction from './DocumentReversingTransaction'
+import DocumentClearingFilter from './DocumentClearingFilter'
+import DocumentClearingActions from './DocumentClearingActions'
+import DocumentClearingTransaction from './DocumentClearingTransaction'
 
-const DocumentReversing = () => {
+const DocumentClearing = () => {
 
   const {
     // status,
@@ -64,36 +60,11 @@ const DocumentReversing = () => {
     changeRows
   } = useTransactions("/api/transactions")
 
-  const user = useSelector(state => state.user)
-
-  // const toast = useToast()
-  // const confirm = useConfirm()
+  const toast = useToast()
+  const confirm = useConfirm()
 
   const [search, setSearch] = React.useState("")
   const [state, setState] = React.useState("pending")
-
-  const [reason, setReason] = React.useState({
-    open: false,
-    data: null,
-    process: null,
-    subprocess: null,
-    onSuccess: refetchData,
-    onClose: () => setReason(currentValue => ({
-      ...currentValue,
-      open: false
-    }))
-  })
-
-  // const [transfer, setTransfer] = React.useState({
-  //   open: false,
-  //   data: null,
-  //   process: null,
-  //   subprocess: null,
-  //   onClose: () => setTransfer(currentValue => ({
-  //     ...currentValue,
-  //     open: false
-  //   }))
-  // })
 
   const [manage, setManage] = React.useState({
     open: false,
@@ -123,56 +94,36 @@ const DocumentReversing = () => {
     }))
   }
 
-  // const onReceive = (ID) => {
-  //   confirm({
-  //     open: true,
-  //     wait: true,
-  //     onConfirm: async () => {
-  //       let response
-  //       try {
-  //         response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
-  //           process: TRANSMIT,
-  //           subprocess: RECEIVE
-  //         })
-
-  //         const { message } = response.data
-
-  //         refetchData()
-  //         toast({
-  //           message,
-  //           title: "Success!"
-  //         })
-  //       } catch (error) {
-  //         console.log("Fisto Error Status", error.request)
-
-  //         toast({
-  //           severity: "error",
-  //           title: "Error!",
-  //           message: "Something went wrong whilst trying to receive transaction. Please try again later."
-  //         })
-  //       }
-  //     }
-  //   })
-  // }
-
-  // const onTransfer = (data) => {
-  //   setTransfer(currentValue => ({
-  //     ...currentValue,
-  //     open: true,
-  //     process: TRANSMIT,
-  //     subprocess: TRANSFER,
-  //     data,
-  //   }))
-  // }
-
-  const onReturn = (data) => {
-    setReason(currentValue => ({
-      ...currentValue,
+  const onReceive = (ID) => {
+    confirm({
       open: true,
-      process: REVERSE,
-      subprocess: RETURN,
-      data,
-    }))
+      wait: true,
+      onConfirm: async () => {
+        let response
+        try {
+          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
+            process: CLEAR,
+            subprocess: RECEIVE
+          })
+
+          const { message } = response.data
+
+          refetchData()
+          toast({
+            message,
+            title: "Success!"
+          })
+        } catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to receive transaction. Please try again later."
+          })
+        }
+      }
+    })
   }
 
 
@@ -213,8 +164,8 @@ const DocumentReversing = () => {
         referrence_no: null,
         referrence_amount: null,
         status: "pending",
-        ...(Boolean(state.match(/-request.*/)) && { status: "request" }),
-        ...(Boolean(state.match(/-accept.*/)) && { status: "accept" }),
+        ...(Boolean(state.match(/-receive.*/)) && { status: "receive" }),
+        ...(Boolean(state.match(/-clear.*/)) && { status: "clear" }),
         users: {
           id: 2,
           first_name: "VINCENT LOUIE",
@@ -255,7 +206,7 @@ const DocumentReversing = () => {
       <Paper className="FstoPaperTable-root" elevation={1}>
         <Box className="FstoBoxToolbar2-root">
           <Box className="FstoBoxToolbar-left">
-            <Typography variant="heading">Reversal Request</Typography>
+            <Typography variant="heading">Clearing of Cheque</Typography>
           </Box>
 
           <Box className="FstoBoxToolbar-right">
@@ -271,20 +222,9 @@ const DocumentReversing = () => {
                 children: <span className="FstoTabsIndicator-root" />
               }}
             >
-              <Tab className="FstoTab-root" label={user?.role === `AP Associate` ? "Pending" : "Filed"} value="pending" disableRipple />
-
-              {
-                user?.role === `AP Associate`
-                  ? <Tab className="FstoTab-root" label="Received" value="reverse-receive" disableRipple />
-                  : <Tab className="FstoTab-root" label="Requested" value="reverse-return-request" disableRipple />
-              }
-
-              <Tab className="FstoTab-root" label="Approved" value="reverse-return-accept" disableRipple />
-
-              {
-                user?.role === `AP Tagging`
-                && <Tab className="FstoTab-root" label="Returned" value="reverse-return" disableRipple />
-              }
+              <Tab className="FstoTab-root" label="Pending" value="pending" disableRipple />
+              <Tab className="FstoTab-root" label="Received" value="clear-receive" disableRipple />
+              <Tab className="FstoTab-root" label="Cleared" value="clear-clear" disableRipple />
             </Tabs>
 
             <Stack className="FstoStackToolbar-root" direction="row">
@@ -324,7 +264,7 @@ const DocumentReversing = () => {
                 }}
               />
 
-              <DocumentReversingFilter filterData={filterData} />
+              <DocumentClearingFilter filterData={filterData} />
             </Stack>
           </Box>
         </Box>
@@ -445,11 +385,10 @@ const DocumentReversing = () => {
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                      <DocumentReversingActions
+                      <DocumentClearingActions
                         data={item}
                         state={state}
-                        // onReceive={onReceive}
-                        // onTransfer={onTransfer}
+                        onReceive={onReceive}
                         onManage={onManage}
                         onView={onView}
                       />
@@ -473,22 +412,14 @@ const DocumentReversing = () => {
           showLastButton
         />
 
-        <DocumentReversingTransaction
+        <DocumentClearingTransaction
           {...manage}
           state={state}
           refetchData={refetchData}
-          onReturn={onReturn}
         />
-
-        {/* <TransferDialog
-          {...transfer}
-          onSuccess={refetchData}
-        /> */}
-
-        <ReasonDialog {...reason} />
       </Paper>
     </Box>
   )
 }
 
-export default DocumentReversing
+export default DocumentClearing

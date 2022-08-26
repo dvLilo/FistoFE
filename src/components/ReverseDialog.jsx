@@ -12,6 +12,8 @@ import {
   DialogActions
 } from '@mui/material'
 
+import { LoadingButton } from '@mui/lab'
+
 import CloseIcon from '@mui/icons-material/CloseRounded'
 import WarningIcon from '@mui/icons-material/WarningAmberRounded'
 
@@ -42,14 +44,18 @@ const ReverseDialog = (props) => {
     // eslint-disable-next-line
   }, [open])
 
+  const [isSaving, setIsSaving] = React.useState(false)
+
   const reverseCloseHandler = () => {
     onClose()
     onClear()
   }
 
-  const reverseSubmitHandler = () => {
+  const reverseSubmitHandler = async () => {
+    setIsSaving(true)
+    await onSubmit()
+    setIsSaving(false)
     onClose()
-    onSubmit()
   }
 
   return (
@@ -122,9 +128,12 @@ const ReverseDialog = (props) => {
         > No
         </Button>
 
-        <Button
-          className="FstoDialogActionsReverse-button"
+        <LoadingButton
+          className="FstoDialogActionsReason-button"
           variant="contained"
+          loadingPosition="start"
+          loading={isSaving}
+          startIcon={<></>}
           onClick={reverseSubmitHandler}
           disabled={
             !Boolean(reverse.id) &&
@@ -132,7 +141,7 @@ const ReverseDialog = (props) => {
           }
           disableElevation
         > Yes
-        </Button>
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   )

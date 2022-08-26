@@ -454,7 +454,7 @@ const DocumentVoucheringTransaction = (props) => {
                       views={['month', 'year']}
                       value={voucherData.voucher.month}
                       renderInput={
-                        (props) => <TextField {...props} className="FstoTextfieldForm-root" label="Voucher Month" variant="outlined" size="small" fullWidth />
+                        (props) => <TextField {...props} className="FstoTextfieldForm-root" label="Voucher Month" variant="outlined" size="small" onKeyPress={(e) => e.preventDefault()} fullWidth />
                       }
                       onChange={(value) => setVoucherData(currentValue => ({
                         ...currentValue,

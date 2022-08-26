@@ -1,7 +1,5 @@
 import React from 'react'
 
-// import { useSelector } from 'react-redux'
-
 import {
   IconButton,
   Menu,
@@ -10,15 +8,12 @@ import {
 
 import {
   MoreHoriz as MoreIcon,
-  // TaskOutlined as ReceiveIcon,
+  TaskOutlined as ReceiveIcon,
   VisibilityOutlined as ViewIcon,
-  DescriptionOutlined as ManageIcon,
-  // ReplyOutlined as TransferIcon
+  DescriptionOutlined as ManageIcon
 } from '@mui/icons-material'
 
-const DocumentReversingActions = ({ data, state, onManage, onView }) => {
-
-  // const user = useSelector(state => state.user)
+const DocumentClearingActions = ({ data, state, onReceive, onManage, onView }) => {
 
   const [anchor, setAnchor] = React.useState(null)
 
@@ -54,7 +49,7 @@ const DocumentReversingActions = ({ data, state, onManage, onView }) => {
         onClose={actionCloseHandler}
         disablePortal
       >
-        {/* {
+        {
           state === `pending` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
@@ -65,23 +60,10 @@ const DocumentReversingActions = ({ data, state, onManage, onView }) => {
             dense
           >
             <ReceiveIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Receive
-          </MenuItem>} */}
-
-        {/* {
-          state === `pending` && user?.role === `AP Specialist` &&
-          <MenuItem
-            sx={{ fontWeight: 500 }}
-            onClick={() => {
-              onTransfer(data)
-              actionCloseHandler()
-            }}
-            dense
-          >
-            <TransferIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75, transform: `scaleX(-1)` }} /> Transfer
-          </MenuItem>} */}
+          </MenuItem>}
 
         {
-          (state === `pending` || state === `reverse-return-accept`) &&
+          state === `clear-receive` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -94,7 +76,7 @@ const DocumentReversingActions = ({ data, state, onManage, onView }) => {
           </MenuItem>}
 
         {
-          (state === `reverse-return-request` || state === `reverse-return`) &&
+          state === `clear-clear` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -106,8 +88,8 @@ const DocumentReversingActions = ({ data, state, onManage, onView }) => {
             <ViewIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> View
           </MenuItem>}
       </Menu>
-    </React.Fragment>
+    </React.Fragment >
   )
 }
 
-export default DocumentReversingActions
+export default DocumentClearingActions

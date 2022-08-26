@@ -2,43 +2,42 @@ import React from 'react'
 
 import axios from 'axios'
 
-import { useSelector } from 'react-redux'
+import DateAdapter from '@mui/lab/AdapterDateFns'
 
 import {
+  Box,
+  Divider,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  IconButton,
-  Button,
-  Autocomplete,
   TextField,
-  Paper,
-  Divider,
-  Box
+  IconButton,
+  Button
 } from '@mui/material'
+
+import {
+  LocalizationProvider,
+  DatePicker
+} from '@mui/lab'
 
 import CloseIcon from '@mui/icons-material/Close'
 
 import useToast from '../../hooks/useToast'
-import useDistribute from '../../hooks/useDistribute'
+import useConfirm from '../../hooks/useConfirm'
 // import useTransaction from '../../hooks/useTransaction'
 
 import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
 import ChequeEntryDialog from '../../components/ChequeEntryDialog'
-import ReverseDialog from '../../components/ReverseDialog'
 
-const DocumentReversingTransaction = (props) => {
-
-  const user = useSelector(state => state.user)
+const DocumentClearingTransaction = (props) => {
 
   const {
     state,
     open = false,
     transaction = null,
     refetchData = () => { },
-    onReturn = () => { },
     onBack = () => { },
     onClose = () => { }
   } = props
@@ -53,9 +52,13 @@ const DocumentReversingTransaction = (props) => {
       date_requested: "2022-06-29 09:07:37",
       status: "release-release",
       state: "pending",
-      ...(Boolean(state.match(/-return-request.*/)) && {
-        status: "reverse-return-request",
-        state: "return"
+      ...(Boolean(state.match(/-receive.*/)) && {
+        status: "clear-receive",
+        state: "receive"
+      }),
+      ...(Boolean(state.match(/-clear.*/)) && {
+        status: "clear-clear",
+        state: "clear"
       })
     },
     reason: {
@@ -63,13 +66,6 @@ const DocumentReversingTransaction = (props) => {
       description: null,
       remarks: null
     },
-    ...(Boolean(state.match(/-return-request.*/)) && {
-      reason: {
-        id: 7,
-        description: "Cheque Reversal",
-        remarks: "Supplier lost the cheque."
-      }
-    }),
     requestor: {
       id: 2,
       id_prefix: "RDFFLFI",
@@ -242,10 +238,47 @@ const DocumentReversingTransaction = (props) => {
     file: {
       status: "file-file",
       date: "2022-08-23"
-    }
+    },
+    ...(Boolean(state.match(/-receive.*/)) && {
+      clear: {
+        status: "clear-receive",
+        date: "2022-08-23"
+      }
+    }),
+    ...(Boolean(state.match(/-clear.*/)) && {
+      clear: {
+        status: "clear-clear",
+        date: "2022-08-23",
+        account_title: [
+          [
+            {
+              id: 29,
+              entry: "Credit",
+              account_title: {
+                id: 29,
+                name: "Clearing - AUB"
+              },
+              amount: 50000,
+              remarks: "Lorem sit amet.."
+            },
+            {
+              id: 16,
+              entry: "Debit",
+              account_title: {
+                id: 16,
+                name: "CIB - AUB"
+              },
+              amount: 50000,
+              remarks: "Lorem sit amet.."
+            }
+          ]
+        ]
+      }
+    })
   }
 
   const toast = useToast()
+  const confirm = useConfirm()
 
   // const {
   //   data,
@@ -253,62 +286,58 @@ const DocumentReversingTransaction = (props) => {
   //   refetch: fetchTransaction
   // } = useTransaction(transaction?.id)
 
-  const {
-    refetch: fetchDistribute,
-    data: DISTUBUTE_LIST,
-    status: DISTRIBUTE_STATUS
-  } = useDistribute(transaction?.company_id)
+  // React.useEffect(() => {
+  //   if (open) fetchTransaction()
+
+  //   // eslint-disable-next-line
+  // }, [open])
 
   React.useEffect(() => {
-    if (open) {
-      // fetchTransaction()
-      fetchDistribute()
+    if (open && state === `clear-receive` && status === `success` && !Boolean(clearData.accounts.length)) {
+      const accounts = data.cheque.account_title[0].filter((item) => item.entry.toLowerCase() === `credit`).map((item) => ({
+        entry: "Debit",
+        account_title: item.account_title,
+        amount: item.amount,
+        remarks: item.remarks
+      }))
+
+      setClearData(currentValue => ({
+        ...currentValue,
+        accounts
+      }))
     }
 
-    // eslint-disable-next-line
-  }, [open])
-
-  React.useEffect(() => {
-    if (open && status === `success`) {
-      setReverseRequestData(currentValue => ({
+    if (open && state === `clear-clear` && status === `success` && !Boolean(clearData.date) && !Boolean(clearData.accounts.length)) {
+      setClearData(currentValue => ({
         ...currentValue,
-        distributed_to: data.tag.distributed_to
+        date: data.clear.date,
+        accounts: data.clear.account_title[0]
       }))
     }
 
     // eslint-disable-next-line
   }, [open, status])
 
-  const [reverseRequestData, setReverseRequestData] = React.useState({
-    process: "reverse",
-    subprocess: "return-request",
-    distributed_to: null,
-    reason: {
-      id: null,
-      description: "",
-      remarks: ""
-    }
+  const [clearData, setClearData] = React.useState({
+    process: "clear",
+    subprocess: "clear",
+    date: null,
+    accounts: []
   })
 
-  const [manageReverse, setManageReverse] = React.useState({
-    open: false,
-    state: null,
-    transaction: null,
-    onClose: () => setManageReverse(currentValue => ({
-      ...currentValue,
-      open: false
-    }))
-  })
-
-  const [viewAccountTitle, setViewAccountTitle] = React.useState({
+  const [manageAccountTitle, setManageAccountTitle] = React.useState({
     open: false,
     state: null,
     transaction: null,
     onBack: undefined,
-    onClose: () => setViewAccountTitle(currentValue => ({
-      ...currentValue,
-      open: false,
-    }))
+    onClose: () => setManageAccountTitle(currentValue => {
+      const { accounts, ...remainingItems } = currentValue
+
+      return ({
+        ...remainingItems,
+        open: false,
+      })
+    })
   })
 
   const [viewCheque, setViewCheque] = React.useState({
@@ -323,9 +352,10 @@ const DocumentReversingTransaction = (props) => {
   })
 
   const clearHandler = () => {
-    setReverseRequestData(currentValue => ({
+    setClearData(currentValue => ({
       ...currentValue,
-      distributed_to: null
+      date: null,
+      accounts: []
     }))
   }
 
@@ -334,50 +364,99 @@ const DocumentReversingTransaction = (props) => {
     clearHandler()
   }
 
-  const submitReverseRequestHandler = async () => {
-    let response
-    try {
-      response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, reverseRequestData)
+  const submitClearHandler = () => {
+    onClose()
+    confirm({
+      open: true,
+      wait: true,
+      onConfirm: async () => {
+        let response
+        try {
+          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, clearData)
 
-      const { message } = response.data
+          const { message } = response.data
 
-      refetchData()
-      toast({
-        message,
-        title: "Success!"
-      })
-    }
-    catch (error) {
-      console.log("Fisto Error Status", error.request)
+          refetchData()
+          toast({
+            message,
+            title: "Success!"
+          })
+        }
+        catch (error) {
+          console.log("Fisto Error Status", error.request)
 
-      toast({
-        severity: "error",
-        title: "Error!",
-        message: "Something went wrong whilst trying to save the reverse request details. Please try again."
-      })
-    }
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to save the clear details. Please try again."
+          })
+        }
+      }
+    })
   }
 
-  const submitReturnHandler = () => {
+  const onAccountTitleManage = () => {
     onClose()
-    onReturn(transaction)
+
+    setManageAccountTitle(currentValue => ({
+      ...currentValue,
+      state,
+      transaction,
+      open: true,
+      onBack: onBack
+    }))
   }
 
   const onAccountTitleView = () => {
     onClose()
 
-    setViewAccountTitle(currentValue => ({
+    setManageAccountTitle(currentValue => ({
       ...currentValue,
       state,
       transaction,
       open: true,
       onBack: onBack,
 
-      ...(state === `pending` && {
-        state: "reverse-pending"
-      }),
+      ...(Boolean(state.match(/-receive.*/)) && {
+        state: "transmit-",
+        accounts: data.cheque.account_title[0]
+      })
     }))
   }
+
+  const onAccountTitleInsert = (data) => {
+    setClearData(currentValue => ({
+      ...currentValue,
+      accounts: [
+        ...currentValue.accounts,
+        data
+      ]
+    }))
+  }
+
+  const onAccountTitleUpdate = (data, index) => {
+    setClearData(currentValue => ({
+      ...currentValue,
+      accounts: [
+        ...currentValue.accounts.map((item, itemIndex) => {
+          if (itemIndex === index) return data
+          return item
+        })
+      ]
+    }))
+  }
+
+  const onAccountTitleRemove = (index) => {
+    setClearData(currentValue => ({
+      ...currentValue,
+      accounts: [
+        ...currentValue.accounts.filter((item, itemIndex) => {
+          return itemIndex !== index
+        })
+      ]
+    }))
+  }
+
 
   const onChequeView = () => {
     onClose()
@@ -387,43 +466,7 @@ const DocumentReversingTransaction = (props) => {
       state,
       transaction,
       open: true,
-      onBack: onBack,
-
-      ...(state === `pending` && {
-        state: "reverse-pending"
-      }),
-    }))
-  }
-
-  const onReverseManage = () => {
-    onClose()
-
-    setManageReverse(currentValue => ({
-      ...currentValue,
-      state,
-      transaction,
-      open: true
-    }))
-  }
-
-  const onReverseSelect = (data) => {
-    setReverseRequestData(currentValue => ({
-      ...currentValue,
-      reason: {
-        ...currentValue.reason,
-        id: data.id,
-        description: data.description
-      }
-    }))
-  }
-
-  const onReverseChange = (data) => {
-    setReverseRequestData(currentValue => ({
-      ...currentValue,
-      reason: {
-        ...currentValue.reason,
-        remarks: data
-      }
+      onBack: onBack
     }))
   }
 
@@ -451,90 +494,67 @@ const DocumentReversingTransaction = (props) => {
           <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
 
           {
-            state === `pending` && user?.role === `AP Tagging` &&
+            (state === `clear-receive` || state === `clear-clear`) &&
             <React.Fragment>
               <Divider className="FstoDividerTransaction-root" variant="middle" />
 
               <Box className="FstoBoxTransactionForm-root">
                 <Box className="FstoBoxTransactionForm-content">
-                  <Autocomplete
-                    className="FstoSelectForm-root"
-                    size="small"
-                    options={DISTUBUTE_LIST || []}
-                    value={reverseRequestData.distributed_to}
-                    loading={
-                      DISTRIBUTE_STATUS === 'loading'
-                    }
-                    renderInput={
-                      (props) => <TextField {...props} label="Distribute To..." variant="outlined" />
-                    }
-                    PaperComponent={
-                      (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
-                    }
-                    getOptionLabel={
-                      (option) => option.name
-                    }
-                    isOptionEqualToValue={
-                      (option, value) => option.id === value.id
-                    }
-                    onChange={(e, value) => setReverseRequestData(currentValue => ({
-                      ...currentValue,
-                      distributed_to: value
-                    }))}
-                    disablePortal
-                    disableClearable
-                  />
+                  <LocalizationProvider dateAdapter={DateAdapter}>
+                    <DatePicker
+                      value={clearData.date}
+                      renderInput={
+                        (props) => <TextField {...props} className="FstoTextfieldForm-root" label="Date Clear" variant="outlined" size="small" onKeyPress={(e) => e.preventDefault()} fullWidth />
+                      }
+                      onChange={(value) => setClearData(currentValue => ({
+                        ...currentValue,
+                        date: new Date(value).toISOString()
+                      }))}
+                      showToolbar
+                    />
+                  </LocalizationProvider>
                 </Box>
               </Box>
             </React.Fragment>
           }
         </DialogContent>
 
-        <DialogActions className="FstoDialogTransaction-actions">
-          {
-            state === `pending` && user?.role === `AP Tagging` &&
+        {
+          (state === `clear-receive` || state === `clear-clear`) &&
+          <DialogActions className="FstoDialogTransaction-actions">
             <Button
-              variant="outlined"
-              color="error"
-              onClick={onReverseManage}
+              variant="contained"
+              onClick={
+                state === `clear-receive`
+                  ? onAccountTitleManage
+                  : submitClearHandler
+              }
+              disabled={
+                !Boolean(clearData.date)
+              }
               disableElevation
-            > Request
+            > {state === `clear-receive` ? "Clear" : "Save"}
             </Button>
-          }
-
-          {
-            state === `reverse-return-accept` && user?.role === `AP Tagging` &&
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={submitReturnHandler}
-              disableElevation
-            > Return
-            </Button>
-          }
-        </DialogActions>
+          </DialogActions>
+        }
       </Dialog>
 
       <AccountTitleDialog
-        accounts={data.cheque.account_title[0]}
-        {...viewAccountTitle}
+        accounts={clearData.accounts}
+        onClear={clearHandler}
+        onSubmit={submitClearHandler}
+        onInsert={onAccountTitleInsert}
+        onUpdate={onAccountTitleUpdate}
+        onRemove={onAccountTitleRemove}
+        {...manageAccountTitle}
       />
 
       <ChequeEntryDialog
         cheques={data.cheque.cheques}
         {...viewCheque}
       />
-
-      <ReverseDialog
-        reverse={reverseRequestData.reason}
-        onClear={clearHandler}
-        onSubmit={submitReverseRequestHandler}
-        onSelect={onReverseSelect}
-        onChange={onReverseChange}
-        {...manageReverse}
-      />
     </React.Fragment>
   )
 }
 
-export default DocumentReversingTransaction
+export default DocumentClearingTransaction

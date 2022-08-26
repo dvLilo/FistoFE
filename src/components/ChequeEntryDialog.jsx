@@ -200,7 +200,7 @@ const ChequeEntryDialog = (props) => {
 
       <DialogContent className="FstoDialogCheque-content">
         {
-          Boolean(state) && !Boolean(state.match(/-release|file|release-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|release-.*/)) &&
           <Box className="FstoBoxCheque-root" sx={{ marginBottom: 5 }}>
             <Autocomplete
               className="FstoSelectForm-root"
@@ -328,7 +328,7 @@ const ChequeEntryDialog = (props) => {
                     <TableCell className="FstoTabelCellCheque-root">Date</TableCell>
                     <TableCell>Amount</TableCell>
                     {
-                      Boolean(state) && !Boolean(state.match(/-release|file|release-.*/)) &&
+                      Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|release-.*/)) &&
                       <TableCell align="right">Action</TableCell>
                     }
                   </TableRow>
@@ -359,7 +359,7 @@ const ChequeEntryDialog = (props) => {
                         </TableCell>
 
                         {
-                          Boolean(state) && !Boolean(state.match(/-release|file|release-.*/)) &&
+                          Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|release-.*/)) &&
                           <TableCell align="right" size="small">
                             <IconButton onClick={() => editChequeHandler(item, index)}>
                               <EditIcon fontSize="small" />
@@ -412,7 +412,7 @@ const ChequeEntryDialog = (props) => {
         </Button>
 
         {
-          Boolean(state) && !Boolean(state.match(/-release|file|release-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|release-.*/)) &&
           <Button
             variant="contained"
             onClick={submitChequehandler}

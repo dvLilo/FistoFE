@@ -6,6 +6,7 @@ export const TRANSMIT = `transmit`
 export const CHEQUE = `cheque`
 export const RELEASE = `release`
 export const FILE = `file`
+export const CLEAR = `clear`
 
 // transaction flow sub-process
 export const PENDING = `pending`
@@ -14,8 +15,8 @@ export const APPROVE = `approve`
 export const TRANSFER = `transfer`
 export const CREATE = `create`
 export const REVERSE = `reverse`
-export const REQUEST = `request`
-export const ACCEPT = `accept`
+export const REQUEST = `return-request`
+export const ACCEPT = `return-accept`
 export const HOLD = `hold`
 export const UNHOLD = `unhold`
 export const RETURN = `return`
