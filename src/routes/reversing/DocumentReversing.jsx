@@ -1,6 +1,6 @@
 import React from 'react'
 
-// import axios from 'axios'
+import axios from 'axios'
 
 import moment from 'moment'
 
@@ -34,13 +34,15 @@ import {
 
 import statusColor from '../../colors/statusColor'
 
-// import useToast from '../../hooks/useToast'
-// import useConfirm from '../../hooks/useConfirm'
+import useToast from '../../hooks/useToast'
+import useConfirm from '../../hooks/useConfirm'
 import useTransactions from '../../hooks/useTransactions'
 
 import {
   REVERSE,
-  RETURN
+  RETURN,
+  UNRETURN,
+  RECEIVE
 } from '../../constants'
 
 import ReasonDialog from '../../components/ReasonDialog'
@@ -66,8 +68,8 @@ const DocumentReversing = () => {
 
   const user = useSelector(state => state.user)
 
-  // const toast = useToast()
-  // const confirm = useConfirm()
+  const toast = useToast()
+  const confirm = useConfirm()
 
   const [search, setSearch] = React.useState("")
   const [state, setState] = React.useState("pending")
@@ -123,37 +125,37 @@ const DocumentReversing = () => {
     }))
   }
 
-  // const onReceive = (ID) => {
-  //   confirm({
-  //     open: true,
-  //     wait: true,
-  //     onConfirm: async () => {
-  //       let response
-  //       try {
-  //         response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
-  //           process: TRANSMIT,
-  //           subprocess: RECEIVE
-  //         })
+  const onReceive = (ID) => {
+    confirm({
+      open: true,
+      wait: true,
+      onConfirm: async () => {
+        let response
+        try {
+          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
+            process: REVERSE,
+            subprocess: RECEIVE
+          })
 
-  //         const { message } = response.data
+          const { message } = response.data
 
-  //         refetchData()
-  //         toast({
-  //           message,
-  //           title: "Success!"
-  //         })
-  //       } catch (error) {
-  //         console.log("Fisto Error Status", error.request)
+          refetchData()
+          toast({
+            message,
+            title: "Success!"
+          })
+        } catch (error) {
+          console.log("Fisto Error Status", error.request)
 
-  //         toast({
-  //           severity: "error",
-  //           title: "Error!",
-  //           message: "Something went wrong whilst trying to receive transaction. Please try again later."
-  //         })
-  //       }
-  //     }
-  //   })
-  // }
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to receive transaction. Please try again later."
+          })
+        }
+      }
+    })
+  }
 
   // const onTransfer = (data) => {
   //   setTransfer(currentValue => ({
@@ -175,11 +177,43 @@ const DocumentReversing = () => {
     }))
   }
 
+  const onUnreturn = (ID) => {
+    confirm({
+      open: true,
+      wait: true,
+      onConfirm: async () => {
+        let response
+        try {
+          response = await axios.post(`/api/transactions/flow/update-transaction/DELETE-ME-LATER/${ID}`, {
+            process: REVERSE,
+            subprocess: UNRETURN
+          })
+
+          const { message } = response.data
+
+          refetchData()
+          toast({
+            message,
+            title: "Success!"
+          })
+        } catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to cancel return transaction. Please try again later."
+          })
+        }
+      }
+    })
+  }
+
 
   const status = 'success'
   const data = {
     total: 1,
-    per_page: 1,
+    per_page: 10,
     current_page: 1,
     data: [
       {
@@ -213,8 +247,10 @@ const DocumentReversing = () => {
         referrence_no: null,
         referrence_amount: null,
         status: "pending",
+        ...(Boolean(state.match(/-return.*/)) && { status: "return" }),
         ...(Boolean(state.match(/-request.*/)) && { status: "request" }),
         ...(Boolean(state.match(/-accept.*/)) && { status: "accept" }),
+        ...(Boolean(state.match(/-receive.*/)) && { status: "receive" }),
         users: {
           id: 2,
           first_name: "VINCENT LOUIE",
@@ -282,8 +318,11 @@ const DocumentReversing = () => {
               <Tab className="FstoTab-root" label="Approved" value="reverse-return-accept" disableRipple />
 
               {
-                user?.role === `AP Tagging`
-                && <Tab className="FstoTab-root" label="Returned" value="reverse-return" disableRipple />
+                user?.role === `AP Tagging` &&
+                [
+                  <Tab className="FstoTab-root" key="Received" label="Received" value="reverse-receive" disableRipple />,
+                  <Tab className="FstoTab-root" key="Returned" label="Returned" value="reverse-return" disableRipple />
+                ]
               }
             </Tabs>
 
@@ -448,8 +487,9 @@ const DocumentReversing = () => {
                       <DocumentReversingActions
                         data={item}
                         state={state}
-                        // onReceive={onReceive}
+                        onReceive={onReceive}
                         // onTransfer={onTransfer}
+                        onCancel={onUnreturn}
                         onManage={onManage}
                         onView={onView}
                       />

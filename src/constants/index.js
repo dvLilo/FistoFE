@@ -1,3 +1,11 @@
+// user role
+export const REQUESTOR = `Requestor`
+export const TAGGING = `AP Tagging`
+export const ASSOCIATE = `AP Associate`
+export const SPECIALIST = `AP Specialist`
+export const APPROVER = `Approver`
+export const TREASURY = `Treasury Associate`
+
 // transaction flow process
 export const TAG = `tag`
 export const VOUCHER = `voucher`

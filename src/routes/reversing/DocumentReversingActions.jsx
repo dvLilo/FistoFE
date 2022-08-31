@@ -1,6 +1,6 @@
 import React from 'react'
 
-// import { useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import {
   IconButton,
@@ -10,15 +10,16 @@ import {
 
 import {
   MoreHoriz as MoreIcon,
-  // TaskOutlined as ReceiveIcon,
+  TaskOutlined as ReceiveIcon,
   VisibilityOutlined as ViewIcon,
   DescriptionOutlined as ManageIcon,
-  // ReplyOutlined as TransferIcon
+  // ReplyOutlined as TransferIcon,
+  ReplyOutlined as CancelIcon
 } from '@mui/icons-material'
 
-const DocumentReversingActions = ({ data, state, onManage, onView }) => {
+const DocumentReversingActions = ({ data, state, onReceive, onManage, onView, onCancel }) => {
 
-  // const user = useSelector(state => state.user)
+  const user = useSelector(state => state.user)
 
   const [anchor, setAnchor] = React.useState(null)
 
@@ -54,8 +55,8 @@ const DocumentReversingActions = ({ data, state, onManage, onView }) => {
         onClose={actionCloseHandler}
         disablePortal
       >
-        {/* {
-          state === `pending` &&
+        {
+          ((user?.role === `AP Tagging` && state === `reverse-return-accept`) || (user?.role === `AP Associate` && state === `pending`)) &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -65,7 +66,7 @@ const DocumentReversingActions = ({ data, state, onManage, onView }) => {
             dense
           >
             <ReceiveIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Receive
-          </MenuItem>} */}
+          </MenuItem>}
 
         {/* {
           state === `pending` && user?.role === `AP Specialist` &&
@@ -81,7 +82,7 @@ const DocumentReversingActions = ({ data, state, onManage, onView }) => {
           </MenuItem>} */}
 
         {
-          (state === `pending` || state === `reverse-return-accept`) &&
+          ((user?.role === `AP Tagging` && state === `pending`) || state === `reverse-receive`) &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -94,7 +95,7 @@ const DocumentReversingActions = ({ data, state, onManage, onView }) => {
           </MenuItem>}
 
         {
-          (state === `reverse-return-request` || state === `reverse-return`) &&
+          (state === `reverse-return-request` || state === `reverse-return` || (user?.role === `AP Associate` && state === `reverse-return-accept`)) &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -104,6 +105,19 @@ const DocumentReversingActions = ({ data, state, onManage, onView }) => {
             dense
           >
             <ViewIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> View
+          </MenuItem>}
+
+        {
+          state === `reverse-return-request` &&
+          <MenuItem
+            sx={{ fontWeight: 500 }}
+            onClick={() => {
+              onCancel(data.id)
+              actionCloseHandler()
+            }}
+            dense
+          >
+            <CancelIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Cancel
           </MenuItem>}
       </Menu>
     </React.Fragment>

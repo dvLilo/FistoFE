@@ -45,6 +45,8 @@ const ReasonDialog = (props) => {
 
   React.useEffect(() => {
     if (open && !REASON_LIST) fetchReasons()
+
+    if (open && data && data.reasonDefault) setReason(data.reasonDefault)
     // eslint-disable-next-line
   }, [open])
 

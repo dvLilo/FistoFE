@@ -21,6 +21,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close'
 
 import useToast from '../../hooks/useToast'
+import useConfirm from '../../hooks/useConfirm'
 import useDistribute from '../../hooks/useDistribute'
 // import useTransaction from '../../hooks/useTransaction'
 
@@ -53,7 +54,7 @@ const DocumentReversingTransaction = (props) => {
       date_requested: "2022-06-29 09:07:37",
       status: "release-release",
       state: "pending",
-      ...(Boolean(state.match(/-return-request.*/)) && {
+      ...(Boolean(state.match(/-receive|-return-request|-return.*/)) && {
         status: "reverse-return-request",
         state: "return"
       })
@@ -63,7 +64,7 @@ const DocumentReversingTransaction = (props) => {
       description: null,
       remarks: null
     },
-    ...(Boolean(state.match(/-return-request.*/)) && {
+    ...(Boolean(state.match(/-receive|-return-request|-return.*/)) && {
       reason: {
         id: 7,
         description: "Cheque Reversal",
@@ -246,6 +247,7 @@ const DocumentReversingTransaction = (props) => {
   }
 
   const toast = useToast()
+  const confirm = useConfirm()
 
   // const {
   //   data,
@@ -325,7 +327,12 @@ const DocumentReversingTransaction = (props) => {
   const clearHandler = () => {
     setReverseRequestData(currentValue => ({
       ...currentValue,
-      distributed_to: null
+      distributed_to: null,
+      reason: {
+        id: null,
+        description: "",
+        remarks: ""
+      }
     }))
   }
 
@@ -337,7 +344,7 @@ const DocumentReversingTransaction = (props) => {
   const submitReverseRequestHandler = async () => {
     let response
     try {
-      response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, reverseRequestData)
+      response = await axios.post(`/api/transactions/flow/update-transaction/DELETE-ME-LATER/${transaction.id}`, reverseRequestData)
 
       const { message } = response.data
 
@@ -358,9 +365,43 @@ const DocumentReversingTransaction = (props) => {
     }
   }
 
+  const submitReverseApproveHandler = async () => {
+    onClose()
+    confirm({
+      open: true,
+      wait: true,
+      onConfirm: async () => {
+        let response
+        try {
+          response = await axios.post(`/api/transactions/flow/update-transaction/DELETE-ME-LATER/${transaction.id}`, { process: "reverse", subprocess: "return-approve" })
+
+          const { message } = response.data
+
+          refetchData()
+          toast({
+            message,
+            title: "Success!"
+          })
+        }
+        catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to save the reverse approve details. Please try again."
+          })
+        }
+      }
+    })
+  }
+
   const submitReturnHandler = () => {
     onClose()
-    onReturn(transaction)
+    onReturn({
+      id: transaction.id,
+      reasonDefault: data.reason
+    })
   }
 
   const onAccountTitleView = () => {
@@ -491,6 +532,7 @@ const DocumentReversingTransaction = (props) => {
         </DialogContent>
 
         <DialogActions className="FstoDialogTransaction-actions">
+
           {
             state === `pending` && user?.role === `AP Tagging` &&
             <Button
@@ -503,13 +545,24 @@ const DocumentReversingTransaction = (props) => {
           }
 
           {
-            state === `reverse-return-accept` && user?.role === `AP Tagging` &&
+            state === `reverse-receive` && user?.role === `AP Tagging` &&
             <Button
               variant="outlined"
               color="error"
               onClick={submitReturnHandler}
               disableElevation
             > Return
+            </Button>
+          }
+
+          {
+            state === `reverse-receive` && user?.role === `AP Associate` &&
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={submitReverseApproveHandler}
+              disableElevation
+            > Approve
             </Button>
           }
         </DialogActions>

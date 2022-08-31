@@ -118,7 +118,7 @@ const DocumentFiling = () => {
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
+          response = await axios.post(`/api/transactions/flow/update-transaction/DELETE-ME-LATER/${ID}`, {
             process: FILE,
             subprocess: RECEIVE
           })

@@ -74,7 +74,7 @@ const DocumentTransmittingTransaction = (props) => {
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, transmittalData)
+          response = await axios.post(`/api/transactions/flow/update-transaction/DELETE-ME-LATER/${transaction.id}`, transmittalData)
 
           const { message } = response.data
 
