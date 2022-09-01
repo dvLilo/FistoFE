@@ -122,6 +122,18 @@ const App = () => {
           }
         }
       },
+      MuiAccordion: {
+        styleOverrides: {
+          root: {
+            color: '#ffffff',
+            backgroundColor: 'transparent',
+
+            '&:before': {
+              backgroundColor: 'transparent'
+            }
+          }
+        }
+      },
       MuiButton: {
         styleOverrides: {
           root: {

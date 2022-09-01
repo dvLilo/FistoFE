@@ -29,6 +29,11 @@
 
 .fsto-logo {
   margin-bottom: 50px;
+
+  opacity: 0;
+  transform: translateY(142px) scale(1.15);
+
+  animation: LoginShrinkAnimation 2s ease 100ms forwards;
 }
 
 .fsto-logo-img {
@@ -37,6 +42,9 @@
 
 .fsto-login-form {
   width: 100%;
+  opacity: 0;
+
+  animation: LoginFadeAnimation 500ms ease 1.3s forwards;
 }
 
 @keyframes LoginAnimation {
@@ -46,5 +54,32 @@
 
   100% {
     background-size: 100% 200%;
+  }
+}
+
+@keyframes LoginShrinkAnimation {
+  0% {
+    opacity: 0;
+    transform: translateY(142px) scale(1.15);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateY(142px) scale(1.15);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(0.95);
+  }
+}
+
+@keyframes LoginFadeAnimation {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
   }
 }

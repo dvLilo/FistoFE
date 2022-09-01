@@ -446,7 +446,10 @@
 //   )
 // }
 
-// export default Sandbox
+// export default 
+
+
+
 
 
 
@@ -521,96 +524,137 @@
 
 
 
+// import React from 'react'
+
+// import ReactDOM from 'react-dom'
+
+// import * as Mui from '@mui/material'
+
+// import { CSSTransition, TransitionGroup } from 'react-transition-group';
+// import './Sandbox.scss'
+
+// const Sandbox = () => {
+
+//   const [data, setData] = React.useState([
+//     {
+//       id: 1,
+//       name: "Limay",
+//       email: "limay@email.com"
+//     },
+//     {
+//       id: 2,
+//       name: "Vilo",
+//       email: "vilo@email.com"
+//     },
+//     {
+//       id: 3,
+//       name: "Roy",
+//       email: "roy@email.com"
+//     },
+//     {
+//       id: 4,
+//       name: "Jaypee",
+//       email: "jaypee@email.com"
+//     }
+//   ])
+
+//   const onInsert = () => {
+//     setData(currentValue => ([
+//       ...currentValue,
+//       {
+//         id: 5,
+//         name: "Humer",
+//         email: "humer@email.com"
+//       }
+//     ]))
+//   }
+
+//   return ReactDOM.createPortal(
+//     <React.Fragment>
+//       <Mui.Box sx={{ maxWidth: 760, margin: `250px auto` }}>
+//         <Mui.Button
+//           variant="contained"
+//           size="large"
+//           onClick={onInsert}
+//           sx={{
+//             marginBottom: `10px`
+//           }}
+//           fullWidth
+//           disableElevation
+//         >
+//           Add
+//         </Mui.Button>
+
+//         <Mui.TableContainer component={Mui.Paper} sx={{ minHeight: `400px`, overflowX: `hidden` }}>
+//           <Mui.Table>
+//             <Mui.TableHead>
+//               <Mui.TableRow>
+//                 <Mui.TableCell>ID</Mui.TableCell>
+//                 <Mui.TableCell>NAME</Mui.TableCell>
+//                 <Mui.TableCell>EMAIL</Mui.TableCell>
+//                 <Mui.TableCell>ACTION</Mui.TableCell>
+//               </Mui.TableRow>
+//             </Mui.TableHead>
+
+//             <TransitionGroup component={Mui.TableBody}>
+//               {
+//                 data.map((item, index) => (
+//                   <CSSTransition classNames="item" key={index} timeout={500}>
+//                     <Mui.TableRow>
+//                       <Mui.TableCell>{item.id}</Mui.TableCell>
+//                       <Mui.TableCell>{item.name}</Mui.TableCell>
+//                       <Mui.TableCell>{item.email}</Mui.TableCell>
+//                       <Mui.TableCell>
+//                         <Mui.Button size="small" onClick={() => setData(data.filter((d) => d.id !== item.id))}>DELETE</Mui.Button>
+//                       </Mui.TableCell>
+//                     </Mui.TableRow>
+//                   </CSSTransition>
+//                 ))
+//               }
+//             </TransitionGroup>
+//           </Mui.Table>
+//         </Mui.TableContainer>
+//       </Mui.Box>
+//     </React.Fragment>,
+//     document.getElementById("sandbox")
+//   )
+// }
+
+// export default Sandbox
+
+
+
+
 import React from 'react'
 
 import ReactDOM from 'react-dom'
 
 import * as Mui from '@mui/material'
-
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import './Sandbox.scss'
+import * as MuiIcon from '@mui/icons-material'
 
 const Sandbox = () => {
 
-  const [data, setData] = React.useState([
-    {
-      id: 1,
-      name: "Limay",
-      email: "limay@email.com"
-    },
-    {
-      id: 2,
-      name: "Vilo",
-      email: "vilo@email.com"
-    },
-    {
-      id: 3,
-      name: "Roy",
-      email: "roy@email.com"
-    },
-    {
-      id: 4,
-      name: "Jaypee",
-      email: "jaypee@email.com"
-    }
-  ])
-
-  const onInsert = () => {
-    setData(currentValue => ([
-      ...currentValue,
-      {
-        id: 5,
-        name: "Humer",
-        email: "humer@email.com"
-      }
-    ]))
-  }
-
   return ReactDOM.createPortal(
     <React.Fragment>
-      <Mui.Box sx={{ maxWidth: 760, margin: `250px auto` }}>
-        <Mui.Button
-          variant="contained"
-          size="large"
-          onClick={onInsert}
-          sx={{
-            marginBottom: `10px`
-          }}
-          fullWidth
-          disableElevation
-        >
-          Add
-        </Mui.Button>
+      <Mui.Typography variant="h2" align="center">Hello world</Mui.Typography>
+      <Mui.Box sx={{ display: `flex`, flexDirection: `column`, alignItems: `center`, paddingTop: `3em` }}>
 
-        <Mui.TableContainer component={Mui.Paper} sx={{ minHeight: `400px`, overflowX: `hidden` }}>
-          <Mui.Table>
-            <Mui.TableHead>
-              <Mui.TableRow>
-                <Mui.TableCell>ID</Mui.TableCell>
-                <Mui.TableCell>NAME</Mui.TableCell>
-                <Mui.TableCell>EMAIL</Mui.TableCell>
-                <Mui.TableCell>ACTION</Mui.TableCell>
-              </Mui.TableRow>
-            </Mui.TableHead>
+        <Mui.Accordion elevation={0} square disableGutters>
+          <Mui.AccordionSummary expandIcon={<MuiIcon.ExpandMoreRounded />}>
+            <b>Hello</b>
+          </Mui.AccordionSummary>
 
-            <TransitionGroup component={Mui.TableBody}>
-              {
-                data.map((item, index) => (
-                  <CSSTransition classNames="item" key={index} timeout={500}>
-                    <Mui.TableRow>
-                      <Mui.TableCell>{item.id}</Mui.TableCell>
-                      <Mui.TableCell>{item.name}</Mui.TableCell>
-                      <Mui.TableCell>{item.email}</Mui.TableCell>
-                      <Mui.TableCell>
-                        <Mui.Button size="small" onClick={() => setData(data.filter((d) => d.id !== item.id))}>DELETE</Mui.Button>
-                      </Mui.TableCell>
-                    </Mui.TableRow>
-                  </CSSTransition>
-                ))
-              }
-            </TransitionGroup>
-          </Mui.Table>
-        </Mui.TableContainer>
+          <Mui.AccordionDetails>Lorem ipsum dolor sit amet..</Mui.AccordionDetails>
+        </Mui.Accordion>
+
+        <Mui.Accordion elevation={0} square disableGutters>
+          <Mui.AccordionSummary expandIcon={<MuiIcon.ExpandMoreRounded />}>
+            <b>Hello</b>
+          </Mui.AccordionSummary>
+
+          <Mui.AccordionDetails>Lorem ipsum dolor sit amet..</Mui.AccordionDetails>
+        </Mui.Accordion>
+
       </Mui.Box>
     </React.Fragment>,
     document.getElementById("sandbox")
