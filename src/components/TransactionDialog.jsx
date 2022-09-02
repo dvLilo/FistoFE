@@ -474,10 +474,19 @@ const TransactionDialog = (props) => {
                   <strong>{data.cheque.date}</strong>
                 </ListItem>
 
-                <ListItem className="FstoListItemTransactionDetails-root" dense>
-                  <span>Date Released:</span>
-                  <strong>07/15/2022</strong>
-                </ListItem>
+                {
+                  data.release && data.release.status === `release-release` &&
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Date Released:</span>
+                    <strong>{moment(data.release.date).format("MM/DD/YYYY")}</strong>
+                  </ListItem>}
+
+                {
+                  data.clear && data.clear.status === `clear-clear` &&
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Date Cleared:</span>
+                    <strong>{moment(data.clear.date).format("MM/DD/YYYY")}</strong>
+                  </ListItem>}
               </List>
             </React.Fragment>}
         </Box>

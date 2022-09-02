@@ -123,21 +123,25 @@ const Landing = () => {
   }
 
   return (
-    <main className="fsto-login">
-      <div className="fsto-login-wrapper">
-        <div className="fsto-logo">
-          <img className="fsto-logo-img" src={FistoLogo} alt="Fistó App" />
-        </div>
-        <form className="fsto-login-form" onSubmit={handleSubmit}>
-          <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 3 }}>
+    <Box className="FstoLoginBox-root">
+      <Box className="FstoLoginBox-wrap">
+        <Box className="FstoLoginBox-logo">
+          <img src={FistoLogo} alt="Fistó App" />
+        </Box>
+
+        <Box className="FstoLoginBox-form">
+          <Box className="FstoLoginBox-group">
             <Person sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
             <TextField
-              autoComplete="off"
+              label="Username"
               variant="standard"
               size="small"
-              label="Username"
+              autoComplete="off"
               value={credential.username}
-              onChange={(e) => setCredential({ ...credential, username: e.target.value })}
+              onChange={(e) => setCredential(currentValue => ({
+                ...currentValue,
+                username: e.target.value
+              }))}
               InputProps={{
                 sx: { paddingLeft: 1 }
               }}
@@ -148,16 +152,19 @@ const Landing = () => {
             />
           </Box>
 
-          <Box sx={{ display: 'flex', alignItems: 'flex-end', mb: 3 }}>
+          <Box className="FstoLoginBox-group">
             <Lock sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
             <TextField
-              autoComplete="off"
+              label="Password"
               variant="standard"
               size="small"
-              label="Password"
+              autoComplete="off"
               type={visibility ? "text" : "password"}
               value={credential.password}
-              onChange={(e) => setCredential({ ...credential, password: e.target.value })}
+              onChange={(e) => setCredential(currentValue => ({
+                ...currentValue,
+                password: e.target.value
+              }))}
               InputProps={{
                 sx: { paddingLeft: 1 },
                 endAdornment: (
@@ -166,9 +173,7 @@ const Landing = () => {
                       edge="end"
                       onClick={() => setVisibility(!visibility)}
                       sx={{
-                        '&:hover': {
-                          background: 'none'
-                        }
+                        '&:hover': { backgroundColor: 'transparent' }
                       }}
                     >
                       {visibility ? <VisibilityOff /> : <VisibilityOn />}
@@ -182,25 +187,23 @@ const Landing = () => {
               fullWidth
             />
           </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 8 }}>
+
+          <Box className="FstoLoginBox-group" sx={{ justifyContent: 'flex-end', mt: 8 }}>
             <LoadingButton
-              type="submit"
-              loading={loading}
-              loadingPosition="start"
-              startIcon={<></>}
               variant="contained"
               color="secondary"
-              sx={{
-                textTransform: 'capitalize',
-                px: 4
-              }}
+              startIcon={<></>}
+              loading={loading}
+              loadingPosition="start"
+              sx={{ px: 4 }}
+              onClick={handleSubmit}
               disableElevation
-            >
-              Sign-In
+            > Sign-In
             </LoadingButton>
           </Box>
-        </form>
-      </div>
+        </Box>
+      </Box>
+
       <Snackbar
         anchorOrigin={{
           vertical: "top",
@@ -213,14 +216,13 @@ const Landing = () => {
           severity="error"
           onClose={() => setToast({
             ...toast, show: false
-          }
-          )}
+          })}
         >
-          <AlertTitle>Error</AlertTitle>
+          <AlertTitle>Error!</AlertTitle>
           {toast.message}
         </Alert>
       </Snackbar>
-    </main>
+    </Box>
   )
 }
 

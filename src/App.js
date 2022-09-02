@@ -99,15 +99,17 @@ const App = () => {
       fontSize: 12,
       heading: {
         margin: 0,
-        fontFamily: "'Open Sans', sans-serif",
-        fontSize: "1.35em",
+        fontSize: '1.35em',
         fontWeight: 700
       },
       permission: {
         margin: 0,
-        fontFamily: "'Open Sans', sans-serif",
-        fontSize: "0.95em",
+        fontSize: '0.95em',
         fontWeight: 500
+      },
+      sidebar: {
+        marginLeft: 20,
+        fontWeight: 700
       }
     },
     components: {
@@ -131,6 +133,20 @@ const App = () => {
             '&:before': {
               backgroundColor: 'transparent'
             }
+          }
+        }
+      },
+      MuiAccordionSummary: {
+        styleOverrides: {
+          content: {
+            alignItems: 'center'
+          }
+        }
+      },
+      MuiAccordionDetails: {
+        styleOverrides: {
+          root: {
+            padding: '8px 12px 12px'
           }
         }
       },

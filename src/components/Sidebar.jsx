@@ -2,8 +2,8 @@ import React from 'react'
 
 import { NavLink } from 'react-router-dom'
 
-import { TOGGLE_SIDEBAR, HIDE_SIDEBAR } from '../actions'
 import { useSelector, useDispatch } from 'react-redux'
+import { TOGGLE_SIDEBAR, HIDE_SIDEBAR } from '../actions'
 
 import {
   Box,
@@ -12,7 +12,9 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Backdrop
+  Backdrop,
+  Typography,
+  Chip
 } from '@mui/material'
 
 import {
@@ -64,8 +66,8 @@ const Sidebar = () => {
               return (
                 <React.Fragment>
                   {isActive
-                    ? <BulletActive sx={{ fontSize: '0.8125rem', ml: 1, mr: 2 }} />
-                    : <BulletInactive sx={{ fontSize: '0.8125rem', ml: 1, mr: 2 }} />
+                    ? <BulletActive sx={{ fontSize: '0.8125rem', ml: '4px', mr: '10px' }} />
+                    : <BulletInactive sx={{ fontSize: '0.8125rem', ml: '4px', mr: '10px' }} />
                   }
                   {children}
                 </React.Fragment>
@@ -83,139 +85,159 @@ const Sidebar = () => {
         <Box className="FstoSidebar-wrapper">
           <Box className="FstoSidebar-toggle">
             <IconButton onClick={toggleSidebarHandler} disableRipple>
-              <Close sx={{ color: '#f0f0e1' }} />
+              <Close htmlColor="#f0f0e1" />
             </IconButton>
           </Box>
 
           <img className="FstoSidebar-logo" src={FistoLogo} alt="Fistó App" />
 
           {
-            user?.role === `Administrator` && user?.permissions.includes(0) &&
-            <Accordion elevation={0} square disableGutters>
+            !!user &&
+            (!!user.role.match(/administrator/i) && user.permissions.includes(0)) &&
+            <Accordion defaultExpanded={/administrator/i.test(user.role)} elevation={0} square disableGutters>
               <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
-                <MasterlistIcon sx={{ mr: 2.5 }} /> Master List
+                <MasterlistIcon />
+                <Typography variant="sidebar">Master List</Typography>
               </AccordionSummary>
+
               <AccordionDetails>
-                <RouterLink className="FstoLink-root" to="/masterlist/users">User Accounts</RouterLink>
-                <RouterLink className="FstoLink-root" to="/masterlist/categories">Categories</RouterLink>
-                <RouterLink className="FstoLink-root" to="/masterlist/document-types">Document Types</RouterLink>
-                <RouterLink className="FstoLink-root" to="/masterlist/companies">Companies</RouterLink>
-                <RouterLink className="FstoLink-root" to="/masterlist/departments">Departments</RouterLink>
-                <RouterLink className="FstoLink-root" to="/masterlist/locations">Locations</RouterLink>
-                <RouterLink className="FstoLink-root" to="/masterlist/references">References</RouterLink>
-                <RouterLink className="FstoLink-root" to="/masterlist/supplier-types">Urgency Types</RouterLink>
-                <RouterLink className="FstoLink-root" to="/masterlist/suppliers">Suppliers</RouterLink>
-                <RouterLink className="FstoLink-root" to="/masterlist/utility-categories">Utility Categories</RouterLink>
-                <RouterLink className="FstoLink-root" to="/masterlist/utility-locations">Utility Locations</RouterLink>
-                <RouterLink className="FstoLink-root" to="/masterlist/account-numbers">Utility Account</RouterLink>
-                <RouterLink className="FstoLink-root" to="/masterlist/credit-cards">Credit Card</RouterLink>
-                <RouterLink className="FstoLink-root" to="/masterlist/account-titles">Account Titles</RouterLink>
-                <RouterLink className="FstoLink-root" to="/masterlist/payroll-clients">Payroll Clients</RouterLink>
-                <RouterLink className="FstoLink-root" to="/masterlist/payroll-categories">Payroll Categories</RouterLink>
-                <RouterLink className="FstoLink-root" to="/masterlist/banks">Banks</RouterLink>
-                <RouterLink className="FstoLink-root" to="/masterlist/reasons">Reasons</RouterLink>
-
-              </AccordionDetails>
-            </Accordion>
-          }
-
-          <Accordion elevation={0} square disableGutters>
-            <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
-              <DocumentIcon sx={{ mr: 2.5 }} /> Documents
-            </AccordionSummary>
-            <AccordionDetails>
-              {user?.permissions.includes(1) && <RouterLink className="FstoLink-root" to="/request">Creation of Request</RouterLink>}
-              {user?.permissions.includes(20) && <RouterLink className="FstoLink-root" to="/document/tagging">Tagging of Documents</RouterLink>}
-              {user?.permissions.includes(19) && <RouterLink className="FstoLink-root" to="/document/transmitting">Transmittal of Documents</RouterLink>}
-              <RouterLink className="FstoLink-root" to="/document/returned-documents">Returned Documents</RouterLink>
-
-            </AccordionDetails>
-          </Accordion>
-
-          {
-            (
-              user?.role === `Administrator` ||
-              user?.role === `AP Associate` ||
-              user?.role === `AP Specialist` ||
-              (user?.role === `AP Tagging` && (user?.permissions.includes(10) || user?.permissions.includes(12)))
-            ) &&
-            <Accordion elevation={0} square disableGutters>
-              <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
-                <VoucherIcon sx={{ mr: 2.5 }} /> Voucher
-              </AccordionSummary>
-              <AccordionDetails>
-                {user?.permissions.includes(12) && <RouterLink className="FstoLink-root" to="/voucher/vouchering">Creation of Voucher</RouterLink>}
-                {user?.permissions.includes(11) && <RouterLink className="FstoLink-root" to="/voucher/filing">Filing of Voucher</RouterLink>}
-                {user?.permissions.includes(10) && <RouterLink className="FstoLink-root" to="/voucher/reversing">Reversal Request</RouterLink>}
-
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/users">User Accounts</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/categories">Categories</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/document-types">Document Types</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/companies">Companies</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/departments">Departments</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/locations">Locations</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/references">References</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/supplier-types">Urgency Types</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/suppliers">Suppliers</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/utility-categories">Utility Categories</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/utility-locations">Utility Locations</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/account-numbers">Utility Account</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/credit-cards">Credit Card</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/account-titles">Account Titles</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/payroll-clients">Payroll Clients</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/payroll-categories">Payroll Categories</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/banks">Banks</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/reasons">Reasons</RouterLink>
               </AccordionDetails>
             </Accordion>
           }
 
           {
-            (
-              user?.role === `Administrator` ||
-              user?.role === `Treasury Associate` ||
-              (user?.role === `AP Tagging` && user?.permissions.includes(6)) ||
-              (user?.role === `AP Associate` && user?.permissions.includes(6)) ||
-              (user?.role === `AP Specialist` && user?.permissions.includes(6))
-            ) &&
-            <Accordion elevation={0} square disableGutters>
+            !!user &&
+            <Accordion defaultExpanded={/tagging/i.test(user.role)} elevation={0} square disableGutters>
               <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
-                <ChequeIcon sx={{ mr: 2.5 }} /> Cheque
+                <DocumentIcon />
+                <Typography variant="sidebar">Documents</Typography>
               </AccordionSummary>
-              <AccordionDetails>
-                {user?.permissions.includes(7) && <RouterLink className="FstoLink-root" to="/cheque/chequing">Creation of Cheque</RouterLink>}
-                {user?.permissions.includes(6) && <RouterLink className="FstoLink-root" to="/cheque/releasing">Releasing of Cheque</RouterLink>}
-                {user?.permissions.includes(8) && <RouterLink className="FstoLink-root" to="/cheque/clearing">Clearing of Cheque</RouterLink>}
 
+              <AccordionDetails>
+                {user.permissions.includes(1) && <RouterLink className="FstoSidebarLink-root" to="/request">Creation of Request</RouterLink>}
+                {user.permissions.includes(20) && <RouterLink className="FstoSidebarLink-root" to="/document/tagging">Tagging of Documents <Chip className="FstoSidebarChip-root" color="primary" label="99+" size="small" /></RouterLink>}
+                {user.permissions.includes(19) && <RouterLink className="FstoSidebarLink-root" to="/document/transmitting">Transmittal of Documents</RouterLink>}
+                <RouterLink className="FstoSidebarLink-root" to="/document/returned-documents">Returned Documents</RouterLink>
               </AccordionDetails>
             </Accordion>
           }
 
           {
-            (
-              user?.role === `Administrator` ||
-              user?.role === `Approver`
-            ) &&
-            <Accordion elevation={0} square disableGutters>
+            !!user &&
+            (!!user.role.match(/administrator|ap associate|specialist/i) || (!!user.role.match(/tagging/i) && (user.permissions.includes(10) || user.permissions.includes(12)))) &&
+            <Accordion defaultExpanded={/associate|specialist/i.test(user.role)} elevation={0} square disableGutters>
               <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
-                <ApprovalIcon sx={{ mr: 2.5 }} /> Approval
+                <VoucherIcon />
+                <Typography variant="sidebar">Voucher</Typography>
               </AccordionSummary>
-              <AccordionDetails>
-                {user?.permissions.includes(17) && <RouterLink className="FstoLink-root" to="/approval">Transaction Approval</RouterLink>}
 
+              <AccordionDetails>
+                {user.permissions.includes(12)
+                  && <RouterLink className="FstoSidebarLink-root" to="/voucher/vouchering">Creation of Voucher</RouterLink>
+                }
+
+                {user.permissions.includes(11)
+                  && <RouterLink className="FstoSidebarLink-root" to="/voucher/filing">Filing of Voucher</RouterLink>
+                }
+
+                {user.permissions.includes(10)
+                  && <RouterLink className="FstoSidebarLink-root" to="/voucher/reversing">Reversal Request</RouterLink>
+                }
               </AccordionDetails>
             </Accordion>
           }
 
           {
-            (
-              user?.role === `Administrator` ||
-              user?.role === `Approver`
-            ) &&
+            !!user &&
+            (!!user.role.match(/administrator|treasury/i) || (!!user.role.match(/tagging|associate|specialist/i) && user.permissions.includes(6))) &&
+            <Accordion defaultExpanded={/treasury/i.test(user.role)} elevation={0} square disableGutters>
+              <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
+                <ChequeIcon />
+                <Typography variant="sidebar">Cheque</Typography>
+              </AccordionSummary>
+
+              <AccordionDetails>
+                {user.permissions.includes(7)
+                  && <RouterLink className="FstoSidebarLink-root" to="/cheque/chequing">Creation of Cheque</RouterLink>
+                }
+
+                {user.permissions.includes(6)
+                  && <RouterLink className="FstoSidebarLink-root" to="/cheque/releasing">Releasing of Cheque</RouterLink>
+                }
+
+                {user.permissions.includes(8)
+                  && <RouterLink className="FstoSidebarLink-root" to="/cheque/clearing">Clearing of Cheque</RouterLink>
+                }
+              </AccordionDetails>
+            </Accordion>
+          }
+
+          {
+            !!user &&
+            !!user.role.match(/administrator|approver/i) &&
+            <Accordion defaultExpanded={/approver/i.test(user.role)} elevation={0} square disableGutters>
+              <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
+                <ApprovalIcon />
+                <Typography variant="sidebar">Approval</Typography>
+              </AccordionSummary>
+
+              <AccordionDetails>
+                {user.permissions.includes(17)
+                  && <RouterLink className="FstoSidebarLink-root" to="/approval">Transaction Approval</RouterLink>
+                }
+              </AccordionDetails>
+            </Accordion>
+          }
+
+          {
+            !!user &&
+            !!user.role.match(/administrator|approver/i) &&
             <Accordion elevation={0} square disableGutters>
               <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
-                <ConfidentialIcon sx={{ mr: 2.5 }} /> Confidential
+                <ConfidentialIcon />
+                <Typography variant="sidebar">Confidential</Typography>
               </AccordionSummary>
+
               <AccordionDetails>
                 {/* RouterLink here... */}
-
               </AccordionDetails>
             </Accordion>
           }
 
-          <Accordion elevation={0} square disableGutters>
-            <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
-              <ReportsIcon sx={{ mr: 2.5 }} /> Reports
-            </AccordionSummary>
-            <AccordionDetails>
-              {/* RouterLink here... */}
+          {
+            !!user &&
+            <Accordion elevation={0} square disableGutters>
+              <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
+                <ReportsIcon />
+                <Typography variant="sidebar">Reports</Typography>
+              </AccordionSummary>
 
-            </AccordionDetails>
-          </Accordion>
+              <AccordionDetails>
+                {/* RouterLink here... */}
+              </AccordionDetails>
+            </Accordion>
+          }
         </Box>
       </aside>
+
       <Backdrop
         className="FstoBackdrop-root"
         open={open}

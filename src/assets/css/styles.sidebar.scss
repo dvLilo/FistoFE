@@ -94,7 +94,7 @@
   justify-content: flex-start;
 }
 
-.FstoLink-root {
+.FstoSidebarLink-root {
   position: relative;
   width: 100%;
   display: flex;
@@ -108,6 +108,11 @@
   overflow: hidden;
 }
 
-.FstoLink-root.active {
+.FstoSidebarLink-root.active {
   color: rgba(255, 255, 255, 1);
+}
+
+.FstoSidebarChip-root.MuiChip-root {
+  height: 17px;
+  margin-left: 7px;
 }

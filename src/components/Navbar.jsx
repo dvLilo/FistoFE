@@ -44,13 +44,13 @@ const Navbar = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  const user = useSelector(state => state.user)
-  const color = useSelector(state => state.color)
+  const user = useSelector((state) => state.user)
+  const color = useSelector((state) => state.color)
 
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
 
-  const showMenuHandler = $event => {
-    setAnchorEl($event.currentTarget)
+  const showMenuHandler = (e) => {
+    setAnchorEl(e.currentTarget)
   }
   const closeMenuHandler = () => {
     setAnchorEl(null)
