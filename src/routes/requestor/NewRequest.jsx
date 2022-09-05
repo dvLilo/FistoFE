@@ -17,7 +17,13 @@ import {
   Stack,
   IconButton,
   Divider,
-  InputAdornment
+  InputAdornment,
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell
 } from '@mui/material'
 
 import {
@@ -223,6 +229,11 @@ const NewRequest = () => {
 
     po_group: []
   })
+
+  // eslint-disable-next-line
+  const [prmGroup, setPrmGroup] = React.useState([])
+  // eslint-disable-next-line
+  const [poGroup, setPoGroup] = React.useState([])
 
   const [PO, setPO] = React.useState({
     update: false,
@@ -2185,7 +2196,7 @@ const NewRequest = () => {
                   )}
 
                 { // Release Date, Batch Number
-                  (data.document.id === 3 && data.document.category && data.document.category.name.toLowerCase() === "loans & leasing") &&
+                  (data.document.id === 3 && data.document.category && data.document.category.name.toLowerCase().match(/loans|leasing/i)) &&
                   (
                     <React.Fragment>
                       <LocalizationProvider dateAdapter={DateAdapter}>
@@ -2944,13 +2955,13 @@ const NewRequest = () => {
       {
         (data.document.id === 3) &&
         (
-          <Paper className="FstoPaperAttachment-root" elevation={1}>
-            <Box className="FstoBoxHeadeing" sx={{ display: 'flex', alignItems: 'center', gap: 2, marginBottom: 3 }}>
+          <Paper className="FstoPaperImport-root" elevation={1}>
+            <Stack direction="row" spacing={2}>
               <Typography variant="heading">Attachment</Typography>
+
               <LoadingButton
                 className="FstoButtonImport-root"
                 variant="contained"
-                component="label"
                 loadingPosition="start"
                 // loading={isImporting}
                 startIcon={<UploadFile />}
@@ -2958,6 +2969,69 @@ const NewRequest = () => {
               > Import
                 <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden />
               </LoadingButton>
+            </Stack>
+
+            <TableContainer className="FstoTableContainerImport-root">
+              <Table className="FstoTableImport-root">
+                <TableHead className="FstoTableHeadImport-root">
+                  <TableRow className="FstoTableRowImport-root">
+                    <TableCell className="FstoTableCellImport-root">Period Covered</TableCell>
+                    <TableCell className="FstoTableCellImport-root">Cheque Date</TableCell>
+                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Gross Amount</TableCell>
+                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>5% WHT</TableCell>
+                    <TableCell className="FstoTableCellImport-root" align="right">Net of Amount</TableCell>
+                  </TableRow>
+                </TableHead>
+
+                <TableBody className="FstoTableBodyImport-root" sx={{ borderBottom: '3px solid #e0e0e0' }}>
+                  <TableRow className="FstoTableRowImport-root">
+                    <TableCell className="FstoTableCellImport-root">03/06/22 - 04/05/22</TableCell>
+                    <TableCell className="FstoTableCellImport-root">03/06/22</TableCell>
+                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>47,368.42</TableCell>
+                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>2,368.42</TableCell>
+                    <TableCell className="FstoTableCellImport-root" align="right">45,000.00</TableCell>
+                  </TableRow>
+
+                  <TableRow className="FstoTableRowImport-root">
+                    <TableCell className="FstoTableCellImport-root">03/06/22 - 04/05/22</TableCell>
+                    <TableCell className="FstoTableCellImport-root">03/06/22</TableCell>
+                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>47,368.42</TableCell>
+                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>2,368.42</TableCell>
+                    <TableCell className="FstoTableCellImport-root" align="right">45,000.00</TableCell>
+                  </TableRow>
+
+                  <TableRow className="FstoTableRowImport-root">
+                    <TableCell className="FstoTableCellImport-root">03/06/22 - 04/05/22</TableCell>
+                    <TableCell className="FstoTableCellImport-root">03/06/22</TableCell>
+                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>47,368.42</TableCell>
+                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>2,368.42</TableCell>
+                    <TableCell className="FstoTableCellImport-root" align="right">45,000.00</TableCell>
+                  </TableRow>
+
+                  <TableRow className="FstoTableRowImport-root">
+                    <TableCell className="FstoTableCellImport-root">03/06/22 - 04/05/22</TableCell>
+                    <TableCell className="FstoTableCellImport-root">03/06/22</TableCell>
+                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>47,368.42</TableCell>
+                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>2,368.42</TableCell>
+                    <TableCell className="FstoTableCellImport-root" align="right">45,000.00</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            <Box className="FstoBoxImport-variance">
+              <Typography sx={{ fontSize: '1em' }}>Total Gross Amount</Typography>
+              <Typography variant="heading">&#8369;521,052.62</Typography>
+            </Box>
+
+            <Box className="FstoBoxImport-variance">
+              <Typography sx={{ fontSize: '1em' }}>Total CWT</Typography>
+              <Typography variant="heading">&#8369;-26,052.62</Typography>
+            </Box>
+
+            <Box className="FstoBoxImport-variance">
+              <Typography sx={{ fontSize: '1em' }}>Total Net Amount</Typography>
+              <Typography variant="heading">&#8369;495,000.00</Typography>
             </Box>
           </Paper>
         )

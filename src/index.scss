@@ -23,6 +23,23 @@ body {
     .FstoBoxCell-head {
       background-color: rgba(206, 212, 217, 0);
     }
+
+    .FstoTableCell-root.FstoTableCell-body {
+      $border-color: rgb(81, 81, 81);
+
+      border-top: 1px solid $border-color;
+      border-bottom: 1px solid $border-color;
+
+      &:first-of-type {
+        border-radius: 4px 0 0 4px;
+        border-left: 1px solid $border-color;
+      }
+
+      &:last-of-type {
+        border-radius: 0 4px 4px 0;
+        border-right: 1px solid $border-color;
+      }
+    }
   }
 
   &.system {
@@ -35,6 +52,23 @@ body {
 
       .FstoBoxCell-head {
         background-color: rgba(206, 212, 217, 0);
+      }
+
+      .FstoTableCell-root.FstoTableCell-body {
+        $border-color: rgb(81, 81, 81);
+
+        border-top: 1px solid $border-color;
+        border-bottom: 1px solid $border-color;
+
+        &:first-of-type {
+          border-radius: 4px 0 0 4px;
+          border-left: 1px solid $border-color;
+        }
+
+        &:last-of-type {
+          border-radius: 0 4px 4px 0;
+          border-right: 1px solid $border-color;
+        }
       }
     }
   }
@@ -543,6 +577,33 @@ body {
   justify-content: space-between;
 }
 
+
+
+
+
+.FstoPaperImport-root {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  min-height: 480px;
+  padding: 3em 2em;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  & .FstoTableContainerImport-root {
+    margin-top: 2em;
+    margin-bottom: 4em;
+  }
+}
+
+.FstoBoxImport-variance {
+  width: 100%;
+  gap: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
 
 
 

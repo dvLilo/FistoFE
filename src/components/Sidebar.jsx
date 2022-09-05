@@ -125,7 +125,7 @@ const Sidebar = () => {
 
           {
             !!user &&
-            <Accordion defaultExpanded={/tagging/i.test(user.role)} elevation={0} square disableGutters>
+            <Accordion defaultExpanded={/tagging|requestor/i.test(user.role)} elevation={0} square disableGutters>
               <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
                 <DocumentIcon />
                 <Typography variant="sidebar">Documents</Typography>
