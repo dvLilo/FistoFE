@@ -41,7 +41,6 @@ import Reasons from './routes/masterlist/Reasons/'
 import DocumentRequesting from './routes/requestor/DocumentRequesting'
 import NewRequest from './routes/requestor/NewRequest'
 import UpdateRequest from './routes/requestor/UpdateRequest'
-import ReturnedDocument from './routes/requestor/ReturnedDocument'
 
 // Tagging
 import DocumentTagging from './routes/tagging/DocumentTagging'
@@ -69,6 +68,9 @@ import DocumentReversing from './routes/reversing/DocumentReversing'
 
 // Clearing
 import DocumentClearing from './routes/clearing/DocumentClearing'
+
+// Returning
+import DocumentReturning from './routes/returning/DocumentReturning'
 
 import NotFound from './exceptions/NotFound'
 import Sandbox from './Sandbox'
@@ -254,7 +256,7 @@ const App = () => {
 
             <Route exact path="/document/returned-documents" element={<ProtectedRoute />}>
               <Route index exact strict
-                element={<ReturnedDocument />}
+                element={<DocumentReturning />}
               />
             </Route>
 

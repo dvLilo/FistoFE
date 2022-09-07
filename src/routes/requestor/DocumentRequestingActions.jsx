@@ -83,7 +83,7 @@ const DocumentRequestingActions = (props) => {
               onUpdate(data)
               actionCloseHandler()
             }}
-            disabled={user?.id !== data.users_id || (data.document_id === 4 && data.payment_type === `partial` && !data.is_latest_transaction)}
+            disabled={user?.id !== data.users_id || (data.document_id === 4 && data.payment_type.toLowerCase() === `partial` && !data.is_latest_transaction) || data.status !== `pending`}
           >
             <UpdateIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Edit
           </MenuItem>}
@@ -97,7 +97,7 @@ const DocumentRequestingActions = (props) => {
               onVoid(data)
               actionCloseHandler()
             }}
-            disabled={user?.id !== data.users_id || (data.document_id === 4 && data.payment_type === `partial` && !data.is_latest_transaction)}
+            disabled={user?.id !== data.users_id || (data.document_id === 4 && data.payment_type.toLowerCase() === `partial` && !data.is_latest_transaction) || data.status !== `pending`}
           >
             <VoidIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Void
           </MenuItem>}

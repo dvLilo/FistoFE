@@ -207,7 +207,7 @@ const AccountTitleDialog = (props) => {
                 (option) => option.name
               }
               getOptionDisabled={
-                (option) => Boolean(state) && Boolean(state.match(/cheque-|clear-.*/)) && option.name.toLowerCase() === `debit`
+                (option) => Boolean(state) && Boolean(state.match(/cheque-|clear-|return-.*/)) && option.name.toLowerCase() === `debit`
               }
               isOptionEqualToValue={
                 (option, value) => option.id === value.id
@@ -386,6 +386,23 @@ const AccountTitleDialog = (props) => {
                 {((accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0)) - (accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0))).toLocaleString()}
               </Typography>
             </Stack>
+
+            {
+              accounts.some((item) => item.entry === `Debit`) &&
+              accounts.some((item) => item.entry === `Credit`) &&
+              accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) !== accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0) &&
+              <Stack className="FstoStackAccountTitle-root" direction="row" justifyContent="flex-end">
+                <Typography variant="caption" color="error">Total debit and credit amount are not equal.</Typography>
+              </Stack>}
+
+            {
+              accounts.some((item) => item.entry === `Debit`) &&
+              accounts.some((item) => item.entry === `Credit`) &&
+              accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0) &&
+              (accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) !== (transaction?.document_amount || transaction?.referrence_amount) || accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0) !== (transaction?.document_amount || transaction?.referrence_amount)) &&
+              <Stack className="FstoStackAccountTitle-root" direction="row" justifyContent="flex-end">
+                <Typography variant="caption" color="error">Total debit, credit and document amount are not equal.</Typography>
+              </Stack>}
 
           </React.Fragment>
         }

@@ -218,7 +218,7 @@ const DocumentChequingTransaction = (props) => {
         date: "2022-08-11"
       }
     }),
-    ...(Boolean(state.match(/-cheque|-release.*/)) && {
+    ...(Boolean(state.match(/-cheque|-release|-return.*/)) && {
       cheque: {
         status: `cheque-cheque`,
         date: "2022-08-11",
@@ -292,7 +292,7 @@ const DocumentChequingTransaction = (props) => {
       }))
     }
 
-    if (open && state === `cheque-cheque` && status === `success` && !Boolean(chequeData.accounts.length) && !Boolean(chequeData.cheques.length)) {
+    if (open && (state === `cheque-cheque` || state === `return-return`) && status === `success` && !Boolean(chequeData.accounts.length) && !Boolean(chequeData.cheques.length)) {
       setChequeData(currentValue => ({
         ...currentValue,
         accounts: data.cheque.account_title[0],
@@ -497,7 +497,7 @@ const DocumentChequingTransaction = (props) => {
       open: true,
       onBack: onBack,
 
-      ...(Boolean(state.match(/-receive|-hold|-return|-void.*/)) && {
+      ...(Boolean(state.match(/-receive|-hold|cheque-return|-void.*/)) && {
         state: "transmit-",
         accounts: data.voucher.account_title[0]
       }),
@@ -687,7 +687,7 @@ const DocumentChequingTransaction = (props) => {
         </DialogContent>
 
         {
-          (state === `cheque-receive` || state === `cheque-cheque` || state === `cheque-hold`) &&
+          (state === `cheque-receive` || state === `cheque-cheque` || state === `return-return` || state === `cheque-hold`) &&
           <DialogActions className="FstoDialogTransaction-actions">
             {
               state === `cheque-receive` &&
@@ -700,7 +700,7 @@ const DocumentChequingTransaction = (props) => {
             }
 
             {
-              state === `cheque-cheque` &&
+              (state === `cheque-cheque` || state === `return-return`) &&
               <React.Fragment>
                 <Button
                   variant="contained"

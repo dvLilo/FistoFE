@@ -30,7 +30,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
 import useApprover from '../../hooks/useApprover'
-import useTransaction from '../../hooks/useTransaction'
+// import useTransaction from '../../hooks/useTransaction'
 
 import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
@@ -84,14 +84,174 @@ const DocumentVoucheringTransaction = (props) => {
     onClose = () => { }
   } = props
 
+  const status = 'success'
+  const data = {
+    transaction: {
+      id: 1,
+      is_latest_transaction: 1,
+      request_id: 1,
+      no: "MISC001",
+      date_requested: "2022-06-29 09:07:37",
+      status: "return-return",
+      state: "return",
+      ...(Boolean(state.match(/-hold.*/)) && {
+        status: "return-hold",
+        state: "hold"
+      }),
+      ...(Boolean(state.match(/-void.*/)) && {
+        status: "return-void",
+        state: "void"
+      })
+    },
+    reason: {
+      id: 1,
+      description: "Wrong Details",
+      remarks: "Lorem ipsum dolor sit amet.."
+    },
+    ...(Boolean(state.match(/-hold.*/)) && {
+      reason: {
+        id: 1,
+        description: "Incomplete Attachment",
+        remarks: "Lorem ipsum dolor sit amet.."
+      }
+    }),
+    ...(Boolean(state.match(/-void.*/)) && {
+      reason: {
+        id: 1,
+        description: "Double Payment",
+        remarks: "Lorem ipsum dolor sit amet.."
+      }
+    }),
+    requestor: {
+      id: 2,
+      id_prefix: "RDFFLFI",
+      id_no: 10185,
+      role: "Requestor",
+      position: "System Developer",
+      first_name: "VINCENT LOUIE",
+      middle_name: "LAYNES",
+      last_name: "ABAD",
+      suffix: null,
+      department: "Management Information System Common"
+    },
+    document: {
+      id: 1,
+      name: "PAD",
+      no: "pad#11001",
+      date: "2022-06-29 00:00:00",
+      payment_type: "Full",
+      amount: 50000,
+      remarks: "swfattener lara: growing performance form, weekly fattener inventory form",
+      category: {
+        id: 1,
+        name: "general"
+      },
+      company: {
+        id: 1,
+        name: "RDF Corporate Services"
+      },
+      department: {
+        id: 12,
+        name: "Management Information System Common"
+      },
+      location: {
+        id: 5,
+        name: "Common"
+      },
+      supplier: {
+        id: 30,
+        name: "1st Advenue Advertising"
+      }
+    },
+    po_group: [
+      {
+        id: 50,
+        no: "PO#11002",
+        amount: 25000,
+        rr_no: [
+          "123",
+          "456",
+          "789"
+        ],
+        request_id: 1,
+        is_editable: 1,
+        previous_balance: 25000
+      },
+      {
+        id: 51,
+        no: "PO#11001",
+        amount: 25000,
+        rr_no: [
+          "123",
+          "456",
+          "789"
+        ],
+        request_id: 1,
+        is_editable: 1,
+        previous_balance: 25000
+      }
+    ],
+    tag: {
+      status: "tag-tag",
+      no: 2,
+      date: "2022-08-09",
+      distributed_to: {
+        id: 7,
+        name: "Daisy Batas"
+      },
+      reason: null
+    },
+    voucher: {
+      status: "voucher-voucher",
+      date: "2022-08-11",
+      no: "ABC123",
+      month: "2022-08-01 00:00:00",
+      tax: {
+        receipt_type: "Official",
+        percentage_tax: 12,
+        witholding_tax: 6000,
+        net_amount: 44000
+      },
+      account_title: [
+        [
+          {
+            id: 10,
+            entry: "Debit",
+            account_title: {
+              id: 34,
+              name: "SE - Salaries Expense"
+            },
+            amount: 50000,
+            remarks: "Lorem ipsum..."
+          },
+          {
+            id: 10,
+            entry: "Credit",
+            account_title: {
+              id: 33,
+              name: "Accounts Payable"
+            },
+            amount: 50000,
+            remarks: "Lorem emit.."
+          }
+        ]
+      ],
+      approver: {
+        id: 8,
+        name: "Reden Cunanan"
+      },
+      reason: null
+    }
+  }
+
   const toast = useToast()
   const confirm = useConfirm()
 
-  const {
-    data,
-    status,
-    refetch: fetchTransaction
-  } = useTransaction(transaction?.id)
+  // const {
+  //   data,
+  //   status,
+  //   refetch: fetchTransaction
+  // } = useTransaction(transaction?.id)
 
   const {
     refetch: fetchApprover,
@@ -100,7 +260,7 @@ const DocumentVoucheringTransaction = (props) => {
   } = useApprover()
 
   React.useEffect(() => {
-    if (open) fetchTransaction()
+    // if (open) fetchTransaction()
 
     if (open && !APPROVER_LIST) fetchApprover()
     // eslint-disable-next-line
@@ -134,7 +294,7 @@ const DocumentVoucheringTransaction = (props) => {
   }, [open, APPROVER_STATUS])
 
   React.useEffect(() => {
-    if (open && state === `voucher-voucher` && status === `success`) {
+    if (open && (state === `voucher-voucher` || state === `return-return`) && status === `success` && !Boolean(voucherData.tax.receipt_type)) {
       setVoucherData(currentValue => ({
         ...currentValue,
         tax: {
@@ -154,6 +314,16 @@ const DocumentVoucheringTransaction = (props) => {
 
     // eslint-disable-next-line
   }, [open, status])
+
+  const [validate, setValidate] = React.useState({
+    status: false,
+    data: []
+  })
+
+  const [error, setError] = React.useState({
+    status: false,
+    data: []
+  })
 
   const [voucherData, setVoucherData] = React.useState({
     process: "voucher",
@@ -315,6 +485,49 @@ const DocumentVoucheringTransaction = (props) => {
     }))
   }
 
+  const checkVoucherHandler = async (e) => {
+    if (error.status && error.data.voucher_no) {
+      delete error.data.voucher_no
+      setError(currentValue => ({
+        ...currentValue,
+        data: error.data
+      }))
+    }
+
+    if (!voucherData.voucher.no) return
+
+    setValidate(currentValue => ({
+      status: true,
+      data: [
+        ...currentValue.data, 'voucher_no'
+      ]
+    }))
+
+    try {
+      await axios.post(`/api/transactions/flow/validate-voucher-no`, {
+        voucher_no: voucherData.voucher.no
+      })
+    }
+    catch (error) {
+      if (error.request.status === 422) {
+        const { errors } = error.response.data
+
+        setError(currentValue => ({
+          status: true,
+          data: {
+            ...currentValue.data,
+            voucher_no: errors["voucher.no"]
+          }
+        }))
+      }
+    }
+
+    setValidate(currentValue => ({
+      ...currentValue,
+      data: currentValue.data.filter((data) => data !== 'voucher_no')
+    }))
+  }
+
   return (
     <React.Fragment>
       <Dialog
@@ -339,7 +552,7 @@ const DocumentVoucheringTransaction = (props) => {
           <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} />
 
           {
-            (state === `voucher-receive` || state === `voucher-voucher`) &&
+            (state === `voucher-receive` || state === `voucher-voucher` || state === `return-return`) &&
             <React.Fragment>
               <Divider className="FstoDividerTransaction-root" variant="middle" />
 
@@ -474,6 +687,20 @@ const DocumentVoucheringTransaction = (props) => {
                     autoComplete="off"
                     size="small"
                     value={voucherData.voucher.no}
+                    error={
+                      error.status
+                      && Boolean(error.data.voucher_no)
+                    }
+                    helperText={
+                      (error.status
+                        && error.data.voucher_no
+                        && error.data.voucher_no[0])
+                      ||
+                      (validate.status
+                        && validate.data.includes('voucher_no')
+                        && "Please wait...")
+                    }
+                    onBlur={checkVoucherHandler}
                     onChange={(e) => setVoucherData(currentValue => ({
                       ...currentValue,
                       voucher: {
@@ -521,14 +748,14 @@ const DocumentVoucheringTransaction = (props) => {
         </DialogContent>
 
         {
-          (state === `voucher-receive` || state === `voucher-voucher` || state === `voucher-hold`) &&
+          (state === `voucher-receive` || state === `voucher-voucher` || state === `voucher-hold` || state === `return-return`) &&
           <DialogActions className="FstoDialogTransaction-actions">
             {
-              (state === `voucher-receive` || state === `voucher-voucher`) &&
+              (state === `voucher-receive` || state === `voucher-voucher` || state === `return-return`) &&
               <Button
                 variant="contained"
                 onClick={
-                  state === `voucher-voucher`
+                  state === `voucher-voucher` || state === `return-return`
                     ? submitVoucherHandler
                     : onAccountTitleManage
                 }
