@@ -398,6 +398,13 @@ const ChequeEntryDialog = (props) => {
                 &#8369;{(cheques.map((item) => item.amount).reduce((a, b) => a + b, 0) - (transaction?.document_amount || transaction?.referrence_amount)).toLocaleString()}
               </Typography>
             </Stack>
+
+            {
+              Boolean(cheques.length) &&
+              cheques.map((item) => item.amount).reduce((a, b) => a + b, 0) !== (transaction?.document_amount || transaction?.referrence_amount) &&
+              <Stack className="FstoStackAccountTitle-root" direction="row" justifyContent="flex-end">
+                <Typography variant="caption" color="error">Total cheque and document amount are not equal.</Typography>
+              </Stack>}
           </React.Fragment>
         }
       </DialogContent>

@@ -603,6 +603,7 @@ const DocumentChequingTransaction = (props) => {
   }
 
 
+
   const onReversalManage = () => {
     onClose()
 
