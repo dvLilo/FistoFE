@@ -294,7 +294,7 @@ const DocumentVoucheringTransaction = (props) => {
   }, [open, APPROVER_STATUS])
 
   React.useEffect(() => {
-    if (open && (state === `voucher-voucher` || state === `return-return`) && status === `success` && !Boolean(voucherData.tax.receipt_type)) {
+    if (open && (state === `voucher-voucher` || state === `return-return`) && status === `success`) {
       setVoucherData(currentValue => ({
         ...currentValue,
         tax: {

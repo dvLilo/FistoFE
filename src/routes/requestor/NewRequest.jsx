@@ -2,6 +2,8 @@ import React from 'react'
 
 import axios from 'axios'
 
+import * as XLSX from 'xlsx'
+
 import { useNavigate } from 'react-router-dom'
 
 import NumberFormat from 'react-number-format'
@@ -963,6 +965,105 @@ const NewRequest = () => {
       ...data,
       po_group: data.po_group.filter((data) => data.no !== no)
     })
+  }
+
+  const importPaymentRequestMemoHandler = (e) => {
+
+    const file = e.target.files[0]
+    const types = ["application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]
+
+    if (!!file) {
+      if (!types.includes(file.type))
+        return toast({
+          open: true,
+          severity: "error",
+          title: "Error!",
+          message: "Please select only excel file types and try again."
+        })
+
+      const reader = new FileReader()
+
+      reader.readAsArrayBuffer(file)
+      reader.onload = async (response) => {
+        const excelFile = response.target.result
+
+        const workbook = XLSX.read(excelFile, { type: 'buffer' })
+
+        const sheetname = workbook.SheetNames[0]
+        const worksheet = workbook.Sheets[sheetname]
+
+        const excelJson = XLSX.utils.sheet_to_json(worksheet, { raw: false, defval: "" })
+
+        if (!excelJson.length)
+          return toast({
+            open: true,
+            severity: "error",
+            title: "Error!",
+            message: "File is empty, please check your excel file and try again."
+          })
+
+        excelJson.forEach((row) => {
+          Object.keys(row).forEach((key) => {
+            let newKey = key.trim().toLowerCase().replace(/ /g, "_")
+            if (key !== newKey) {
+              row[newKey] = row[key]
+              delete row[key]
+            }
+          })
+        })
+
+        if (data.document.category.name.toLowerCase() === `rental`) {
+          // const errors = []
+          const header = ["period_covered", "gross_amount", "wht", "net_of_amount", "cheque_date"]
+
+          if (!Object.keys(excelJson[0]).every((item) => header.includes(item)))
+            return toast({
+              open: true,
+              severity: "error",
+              title: "Error!",
+              message: "Invalid excel template, please check your excel file and try again."
+            })
+
+          // excelJson.forEach((item, itemIndex) => {
+          //   Object.entries(item).forEach((entry) => {
+          //     const [key, value] = entry
+
+          //     if (value === "")
+          //       errors.push({
+          //         line: itemIndex++,
+          //         error_type: "empty",
+          //         description: `${key} is empty.`
+          //       })
+          //   })
+          // })
+        }
+
+        // if (data.document.category.name.toLowerCase() === `loans`) {
+        //   const header = ["principal", "interest", "cwt", "net_of_amount", "cheque_date"]
+
+        //   if (!Object.keys(excelJson[0]).every((item) => header.includes(item)))
+        //     return toast({
+        //       open: true,
+        //       severity: "error",
+        //       title: "Error!",
+        //       message: "Invalid excel template, please check your excel file and try again."
+        //     })
+        // }
+
+        // if (data.document.category.name.toLowerCase() === `leasing`) {
+        //  const header = ["period_covered", "gross_amount", "cwt", "net_of_amount", "cheque_date"]
+        // }
+
+        console.log(excelJson)
+
+
+
+        // console.log("Hello world. Hello, Fisto!")
+      }
+    }
+
+    // reset the import button
+    e.target.value = null
   }
 
   const transformData = (ID) => {
@@ -2959,16 +3060,15 @@ const NewRequest = () => {
             <Stack direction="row" spacing={2}>
               <Typography variant="heading">Attachment</Typography>
 
-              <LoadingButton
+              <Button
                 className="FstoButtonImport-root"
+                component="label"
                 variant="contained"
-                loadingPosition="start"
-                // loading={isImporting}
                 startIcon={<UploadFile />}
                 disableElevation
               > Import
-                <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden />
-              </LoadingButton>
+                <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onChange={importPaymentRequestMemoHandler} hidden />
+              </Button>
             </Stack>
 
             <TableContainer className="FstoTableContainerImport-root">

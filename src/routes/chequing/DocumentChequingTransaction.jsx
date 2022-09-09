@@ -292,7 +292,7 @@ const DocumentChequingTransaction = (props) => {
       }))
     }
 
-    if (open && (state === `cheque-cheque` || state === `return-return`) && status === `success` && !Boolean(chequeData.accounts.length) && !Boolean(chequeData.cheques.length)) {
+    if (open && (state === `cheque-cheque` || state === `return-return`) && status === `success`) {
       setChequeData(currentValue => ({
         ...currentValue,
         accounts: data.cheque.account_title[0],
