@@ -1021,8 +1021,29 @@ const NewRequest = () => {
               open: true,
               severity: "error",
               title: "Error!",
-              message: "Invalid excel template, please check your excel file and try again."
+              message: "Invalid excel template for rental category, please check your excel file and try again."
             })
+
+
+          // Transforming data
+          const excelTransformed = excelJson.map((item) => {
+            const parseAmount = (amount) => {
+              const sanitizeAmount = amount.replace(/[a-z,]/gi, '')
+
+              if (sanitizeAmount) return parseFloat(sanitizeAmount)
+              else return 0.00
+            }
+
+            return {
+              ...item,
+              gross_amount: parseAmount(item.gross_amount),
+              wht: parseAmount(item.wht),
+              net_of_amount: parseAmount(item.net_of_amount)
+            }
+          })
+
+          setPrmGroup(excelTransformed)
+          console.log(excelTransformed)
 
           // excelJson.forEach((item, itemIndex) => {
           //   Object.entries(item).forEach((entry) => {
@@ -1053,8 +1074,6 @@ const NewRequest = () => {
         // if (data.document.category.name.toLowerCase() === `leasing`) {
         //  const header = ["period_covered", "gross_amount", "cwt", "net_of_amount", "cheque_date"]
         // }
-
-        console.log(excelJson)
 
 
 
@@ -3065,74 +3084,108 @@ const NewRequest = () => {
                 component="label"
                 variant="contained"
                 startIcon={<UploadFile />}
+                disabled={
+                  !Boolean(data.document.category)
+                }
                 disableElevation
               > Import
                 <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onChange={importPaymentRequestMemoHandler} hidden />
               </Button>
             </Stack>
 
-            <TableContainer className="FstoTableContainerImport-root">
-              <Table className="FstoTableImport-root">
-                <TableHead className="FstoTableHeadImport-root">
-                  <TableRow className="FstoTableRowImport-root">
-                    <TableCell className="FstoTableCellImport-root">Period Covered</TableCell>
-                    <TableCell className="FstoTableCellImport-root">Cheque Date</TableCell>
-                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Gross Amount</TableCell>
-                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>5% WHT</TableCell>
-                    <TableCell className="FstoTableCellImport-root" align="right">Net of Amount</TableCell>
-                  </TableRow>
-                </TableHead>
+            {
+              Boolean(prmGroup.length) &&
+              (
+                <React.Fragment>
+                  <TableContainer className="FstoTableContainerImport-root">
+                    <Table className="FstoTableImport-root">
+                      <TableHead className="FstoTableHeadImport-root">
+                        <TableRow className="FstoTableRowImport-root">
+                          <TableCell className="FstoTableCellImport-root">Period Covered</TableCell>
+                          <TableCell className="FstoTableCellImport-root">Cheque Date</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Gross Amount</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Withholding Tax</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right">Net of Amount</TableCell>
+                        </TableRow>
+                      </TableHead>
 
-                <TableBody className="FstoTableBodyImport-root" sx={{ borderBottom: '3px solid #e0e0e0' }}>
-                  <TableRow className="FstoTableRowImport-root">
-                    <TableCell className="FstoTableCellImport-root">03/06/22 - 04/05/22</TableCell>
-                    <TableCell className="FstoTableCellImport-root">03/06/22</TableCell>
-                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>47,368.42</TableCell>
-                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>2,368.42</TableCell>
-                    <TableCell className="FstoTableCellImport-root" align="right">45,000.00</TableCell>
-                  </TableRow>
+                      <TableBody className="FstoTableBodyImport-root" sx={{ borderBottom: '3px solid #e0e0e0' }}>
+                        {
+                          prmGroup.map((data, index) => (
+                            <TableRow className="FstoTableRowImport-root" key={index}>
+                              <TableCell className="FstoTableCellImport-root">
+                                {data.period_covered}
+                              </TableCell>
 
-                  <TableRow className="FstoTableRowImport-root">
-                    <TableCell className="FstoTableCellImport-root">03/06/22 - 04/05/22</TableCell>
-                    <TableCell className="FstoTableCellImport-root">03/06/22</TableCell>
-                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>47,368.42</TableCell>
-                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>2,368.42</TableCell>
-                    <TableCell className="FstoTableCellImport-root" align="right">45,000.00</TableCell>
-                  </TableRow>
+                              <TableCell className="FstoTableCellImport-root">
+                                {data.cheque_date}
+                              </TableCell>
 
-                  <TableRow className="FstoTableRowImport-root">
-                    <TableCell className="FstoTableCellImport-root">03/06/22 - 04/05/22</TableCell>
-                    <TableCell className="FstoTableCellImport-root">03/06/22</TableCell>
-                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>47,368.42</TableCell>
-                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>2,368.42</TableCell>
-                    <TableCell className="FstoTableCellImport-root" align="right">45,000.00</TableCell>
-                  </TableRow>
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.gross_amount.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency'
+                                  })}
+                              </TableCell>
 
-                  <TableRow className="FstoTableRowImport-root">
-                    <TableCell className="FstoTableCellImport-root">03/06/22 - 04/05/22</TableCell>
-                    <TableCell className="FstoTableCellImport-root">03/06/22</TableCell>
-                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>47,368.42</TableCell>
-                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>2,368.42</TableCell>
-                    <TableCell className="FstoTableCellImport-root" align="right">45,000.00</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.wht.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency'
+                                  })}
+                              </TableCell>
 
-            <Box className="FstoBoxImport-variance">
-              <Typography sx={{ fontSize: '1em' }}>Total Gross Amount</Typography>
-              <Typography variant="heading">&#8369;521,052.62</Typography>
-            </Box>
+                              <TableCell className="FstoTableCellImport-root" align="right">
+                                {
+                                  data.net_of_amount.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency'
+                                  })}
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        }
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
 
-            <Box className="FstoBoxImport-variance">
-              <Typography sx={{ fontSize: '1em' }}>Total CWT</Typography>
-              <Typography variant="heading">&#8369;-26,052.62</Typography>
-            </Box>
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total Gross Amount</Typography>
+                    <Typography variant="heading">
+                      {
+                        prmGroup.map((data) => data.gross_amount).reduce((a, b) => a + b).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency'
+                        })}
+                    </Typography>
+                  </Box>
 
-            <Box className="FstoBoxImport-variance">
-              <Typography sx={{ fontSize: '1em' }}>Total Net Amount</Typography>
-              <Typography variant="heading">&#8369;495,000.00</Typography>
-            </Box>
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total CWT</Typography>
+                    <Typography variant="heading">
+                      {
+                        prmGroup.map((data) => data.wht).reduce((a, b) => a + b).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency'
+                        })}
+                    </Typography>
+                  </Box>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total Net Amount</Typography>
+                    <Typography variant="heading">
+                      {
+                        prmGroup.map((data) => data.net_of_amount).reduce((a, b) => a + b).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency'
+                        })}
+                    </Typography>
+                  </Box>
+                </React.Fragment>
+              )
+            }
           </Paper>
         )
       }

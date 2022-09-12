@@ -1,6 +1,6 @@
 import React from 'react'
 
-// import axios from 'axios'
+import axios from 'axios'
 
 import moment from 'moment'
 
@@ -34,15 +34,17 @@ import {
 
 import statusColor from '../../colors/statusColor'
 
-// import useToast from '../../hooks/useToast'
-// import useConfirm from '../../hooks/useConfirm'
+import useToast from '../../hooks/useToast'
+import useConfirm from '../../hooks/useConfirm'
 import useTransactions from '../../hooks/useTransactions'
 
 import {
   REVERSE,
   RETURN,
   HOLD,
-  VOID
+  VOID,
+  CHEQUE,
+  RELEASE
 } from '../../constants'
 
 import ReasonDialog from '../../components/ReasonDialog'
@@ -71,8 +73,8 @@ const DocumentReturning = () => {
 
   const user = useSelector(state => state.user)
 
-  // const toast = useToast()
-  // const confirm = useConfirm()
+  const toast = useToast()
+  const confirm = useConfirm()
 
   const [search, setSearch] = React.useState("")
   const [state, setState] = React.useState("return-return")
@@ -145,6 +147,38 @@ const DocumentReturning = () => {
       subprocess: RETURN,
       data,
     }))
+  }
+
+  const onRelease = (ID) => {
+    confirm({
+      open: true,
+      wait: true,
+      onConfirm: async () => {
+        let response
+        try {
+          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
+            process: CHEQUE,
+            subprocess: RELEASE
+          })
+
+          const { message } = response.data
+
+          refetchData()
+          toast({
+            message,
+            title: "Success!"
+          })
+        } catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to receive transaction. Please try again later."
+          })
+        }
+      }
+    })
   }
 
 
@@ -466,6 +500,7 @@ const DocumentReturning = () => {
             {...manage}
             state={state}
             refetchData={refetchData}
+            onRelease={onRelease}
             onHold={onHold}
             onReturn={onReturn}
             onVoid={onVoid}
