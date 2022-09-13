@@ -513,6 +513,15 @@ const NewRequest = () => {
   }, [data.document.from, data.document.to, data.document.company, data.document.department, data.document.utility.category, data.document.utility.location])
 
 
+  // Clear PRM Import
+  React.useEffect(() => {
+    if (data.document.id === 3 && prmGroup.length)
+      setPrmGroup([])
+
+    // eslint-disable-next-line
+  }, [data.document.category])
+
+
   React.useEffect(() => {
     const unload = (e) => {
       e = e || window.event
@@ -563,16 +572,25 @@ const NewRequest = () => {
           && (!validate.status || !validate.data.includes('document_no'))
           ? false : true
 
-      case 3:
+      case 3: // PRM Multiple - Payment Request Memo Multiple
         return data.document.payment_type
           && data.document.no
-          && data.document.date
           && data.document.amount
           && data.document.company
           && data.document.department
           && data.document.location
           && data.document.supplier
           && data.document.category
+          && (
+            data.document.category.name.match(/rental/i) || (data.document.category.name.match(/loans|leasing/i) && data.document.release_date && data.document.batch_no)
+          )
+          && prmGroup.length
+          && (
+            (data.document.category.name.match(/rental/i) && Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) >= 0.00 && Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) <= 1.00) ||
+            (data.document.category.name.match(/loans/i) && Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) >= 0.00 && Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) <= 1.00)
+          )
+          && (!error.status || !Boolean(error.data.document_no))
+          && (!validate.status || !validate.data.includes('document_no'))
           ? false : true
 
       case 4: // Receipt
@@ -1013,7 +1031,6 @@ const NewRequest = () => {
         })
 
         if (data.document.category.name.toLowerCase() === `rental`) {
-          // const errors = []
           const header = ["period_covered", "gross_amount", "wht", "net_of_amount", "cheque_date"]
 
           if (!Object.keys(excelJson[0]).every((item) => header.includes(item)))
@@ -1036,8 +1053,8 @@ const NewRequest = () => {
 
             return {
               ...item,
-              gross_amount: parseAmount(item.gross_amount),
               wht: parseAmount(item.wht),
+              gross_amount: parseAmount(item.gross_amount),
               net_of_amount: parseAmount(item.net_of_amount)
             }
           })
@@ -1059,25 +1076,73 @@ const NewRequest = () => {
           // })
         }
 
-        // if (data.document.category.name.toLowerCase() === `loans`) {
-        //   const header = ["principal", "interest", "cwt", "net_of_amount", "cheque_date"]
+        if (data.document.category.name.toLowerCase() === `loans`) {
+          const header = ["principal", "interest", "cwt", "net_of_amount", "cheque_date"]
 
-        //   if (!Object.keys(excelJson[0]).every((item) => header.includes(item)))
-        //     return toast({
-        //       open: true,
-        //       severity: "error",
-        //       title: "Error!",
-        //       message: "Invalid excel template, please check your excel file and try again."
-        //     })
-        // }
+          if (!Object.keys(excelJson[0]).every((item) => header.includes(item)))
+            return toast({
+              open: true,
+              severity: "error",
+              title: "Error!",
+              message: "Invalid excel template for loans category, please check your excel file and try again."
+            })
 
-        // if (data.document.category.name.toLowerCase() === `leasing`) {
-        //  const header = ["period_covered", "gross_amount", "cwt", "net_of_amount", "cheque_date"]
-        // }
+          // Transforming data
+          const excelTransformed = excelJson.map((item) => {
+            const parseAmount = (amount) => {
+              const sanitizeAmount = amount.replace(/[a-z,]/gi, '')
 
+              if (sanitizeAmount) return parseFloat(sanitizeAmount)
+              else return 0.00
+            }
 
+            return {
+              ...item,
+              cwt: parseAmount(item.cwt),
+              principal: parseAmount(item.principal),
+              interest: parseAmount(item.interest),
+              net_of_amount: parseAmount(item.net_of_amount)
+            }
+          })
 
-        // console.log("Hello world. Hello, Fisto!")
+          setPrmGroup(excelTransformed)
+          console.log(excelTransformed)
+        }
+
+        if (data.document.category.name.toLowerCase() === `leasing`) {
+          const header = ["amortization", "interest", "cwt", "principal", "net_of_amount", "cheque_date"]
+
+          if (!Object.keys(excelJson[0]).every((item) => header.includes(item)))
+            return toast({
+              open: true,
+              severity: "error",
+              title: "Error!",
+              message: "Invalid excel template for leasing category, please check your excel file and try again."
+            })
+
+          // Transforming data
+          const excelTransformed = excelJson.map((item) => {
+            const parseAmount = (amount) => {
+              const sanitizeAmount = amount.replace(/[a-z,]/gi, '')
+
+              if (sanitizeAmount) return parseFloat(sanitizeAmount)
+              else return 0.00
+            }
+
+            return {
+              ...item,
+              amortization: parseAmount(item.amortization),
+              interest: parseAmount(item.interest),
+              cwt: parseAmount(item.cwt),
+              principal: parseAmount(item.principal),
+              net_of_amount: parseAmount(item.net_of_amount)
+            }
+          })
+
+          // setPrmGroup(excelTransformed)
+          console.log(excelTransformed)
+        }
+
       }
     }
 
@@ -1132,7 +1197,27 @@ const NewRequest = () => {
 
       case 3: // PRM Multiple - Payment Request Memo Multiple
         return {
+          requestor: data.requestor,
+          document: {
+            id: data.document.id,
+            no: `prmm#${data.document.no}`,
+            name: data.document.name,
+            payment_type: data.document.payment_type,
+            amount: data.document.amount,
+            date: new Date(data.document.date).toISOString().slice(0, 10),
 
+            batch_no: data.document.batch_no,
+            release_date: new Date(data.document.release_date).toISOString().slice(0, 10),
+
+            company: data.document.company,
+            department: data.document.department,
+            location: data.document.location,
+            supplier: data.document.supplier,
+            category: data.document.category,
+
+            remarks: data.document.remarks
+          },
+          prm_group: prmGroup
         }
 
       case 4: // Receipt
@@ -1257,6 +1342,10 @@ const NewRequest = () => {
   }
 
   const truncateData = () => {
+    setPrmGroup([])
+
+    setPoGroup([])
+
     setError({
       status: false,
       data: []
@@ -1884,21 +1973,61 @@ const NewRequest = () => {
                       value={data.document.amount}
                       disabled={data.document.id === 8}
                       error={
-                        Boolean(data.po_group.length) &&
-                        Boolean(data.document.amount)
-                        && !(
-                          Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                          Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 1.00
-                        )
+                        (
+                          Boolean(data.po_group.length) &&
+                          Boolean(data.document.amount)
+                          && !(
+                            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
+                            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 1.00
+                          )) ||
+                        (
+                          Boolean(prmGroup.length) &&
+                          Boolean(data.document.category) &&
+                          Boolean(data.document.category.name.match(/rental/i)) &&
+                          Boolean(data.document.amount)
+                          && !(
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) >= 0.00 &&
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) <= 1.00
+                          )) ||
+                        (
+                          Boolean(prmGroup.length) &&
+                          Boolean(data.document.category) &&
+                          Boolean(data.document.category.name.match(/loans/i)) &&
+                          Boolean(data.document.amount)
+                          && !(
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) >= 0.00 &&
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) <= 1.00
+                          ))
                       }
                       helperText={
-                        Boolean(data.po_group.length) &&
-                        Boolean(data.document.amount)
-                        && !(
-                          Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                          Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 1.00
-                        )
-                        && "Document amount and PO balance amount is not equal."
+                        (
+                          Boolean(data.po_group.length) &&
+                          Boolean(data.document.amount)
+                          && !(
+                            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
+                            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 1.00
+                          )
+                          && "Document amount and PO balance amount is not equal.") ||
+                        (
+                          Boolean(prmGroup.length) &&
+                          Boolean(data.document.category) &&
+                          Boolean(data.document.category.name.match(/rental/i)) &&
+                          Boolean(data.document.amount)
+                          && !(
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) >= 0.00 &&
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) <= 1.00
+                          )
+                          && "Document amount and gross amount is not equal.") ||
+                        (
+                          Boolean(prmGroup.length) &&
+                          Boolean(data.document.category) &&
+                          Boolean(data.document.category.name.match(/loans/i)) &&
+                          Boolean(data.document.amount)
+                          && !(
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) >= 0.00 &&
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) <= 1.00
+                          )
+                          && "Document amount and principal amount is not equal.")
                       }
                       onChange={(e) => setData({
                         ...data,
@@ -2337,6 +2466,8 @@ const NewRequest = () => {
                                 variant="outlined"
                                 size="small"
                                 label="Release Date"
+                                autoComplete="off"
+                                onKeyPress={(e) => e.preventDefault()}
                                 fullWidth
                               />
                           }
@@ -3094,7 +3225,7 @@ const NewRequest = () => {
             </Stack>
 
             {
-              Boolean(prmGroup.length) &&
+              Boolean(prmGroup.length) && Boolean(data.document.category) && Boolean(data.document.category.name.match(/rental/i)) &&
               (
                 <React.Fragment>
                   <TableContainer className="FstoTableContainerImport-root">
@@ -3184,8 +3315,115 @@ const NewRequest = () => {
                     </Typography>
                   </Box>
                 </React.Fragment>
-              )
-            }
+              )}
+
+            {
+              Boolean(prmGroup.length) && Boolean(data.document.category) && Boolean(data.document.category.name.match(/loans/i)) &&
+              (
+                <React.Fragment>
+                  <TableContainer className="FstoTableContainerImport-root">
+                    <Table className="FstoTableImport-root">
+                      <TableHead className="FstoTableHeadImport-root">
+                        <TableRow className="FstoTableRowImport-root">
+                          <TableCell className="FstoTableCellImport-root">Cheque Date</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Principal</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>interest</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Withholding Tax</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right">Net of Amount</TableCell>
+                        </TableRow>
+                      </TableHead>
+
+                      <TableBody className="FstoTableBodyImport-root" sx={{ borderBottom: '3px solid #e0e0e0' }}>
+                        {
+                          prmGroup.map((data, index) => (
+                            <TableRow className="FstoTableRowImport-root" key={index}>
+                              <TableCell className="FstoTableCellImport-root">
+                                {data.cheque_date}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.principal.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency'
+                                  })}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.interest.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency'
+                                  })}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.cwt.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency'
+                                  })}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root" align="right">
+                                {
+                                  data.net_of_amount.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency'
+                                  })}
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        }
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total Principal Amount</Typography>
+                    <Typography variant="heading">
+                      {
+                        prmGroup.map((data) => data.principal).reduce((a, b) => a + b).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency'
+                        })}
+                    </Typography>
+                  </Box>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total Interest</Typography>
+                    <Typography variant="heading">
+                      {
+                        prmGroup.map((data) => data.interest).reduce((a, b) => a + b).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency'
+                        })}
+                    </Typography>
+                  </Box>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total CWT</Typography>
+                    <Typography variant="heading">
+                      {
+                        prmGroup.map((data) => data.cwt).reduce((a, b) => a + b).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency'
+                        })}
+                    </Typography>
+                  </Box>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total Net Amount</Typography>
+                    <Typography variant="heading">
+                      {
+                        prmGroup.map((data) => data.net_of_amount).reduce((a, b) => a + b).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency'
+                        })}
+                    </Typography>
+                  </Box>
+                </React.Fragment>
+              )}
           </Paper>
         )
       }
