@@ -54,7 +54,15 @@ const ErrorDialog = (props) => {
                 <TableRow key={index}>
                   <TableCell sx={{ color: "#D32F2F", fontWeight: 500, textTransform: "capitalize" }}>{error.error_type}</TableCell>
                   <TableCell>{error.line}</TableCell>
-                  <TableCell>{error.description}</TableCell>
+                  <TableCell
+                    sx={{
+                      '&::first-letter': {
+                        textTransform: "uppercase"
+                      }
+                    }}
+                  >
+                    {error.description}
+                  </TableCell>
                 </TableRow>
               ))
             }
