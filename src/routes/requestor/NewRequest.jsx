@@ -1081,6 +1081,24 @@ const NewRequest = () => {
               })
           })
 
+          // Check if cheque date is less than 28 days or more than 31 days
+          excelJson.reduce((previousItem, currentItem, itemIndex) => {
+            const previousDate = new Date(previousItem.cheque_date)
+            const currentDate = new Date(currentItem.cheque_date)
+
+            const differenceTime = Math.abs(currentDate - previousDate)
+            const differenceDays = Math.ceil(differenceTime / (1000 * 60 * 60 * 24))
+
+            if (differenceDays < 27 || differenceDays > 32)
+              errors.push({
+                line: itemIndex + 2,
+                error_type: "invalid",
+                description: `Cheque date range is invalid.`
+              })
+
+            return currentItem
+          })
+
           // Check if gross, wht and net of amount is valid
           excelJson.map((item) => {
             const { gross_amount, wht, net_of_amount } = item
@@ -1161,6 +1179,24 @@ const NewRequest = () => {
                 error_type: "invalid",
                 description: `Cheque date is invalid.`
               })
+          })
+
+          // Check if cheque date is less than 28 days or more than 31 days
+          excelJson.reduce((previousItem, currentItem, itemIndex) => {
+            const previousDate = new Date(previousItem.cheque_date)
+            const currentDate = new Date(currentItem.cheque_date)
+
+            const differenceTime = Math.abs(currentDate - previousDate)
+            const differenceDays = Math.ceil(differenceTime / (1000 * 60 * 60 * 24))
+
+            if (differenceDays < 27 || differenceDays > 32)
+              errors.push({
+                line: itemIndex + 2,
+                error_type: "invalid",
+                description: `Cheque date range is invalid.`
+              })
+
+            return currentItem
           })
 
           // Check if principal, interest, cwt and net of amount is valid
@@ -1245,6 +1281,24 @@ const NewRequest = () => {
                 error_type: "invalid",
                 description: `Cheque date is invalid.`
               })
+          })
+
+          // Check if cheque date is less than 28 days or more than 31 days
+          excelJson.reduce((previousItem, currentItem, itemIndex) => {
+            const previousDate = new Date(previousItem.cheque_date)
+            const currentDate = new Date(currentItem.cheque_date)
+
+            const differenceTime = Math.abs(currentDate - previousDate)
+            const differenceDays = Math.ceil(differenceTime / (1000 * 60 * 60 * 24))
+
+            if (differenceDays < 27 || differenceDays > 32)
+              errors.push({
+                line: itemIndex + 2,
+                error_type: "invalid",
+                description: `Cheque date range is invalid.`
+              })
+
+            return currentItem
           })
 
           // Check if gross, wht and net of amount is valid
