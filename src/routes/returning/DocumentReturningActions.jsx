@@ -10,7 +10,12 @@ import {
   MoreHoriz as MoreIcon,
   VisibilityOutlined as ViewIcon,
   DescriptionOutlined as ManageIcon,
+
+  ModeEditOutlineOutlined as UpdateIcon,
+  RemoveCircleOutlineOutlined as VoidIcon
 } from '@mui/icons-material'
+
+import { useSelector } from 'react-redux'
 
 const DocumentReturningActions = (props) => {
 
@@ -18,8 +23,12 @@ const DocumentReturningActions = (props) => {
     data,
     state = "return-return",
     onManage = () => { },
-    onView = () => { }
+    onUpdate = () => { },
+    onView = () => { },
+    onVoid = () => { }
   } = props
+
+  const user = useSelector(state => state.user)
 
   const [anchor, setAnchor] = React.useState(null)
 
@@ -56,7 +65,7 @@ const DocumentReturningActions = (props) => {
         disablePortal
       >
         {
-          state === `return-return` &&
+          state === `return-return` && user?.role !== 'Requestor' &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -69,7 +78,7 @@ const DocumentReturningActions = (props) => {
           </MenuItem>}
 
         {
-          (state === `return-hold` || state === `return-void`) &&
+          (state === `return-hold` || state === `return-void` || (state === `return-return` && user?.role === `Requestor`)) &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -79,6 +88,32 @@ const DocumentReturningActions = (props) => {
             dense
           >
             <ViewIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> View
+          </MenuItem>}
+
+        {
+          state === `return-return` && user?.role === `Requestor` &&
+          <MenuItem
+            sx={{ fontWeight: 500 }}
+            onClick={() => {
+              onUpdate(data)
+              actionCloseHandler()
+            }}
+            dense
+          >
+            <UpdateIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Edit
+          </MenuItem>}
+
+        {
+          state === `return-return` && user?.role === `Requestor` &&
+          <MenuItem
+            sx={{ fontWeight: 500 }}
+            onClick={() => {
+              onVoid(data)
+              actionCloseHandler()
+            }}
+            dense
+          >
+            <VoidIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Void
           </MenuItem>}
       </Menu>
     </React.Fragment>

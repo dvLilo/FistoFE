@@ -243,7 +243,6 @@ const NewRequest = () => {
     po_group: []
   })
 
-  // eslint-disable-next-line
   const [prmGroup, setPrmGroup] = React.useState([])
   // eslint-disable-next-line
   const [poGroup, setPoGroup] = React.useState([])
@@ -3417,7 +3416,6 @@ const NewRequest = () => {
           </Paper>
         )
       }
-
 
       {
         (data.document.id === 3) &&

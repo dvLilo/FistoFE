@@ -2,6 +2,8 @@ import React from 'react'
 
 import axios from 'axios'
 
+import * as XLSX from 'xlsx'
+
 import { useNavigate, useParams } from 'react-router-dom'
 
 import NumberFormat from 'react-number-format'
@@ -17,13 +19,20 @@ import {
   Stack,
   IconButton,
   Divider,
-  InputAdornment
+  InputAdornment,
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell
 } from '@mui/material'
 
 import {
   Add,
   Edit,
-  Delete
+  Delete,
+  UploadFile
 } from '@mui/icons-material'
 
 import {
@@ -49,6 +58,8 @@ import useAccountNumbers from '../../hooks/useAccountNumbers'
 import useUtilityCategories from '../../hooks/useUtilityCategories'
 import useUtilityLocations from '../../hooks/useUtilityLocations'
 
+import ErrorDialog from '../../components/ErrorDialog'
+
 const REQUEST_TYPES = [
   {
     id: 1,
@@ -68,34 +79,6 @@ const PAYMENT_TYPES = [
   {
     id: 2,
     label: "Partial"
-  },
-]
-
-const COVERAGE_MONTH = [
-  {
-    id: 1,
-    label: "3 Months",
-    value: 3.0
-  },
-  {
-    id: 2,
-    label: "6 Months",
-    value: 6.0
-  },
-  {
-    id: 3,
-    label: "12 Months",
-    value: 12.0
-  },
-  {
-    id: 4,
-    label: "24 Months",
-    value: 24.0
-  },
-  {
-    id: 5,
-    label: "36 Months",
-    value: 36.0
   },
 ]
 
@@ -168,11 +151,19 @@ const UpdateRequest = () => {
   const navigate = useNavigate()
 
   const [isSaving, setIsSaving] = React.useState(false)
-  // const [isFetching, setIsFetching] = React.useState(false)
 
   const [validate, setValidate] = React.useState({
     status: false,
     data: []
+  })
+
+  const [errorImport, setErrorImport] = React.useState({
+    open: false,
+    data: [],
+    onClose: () => setErrorImport(currentValue => ({
+      ...currentValue,
+      open: false
+    }))
   })
 
   const [error, setError] = React.useState({
@@ -208,8 +199,9 @@ const UpdateRequest = () => {
       date: null,
       amount: null,
 
-      payment_date: null,
-      coverage: null,
+      needed_date: null,
+      release_date: null,
+      batch_no: "",
 
       category: null,
 
@@ -251,6 +243,10 @@ const UpdateRequest = () => {
 
     po_group: []
   })
+
+  const [prmGroup, setPrmGroup] = React.useState([])
+  // eslint-disable-next-line
+  const [poGroup, setPoGroup] = React.useState([])
 
   const [PO, setPO] = React.useState({
     update: false,
@@ -545,6 +541,28 @@ const UpdateRequest = () => {
   }, [data.document.from, data.document.to, data.document.company, data.document.department, data.document.utility.category, data.document.utility.location])
 
 
+
+  React.useEffect(() => { // Clear PRM Import
+    if (data.document.id === 3 && prmGroup.length)
+      setPrmGroup([])
+
+    // eslint-disable-next-line
+  }, [data.document.category])
+
+
+  React.useEffect(() => {
+    const unload = (e) => {
+      e = e || window.event
+
+      if (e) e.returnValue = 'Are you sure you want to proceed?'
+      return 'Are you sure you want to proceed?'
+    }
+
+    window.addEventListener("beforeunload", unload)
+    return () => window.removeEventListener("beforeunload", unload)
+  }, [])
+
+
   const isDisabled = () => {
     switch (data.document.id) {
       case 1: // PAD - Post Acquisition Delivery
@@ -582,16 +600,25 @@ const UpdateRequest = () => {
           && (!validate.status || !validate.data.includes('document_no'))
           ? false : true
 
-      case 3:
+      case 3: // PRM Multiple - Payment Request Memo Multiple
         return data.document.payment_type
           && data.document.no
-          && data.document.date
           && data.document.amount
           && data.document.company
           && data.document.department
           && data.document.location
           && data.document.supplier
           && data.document.category
+          && (
+            data.document.category.name.match(/rental/i) || (data.document.category.name.match(/loans|leasing/i) && data.document.release_date && data.document.batch_no)
+          )
+          && prmGroup.length
+          && (
+            (data.document.category.name.match(/rental/i) && Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) >= 0.00 && Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) <= 1.00) ||
+            (data.document.category.name.match(/loans|leasing/i) && Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) >= 0.00 && Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) <= 1.00)
+          )
+          && (!error.status || !Boolean(error.data.document_no))
+          && (!validate.status || !validate.data.includes('document_no'))
           ? false : true
 
       case 4: // Receipt
@@ -994,10 +1021,373 @@ const UpdateRequest = () => {
     })
   }
 
-  const filterOptions = createFilterOptions({
-    matchFrom: 'any',
-    limit: 100
-  })
+  const importPaymentRequestMemoHandler = (e) => {
+
+    const file = e.target.files[0]
+    const types = ["application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]
+
+    if (!!file) {
+      if (!types.includes(file.type))
+        return toast({
+          open: true,
+          severity: "error",
+          title: "Error!",
+          message: "Please select only excel file types and try again."
+        })
+
+      const reader = new FileReader()
+
+      reader.readAsArrayBuffer(file)
+      reader.onload = async (response) => {
+        const excelFile = response.target.result
+
+        const workbook = XLSX.read(excelFile, { type: 'buffer' })
+
+        const sheetname = workbook.SheetNames[0]
+        const worksheet = workbook.Sheets[sheetname]
+
+        const excelJson = XLSX.utils.sheet_to_json(worksheet, { raw: false, defval: "" })
+
+        if (!excelJson.length)
+          return toast({
+            open: true,
+            severity: "error",
+            title: "Error!",
+            message: "Excel file is empty, please check your excel file and try again."
+          })
+
+        // Transaform headers
+        excelJson.forEach((row) => {
+          Object.keys(row).forEach((key) => {
+            let newKey = key.trim().toLowerCase().replace(/[ ]/g, "_")
+            if (key !== newKey) {
+              row[newKey] = row[key]
+              delete row[key]
+            }
+          })
+        })
+
+        if (data.document.category.name.toLowerCase() === `rental`) {
+          const errors = []
+          const header = ["period_covered", "gross_amount", "wht", "net_of_amount", "cheque_date"]
+
+          // Check headers
+          if (!Object.keys(excelJson[0]).every((item) => header.includes(item)))
+            return toast({
+              open: true,
+              severity: "error",
+              title: "Error!",
+              message: "Invalid excel template for rental category, please check your excel file and try again."
+            })
+
+          // Check for empty cell
+          excelJson.forEach((item, itemIndex) => {
+            Object.entries(item).forEach((entry) => {
+              const [key, value] = entry
+
+              if (value === "")
+                errors.push({
+                  line: itemIndex + 2,
+                  error_type: "empty",
+                  description: `${key.replace(/[_]/g, " ")} is empty.`
+                })
+            })
+          })
+
+          // Check if cheque date is valid
+          excelJson.forEach((item, itemIndex) => {
+            const timestamp = new Date(item.cheque_date)
+
+            if (!(timestamp instanceof Date && !isNaN(timestamp)))
+              errors.push({
+                line: itemIndex + 2,
+                error_type: "invalid",
+                description: `Cheque date is invalid.`
+              })
+          })
+
+          // Check if cheque date is less than 28 days or more than 31 days
+          excelJson.reduce((previousItem, currentItem, itemIndex) => {
+            const previousDate = new Date(previousItem.cheque_date)
+            const currentDate = new Date(currentItem.cheque_date)
+
+            const differenceTime = Math.abs(currentDate - previousDate)
+            const differenceDays = Math.ceil(differenceTime / (1000 * 60 * 60 * 24))
+
+            if (differenceDays < 27 || differenceDays > 32)
+              errors.push({
+                line: itemIndex + 2,
+                error_type: "invalid",
+                description: `Cheque date range is invalid.`
+              })
+
+            return currentItem
+          })
+
+          // Check if gross, wht and net of amount is valid
+          excelJson.map((item) => {
+            const { gross_amount, wht, net_of_amount } = item
+
+            return {
+              gross_amount,
+              wht,
+              net_of_amount
+            }
+          }).forEach((item, itemIndex) => {
+            Object.entries(item).forEach((entry) => {
+              const [key, value] = entry
+
+              if (isNaN(Number(value.replace(/[,]/gi, ''))))
+                errors.push({
+                  line: itemIndex + 2,
+                  error_type: "invalid",
+                  description: `${key.replace(/[_]/g, " ")} is invalid.`
+                })
+            })
+          })
+
+          if (errors.length)
+            return setErrorImport(currentValue => ({
+              ...currentValue,
+              open: true,
+              data: {
+                message: "Import failed. Kindly check the errors.",
+                result: errors
+              }
+            }))
+
+          // Transforming data
+          const excelTransformed = excelJson.map((item) => ({
+            ...item,
+            wht: parseFloat(item.wht.replace(/[,]/gi, '')),
+            gross_amount: parseFloat(item.gross_amount.replace(/[,]/gi, '')),
+            net_of_amount: parseFloat(item.net_of_amount.replace(/[,]/gi, ''))
+          }))
+
+          setPrmGroup(excelTransformed)
+        }
+
+        if (data.document.category.name.toLowerCase() === `loans`) {
+          const errors = []
+          const header = ["principal", "interest", "cwt", "net_of_amount", "cheque_date"]
+
+          // Check headers
+          if (!Object.keys(excelJson[0]).every((item) => header.includes(item)))
+            return toast({
+              open: true,
+              severity: "error",
+              title: "Error!",
+              message: "Invalid excel template for loans category, please check your excel file and try again."
+            })
+
+          // Check for empty cell
+          excelJson.forEach((item, itemIndex) => {
+            Object.entries(item).forEach((entry) => {
+              const [key, value] = entry
+
+              if (value === "")
+                errors.push({
+                  line: itemIndex + 2,
+                  error_type: "empty",
+                  description: `${key} is empty.`
+                })
+            })
+          })
+
+          // Check if cheque date is valid
+          excelJson.forEach((item, itemIndex) => {
+            const timestamp = new Date(item.cheque_date)
+
+            if (!(timestamp instanceof Date && !isNaN(timestamp)))
+              errors.push({
+                line: itemIndex + 2,
+                error_type: "invalid",
+                description: `Cheque date is invalid.`
+              })
+          })
+
+          // Check if cheque date is less than 28 days or more than 31 days
+          excelJson.reduce((previousItem, currentItem, itemIndex) => {
+            const previousDate = new Date(previousItem.cheque_date)
+            const currentDate = new Date(currentItem.cheque_date)
+
+            const differenceTime = Math.abs(currentDate - previousDate)
+            const differenceDays = Math.ceil(differenceTime / (1000 * 60 * 60 * 24))
+
+            if (differenceDays < 27 || differenceDays > 32)
+              errors.push({
+                line: itemIndex + 2,
+                error_type: "invalid",
+                description: `Cheque date range is invalid.`
+              })
+
+            return currentItem
+          })
+
+          // Check if principal, interest, cwt and net of amount is valid
+          excelJson.map((item) => {
+            const { principal, interest, cwt, net_of_amount } = item
+
+            return {
+              principal,
+              interest,
+              cwt,
+              net_of_amount
+            }
+          }).forEach((item, itemIndex) => {
+            Object.entries(item).forEach((entry) => {
+              const [key, value] = entry
+
+              if (isNaN(Number(value.replace(/[,]/gi, ''))))
+                errors.push({
+                  line: itemIndex + 2,
+                  error_type: "invalid",
+                  description: `${key.replace(/[_]/g, " ")} is invalid.`
+                })
+            })
+          })
+
+          if (errors.length)
+            return setErrorImport(currentValue => ({
+              ...currentValue,
+              open: true,
+              data: {
+                message: "Import failed. Kindly check the errors.",
+                result: errors
+              }
+            }))
+
+          // Transforming data
+          const excelTransformed = excelJson.map((item) => ({
+            ...item,
+            cwt: parseFloat(item.cwt.replace(/[,]/gi, '')),
+            principal: parseFloat(item.principal.replace(/[,]/gi, '')),
+            interest: parseFloat(item.interest.replace(/[,]/gi, '')),
+            net_of_amount: parseFloat(item.net_of_amount.replace(/[,]/gi, ''))
+          }))
+
+          setPrmGroup(excelTransformed)
+        }
+
+        if (data.document.category.name.toLowerCase() === `leasing`) {
+          const errors = []
+          const header = ["amortization", "interest", "cwt", "principal", "net_of_amount", "cheque_date"]
+
+          // Check headers
+          if (!Object.keys(excelJson[0]).every((item) => header.includes(item)))
+            return toast({
+              open: true,
+              severity: "error",
+              title: "Error!",
+              message: "Invalid excel template for leasing category, please check your excel file and try again."
+            })
+
+          // Check for empty cell
+          excelJson.forEach((item, itemIndex) => {
+            Object.entries(item).forEach((entry) => {
+              const [key, value] = entry
+
+              if (value === "")
+                errors.push({
+                  line: itemIndex + 2,
+                  error_type: "empty",
+                  description: `${key.replace(/[_]/g, " ")} is empty.`
+                })
+            })
+          })
+
+          // Check if cheque date is valid
+          excelJson.forEach((item, itemIndex) => {
+            const timestamp = new Date(item.cheque_date)
+
+            if (!(timestamp instanceof Date && !isNaN(timestamp)))
+              errors.push({
+                line: itemIndex + 2,
+                error_type: "invalid",
+                description: `Cheque date is invalid.`
+              })
+          })
+
+          // Check if cheque date is less than 28 days or more than 31 days
+          excelJson.reduce((previousItem, currentItem, itemIndex) => {
+            const previousDate = new Date(previousItem.cheque_date)
+            const currentDate = new Date(currentItem.cheque_date)
+
+            const differenceTime = Math.abs(currentDate - previousDate)
+            const differenceDays = Math.ceil(differenceTime / (1000 * 60 * 60 * 24))
+
+            if (differenceDays < 27 || differenceDays > 32)
+              errors.push({
+                line: itemIndex + 2,
+                error_type: "invalid",
+                description: `Cheque date range is invalid.`
+              })
+
+            return currentItem
+          })
+
+          // Check if gross, wht and net of amount is valid
+          excelJson.map((item) => {
+            const { amortization, interest, cwt, principal, net_of_amount } = item
+
+            return {
+              amortization,
+              interest,
+              cwt,
+              principal,
+              net_of_amount
+            }
+          }).forEach((item, itemIndex) => {
+            Object.entries(item).forEach((entry) => {
+              const [key, value] = entry
+
+              if (isNaN(Number(value.replace(/[,]/gi, ''))))
+                errors.push({
+                  line: itemIndex + 2,
+                  error_type: "invalid",
+                  description: `${key.replace(/[_]/g, " ")} is invalid.`
+                })
+            })
+          })
+
+          if (errors.length)
+            return setErrorImport(currentValue => ({
+              ...currentValue,
+              open: true,
+              data: {
+                message: "Import failed. Kindly check the errors.",
+                result: errors
+              }
+            }))
+
+          // Transforming data
+          const excelTransformed = excelJson.map((item) => {
+            const parseAmount = (amount) => {
+              const sanitizeAmount = amount.replace(/[a-z,]/gi, '')
+
+              if (sanitizeAmount) return parseFloat(sanitizeAmount)
+              else return 0.00
+            }
+
+            return {
+              ...item,
+              amortization: parseAmount(item.amortization),
+              interest: parseAmount(item.interest),
+              cwt: parseAmount(item.cwt),
+              principal: parseAmount(item.principal),
+              net_of_amount: parseAmount(item.net_of_amount)
+            }
+          })
+
+          setPrmGroup(excelTransformed)
+        }
+
+      }
+    }
+
+    // reset the import button
+    e.target.value = null
+  }
 
   const transformData = (ID) => {
     switch (ID) {
@@ -1054,7 +1444,27 @@ const UpdateRequest = () => {
 
       case 3: // PRM Multiple - Payment Request Memo Multiple
         return {
+          requestor: data.requestor,
+          document: {
+            id: data.document.id,
+            no: `prmm#${data.document.no}`,
+            name: data.document.name,
+            payment_type: data.document.payment_type,
+            amount: data.document.amount,
+            date: new Date(data.document.date).toISOString().slice(0, 10),
 
+            batch_no: data.document.batch_no,
+            release_date: new Date(data.document.release_date).toISOString().slice(0, 10),
+
+            company: data.document.company,
+            department: data.document.department,
+            location: data.document.location,
+            supplier: data.document.supplier,
+            category: data.document.category,
+
+            remarks: data.document.remarks
+          },
+          prm_group: prmGroup
         }
 
       case 4: // Receipt
@@ -1199,6 +1609,10 @@ const UpdateRequest = () => {
   }
 
   const truncateData = () => {
+    setPrmGroup([])
+
+    setPoGroup([])
+
     setError({
       status: false,
       data: []
@@ -1231,8 +1645,9 @@ const UpdateRequest = () => {
         date: null,
         amount: null,
 
-        payment_date: null,
-        coverage: null,
+        needed_date: null,
+        release_date: null,
+        batch_no: "",
 
         category: null,
 
@@ -1343,6 +1758,11 @@ const UpdateRequest = () => {
     })
   }
 
+  const filterOptions = createFilterOptions({
+    matchFrom: 'any',
+    limit: 100
+  })
+
   return (
     <Box className="FstoBox-root">
       <Paper className="FstoPaperForm-root" elevation={1}>
@@ -1433,7 +1853,7 @@ const UpdateRequest = () => {
                     />
                   )}
 
-                <Autocomplete
+                <Autocomplete // Payment Types
                   className="FstoSelectForm-root"
                   size="small"
                   options={PAYMENT_TYPES}
@@ -2252,18 +2672,18 @@ const UpdateRequest = () => {
                     />
                   )}
 
-                { // Payment Date, Coverage Month
-                  (data.document.id === 3) &&
+                { // Release Date, Batch Number
+                  (data.document.id === 3 && data.document.category && data.document.category.name.toLowerCase().match(/loans|leasing/i)) &&
                   (
                     <React.Fragment>
                       <LocalizationProvider dateAdapter={DateAdapter}>
                         <DatePicker
-                          value={data.document.payment_date}
+                          value={data.document.release_date}
                           onChange={(value) => setData({
                             ...data,
                             document: {
                               ...data.document,
-                              payment_date: value
+                              release_date: value
                             }
                           })}
                           renderInput={
@@ -2273,46 +2693,41 @@ const UpdateRequest = () => {
                                 className="FstoTextfieldForm-root"
                                 variant="outlined"
                                 size="small"
-                                label="Payment Date"
+                                label="Release Date"
+                                autoComplete="off"
+                                onKeyPress={(e) => e.preventDefault()}
                                 fullWidth
                               />
                           }
+                          showToolbar
+                          showTodayButton
                         />
                       </LocalizationProvider>
 
-                      <Autocomplete
-                        className="FstoSelectForm-root"
+                      <TextField
+                        className="FstoTextfieldForm-root"
+                        label="Batch Number"
+                        variant="outlined"
+                        autoComplete="off"
                         size="small"
-                        options={COVERAGE_MONTH}
-                        value={COVERAGE_MONTH.find(row => row.value === data.document.coverage) || null}
-                        renderInput={
-                          props =>
-                            <TextField
-                              {...props}
-                              variant="outlined"
-                              label="Coverage Month"
-                            />
-                        }
-                        PaperComponent={
-                          props =>
-                            <Paper
-                              {...props}
-                              sx={{ textTransform: 'capitalize' }}
-                            />
-                        }
-                        isOptionEqualToValue={
-                          (option, value) => option.id === value.id
-                        }
-                        onChange={(e, value) => setData({
+                        type="number"
+                        value={data.document.batch_no}
+                        onKeyDown={(e) => ["E", "e", ".", "+", "-"].includes(e.key) && e.preventDefault()}
+                        onChange={(e) => setData({
                           ...data,
                           document: {
                             ...data.document,
-                            coverage: value.value
+                            batch_no: parseFloat(e.target.value)
                           }
                         })}
+                        InputProps={{
+                          startAdornment: data.document.batch_no &&
+                            <InputAdornment className="FstoAdrmentForm-root" position="start">batch#</InputAdornment>
+                        }}
+                        InputLabelProps={{
+                          className: "FstoLabelForm-root"
+                        }}
                         fullWidth
-                        disablePortal
-                        disableClearable
                       />
                     </React.Fragment>
                   )}
@@ -2999,6 +3414,351 @@ const UpdateRequest = () => {
                 </React.Fragment>
               )
             }
+          </Paper>
+        )
+      }
+
+
+      {
+        (data.document.id === 3) &&
+        (
+          <Paper className="FstoPaperImport-root" elevation={1}>
+            <Stack direction="row" spacing={2}>
+              <Typography variant="heading">Attachment</Typography>
+
+              <Button
+                className="FstoButtonImport-root"
+                component="label"
+                variant="contained"
+                startIcon={<UploadFile />}
+                disabled={
+                  !Boolean(data.document.category)
+                }
+                disableElevation
+              > Import
+                <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onChange={importPaymentRequestMemoHandler} hidden />
+              </Button>
+            </Stack>
+
+            { // Table for Rental Import
+              Boolean(prmGroup.length) && Boolean(data.document.category) && Boolean(data.document.category.name.match(/rental/i)) &&
+              (
+                <React.Fragment>
+                  <TableContainer className="FstoTableContainerImport-root">
+                    <Table className="FstoTableImport-root">
+                      <TableHead className="FstoTableHeadImport-root">
+                        <TableRow className="FstoTableRowImport-root">
+                          <TableCell className="FstoTableCellImport-root">Period Covered</TableCell>
+                          <TableCell className="FstoTableCellImport-root">Cheque Date</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Gross Amount</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Withholding Tax</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right">Net of Amount</TableCell>
+                        </TableRow>
+                      </TableHead>
+
+                      <TableBody className="FstoTableBodyImport-root" sx={{ borderBottom: '3px solid #e0e0e0' }}>
+                        {
+                          prmGroup.map((data, index) => (
+                            <TableRow className="FstoTableRowImport-root" key={index}>
+                              <TableCell className="FstoTableCellImport-root">
+                                {data.period_covered}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root">
+                                {data.cheque_date}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.gross_amount?.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency'
+                                  })}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.wht?.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency'
+                                  })}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root" align="right">
+                                {
+                                  data.net_of_amount?.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency'
+                                  })}
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        }
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total Gross Amount</Typography>
+                    <Typography variant="heading">
+                      {
+                        prmGroup.map((data) => data.gross_amount).reduce((a, b) => a + b).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency'
+                        })}
+                    </Typography>
+                  </Box>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total CWT</Typography>
+                    <Typography variant="heading">
+                      {
+                        prmGroup.map((data) => data.wht).reduce((a, b) => a + b).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency'
+                        })}
+                    </Typography>
+                  </Box>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total Net Amount</Typography>
+                    <Typography variant="heading">
+                      {
+                        prmGroup.map((data) => data.net_of_amount).reduce((a, b) => a + b).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency'
+                        })}
+                    </Typography>
+                  </Box>
+                </React.Fragment>
+              )}
+
+            { // Table for Loans Import
+              Boolean(prmGroup.length) && Boolean(data.document.category) && Boolean(data.document.category.name.match(/loans/i)) &&
+              (
+                <React.Fragment>
+                  <TableContainer className="FstoTableContainerImport-root">
+                    <Table className="FstoTableImport-root">
+                      <TableHead className="FstoTableHeadImport-root">
+                        <TableRow className="FstoTableRowImport-root">
+                          <TableCell className="FstoTableCellImport-root">Cheque Date</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Principal</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>interest</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Withholding Tax</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right">Net of Amount</TableCell>
+                        </TableRow>
+                      </TableHead>
+
+                      <TableBody className="FstoTableBodyImport-root" sx={{ borderBottom: '3px solid #e0e0e0' }}>
+                        {
+                          prmGroup.map((data, index) => (
+                            <TableRow className="FstoTableRowImport-root" key={index}>
+                              <TableCell className="FstoTableCellImport-root">
+                                {data.cheque_date}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.principal?.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency'
+                                  })}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.interest?.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency'
+                                  })}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.cwt?.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency'
+                                  })}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root" align="right">
+                                {
+                                  data.net_of_amount?.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency'
+                                  })}
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        }
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total Principal Amount</Typography>
+                    <Typography variant="heading">
+                      {
+                        prmGroup.map((data) => data.principal).reduce((a, b) => a + b).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency'
+                        })}
+                    </Typography>
+                  </Box>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total Interest</Typography>
+                    <Typography variant="heading">
+                      {
+                        prmGroup.map((data) => data.interest).reduce((a, b) => a + b).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency'
+                        })}
+                    </Typography>
+                  </Box>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total CWT</Typography>
+                    <Typography variant="heading">
+                      {
+                        prmGroup.map((data) => data.cwt).reduce((a, b) => a + b).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency'
+                        })}
+                    </Typography>
+                  </Box>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total Net Amount</Typography>
+                    <Typography variant="heading">
+                      {
+                        prmGroup.map((data) => data.net_of_amount).reduce((a, b) => a + b).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency'
+                        })}
+                    </Typography>
+                  </Box>
+                </React.Fragment>
+              )}
+
+            { // Table for Loans Import
+              Boolean(prmGroup.length) && Boolean(data.document.category) && Boolean(data.document.category.name.match(/leasing/i)) &&
+              (
+                <React.Fragment>
+                  <TableContainer className="FstoTableContainerImport-root">
+                    <Table className="FstoTableImport-root">
+                      <TableHead className="FstoTableHeadImport-root">
+                        <TableRow className="FstoTableRowImport-root">
+                          <TableCell className="FstoTableCellImport-root">Cheque Date</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Amortization</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Interest</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Withholding Tax</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Principal</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right">Net of Amount</TableCell>
+                        </TableRow>
+                      </TableHead>
+
+                      <TableBody className="FstoTableBodyImport-root" sx={{ borderBottom: '3px solid #e0e0e0' }}>
+                        {
+                          prmGroup.map((data, index) => (
+                            <TableRow className="FstoTableRowImport-root" key={index}>
+                              <TableCell className="FstoTableCellImport-root">
+                                {data.cheque_date}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.amortization?.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency'
+                                  })}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.interest?.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency'
+                                  })}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.cwt?.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency'
+                                  })}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.principal?.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency'
+                                  })}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root" align="right">
+                                {
+                                  data.net_of_amount?.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency'
+                                  })}
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        }
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total Principal Amount</Typography>
+                    <Typography variant="heading">
+                      {
+                        prmGroup.map((data) => data.principal).reduce((a, b) => a + b).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency'
+                        })}
+                    </Typography>
+                  </Box>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total Interest</Typography>
+                    <Typography variant="heading">
+                      {
+                        prmGroup.map((data) => data.interest).reduce((a, b) => a + b).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency'
+                        })}
+                    </Typography>
+                  </Box>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total CWT</Typography>
+                    <Typography variant="heading">
+                      {
+                        prmGroup.map((data) => data.cwt).reduce((a, b) => a + b).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency'
+                        })}
+                    </Typography>
+                  </Box>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total Net Amount</Typography>
+                    <Typography variant="heading">
+                      {
+                        prmGroup.map((data) => data.net_of_amount).reduce((a, b) => a + b).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency'
+                        })}
+                    </Typography>
+                  </Box>
+                </React.Fragment>
+              )}
+
+            <ErrorDialog {...errorImport} />
           </Paper>
         )
       }

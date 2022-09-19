@@ -6,6 +6,8 @@ import moment from 'moment'
 
 import { useSelector } from 'react-redux'
 
+import { useNavigate } from 'react-router-dom'
+
 import {
   Box,
   Paper,
@@ -54,6 +56,7 @@ import TablePreloader from '../../components/TablePreloader'
 import DocumentReturningFilter from './DocumentReturningFilter'
 import DocumentReturningActions from './DocumentReturningActions'
 
+import DocumentRequestingTransaction from '../requestor/DocumentRequestingTransaction'
 import DocumentTaggingTransaction from '../tagging/DocumentTaggingTransaction'
 import DocumentVoucheringTransaction from '../vouchering/DocumentVoucheringTransaction'
 import DocumentChequingTransaction from '../chequing/DocumentChequingTransaction'
@@ -75,6 +78,7 @@ const DocumentReturning = () => {
 
   const toast = useToast()
   const confirm = useConfirm()
+  const navigate = useNavigate()
 
   const [search, setSearch] = React.useState("")
   const [state, setState] = React.useState("return-return")
@@ -147,6 +151,12 @@ const DocumentReturning = () => {
       subprocess: RETURN,
       data,
     }))
+  }
+
+  const onUpdate = (data) => {
+    const { id } = data
+
+    navigate(`/request/update-request/${id}`)
   }
 
   const onRelease = (ID) => {
@@ -449,7 +459,9 @@ const DocumentReturning = () => {
                         state={state}
                         // onTransfer={onTransfer}
                         onManage={onManage}
+                        onUpdate={onUpdate}
                         onView={onView}
+                        onVoid={onVoid}
                       />
                     </TableCell>
                   </TableRow>
@@ -504,6 +516,13 @@ const DocumentReturning = () => {
             onHold={onHold}
             onReturn={onReturn}
             onVoid={onVoid}
+          />
+        }
+
+        {
+          user?.role === `Requestor` &&
+          <DocumentRequestingTransaction
+            {...manage}
           />
         }
 

@@ -15,7 +15,7 @@ import CloseIcon from '@mui/icons-material/Close'
 
 import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
-// import useTransaction from '../../hooks/useTransaction'
+import useTransaction from '../../hooks/useTransaction'
 
 import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
@@ -32,227 +32,20 @@ const DocumentFilingTransaction = (props) => {
     onClose = () => { }
   } = props
 
-  const status = 'success'
-  const data = {
-    transaction: {
-      id: 1,
-      is_latest_transaction: 1,
-      request_id: 1,
-      no: "MISC001",
-      date_requested: "2022-06-29 09:07:37",
-      status: "release-release",
-      state: "pending",
-      ...(Boolean(state.match(/-receive.*/)) && {
-        status: "file-receive",
-        state: "receive"
-      }),
-      ...(Boolean(state.match(/-release.*/)) && {
-        status: "file-file",
-        state: "file"
-      })
-    },
-    reason: {
-      id: null,
-      description: null,
-      remarks: null
-    },
-    requestor: {
-      id: 2,
-      id_prefix: "RDFFLFI",
-      id_no: 10185,
-      role: "Requestor",
-      position: "System Developer",
-      first_name: "VINCENT LOUIE",
-      middle_name: "LAYNES",
-      last_name: "ABAD",
-      suffix: null,
-      department: "Management Information System Common"
-    },
-    document: {
-      id: 1,
-      name: "PAD",
-      no: "pad#11001",
-      date: "2022-06-29 00:00:00",
-      payment_type: "Full",
-      amount: 50000,
-      remarks: "swfattener lara: growing performance form, weekly fattener inventory form",
-      category: {
-        id: 1,
-        name: "general"
-      },
-      company: {
-        id: 1,
-        name: "RDF Corporate Services"
-      },
-      department: {
-        id: 12,
-        name: "Management Information System Common"
-      },
-      location: {
-        id: 5,
-        name: "Common"
-      },
-      supplier: {
-        id: 30,
-        name: "1st Advenue Advertising"
-      }
-    },
-    po_group: [
-      {
-        id: 50,
-        no: "PO#11002",
-        amount: 25000,
-        rr_no: [
-          "123",
-          "456",
-          "789"
-        ],
-        request_id: 1,
-        is_editable: 1,
-        previous_balance: 25000
-      },
-      {
-        id: 51,
-        no: "PO#11001",
-        amount: 25000,
-        rr_no: [
-          "123",
-          "456",
-          "789"
-        ],
-        request_id: 1,
-        is_editable: 1,
-        previous_balance: 25000
-      }
-    ],
-    tag: {
-      status: "tag-tag",
-      no: 2,
-      date: "2022-08-09",
-      distributed_to: {
-        id: 7,
-        name: "Daisy Batas"
-      },
-      reason: null
-    },
-    voucher: {
-      status: "voucher-voucher",
-      date: "2022-08-11",
-      no: "ABC123",
-      month: "2022-08-01 00:00:00",
-      tax: {
-        receipt_type: "Official",
-        percentage_tax: 12,
-        witholding_tax: 6000,
-        net_amount: 44000
-      },
-      account_title: [
-        [
-          {
-            id: 10,
-            entry: "Debit",
-            account_title: {
-              id: 34,
-              name: "SE - Salaries Expense"
-            },
-            amount: 50000,
-            remarks: "Lorem ipsum..."
-          },
-          {
-            id: 10,
-            entry: "Credit",
-            account_title: {
-              id: 33,
-              name: "Accounts Payable"
-            },
-            amount: 50000,
-            remarks: "Lorem emit.."
-          }
-        ]
-      ],
-      approver: {
-        id: 8,
-        name: "Reden Cunanan"
-      },
-      reason: null
-    },
-    approval: {
-      status: "approve-approve",
-      date: "2022-08-11",
-      reason: null
-    },
-    cheque: {
-      status: `cheque-release`,
-      date: "2022-08-11",
-      cheques: [
-        {
-          type: "Cheque",
-          bank: {
-            id: 1,
-            name: "Asia United Bank"
-          },
-          no: "ABC123TEST",
-          date: "2022-08-31",
-          amount: 50000
-        }
-      ],
-      account_title: [
-        [
-          {
-            id: 10,
-            entry: "Debit",
-            account_title: {
-              id: 33,
-              name: "Accounts Payable"
-            },
-            amount: 50000,
-            remarks: "Lorem dolor.."
-          },
-          {
-            id: 29,
-            entry: "Credit",
-            account_title: {
-              id: 29,
-              name: "Clearing - AUB"
-            },
-            amount: 50000,
-            remarks: "Lorem sit amet.."
-          }
-        ]
-      ]
-    },
-    release: {
-      status: "release-release",
-      date: "2022-08-23"
-    },
-    ...(Boolean(state.match(/-receive.*/)) && {
-      file: {
-        status: "file-receive",
-        date: "2022-08-23"
-      }
-    }),
-    ...(Boolean(state.match(/-file.*/)) && {
-      file: {
-        status: "file-file",
-        date: "2022-08-23"
-      }
-    })
-  }
-
   const toast = useToast()
   const confirm = useConfirm()
 
-  // const {
-  //   data,
-  //   status,
-  //   refetch: fetchTransaction
-  // } = useTransaction(transaction?.id)
+  const {
+    data,
+    status,
+    refetch: fetchTransaction
+  } = useTransaction(transaction?.id)
 
-  // React.useEffect(() => {
-  //   if (open) fetchTransaction()
+  React.useEffect(() => {
+    if (open) fetchTransaction()
 
-  //   // eslint-disable-next-line
-  // }, [open])
+    // eslint-disable-next-line
+  }, [open])
 
   const [fileData] = React.useState({
     process: "file",

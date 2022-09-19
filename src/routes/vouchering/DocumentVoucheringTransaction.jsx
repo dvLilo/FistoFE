@@ -2,6 +2,8 @@ import React from 'react'
 
 import axios from 'axios'
 
+import moment from 'moment'
+
 import NumberFormat from 'react-number-format'
 
 import DateAdapter from '@mui/lab/AdapterDateFns'
@@ -30,7 +32,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
 import useApprover from '../../hooks/useApprover'
-// import useTransaction from '../../hooks/useTransaction'
+import useTransaction from '../../hooks/useTransaction'
 
 import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
@@ -84,174 +86,14 @@ const DocumentVoucheringTransaction = (props) => {
     onClose = () => { }
   } = props
 
-  const status = 'success'
-  const data = {
-    transaction: {
-      id: 1,
-      is_latest_transaction: 1,
-      request_id: 1,
-      no: "MISC001",
-      date_requested: "2022-06-29 09:07:37",
-      status: "return-return",
-      state: "return",
-      ...(Boolean(state.match(/-hold.*/)) && {
-        status: "return-hold",
-        state: "hold"
-      }),
-      ...(Boolean(state.match(/-void.*/)) && {
-        status: "return-void",
-        state: "void"
-      })
-    },
-    reason: {
-      id: 1,
-      description: "Wrong Details",
-      remarks: "Lorem ipsum dolor sit amet.."
-    },
-    ...(Boolean(state.match(/-hold.*/)) && {
-      reason: {
-        id: 1,
-        description: "Incomplete Attachment",
-        remarks: "Lorem ipsum dolor sit amet.."
-      }
-    }),
-    ...(Boolean(state.match(/-void.*/)) && {
-      reason: {
-        id: 1,
-        description: "Double Payment",
-        remarks: "Lorem ipsum dolor sit amet.."
-      }
-    }),
-    requestor: {
-      id: 2,
-      id_prefix: "RDFFLFI",
-      id_no: 10185,
-      role: "Requestor",
-      position: "System Developer",
-      first_name: "VINCENT LOUIE",
-      middle_name: "LAYNES",
-      last_name: "ABAD",
-      suffix: null,
-      department: "Management Information System Common"
-    },
-    document: {
-      id: 1,
-      name: "PAD",
-      no: "pad#11001",
-      date: "2022-06-29 00:00:00",
-      payment_type: "Full",
-      amount: 50000,
-      remarks: "swfattener lara: growing performance form, weekly fattener inventory form",
-      category: {
-        id: 1,
-        name: "general"
-      },
-      company: {
-        id: 1,
-        name: "RDF Corporate Services"
-      },
-      department: {
-        id: 12,
-        name: "Management Information System Common"
-      },
-      location: {
-        id: 5,
-        name: "Common"
-      },
-      supplier: {
-        id: 30,
-        name: "1st Advenue Advertising"
-      }
-    },
-    po_group: [
-      {
-        id: 50,
-        no: "PO#11002",
-        amount: 25000,
-        rr_no: [
-          "123",
-          "456",
-          "789"
-        ],
-        request_id: 1,
-        is_editable: 1,
-        previous_balance: 25000
-      },
-      {
-        id: 51,
-        no: "PO#11001",
-        amount: 25000,
-        rr_no: [
-          "123",
-          "456",
-          "789"
-        ],
-        request_id: 1,
-        is_editable: 1,
-        previous_balance: 25000
-      }
-    ],
-    tag: {
-      status: "tag-tag",
-      no: 2,
-      date: "2022-08-09",
-      distributed_to: {
-        id: 7,
-        name: "Daisy Batas"
-      },
-      reason: null
-    },
-    voucher: {
-      status: "voucher-voucher",
-      date: "2022-08-11",
-      no: "ABC123",
-      month: "2022-08-01 00:00:00",
-      tax: {
-        receipt_type: "Official",
-        percentage_tax: 12,
-        witholding_tax: 6000,
-        net_amount: 44000
-      },
-      account_title: [
-        [
-          {
-            id: 10,
-            entry: "Debit",
-            account_title: {
-              id: 34,
-              name: "SE - Salaries Expense"
-            },
-            amount: 50000,
-            remarks: "Lorem ipsum..."
-          },
-          {
-            id: 10,
-            entry: "Credit",
-            account_title: {
-              id: 33,
-              name: "Accounts Payable"
-            },
-            amount: 50000,
-            remarks: "Lorem emit.."
-          }
-        ]
-      ],
-      approver: {
-        id: 8,
-        name: "Reden Cunanan"
-      },
-      reason: null
-    }
-  }
-
   const toast = useToast()
   const confirm = useConfirm()
 
-  // const {
-  //   data,
-  //   status,
-  //   refetch: fetchTransaction
-  // } = useTransaction(transaction?.id)
+  const {
+    data,
+    status,
+    refetch: fetchTransaction
+  } = useTransaction(transaction?.id)
 
   const {
     refetch: fetchApprover,
@@ -260,7 +102,7 @@ const DocumentVoucheringTransaction = (props) => {
   } = useApprover()
 
   React.useEffect(() => {
-    // if (open) fetchTransaction()
+    if (open) fetchTransaction()
 
     if (open && !APPROVER_LIST) fetchApprover()
     // eslint-disable-next-line
@@ -308,12 +150,12 @@ const DocumentVoucheringTransaction = (props) => {
           month: data.voucher.month
         },
         approver: data.voucher.approver,
-        accounts: data.voucher.account_title[0]
+        accounts: data.voucher.accounts[0]
       }))
     }
 
     // eslint-disable-next-line
-  }, [open, status])
+  }, [open, data, status])
 
   const [validate, setValidate] = React.useState({
     status: false,
@@ -369,6 +211,11 @@ const DocumentVoucheringTransaction = (props) => {
       approver: null,
       accounts: []
     }))
+
+    setError({
+      status: false,
+      data: []
+    })
   }
 
   const closeHandler = () => {
@@ -384,7 +231,7 @@ const DocumentVoucheringTransaction = (props) => {
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/DELETE-ME-LATER/${transaction.id}`, voucherData)
+          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, voucherData)
 
           const { message } = response.data
 
@@ -505,7 +352,12 @@ const DocumentVoucheringTransaction = (props) => {
 
     try {
       await axios.post(`/api/transactions/flow/validate-voucher-no`, {
-        voucher_no: voucherData.voucher.no
+        voucher_no: voucherData.voucher.no,
+        ...(
+          /voucher-voucher|return-return/i.test(state) && {
+            id: transaction?.id
+          }
+        )
       })
     }
     catch (error) {
@@ -673,7 +525,8 @@ const DocumentVoucheringTransaction = (props) => {
                         ...currentValue,
                         voucher: {
                           ...currentValue.voucher,
-                          month: value
+                          // month: value
+                          month: moment(value).format("YYYY-MM-DD")
                         }
                       }))}
                       showToolbar
