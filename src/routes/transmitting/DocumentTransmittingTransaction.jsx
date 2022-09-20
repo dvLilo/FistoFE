@@ -74,7 +74,7 @@ const DocumentTransmittingTransaction = (props) => {
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/DELETE-ME-LATER/${transaction.id}`, transmittalData)
+          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, transmittalData)
 
           const { message } = response.data
 
@@ -148,7 +148,7 @@ const DocumentTransmittingTransaction = (props) => {
 
       <AccountTitleDialog
         {...viewAccountTitle}
-        accounts={data?.voucher.account_title[0]}
+        accounts={data?.voucher.accounts[0]}
       />
     </React.Fragment>
   )

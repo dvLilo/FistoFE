@@ -56,11 +56,9 @@ const DocumentApprovingTransaction = (props) => {
   } = useDistribute(transaction?.company_id)
 
   React.useEffect(() => {
-    if (open) {
-      fetchTransaction()
-      fetchDistribute()
-    }
+    if (open) fetchTransaction()
 
+    if (open && !DISTUBUTE_LIST) fetchDistribute()
     // eslint-disable-next-line
   }, [open])
 
@@ -68,12 +66,17 @@ const DocumentApprovingTransaction = (props) => {
     if (open && status === `success`) {
       setApprovalData(currentValue => ({
         ...currentValue,
-        distributed_to: data.tag.distributed_to
+        distributed_to: data.tag.distributed_to,
+        ...(
+          /approve-approve/i.test(state) && {
+            distributed_to: data.approve.distributed_to
+          }
+        )
       }))
     }
 
     // eslint-disable-next-line
-  }, [open, status])
+  }, [open, data, status])
 
   const [approvalData, setApprovalData] = React.useState({
     process: "approve",
@@ -273,7 +276,7 @@ const DocumentApprovingTransaction = (props) => {
 
       <AccountTitleDialog
         {...viewAccountTitle}
-        accounts={data?.voucher.account_title[0]}
+        accounts={data?.voucher.accounts[0]}
       />
     </React.Fragment>
   )

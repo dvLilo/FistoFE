@@ -55,11 +55,9 @@ const DocumentTaggingTransaction = (props) => {
   } = useDistribute(transaction?.company_id)
 
   React.useEffect(() => {
-    if (open) {
-      fetchTransaction()
-      fetchDistribute()
-    }
+    if (open) fetchTransaction()
 
+    if (open && !DISTUBUTE_LIST) fetchDistribute()
     // eslint-disable-next-line
   }, [open])
 
@@ -83,7 +81,7 @@ const DocumentTaggingTransaction = (props) => {
     }
 
     // eslint-disable-next-line
-  }, [open, status])
+  }, [open, status, data])
 
   const [tagData, setTagData] = React.useState({
     process: "tag",

@@ -55,11 +55,9 @@ const DocumentReleasingTransaction = (props) => {
   } = useDistribute(transaction?.company_id)
 
   React.useEffect(() => {
-    if (open) {
-      fetchTransaction()
-      fetchDistribute()
-    }
+    if (open) fetchTransaction()
 
+    if (open && !DISTUBUTE_LIST) fetchDistribute()
     // eslint-disable-next-line
   }, [open])
 
@@ -264,13 +262,13 @@ const DocumentReleasingTransaction = (props) => {
       </Dialog>
 
       <AccountTitleDialog
-        accounts={data.cheque.account_title[0]}
+        accounts={data?.cheque.accounts[0]}
         onClear={clearHandler}
         {...viewAccountTitle}
       />
 
       <ChequeEntryDialog
-        cheques={data.cheque.cheques}
+        cheques={data?.cheque.cheques}
         onClear={clearHandler}
         {...viewCheque}
       />

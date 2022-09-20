@@ -367,12 +367,12 @@ const DocumentReversingTransaction = (props) => {
       </Dialog>
 
       <AccountTitleDialog
-        accounts={data.cheque.account_title[0]}
+        accounts={data?.cheque.accounts[0]}
         {...viewAccountTitle}
       />
 
       <ChequeEntryDialog
-        cheques={data.cheque.cheques}
+        cheques={data?.cheque.cheques}
         {...viewCheque}
       />
 

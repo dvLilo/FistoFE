@@ -64,13 +64,19 @@ const DocumentTransmitting = () => {
     changeRows
   } = useTransactions("/api/transactions")
 
+  React.useEffect(() => {
+    changeStatus(state)
+
+    // eslint-disable-next-line
+  }, [])
+
   const user = useSelector(state => state.user)
 
   const toast = useToast()
   const confirm = useConfirm()
 
   const [search, setSearch] = React.useState("")
-  const [state, setState] = React.useState("pending")
+  const [state, setState] = React.useState("pending-transmit")
 
   const [transfer, setTransfer] = React.useState({
     open: false,
@@ -174,7 +180,7 @@ const DocumentTransmitting = () => {
                 children: <span className="FstoTabsIndicator-root" />
               }}
             >
-              <Tab className="FstoTab-root" label="Pending" value="pending" disableRipple />
+              <Tab className="FstoTab-root" label="Pending" value="pending-transmit" disableRipple />
               {
                 user?.role === `AP Specialist` &&
                 <Tab className="FstoTab-root" label="Transferred" value="transmit-transfer" disableRipple />

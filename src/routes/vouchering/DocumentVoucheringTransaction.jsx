@@ -136,14 +136,14 @@ const DocumentVoucheringTransaction = (props) => {
   }, [open, APPROVER_STATUS])
 
   React.useEffect(() => {
-    if (open && (state === `voucher-voucher` || state === `return-return`) && status === `success`) {
+    if (open && (state === `voucher-voucher` || state === `return-return`) && status === `success` && !voucherData.accounts.length) {
       setVoucherData(currentValue => ({
         ...currentValue,
         tax: {
-          receipt_type: data.voucher.tax.receipt_type,
-          percentage_tax: data.voucher.tax.percentage_tax,
-          withholding_tax: data.voucher.tax.witholding_tax,
-          net_amount: data.voucher.tax.net_amount
+          receipt_type: data.voucher.tax?.receipt_type,
+          percentage_tax: data.voucher.tax?.percentage_tax,
+          withholding_tax: data.voucher.tax?.witholding_tax,
+          net_amount: data.voucher.tax?.net_amount
         },
         voucher: {
           no: data.voucher.no,
@@ -243,13 +243,25 @@ const DocumentVoucheringTransaction = (props) => {
           })
         }
         catch (error) {
-          console.log("Fisto Error Status", error.request)
+          switch (error.request.status) {
+            case 422:
+              const { message } = error.response.data
+              toast({
+                message,
+                title: "Error!",
+                severity: "error"
+              })
+              break
 
-          toast({
-            severity: "error",
-            title: "Error!",
-            message: "Something went wrong whilst trying to save the voucher details. Please try again."
-          })
+            default:
+              toast({
+                severity: "error",
+                title: "Error!",
+                message: "Something went wrong whilst trying to save the voucher details. Please try again."
+              })
+          }
+
+          console.log("Fisto Error Status", error.request)
         }
       }
     })

@@ -429,7 +429,7 @@ const TransactionDialog = (props) => {
                 </ListItem>
 
                 {
-                  data.approval && data.approval.status === `approve-approve` &&
+                  data.approve && data.approve.status === `approve-approve` &&
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Approved By:</span>
                     <strong>{data.voucher.approver.name}</strong>
