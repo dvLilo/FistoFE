@@ -308,6 +308,14 @@ const App = () => {
               />
             </Route>
 
+            <Route exact path="/confidential/vouchering" element={<ProtectedRoute permission={15} />}>
+              <Route index exact strict
+                element={
+                  <h1>Hello world.</h1>
+                }
+              />
+            </Route>
+
             <Route exact path="/cheque/chequing" element={<ProtectedRoute permission={7} />}>
               <Route index exact strict
                 element={

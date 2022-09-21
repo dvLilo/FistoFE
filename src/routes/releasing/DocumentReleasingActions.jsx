@@ -51,7 +51,7 @@ const DocumentReleasingActions = ({ data, state, onReceive, onManage, onView, on
         disablePortal
       >
         {
-          state === `pending` &&
+          state === `pending-cheque` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {

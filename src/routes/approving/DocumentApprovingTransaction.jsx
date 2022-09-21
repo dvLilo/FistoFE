@@ -276,7 +276,7 @@ const DocumentApprovingTransaction = (props) => {
 
       <AccountTitleDialog
         {...viewAccountTitle}
-        accounts={data?.voucher.accounts[0]}
+        accounts={data?.voucher?.accounts[0]}
       />
     </React.Fragment>
   )

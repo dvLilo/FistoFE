@@ -56,7 +56,7 @@ const DocumentReversingActions = ({ data, state, onReceive, onManage, onView, on
         disablePortal
       >
         {
-          ((user?.role === `AP Tagging` && state === `reverse-return-accept`) || (user?.role === `AP Associate` && state === `pending`)) &&
+          ((user?.role === `AP Tagging` && state === `reverse-approve`) || (user?.role === `AP Associate` && state === `pending-request`)) &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -69,7 +69,7 @@ const DocumentReversingActions = ({ data, state, onReceive, onManage, onView, on
           </MenuItem>}
 
         {/* {
-          state === `pending` && user?.role === `AP Specialist` &&
+          state === `pending-file` && user?.role === `AP Specialist` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -82,7 +82,7 @@ const DocumentReversingActions = ({ data, state, onReceive, onManage, onView, on
           </MenuItem>} */}
 
         {
-          ((user?.role === `AP Tagging` && state === `pending`) || state === `reverse-receive`) &&
+          ((user?.role === `AP Tagging` && state === `pending-file`) || (user?.role === `AP Tagging` && state === `reverse-receive-requestor`) || state === `reverse-receive-approver`) &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -95,7 +95,7 @@ const DocumentReversingActions = ({ data, state, onReceive, onManage, onView, on
           </MenuItem>}
 
         {
-          (state === `reverse-return-request` || state === `reverse-return` || (user?.role === `AP Associate` && state === `reverse-return-accept`)) &&
+          (state === `reverse-request` || state === `reverse-return` || (user?.role === `AP Associate` && state === `reverse-approve`)) &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -108,7 +108,7 @@ const DocumentReversingActions = ({ data, state, onReceive, onManage, onView, on
           </MenuItem>}
 
         {
-          state === `reverse-return-request` &&
+          state === `reverse-request` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {

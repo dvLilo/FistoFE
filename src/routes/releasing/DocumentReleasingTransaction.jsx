@@ -73,8 +73,8 @@ const DocumentReleasingTransaction = (props) => {
   }, [open, status])
 
   const [releaseData, setReleaseData] = React.useState({
-    process: "file",
-    subprocess: "file",
+    process: "release",
+    subprocess: "release",
     distributed_to: null
   })
 
@@ -121,7 +121,7 @@ const DocumentReleasingTransaction = (props) => {
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/DELETE-ME-LATER/${transaction.id}`, releaseData)
+          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, releaseData)
 
           const { message } = response.data
 
@@ -262,7 +262,7 @@ const DocumentReleasingTransaction = (props) => {
       </Dialog>
 
       <AccountTitleDialog
-        accounts={data?.cheque.accounts[0]}
+        accounts={data?.cheque.accounts}
         onClear={clearHandler}
         {...viewAccountTitle}
       />

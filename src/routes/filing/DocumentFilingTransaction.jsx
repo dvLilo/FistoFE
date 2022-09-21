@@ -86,7 +86,7 @@ const DocumentFilingTransaction = (props) => {
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/DELETE-ME-LATER/${transaction.id}`, fileData)
+          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, fileData)
 
           const { message } = response.data
 
@@ -171,12 +171,12 @@ const DocumentFilingTransaction = (props) => {
       </Dialog>
 
       <AccountTitleDialog
-        accounts={data.cheque.account_title[0]}
+        accounts={data?.cheque?.accounts}
         {...viewAccountTitle}
       />
 
       <ChequeEntryDialog
-        cheques={data.cheque.cheques}
+        cheques={data?.cheque?.cheques}
         {...viewCheque}
       />
     </React.Fragment>

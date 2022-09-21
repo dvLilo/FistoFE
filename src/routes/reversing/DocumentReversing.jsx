@@ -66,13 +66,19 @@ const DocumentReversing = () => {
     changeRows
   } = useTransactions("/api/transactions")
 
+  React.useEffect(() => {
+    changeStatus(state)
+
+    // eslint-disable-next-line
+  }, [])
+
   const user = useSelector(state => state.user)
 
   const toast = useToast()
   const confirm = useConfirm()
 
   const [search, setSearch] = React.useState("")
-  const [state, setState] = React.useState("pending")
+  const [state, setState] = React.useState(user?.role === `AP Associate` ? "pending-request" : "pending-file")
 
   const [reason, setReason] = React.useState({
     open: false,
@@ -134,7 +140,8 @@ const DocumentReversing = () => {
         try {
           response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
             process: REVERSE,
-            subprocess: RECEIVE
+            // subprocess: RECEIVE
+            subprocess: user?.role === `AP Associate` ? `${RECEIVE}-approver` : `${RECEIVE}-requestor`
           })
 
           const { message } = response.data
@@ -230,20 +237,21 @@ const DocumentReversing = () => {
                 children: <span className="FstoTabsIndicator-root" />
               }}
             >
-              <Tab className="FstoTab-root" label={user?.role === `AP Associate` ? "Pending" : "Filed"} value="pending" disableRipple />
+              {/* <Tab className="FstoTab-root" label={user?.role === `AP Associate` ? "Pending" : "Filed"} value="pending-file" disableRipple /> */}
+              <Tab className="FstoTab-root" label={user?.role === `AP Associate` ? "Pending" : "Filed"} value={user?.role === `AP Associate` ? "pending-request" : "pending-file"} disableRipple />
 
               {
                 user?.role === `AP Associate`
-                  ? <Tab className="FstoTab-root" label="Received" value="reverse-receive" disableRipple />
-                  : <Tab className="FstoTab-root" label="Requested" value="reverse-return-request" disableRipple />
+                  ? <Tab className="FstoTab-root" label="Received" value="reverse-receive-approver" disableRipple />
+                  : <Tab className="FstoTab-root" label="Requested" value="reverse-request" disableRipple />
               }
 
-              <Tab className="FstoTab-root" label="Approved" value="reverse-return-accept" disableRipple />
+              <Tab className="FstoTab-root" label="Approved" value="reverse-approve" disableRipple />
 
               {
                 user?.role === `AP Tagging` &&
                 [
-                  <Tab className="FstoTab-root" key="Received" label="Received" value="reverse-receive" disableRipple />,
+                  <Tab className="FstoTab-root" key="Received" label="Received" value="reverse-receive-requestor" disableRipple />,
                   <Tab className="FstoTab-root" key="Returned" label="Returned" value="reverse-return" disableRipple />
                 ]
               }

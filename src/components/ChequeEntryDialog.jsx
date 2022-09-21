@@ -273,7 +273,8 @@ const ChequeEntryDialog = (props) => {
                 }
                 onChange={(value) => setCQ(currentValue => ({
                   ...currentValue,
-                  date: new Date(value).toISOString()
+                  // date: new Date(value).toISOString()
+                  date: moment(value).format("YYYY-MM-DD")
                 }))}
                 showToolbar
               />

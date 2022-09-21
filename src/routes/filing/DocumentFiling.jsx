@@ -54,8 +54,8 @@ import DocumentFilingTransaction from './DocumentFilingTransaction'
 const DocumentFiling = () => {
 
   const {
-    // status,
-    // data,
+    status,
+    data,
     refetchData,
     searchData,
     filterData,
@@ -64,13 +64,19 @@ const DocumentFiling = () => {
     changeRows
   } = useTransactions("/api/transactions")
 
+  React.useEffect(() => {
+    changeStatus(state)
+
+    // eslint-disable-next-line
+  }, [])
+
   const user = useSelector(state => state.user)
 
   const toast = useToast()
   const confirm = useConfirm()
 
   const [search, setSearch] = React.useState("")
-  const [state, setState] = React.useState("pending")
+  const [state, setState] = React.useState("pending-file")
 
   const [transfer, setTransfer] = React.useState({
     open: false,
@@ -118,7 +124,7 @@ const DocumentFiling = () => {
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/DELETE-ME-LATER/${ID}`, {
+          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
             process: FILE,
             subprocess: RECEIVE
           })
@@ -153,81 +159,6 @@ const DocumentFiling = () => {
     }))
   }
 
-
-  const status = 'success'
-  const data = {
-    total: 1,
-    per_page: 1,
-    current_page: 1,
-    data: [
-      {
-        id: 1,
-        tag_no: 2,
-        is_latest_transaction: 0,
-        users_id: 2,
-        request_id: 1,
-        supplier_id: 30,
-        document_id: 1,
-        transaction_id: "MISC001",
-        document_type: "PAD",
-        payment_type: "Full",
-        supplier: {
-          id: 30,
-          name: "1ST ADVENUE ADVERTISING",
-          supplier_type: {
-            id: 2,
-            name: "rush",
-            transaction_days: 7
-          }
-        },
-        remarks: "swfattener lara: growing performance form, weekly fattener inventory form",
-        date_requested: "2022-06-29 09:07:37",
-        company_id: 1,
-        company: "RDF Corporate Services",
-        department: "Management Information System Common",
-        location: "Common",
-        document_no: "pad#11001",
-        document_amount: 50000,
-        referrence_no: null,
-        referrence_amount: null,
-        status: "pending",
-        ...(Boolean(state.match(/-receive.*/)) && { status: "receive" }),
-        ...(Boolean(state.match(/-file.*/)) && { status: "file" }),
-        users: {
-          id: 2,
-          first_name: "VINCENT LOUIE",
-          middle_name: "LAYNES",
-          last_name: "ABAD",
-          department: [
-            {
-              id: 12,
-              name: "Management Information System Common"
-            },
-            {
-              id: 3,
-              name: "Management Information System"
-            }
-          ],
-          position: "System Developer"
-        },
-        po_details: [
-          {
-            id: 50,
-            request_id: 1,
-            po_no: "PO#11002",
-            po_total_amount: 50000
-          },
-          {
-            id: 51,
-            request_id: 1,
-            po_no: "PO#11001",
-            po_total_amount: 50000
-          }
-        ]
-      }
-    ]
-  }
-
   return (
     <Box className="FstoBox-root">
       <Paper className="FstoPaperTable-root" elevation={1}>
@@ -249,7 +180,7 @@ const DocumentFiling = () => {
                 children: <span className="FstoTabsIndicator-root" />
               }}
             >
-              <Tab className="FstoTab-root" label="Pending" value="pending" disableRipple />
+              <Tab className="FstoTab-root" label="Pending" value="pending-file" disableRipple />
               {
                 user?.role === `AP Specialist` &&
                 <Tab className="FstoTab-root" label="Transferred" value="file-transfer" disableRipple />

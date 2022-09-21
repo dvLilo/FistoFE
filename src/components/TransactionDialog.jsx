@@ -32,7 +32,7 @@ const TransactionDialog = (props) => {
     <React.Fragment>
 
       {
-        status === `success` && (data.transaction.state === `hold` || data.transaction.state === `return` || data.transaction.state === `void`) &&
+        status === `success` && (data.transaction.state === `hold` || data.transaction.state === `return` || data.transaction.state === `void` || data.transaction.state === `request`) &&
         <Alert
           className="FstoAlertTransactionDetails-root"
           severity={data.transaction.state === `void` ? "error" : "info"}
@@ -441,7 +441,7 @@ const TransactionDialog = (props) => {
 
 
           {
-            Boolean(data?.cheque) && Boolean(data.cheque.cheques) && Boolean(data.cheque.account_title) &&
+            Boolean(data?.cheque) && Boolean(data.cheque.cheques) && Boolean(data.cheque.accounts) &&
             <React.Fragment>
               <Divider className="FstoDividerTransactionDetails-root" textAlign="left">
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>Cheque</Typography>

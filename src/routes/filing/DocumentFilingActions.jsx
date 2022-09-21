@@ -55,7 +55,7 @@ const DocumentFilingActions = ({ data, state, onReceive, onManage, onView, onTra
         disablePortal
       >
         {
-          state === `pending` &&
+          state === `pending-file` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -68,7 +68,7 @@ const DocumentFilingActions = ({ data, state, onReceive, onManage, onView, onTra
           </MenuItem>}
 
         {
-          state === `pending` && user?.role === `AP Specialist` &&
+          state === `pending-file` && user?.role === `AP Specialist` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {

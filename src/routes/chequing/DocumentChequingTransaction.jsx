@@ -55,7 +55,7 @@ const DocumentChequingTransaction = (props) => {
 
   React.useEffect(() => {
     if (open && state === `cheque-receive` && status === `success` && !Boolean(chequeData.accounts.length)) {
-      const accounts = data.voucher.account_title[0].filter((item) => item.entry.toLowerCase() === `credit`).map((item) => ({
+      const accounts = data.voucher.accounts[0].filter((item) => item.entry.toLowerCase() === `credit`).map((item) => ({
         entry: "Debit",
         account_title: item.account_title,
         amount: item.amount,
@@ -71,13 +71,13 @@ const DocumentChequingTransaction = (props) => {
     if (open && (state === `cheque-cheque` || state === `return-return`) && status === `success`) {
       setChequeData(currentValue => ({
         ...currentValue,
-        accounts: data.cheque.account_title[0],
-        cheques: data.cheque.cheques
+        accounts: data?.cheque?.accounts,
+        cheques: data?.cheque?.cheques
       }))
     }
 
     // eslint-disable-next-line
-  }, [open, status])
+  }, [open, data, status])
 
   const [chequeData, setChequeData] = React.useState({
     process: "cheque",
@@ -275,11 +275,11 @@ const DocumentChequingTransaction = (props) => {
 
       ...(Boolean(state.match(/-receive|-hold|cheque-return|-void.*/)) && {
         state: "transmit-",
-        accounts: data.voucher.account_title[0]
+        accounts: data.voucher.accounts[0]
       }),
       ...(Boolean(state.match(/-release.*/)) && {
         state: "transmit-",
-        accounts: data.cheque.account_title[0]
+        accounts: data.cheque.accounts
       })
     }))
   }
@@ -391,7 +391,7 @@ const DocumentChequingTransaction = (props) => {
     }))
 
     if (!reversalData.reason.id && !reversalData.reason.description) {
-      const accounts = data.cheque.account_title[0].filter((item) => item.entry.toLowerCase() === `debit`)
+      const accounts = data?.cheque?.accounts.filter((item) => item.entry.toLowerCase() === `debit`)
       setChequeData(currentValue => ({
         ...currentValue,
         accounts,

@@ -81,7 +81,7 @@ const DocumentReversingTransaction = (props) => {
 
   const [reverseRequestData, setReverseRequestData] = React.useState({
     process: "reverse",
-    subprocess: "return-request",
+    subprocess: "request",
     distributed_to: null,
     reason: {
       id: null,
@@ -142,7 +142,7 @@ const DocumentReversingTransaction = (props) => {
   const submitReverseRequestHandler = async () => {
     let response
     try {
-      response = await axios.post(`/api/transactions/flow/update-transaction/DELETE-ME-LATER/${transaction.id}`, reverseRequestData)
+      response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, reverseRequestData)
 
       const { message } = response.data
 
@@ -171,7 +171,7 @@ const DocumentReversingTransaction = (props) => {
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/DELETE-ME-LATER/${transaction.id}`, { process: "reverse", subprocess: "return-approve" })
+          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, { process: "reverse", subprocess: "approve" })
 
           const { message } = response.data
 
@@ -290,7 +290,7 @@ const DocumentReversingTransaction = (props) => {
           <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
 
           {
-            state === `pending` && user?.role === `AP Tagging` &&
+            state === `pending-file` && user?.role === `AP Tagging` &&
             <React.Fragment>
               <Divider className="FstoDividerTransaction-root" variant="middle" />
 
@@ -332,7 +332,7 @@ const DocumentReversingTransaction = (props) => {
         <DialogActions className="FstoDialogTransaction-actions">
 
           {
-            state === `pending` && user?.role === `AP Tagging` &&
+            state === `pending-file` && user?.role === `AP Tagging` &&
             <Button
               variant="outlined"
               color="error"
@@ -343,7 +343,7 @@ const DocumentReversingTransaction = (props) => {
           }
 
           {
-            state === `reverse-receive` && user?.role === `AP Tagging` &&
+            state === `reverse-receive-requestor` && user?.role === `AP Tagging` &&
             <Button
               variant="outlined"
               color="error"
@@ -354,7 +354,7 @@ const DocumentReversingTransaction = (props) => {
           }
 
           {
-            state === `reverse-receive` && user?.role === `AP Associate` &&
+            state === `reverse-receive-approver` && user?.role === `AP Associate` &&
             <Button
               variant="contained"
               color="primary"
@@ -367,7 +367,7 @@ const DocumentReversingTransaction = (props) => {
       </Dialog>
 
       <AccountTitleDialog
-        accounts={data?.cheque.accounts[0]}
+        accounts={data?.cheque.accounts}
         {...viewAccountTitle}
       />
 

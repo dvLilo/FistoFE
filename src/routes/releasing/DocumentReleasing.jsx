@@ -63,11 +63,17 @@ const DocumentReleasing = () => {
     changeRows
   } = useTransactions("/api/transactions")
 
+  React.useEffect(() => {
+    changeStatus(state)
+
+    // eslint-disable-next-line
+  }, [])
+
   const toast = useToast()
   const confirm = useConfirm()
 
   const [search, setSearch] = React.useState("")
-  const [state, setState] = React.useState("pending")
+  const [state, setState] = React.useState("pending-cheque")
 
   const [reason, setReason] = React.useState({
     open: false,
@@ -204,7 +210,7 @@ const DocumentReleasing = () => {
                 children: <span className="FstoTabsIndicator-root" />
               }}
             >
-              <Tab className="FstoTab-root" label="Pending" value="pending" disableRipple />
+              <Tab className="FstoTab-root" label="Pending" value="pending-cheque" disableRipple />
               <Tab className="FstoTab-root" label="Received" value="release-receive" disableRipple />
               <Tab className="FstoTab-root" label="Released" value="release-release" disableRipple />
               <Tab className="FstoTab-root" label="Returned" value="release-return" disableRipple />
