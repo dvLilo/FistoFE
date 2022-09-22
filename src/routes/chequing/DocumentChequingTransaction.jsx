@@ -71,8 +71,8 @@ const DocumentChequingTransaction = (props) => {
     if (open && (state === `cheque-cheque` || state === `return-return`) && status === `success`) {
       setChequeData(currentValue => ({
         ...currentValue,
-        accounts: data?.cheque?.accounts,
-        cheques: data?.cheque?.cheques
+        accounts: data.cheque?.accounts,
+        cheques: data.cheque?.cheques
       }))
     }
 

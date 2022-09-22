@@ -72,6 +72,10 @@ import DocumentClearing from './routes/clearing/DocumentClearing'
 // Returning
 import DocumentReturning from './routes/returning/DocumentReturning'
 
+// Confidential
+import DocumentConfidentialVouchering from './routes/confidential/vouchering/DocumentConfidentialVouchering'
+import DocumentConfidentialApproving from './routes/confidential/approving/DocumentConfidentialApproving'
+
 import NotFound from './exceptions/NotFound'
 import Sandbox from './Sandbox'
 
@@ -310,9 +314,13 @@ const App = () => {
 
             <Route exact path="/confidential/vouchering" element={<ProtectedRoute permission={15} />}>
               <Route index exact strict
-                element={
-                  <h1>Hello world.</h1>
-                }
+                element={<DocumentConfidentialVouchering />}
+              />
+            </Route>
+
+            <Route exact path="/confidential/approving" element={<ProtectedRoute permission={18} />}>
+              <Route index exact strict
+                element={<DocumentConfidentialApproving />}
               />
             </Route>
 

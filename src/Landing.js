@@ -129,7 +129,7 @@ const Landing = () => {
           <img src={FistoLogo} alt="Fistó App" />
         </Box>
 
-        <Box className="FstoLoginBox-form">
+        <Box className="FstoLoginBox-form" component="form" onSubmit={handleSubmit}>
           <Box className="FstoLoginBox-group">
             <Person sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
             <TextField
@@ -191,12 +191,12 @@ const Landing = () => {
           <Box className="FstoLoginBox-group" sx={{ justifyContent: 'flex-end', mt: 8 }}>
             <LoadingButton
               variant="contained"
+              type="submit"
               color="secondary"
               startIcon={<></>}
               loading={loading}
               loadingPosition="start"
               sx={{ px: 4 }}
-              onClick={handleSubmit}
               disableElevation
             > Sign-In
             </LoadingButton>

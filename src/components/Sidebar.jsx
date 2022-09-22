@@ -220,6 +220,10 @@ const Sidebar = () => {
                 {user.permissions.includes(15)
                   && <RouterLink className="FstoSidebarLink-root" to="/confidential/vouchering">Tagging and Vouchering</RouterLink>
                 }
+
+                {user.permissions.includes(18)
+                  && <RouterLink className="FstoSidebarLink-root" to="/confidential/approving">Transaction Approval</RouterLink>
+                }
               </AccordionDetails>
             </Accordion>
           }

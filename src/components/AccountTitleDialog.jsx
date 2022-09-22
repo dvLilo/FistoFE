@@ -318,7 +318,7 @@ const AccountTitleDialog = (props) => {
                 <TableBody className="FstoTableBodyAccountTitle-root">
                   {
                     accounts.map((item, index) => (
-                      <TableRow key={index}>
+                      <TableRow className="FstoTableRowAccountTitle-root" key={index}>
                         <TableCell size="small">
                           <strong>{item.account_title.name}</strong>
                           {
