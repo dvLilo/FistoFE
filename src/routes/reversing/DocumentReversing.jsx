@@ -191,7 +191,7 @@ const DocumentReversing = () => {
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/DELETE-ME-LATER/${ID}`, {
+          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
             process: REVERSE,
             subprocess: UNRETURN
           })

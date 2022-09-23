@@ -1,5 +1,7 @@
 import React from 'react'
 
+import axios from 'axios'
+
 import moment from 'moment'
 
 import NumberFormat from 'react-number-format'
@@ -112,9 +114,19 @@ const ChequeEntryDialog = (props) => {
 
   React.useEffect(() => {
     if (!open) clearChequeHandler()
+
     // eslint-disable-next-line
   }, [open])
 
+  const [validate, setValidate] = React.useState({
+    status: false,
+    data: []
+  })
+
+  const [error, setError] = React.useState({
+    status: false,
+    data: []
+  })
 
   const addChequeHandler = () => {
     if (!CQ.update)
@@ -181,6 +193,54 @@ const ChequeEntryDialog = (props) => {
     clearChequeHandler()
   }
 
+  const checkChequeHandler = async (e) => {
+    if (error.status && error.data.cheque_no) {
+      delete error.data.cheque_no
+      setError(currentValue => ({
+        ...currentValue,
+        data: error.data
+      }))
+    }
+
+    if (!CQ.no) return
+
+    setValidate(currentValue => ({
+      status: true,
+      data: [
+        ...currentValue.data, 'cheque_no'
+      ]
+    }))
+
+    try {
+      await axios.post(`/api/transactions/flow/validate-cheque-no`, {
+        cheque_no: CQ.no,
+        ...(
+          /cheque-cheque|return-return/i.test(state) && {
+            id: transaction?.id
+          }
+        )
+      })
+    }
+    catch (error) {
+      if (error.request.status === 422) {
+        const { errors } = error.response.data
+
+        setError(currentValue => ({
+          status: true,
+          data: {
+            ...currentValue.data,
+            cheque_no: errors["cheque.no"]
+          }
+        }))
+      }
+    }
+
+    setValidate(currentValue => ({
+      ...currentValue,
+      data: currentValue.data.filter((data) => data !== 'cheque_no')
+    }))
+  }
+
   return (
     <Dialog
       className="FstoDialogCheque-root"
@@ -200,7 +260,7 @@ const ChequeEntryDialog = (props) => {
 
       <DialogContent className="FstoDialogCheque-content">
         {
-          Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|release-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|return|release-.*/)) &&
           <Box className="FstoBoxCheque-root" sx={{ marginBottom: 5 }}>
             <Autocomplete
               className="FstoSelectForm-root"
@@ -259,6 +319,20 @@ const ChequeEntryDialog = (props) => {
               autoComplete="off"
               size="small"
               value={CQ.no}
+              error={
+                error.status
+                && Boolean(error.data.cheque_no)
+              }
+              helperText={
+                (error.status
+                  && error.data.cheque_no
+                  && error.data.cheque_no[0])
+                ||
+                (validate.status
+                  && validate.data.includes('cheque_no')
+                  && "Please wait...")
+              }
+              onBlur={checkChequeHandler}
               onChange={(e) => setCQ(currentValue => ({
                 ...currentValue,
                 no: e.target.value
@@ -308,7 +382,9 @@ const ChequeEntryDialog = (props) => {
                 !Boolean(CQ.type) ||
                 !Boolean(CQ.bank) ||
                 !Boolean(CQ.date) ||
-                !Boolean(CQ.amount)
+                !Boolean(CQ.amount) ||
+                (error.status && Boolean(error.data.cheque_no)) ||
+                (validate.status && Boolean(validate.data.includes('cheque_no')))
               }
               disableElevation
             > {CQ.update ? "Update" : "Add"}
@@ -329,7 +405,7 @@ const ChequeEntryDialog = (props) => {
                     <TableCell className="FstoTabelCellCheque-root">Date</TableCell>
                     <TableCell>Amount</TableCell>
                     {
-                      Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|release-.*/)) &&
+                      Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|return|release-.*/)) &&
                       <TableCell align="right">Action</TableCell>
                     }
                   </TableRow>
@@ -338,7 +414,7 @@ const ChequeEntryDialog = (props) => {
                 <TableBody className="FstoTableBodyCheque-root">
                   {
                     cheques.map((item, index) => (
-                      <TableRow key={index}>
+                      <TableRow className="FstoTableRowCheque-root" key={index}>
                         <TableCell size="small">
                           {item.type}
                         </TableCell>
@@ -360,7 +436,7 @@ const ChequeEntryDialog = (props) => {
                         </TableCell>
 
                         {
-                          Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|release-.*/)) &&
+                          Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|return|release-.*/)) &&
                           <TableCell align="right" size="small">
                             <IconButton onClick={() => editChequeHandler(item, index)}>
                               <EditIcon fontSize="small" />
@@ -420,7 +496,7 @@ const ChequeEntryDialog = (props) => {
         </Button>
 
         {
-          Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|release-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|return|release-.*/)) &&
           <Button
             variant="contained"
             onClick={submitChequehandler}

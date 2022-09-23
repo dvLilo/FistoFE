@@ -83,6 +83,7 @@ import FistoProvider from './contexts/FistoContext'
 import PasswordContextProvider from './contexts/PasswordContext'
 
 import { QueryClient, QueryClientProvider } from 'react-query'
+import ReportReceiveReceipt from './routes/reports/receive-receipt/ReportReceiveReceipt'
 
 // Create a client
 const queryClient = new QueryClient()
@@ -290,7 +291,7 @@ const App = () => {
               />
             </Route>
 
-            <Route exact path="/voucher/filing" element={<ProtectedRoute />}>
+            <Route exact path="/voucher/filing" element={<ProtectedRoute permission={11} />}>
               <Route index exact strict
                 element={<DocumentFiling />}
               />
@@ -334,16 +335,20 @@ const App = () => {
               />
             </Route>
 
-            <Route exact path="/cheque/clearing" element={<ProtectedRoute />}>
+            <Route exact path="/cheque/clearing" element={<ProtectedRoute permission={8} />}>
               <Route index exact strict
                 element={<DocumentClearing />}
               />
             </Route>
 
-            <Route exact path="/cheque/releasing" element={<ProtectedRoute />}>
+            <Route exact path="/cheque/releasing" element={<ProtectedRoute permission={6} />}>
               <Route index exact strict
                 element={<DocumentReleasing />}
               />
+            </Route>
+
+            <Route element={<ProtectedRoute permission={4} />}>
+              <Route index exact strict path="/reports/receive-receipt" element={<ReportReceiveReceipt />} />
             </Route>
           </Routes>
         </Router>

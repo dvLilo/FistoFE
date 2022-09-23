@@ -80,6 +80,10 @@ const NewUser = () => {
         name: "Releasing of Cheque"
       },
       {
+        id: 10,
+        name: "Reversal Request"
+      },
+      {
         id: 11,
         name: "Filing of Voucher"
       },
@@ -128,11 +132,7 @@ const NewUser = () => {
       {
         id: 8,
         name: "Clearing of Cheque"
-      },
-      // {
-      //   id: 10,
-      //   name: "Cheque Reports"
-      // }
+      }
     ],
     confidential: [
       {

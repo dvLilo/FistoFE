@@ -277,7 +277,7 @@ const DocumentChequingTransaction = (props) => {
         state: "transmit-",
         accounts: data.voucher.accounts[0]
       }),
-      ...(Boolean(state.match(/-release.*/)) && {
+      ...(Boolean(state.match(/-release|return-.*/)) && {
         state: "transmit-",
         accounts: data.cheque.accounts
       })

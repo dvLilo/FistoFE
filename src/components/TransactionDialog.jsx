@@ -441,7 +441,7 @@ const TransactionDialog = (props) => {
 
 
           {
-            Boolean(data?.cheque) && Boolean(data.cheque.cheques) && Boolean(data.cheque.accounts) &&
+            Boolean(data?.cheque) && Boolean(data.cheque.cheques.length) && Boolean(data.cheque.accounts.length) &&
             <React.Fragment>
               <Divider className="FstoDividerTransactionDetails-root" textAlign="left">
                 <Typography variant="h6" sx={{ fontWeight: 700 }}>Cheque</Typography>

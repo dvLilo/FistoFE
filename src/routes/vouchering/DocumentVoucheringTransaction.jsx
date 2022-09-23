@@ -632,6 +632,10 @@ const DocumentVoucheringTransaction = (props) => {
                   !Boolean(voucherData.tax.receipt_type) ||
                   !Boolean(voucherData.voucher.no) ||
                   !Boolean(voucherData.voucher.month) ||
+
+                  (error.status && Boolean(error.data.voucher_no)) ||
+                  (validate.status && Boolean(validate.data.includes('voucher_no'))) ||
+
                   (voucherData.tax.receipt_type === `Official` && !Boolean(voucherData.tax.net_amount)) ||
                   (voucherData.tax.receipt_type === `Official` && !Boolean(voucherData.tax.percentage_tax)) ||
                   (voucherData.tax.receipt_type === `Official` && !Boolean(voucherData.tax.withholding_tax))
