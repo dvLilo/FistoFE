@@ -59,7 +59,7 @@ const DocumentClearingTransaction = (props) => {
 
   React.useEffect(() => {
     if (open && state === `clear-receive` && status === `success` && !Boolean(clearData.accounts.length)) {
-      const accounts = data.cheque.account_title[0].filter((item) => item.entry.toLowerCase() === `credit`).map((item) => ({
+      const accounts = data.cheque.accounts.filter((item) => item.entry.toLowerCase() === `credit`).map((item) => ({
         entry: "Debit",
         account_title: item.account_title,
         amount: item.amount,
@@ -76,7 +76,7 @@ const DocumentClearingTransaction = (props) => {
       setClearData(currentValue => ({
         ...currentValue,
         date: data.clear.date,
-        accounts: data.clear.account_title[0]
+        accounts: data.clear.accounts
       }))
     }
 
@@ -184,7 +184,7 @@ const DocumentClearingTransaction = (props) => {
 
       ...(Boolean(state.match(/-receive.*/)) && {
         state: "transmit-",
-        accounts: data.cheque.account_title[0]
+        accounts: data.cheque.accounts
       })
     }))
   }
@@ -315,7 +315,7 @@ const DocumentClearingTransaction = (props) => {
       />
 
       <ChequeEntryDialog
-        cheques={data.cheque.cheques}
+        cheques={data?.cheque?.cheques}
         {...viewCheque}
       />
     </React.Fragment>

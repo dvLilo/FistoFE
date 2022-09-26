@@ -256,8 +256,19 @@ body {
 
 
 .FstoTableContainer-root {
+  display: flex;
   flex-grow: 1;
+  flex-direction: column;
   padding: 10px;
+
+  & .FstoTableBox-root {
+    display: flex;
+    gap: 16px;
+    flex-grow: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 
   & .FstoTable-root {
     border-collapse: separate;
@@ -273,13 +284,14 @@ body {
   }
 
   & .FstoTableCell-root.FstoTableCell-body {
-    // max-width: 0;
     padding: 6px 10px;
     border-top: 1px solid rgb(224, 224, 224);
     border-bottom: 1px solid rgba(224, 224, 224);
     font-family: 'Open Sans', sans-serif;
     font-size: 0.75em;
     font-weight: 400;
+
+    // max-width: 0;
     // white-space: nowrap;
     // text-overflow: ellipsis;
     // overflow: hidden;
@@ -293,6 +305,59 @@ body {
   & .FstoTableCell-root.FstoTableCell-body:last-of-type {
     border-radius: 0 4px 4px 0;
     border-right: 1px solid rgba(224, 224, 224);
+  }
+
+  & .FstoTypography-transaction {
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  & .FstoTypography-supplier {
+    font-style: 1.25em;
+    text-transform: uppercase;
+    line-height: 1.55;
+  }
+
+  & .FstoTypography-remarks {
+    margin-top: 5px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  & .FstoTypography-dates {
+    line-height: 1.65;
+  }
+
+  & .FstoTypography-requestor {
+    text-transform: capitalize;
+  }
+
+  & .FstoTypography-number {
+    font-weight: 500;
+  }
+
+  & .FstoTypography-amount {
+    font-weight: 700;
+  }
+
+  & .FstoChip-root {
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+
+  & .FstoChip-payment,
+  & .FstoChip-latest,
+  & .FstoChip-priority {
+    height: 20px;
+    margin-left: 5px;
+    text-transform: uppercase;
+  }
+
+  & .FstoChip-status {
+    min-width: 60px;
+    color: #f0f0f0;
   }
 }
 
