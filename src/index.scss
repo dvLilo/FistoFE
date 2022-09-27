@@ -310,24 +310,31 @@ body {
   & .FstoTypography-transaction {
     display: flex;
     align-items: center;
+    margin-bottom: 2px;
     font-weight: 700;
     line-height: 1.25;
   }
 
   & .FstoTypography-supplier {
-    font-style: 1.25em;
+    font-size: 1.15em;
     text-transform: uppercase;
     line-height: 1.55;
   }
 
   & .FstoTypography-remarks {
+    max-width: 500px;
     margin-top: 5px;
+    margin-bottom: 5px;
     font-weight: 700;
-    line-height: 1;
+    line-height: 1.15;
   }
 
   & .FstoTypography-dates {
-    line-height: 1.65;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    line-height: 1;
+    opacity: 0.65;
   }
 
   & .FstoTypography-requestor {
@@ -352,7 +359,7 @@ body {
   & .FstoChip-priority {
     height: 20px;
     margin-left: 5px;
-    text-transform: uppercase;
+    text-transform: capitalize;
   }
 
   & .FstoChip-status {

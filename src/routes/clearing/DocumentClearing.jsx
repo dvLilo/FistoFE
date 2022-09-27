@@ -22,12 +22,14 @@ import {
   Tabs,
   Tab,
   Stack,
-  Chip
+  Chip,
+  Divider
 } from '@mui/material'
 
 import {
   Search,
-  Close
+  Close,
+  AccessTime
 } from '@mui/icons-material'
 
 import statusColor from '../../colors/statusColor'
@@ -41,6 +43,8 @@ import {
   RECEIVE
 } from '../../constants'
 
+import EmptyImage from '../../assets/img/empty.svg'
+
 import TablePreloader from '../../components/TablePreloader'
 
 import DocumentClearingFilter from './DocumentClearingFilter'
@@ -50,8 +54,8 @@ import DocumentClearingTransaction from './DocumentClearingTransaction'
 const DocumentClearing = () => {
 
   const {
-    // status,
-    // data,
+    status,
+    data,
     refetchData,
     searchData,
     filterData,
@@ -124,81 +128,6 @@ const DocumentClearing = () => {
         }
       }
     })
-  }
-
-
-  const status = 'success'
-  const data = {
-    total: 1,
-    per_page: 1,
-    current_page: 1,
-    data: [
-      {
-        id: 1,
-        tag_no: 2,
-        is_latest_transaction: 0,
-        users_id: 2,
-        request_id: 1,
-        supplier_id: 30,
-        document_id: 1,
-        transaction_id: "MISC001",
-        document_type: "PAD",
-        payment_type: "Full",
-        supplier: {
-          id: 30,
-          name: "1ST ADVENUE ADVERTISING",
-          supplier_type: {
-            id: 2,
-            name: "rush",
-            transaction_days: 7
-          }
-        },
-        remarks: "swfattener lara: growing performance form, weekly fattener inventory form",
-        date_requested: "2022-06-29 09:07:37",
-        company_id: 1,
-        company: "RDF Corporate Services",
-        department: "Management Information System Common",
-        location: "Common",
-        document_no: "pad#11001",
-        document_amount: 50000,
-        referrence_no: null,
-        referrence_amount: null,
-        status: "pending",
-        ...(Boolean(state.match(/-receive.*/)) && { status: "receive" }),
-        ...(Boolean(state.match(/-clear.*/)) && { status: "clear" }),
-        users: {
-          id: 2,
-          first_name: "VINCENT LOUIE",
-          middle_name: "LAYNES",
-          last_name: "ABAD",
-          department: [
-            {
-              id: 12,
-              name: "Management Information System Common"
-            },
-            {
-              id: 3,
-              name: "Management Information System"
-            }
-          ],
-          position: "System Developer"
-        },
-        po_details: [
-          {
-            id: 50,
-            request_id: 1,
-            po_no: "PO#11002",
-            po_total_amount: 50000
-          },
-          {
-            id: 51,
-            request_id: 1,
-            po_no: "PO#11001",
-            po_total_amount: 50000
-          }
-        ]
-      }
-    ]
   }
 
   return (
@@ -305,62 +234,79 @@ const DocumentClearing = () => {
                 && <TablePreloader row={3} />}
 
               {
-                status === 'error'
-                && <TableRow><TableCell align="center" colSpan={7}>NO RECORDS FOUND</TableCell></TableRow>}
-
-              {
                 status === 'success'
                 && data.data.map((item, index) => (
                   <TableRow className="FstoTableRow-root" key={index} hover>
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
-                      <Typography variant="button" sx={{ display: `flex`, alignItems: `center`, fontWeight: 700, lineHeight: 1.25 }}>
-                        TAG#{item.tag_no}
-                        &nbsp;&mdash;&nbsp;
-                        {item.document_type}
+                      <Typography className="FstoTypography-root FstoTypography-transaction" variant="button">
+                        TAG#${item.tag_no}&nbsp;&mdash;&nbsp;{item.document_type}
                         {
                           item.document_id === 4 && item.payment_type.toLowerCase() === `partial` &&
-                          <Chip label={item.payment_type} size="small" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
+                          <Chip className="FstoChip-root FstoChip-payment" label={item.payment_type} size="small" />
                         }
                         {
                           Boolean(item.is_latest_transaction) &&
-                          <Chip label="Latest" size="small" color="primary" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
+                          <Chip className="FstoChip-root FstoChip-latest" label="Latest" size="small" color="primary" />
                         }
-                      </Typography>
-                      <Typography variant="caption" sx={{ fontSize: `1.25em`, textTransform: `uppercase`, lineHeight: 1.55 }}>
-                        {item.supplier.name}
                         {
                           item.supplier.supplier_type.id === 1 &&
-                          <Chip label={item.supplier.supplier_type.name} size="small" color="primary" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
+                          <Chip className="FstoChip-root FstoChip-priority" label={item.supplier.supplier_type.name} size="small" color="secondary" />
                         }
                       </Typography>
-                      <Typography variant="h6" sx={{ marginTop: `4px`, marginBottom: `4px`, fontSize: `1.35em`, fontWeight: 700, lineHeight: 1 }}>
+
+                      <Typography className="FstoTypography-root FstoTypography-supplier" variant="caption">
+                        {item.supplier.name}
+                      </Typography>
+
+                      <Typography className="FstoTypography-root FstoTypography-remarks" variant="h6">
                         {
                           item.remarks
                             ? item.remarks
                             : <React.Fragment>&mdash;</React.Fragment>
                         }
                       </Typography>
-                      <Typography variant="caption" sx={{ lineHeight: 1.65 }}>{moment(item.date_requested).format("YYYY-MM-DD hh:mm A")}</Typography>
+
+                      <Typography className="FstoTypography-root FstoTypography-dates" variant="caption">
+                        <AccessTime sx={{ fontSize: `1.3em` }} />
+                        {moment(item.date_requested).format("MMMM DD, YYYY — hh:mm A")}
+                      </Typography>
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
-                      <Typography variant="subtitle1" sx={{ textTransform: `capitalize` }}>{item.users.first_name.toLowerCase()} {item.users.middle_name.toLowerCase()} {item.users.last_name.toLowerCase()}</Typography>
-                      <Typography variant="subtitle2">{item.users.department[0].name}</Typography>
-                      <Typography variant="subtitle2">{item.users.position}</Typography>
+                      <Typography className="FstoTypography-root FstoTypography-requestor" variant="subtitle1">
+                        {item.users.first_name.toLowerCase()} {item.users.middle_name.toLowerCase()} {item.users.last_name.toLowerCase()}
+                      </Typography>
+
+                      <Typography variant="subtitle2">
+                        {item.users.department[0].name}
+                      </Typography>
+
+                      <Typography variant="subtitle2">
+                        {item.users.position}
+                      </Typography>
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
-                      <Typography variant="subtitle1">{item.company}</Typography>
-                      <Typography variant="subtitle2">{item.department}</Typography>
-                      <Typography variant="subtitle2">{item.location}</Typography>
+                      <Typography variant="subtitle1">
+                        {item.company}
+                      </Typography>
+
+                      <Typography variant="subtitle2">
+                        {item.department}
+                      </Typography>
+
+                      <Typography variant="subtitle2">
+                        {item.location}
+                      </Typography>
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
-                      <Typography variant="caption" sx={{ fontWeight: 500 }}>
+                      <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
                         {item.document_id !== 4 && item.document_no?.toUpperCase()}
                         {item.document_id === 4 && item.referrence_no?.toUpperCase()}
                       </Typography>
-                      <Typography variant="h6" sx={{ fontWeight: 700 }}>
+
+                      <Typography className="FstoTypography-root FstoTypography-amount" variant="h6">
                         &#8369;
                         {item.document_id !== 4 && item.document_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
                         {item.document_id === 4 && item.referrence_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
@@ -369,19 +315,37 @@ const DocumentClearing = () => {
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
                       {
-                        item.po_details.length
-                          ? <React.Fragment>
-                            <Typography variant="caption" sx={{ fontWeight: 500 }}>{item.po_details[0].po_no.toUpperCase()}{item.po_details.length > 1 && `...`}</Typography>
-                            <Typography variant="h6" sx={{ fontWeight: 700 }}>&#8369;{item.po_details[0].po_total_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</Typography>
-                          </React.Fragment>
-                          : <React.Fragment>
-                            &mdash;
-                          </React.Fragment>
+                        Boolean(item.po_details.length) &&
+                        <React.Fragment>
+                          <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
+                            {item.po_details[0].po_no.toUpperCase()}
+                            {item.po_details.length > 1 && <React.Fragment>&nbsp;&bull;&bull;&bull;</React.Fragment>}
+                          </Typography>
+
+                          <Typography className="FstoTypography-root FstoTypography-amount" variant="h6">
+                            &#8369;
+                            {item.po_details[0].po_total_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                          </Typography>
+                        </React.Fragment>
+                      }
+
+                      {
+                        !Boolean(item.po_details.length) &&
+                        <React.Fragment>
+                          &mdash;
+                        </React.Fragment>
                       }
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                      <Chip label={item.status} size="small" sx={{ backgroundColor: statusColor(item.status), minWidth: 60, color: `#fff`, textTransform: `capitalize`, fontWeight: 500 }} />
+                      <Chip
+                        className="FstoChip-root FstoChip-status"
+                        size="small"
+                        label={item.status}
+                        sx={{
+                          backgroundColor: statusColor(item.status)
+                        }}
+                      />
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
@@ -397,6 +361,18 @@ const DocumentClearing = () => {
                 ))}
             </TableBody>
           </Table>
+
+          {
+            status === 'error' &&
+            <React.Fragment>
+              <Divider variant="fullWidth" />
+
+              <Box className="FstoTableBox-root">
+                <img alt="No Data" src={EmptyImage} />
+                <Typography variant="body1">NO RECORDS FOUND</Typography>
+              </Box>
+            </React.Fragment>}
+
         </TableContainer>
 
         <TablePagination

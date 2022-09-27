@@ -27,7 +27,8 @@ import {
 
 import {
   Search,
-  Close
+  Close,
+  AccessTime
 } from '@mui/icons-material'
 
 import statusColor from '../../colors/statusColor'
@@ -353,14 +354,14 @@ const DocumentTagging = () => {
                           Boolean(item.is_latest_transaction) &&
                           <Chip className="FstoChip-root FstoChip-latest" label="Latest" size="small" color="primary" />
                         }
+                        {
+                          item.supplier.supplier_type.id === 1 &&
+                          <Chip className="FstoChip-root FstoChip-priority" label={item.supplier.supplier_type.name} size="small" color="secondary" />
+                        }
                       </Typography>
 
                       <Typography className="FstoTypography-root FstoTypography-supplier" variant="caption">
                         {item.supplier.name}
-                        {/* {
-                          item.supplier.supplier_type.id === 1 &&
-                          <Chip className="FstoChip-root FstoChip-priority" label={item.supplier.supplier_type.name} size="small" color="primary" />
-                        } */}
                       </Typography>
 
                       <Typography className="FstoTypography-root FstoTypography-remarks" variant="h6">
@@ -372,16 +373,23 @@ const DocumentTagging = () => {
                       </Typography>
 
                       <Typography className="FstoTypography-root FstoTypography-dates" variant="caption">
-                        {
-                          moment(item.date_requested).format("YYYY-MM-DD hh:mm A")
-                        }
+                        <AccessTime sx={{ fontSize: `1.3em` }} />
+                        {moment(item.date_requested).format("MMMM DD, YYYY — hh:mm A")}
                       </Typography>
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
-                      <Typography className="FstoTypography-root FstoTypography-requestor" variant="subtitle1">{item.users.first_name.toLowerCase()} {item.users.middle_name.toLowerCase()} {item.users.last_name.toLowerCase()}</Typography>
-                      <Typography variant="subtitle2">{item.users.department[0].name}</Typography>
-                      <Typography variant="subtitle2">{item.users.position}</Typography>
+                      <Typography className="FstoTypography-root FstoTypography-requestor" variant="subtitle1">
+                        {item.users.first_name.toLowerCase()} {item.users.middle_name.toLowerCase()} {item.users.last_name.toLowerCase()}
+                      </Typography>
+
+                      <Typography variant="subtitle2">
+                        {item.users.department[0].name}
+                      </Typography>
+
+                      <Typography variant="subtitle2">
+                        {item.users.position}
+                      </Typography>
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">

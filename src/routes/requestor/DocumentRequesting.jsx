@@ -275,14 +275,16 @@ const DocumentRequesting = () => {
                             Boolean(data.is_latest_transaction) &&
                             <Chip label="Latest" size="small" color="primary" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
                           }
-                        </Typography>
-                        <Typography variant="caption" sx={{ display: `flex`, alignItems: `center`, fontSize: `1.25em`, textTransform: `uppercase`, lineHeight: 1.55 }}>
-                          {data.supplier.name}
                           {
                             data.supplier.supplier_type.id === 1 &&
-                            <Chip label={data.supplier.supplier_type.name} size="small" color="primary" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
+                            <Chip label={data.supplier.supplier_type.name} size="small" color="secondary" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
                           }
                         </Typography>
+
+                        <Typography variant="caption" sx={{ display: `flex`, alignItems: `center`, fontSize: `1.25em`, textTransform: `uppercase`, lineHeight: 1.55 }}>
+                          {data.supplier.name}
+                        </Typography>
+
                         <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1 }}>
                           {
                             data.remarks
@@ -290,6 +292,7 @@ const DocumentRequesting = () => {
                               : <React.Fragment>&mdash;</React.Fragment>
                           }
                         </Typography>
+
                         <Typography variant="caption" sx={{ display: `flex`, alignItems: `center`, lineHeight: 1.65 }}>
                           Estimated Release Date:&nbsp;
                           <strong>
@@ -338,7 +341,7 @@ const DocumentRequesting = () => {
                       </TableCell>
 
                       <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                        <Tooltip title="Hello world. Hello, Fisto!" disableInteractive disableFocusListener arrow>
+                        <Tooltip title="Hello world. Hello, Fisto!" placement="top" disableInteractive disableFocusListener arrow>
                           <Chip label={data.status} size="small" color="warning" sx={{ textTransform: `capitalize`, fontWeight: 500 }} />
                         </Tooltip>
                       </TableCell>

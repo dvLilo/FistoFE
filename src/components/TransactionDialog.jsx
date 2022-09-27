@@ -40,7 +40,10 @@ const TransactionDialog = (props) => {
             <ReportIcon className="FstoAlertTransactionDetails-icon" />
           }
         >
-          <AlertTitle className="FstoAlertTransactionDetails-title">{data.reason.description}</AlertTitle>
+          <AlertTitle className="FstoAlertTransactionDetails-title">
+            {data.reason.description}
+          </AlertTitle>
+
           Remarks: {data.reason.remarks ? <b>{data.reason.remarks}</b> : <i>None</i>}
         </Alert>}
 
@@ -349,26 +352,26 @@ const TransactionDialog = (props) => {
               }
 
               {
-                Boolean(data.voucher) && Boolean(data.voucher.receipt_type) &&
+                Boolean(data.voucher) && Boolean(data.voucher.tax) && Boolean(data.voucher.tax.receipt_type === 'Official') &&
                 <React.Fragment>
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Type of Receipt:</span>
-                    <strong>{data.voucher.receipt_type}</strong>
+                    <strong>{data.voucher.tax.receipt_type}</strong>
                   </ListItem>
 
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Withholding Tax:</span>
-                    <strong>&#8369;{data.voucher.witholding_tax?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                    <strong>&#8369;{data.voucher.tax.witholding_tax?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
                   </ListItem>
 
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Percentage Tax:</span>
-                    <strong>&#8369;{data.voucher.percentage_tax?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                    <strong>&#8369;{data.voucher.tax.percentage_tax?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
                   </ListItem>
 
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Net of Amount:</span>
-                    <strong>&#8369;{data.voucher.gross_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                    <strong>&#8369;{data.voucher.tax.net_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
                   </ListItem>
                 </React.Fragment>
               }

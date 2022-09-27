@@ -81,7 +81,7 @@ const DocumentClearingTransaction = (props) => {
     }
 
     // eslint-disable-next-line
-  }, [open, status])
+  }, [open, data, status])
 
   const [clearData, setClearData] = React.useState({
     process: "clear",
@@ -159,6 +159,7 @@ const DocumentClearingTransaction = (props) => {
       }
     })
   }
+
 
   const onAccountTitleManage = () => {
     onClose()

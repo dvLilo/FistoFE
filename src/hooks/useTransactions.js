@@ -6,12 +6,12 @@ import { useQuery } from 'react-query'
 
 import useToast from './useToast'
 
-const useTransactions = (URL) => {
+const useTransactions = (URL, STATE = "pending") => {
 
   const toast = useToast()
 
   const [params, setParams] = React.useState({
-    state: "pending",
+    state: STATE,
     page: 1,
     rows: 10,
     search: null,
