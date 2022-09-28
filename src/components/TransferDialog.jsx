@@ -60,7 +60,7 @@ const TransferDialog = (props) => {
 
     let response
     try {
-      response = await axios.post(`/api/transactions/flow/update-transaction/${data.id}`, {
+      response = await axios.put(`/api/transactions/flow/transfer/${data.id}`, {
         process,
         subprocess,
         transfer

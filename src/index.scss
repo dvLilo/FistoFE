@@ -681,10 +681,6 @@ body {
 
 
 
-.FstoIconButtonFilter-root.MuiIconButton-root {
-  margin-left: 0.25em;
-}
-
 .FstoPaperFilter-root.MuiPaper-root {
   max-width: 430px;
   padding: 10px 20px;
@@ -881,6 +877,32 @@ body {
     height: 46px;
   }
 
+}
+
+
+
+
+
+
+#fsto {
+
+  // BETTER TOOLBAR
+  .FstoStackToolbar-root {
+    align-items: stretch;
+    margin-bottom: 2em;
+    padding-left: 2em;
+    padding-right: 2em;
+
+    & .FstoTextFieldSearch-root {
+      flex-grow: 1;
+      border-radius: 25px;
+    }
+
+    @media (min-width: 992px) {
+      flex-direction: row;
+      align-items: flex-end;
+    }
+  }
 }
 
 
