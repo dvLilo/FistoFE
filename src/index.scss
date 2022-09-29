@@ -424,8 +424,6 @@ body {
   margin-bottom: 1.25em;
 }
 
-// .FstoLabelForm-root {}
-
 .FstoAdrmentForm-root.MuiInputAdornment-root {
   margin-right: 0;
 }
@@ -535,6 +533,7 @@ body {
     margin-right: 2px;
   }
 }
+
 
 
 .FstoPurchaseOrderBox-root {
@@ -651,6 +650,107 @@ body {
 
 
 
+.FstoBoxCounterReceipts-root {
+  display: flex;
+  flex-direction: column;
+
+  margin-top: 64px;
+
+  & .FstoBoxCounterReceipt-root {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 16px;
+
+    padding-top: 0.5em;
+    padding-left: 1em;
+    padding-bottom: 0.5em;
+    padding-right: 1em;
+
+    border: 1px solid #9A9A9A;
+    border-top-style: dashed;
+    border-bottom-style: dashed;
+
+
+    &:first-of-type {
+      border-top-style: solid;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+    }
+
+    &:last-of-type {
+      border-bottom-style: solid;
+      border-bottom-left-radius: 5px;
+      border-bottom-right-radius: 5px;
+    }
+
+    &:before {
+      content: " ";
+      background: #fff;
+      position: absolute;
+      display: block;
+      bottom: -15px;
+      right: -1px;
+      width: 14px;
+      height: 28px;
+      border-top-left-radius: 14px;
+      border-bottom-left-radius: 14px;
+      border: 1px solid #9A9A9A;
+      border-right: 0;
+      z-index: 1;
+    }
+
+    &:after {
+      content: " ";
+      background: #fff;
+      position: absolute;
+      display: block;
+      bottom: -15px;
+      left: -1px;
+      width: 14px;
+      height: 28px;
+      border-top-right-radius: 14px;
+      border-bottom-right-radius: 14px;
+      border: 1px solid #9A9A9A;
+      border-left: 0;
+      z-index: 1;
+    }
+
+    &:last-of-type:before {
+      display: none;
+    }
+
+    &:last-of-type:after {
+      display: none;
+    }
+
+    @media (min-width: 576px) {
+      flex-wrap: nowrap;
+    }
+  }
+
+  & .FstoStackCounterReceipt-root {
+    min-width: 1px;
+    flex: 1 1 100%;
+
+    &.short {
+      flex-basis: 45%;
+    }
+  }
+
+  & .FstoTypographyCounterReceipts-root {
+    min-width: 1px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+}
+
+
 
 
 .FstoPaperImport-root {
@@ -763,6 +863,8 @@ body {
     margin-bottom: 40px;
   }
 }
+
+
 
 .FstoDialogAccountTitle-root {
 

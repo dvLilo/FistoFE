@@ -76,6 +76,14 @@ import DocumentReturning from './routes/returning/DocumentReturning'
 import DocumentConfidentialVouchering from './routes/confidential/vouchering/DocumentConfidentialVouchering'
 import DocumentConfidentialApproving from './routes/confidential/approving/DocumentConfidentialApproving'
 
+// Counter Receipt
+import DocumentCounterReceiptCreating from './routes/countering/DocumentCounterReceiptCreating'
+import DocumentCounterReceiptMonitoring from './routes/countering/DocumentCounterReceiptMonitoring'
+import NewCounterReceipt from './routes/countering/NewCounterReceipt'
+
+// Receive Receipt
+import ReportReceiveReceipt from './routes/reports/receive-receipt/ReportReceiveReceipt'
+
 import NotFound from './exceptions/NotFound'
 import Sandbox from './Sandbox'
 
@@ -83,7 +91,6 @@ import FistoProvider from './contexts/FistoContext'
 import PasswordContextProvider from './contexts/PasswordContext'
 
 import { QueryClient, QueryClientProvider } from 'react-query'
-import ReportReceiveReceipt from './routes/reports/receive-receipt/ReportReceiveReceipt'
 
 // Create a client
 const queryClient = new QueryClient()
@@ -346,6 +353,21 @@ const App = () => {
                 element={<DocumentReleasing />}
               />
             </Route>
+
+
+            <Route exact path="/counter-receipt/creating" element={<ProtectedRoute permission={6} />}>
+              <Route index exact strict element={<DocumentCounterReceiptCreating />} />
+            </Route>
+
+            <Route exact path="/counter-receipt/new-counter-receipt" element={<ProtectedRoute permission={6} />}>
+              <Route index exact strict element={<NewCounterReceipt />} />
+            </Route>
+
+            <Route exact path="/counter-receipt/monitoring" element={<ProtectedRoute permission={6} />}>
+              <Route index exact strict element={<DocumentCounterReceiptMonitoring />} />
+            </Route>
+
+
 
             <Route element={<ProtectedRoute permission={4} />}>
               <Route index exact strict path="/reports/receive-receipt" element={<ReportReceiveReceipt />} />

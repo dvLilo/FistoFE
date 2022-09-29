@@ -625,35 +625,69 @@
 
 
 
+// import React from 'react'
+
+// import ReactDOM from 'react-dom'
+
+// import * as Mui from '@mui/material'
+// import * as MuiIcon from '@mui/icons-material'
+
+// const Sandbox = () => {
+
+//   return ReactDOM.createPortal(
+//     <React.Fragment>
+//       <Mui.Typography variant="h2" align="center">Hello world</Mui.Typography>
+//       <Mui.Box sx={{ display: `flex`, flexDirection: `column`, alignItems: `center`, paddingTop: `3em` }}>
+
+//         <Mui.Accordion elevation={0} square disableGutters>
+//           <Mui.AccordionSummary expandIcon={<MuiIcon.ExpandMoreRounded />}>
+//             <b>Hello</b>
+//           </Mui.AccordionSummary>
+
+//           <Mui.AccordionDetails>Lorem ipsum dolor sit amet..</Mui.AccordionDetails>
+//         </Mui.Accordion>
+
+//         <Mui.Accordion elevation={0} square disableGutters>
+//           <Mui.AccordionSummary expandIcon={<MuiIcon.ExpandMoreRounded />}>
+//             <b>Hello</b>
+//           </Mui.AccordionSummary>
+
+//           <Mui.AccordionDetails>Lorem ipsum dolor sit amet..</Mui.AccordionDetails>
+//         </Mui.Accordion>
+
+//       </Mui.Box>
+//     </React.Fragment>,
+//     document.getElementById("sandbox")
+//   )
+// }
+
+// export default Sandbox
+
+
+
+
+
+
 import React from 'react'
 
 import ReactDOM from 'react-dom'
 
 import * as Mui from '@mui/material'
-import * as MuiIcon from '@mui/icons-material'
 
 const Sandbox = () => {
+
+  const [loading, setLoading] = React.useState(true)
 
   return ReactDOM.createPortal(
     <React.Fragment>
       <Mui.Typography variant="h2" align="center">Hello world</Mui.Typography>
       <Mui.Box sx={{ display: `flex`, flexDirection: `column`, alignItems: `center`, paddingTop: `3em` }}>
 
-        <Mui.Accordion elevation={0} square disableGutters>
-          <Mui.AccordionSummary expandIcon={<MuiIcon.ExpandMoreRounded />}>
-            <b>Hello</b>
-          </Mui.AccordionSummary>
+        <Mui.Button variant="contained" size="large" startIcon={loading && <Mui.CircularProgress color="inherit" size={16} />} disabled={loading}>Hello world.</Mui.Button>
 
-          <Mui.AccordionDetails>Lorem ipsum dolor sit amet..</Mui.AccordionDetails>
-        </Mui.Accordion>
-
-        <Mui.Accordion elevation={0} square disableGutters>
-          <Mui.AccordionSummary expandIcon={<MuiIcon.ExpandMoreRounded />}>
-            <b>Hello</b>
-          </Mui.AccordionSummary>
-
-          <Mui.AccordionDetails>Lorem ipsum dolor sit amet..</Mui.AccordionDetails>
-        </Mui.Accordion>
+        <Mui.Switch
+          onChange={(e) => setLoading(e.target.checked)}
+        />
 
       </Mui.Box>
     </React.Fragment>,
