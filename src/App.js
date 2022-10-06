@@ -80,6 +80,7 @@ import DocumentConfidentialApproving from './routes/confidential/approving/Docum
 import DocumentCounterReceiptCreating from './routes/countering/DocumentCounterReceiptCreating'
 import DocumentCounterReceiptMonitoring from './routes/countering/DocumentCounterReceiptMonitoring'
 import NewCounterReceipt from './routes/countering/NewCounterReceipt'
+import UpdateCounterReceipt from './routes/countering/UpdateCounterReceipt'
 
 // Receive Receipt
 import ReportReceiveReceipt from './routes/reports/receive-receipt/ReportReceiveReceipt'
@@ -361,6 +362,10 @@ const App = () => {
 
             <Route exact path="/counter-receipt/new-counter-receipt" element={<ProtectedRoute permission={6} />}>
               <Route index exact strict element={<NewCounterReceipt />} />
+            </Route>
+
+            <Route exact path="/counter-receipt/update-counter-receipt/:id" element={<ProtectedRoute permission={6} />}>
+              <Route index exact strict element={<UpdateCounterReceipt />} />
             </Route>
 
             <Route exact path="/counter-receipt/monitoring" element={<ProtectedRoute permission={6} />}>

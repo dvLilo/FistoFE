@@ -15,6 +15,7 @@ export const CHEQUE = `cheque`
 export const RELEASE = `release`
 export const FILE = `file`
 export const CLEAR = `clear`
+export const COUNTER = `counter`
 
 // transaction flow sub-process
 export const PENDING = `pending`

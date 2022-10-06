@@ -4,7 +4,10 @@ import axios from 'axios'
 
 import moment from 'moment'
 
-import { useNavigate } from 'react-router-dom'
+import {
+  useParams,
+  useNavigate
+} from 'react-router-dom'
 
 import NumberFormat from 'react-number-format'
 
@@ -42,11 +45,13 @@ import useConfirm from '../../hooks/useConfirm'
 import useSuppliers from '../../hooks/useSuppliers'
 import useDepartments from '../../hooks/useDepartments'
 
-const NewCounterReceipt = () => {
+const UpdateCounterReceipt = () => {
 
   const toast = useToast()
   const confirm = useConfirm()
   const navigate = useNavigate()
+
+  const { id } = useParams()
 
   const {
     status: SUPPLIER_STATUS,
@@ -88,6 +93,86 @@ const NewCounterReceipt = () => {
 
   const [crGroup, setCrGroup] = React.useState([])
 
+
+  // React.useEffect(() => { // Fetch Counter Receipt
+  //   (async () => {
+  //     let response
+  //     try {
+  //       response = await axios.get(`/api/counter-receipt/${id}`)
+
+  //       const {
+  //         supplier,
+  //         remarks,
+  //         cr_group
+  //       } = response.data.result
+
+  //       setCrGroup([...cr_group])
+  //       setData({ supplier, remarks })
+  //     }
+  //     catch (error) { }
+  //   })()
+
+  //   // eslint-disable-next-line
+  // }, [])
+
+  React.useEffect(() => { // Simulate FAKE Fetch Counter Receipt
+    setTimeout(() => {
+      setData({
+        supplier: {
+          id: 38,
+          name: "8 SOURCES, INC.",
+          references: [
+            {
+              id: 1,
+              type: "CR"
+            },
+            {
+              id: 2,
+              type: "OR"
+            },
+            {
+              id: 4,
+              type: "SI"
+            }
+          ]
+        },
+        remarks: ""
+      })
+
+      setCrGroup([
+        {
+          id: 1,
+          department: {
+            id: 12,
+            name: "Management Information System Common"
+          },
+          type: {
+            id: 4,
+            type: "SI"
+          },
+          no: "REF#10001",
+          amount: 10000,
+          date: "10/03/2022"
+        },
+        {
+          id: 2,
+          department: {
+            id: 12,
+            name: "Management Information System Common"
+          },
+          type: {
+            id: 2,
+            type: "OR"
+          },
+          no: "REF#10002",
+          amount: 13000,
+          date: "10/03/2022"
+        }
+      ])
+    }, 1000);
+
+    // eslint-disable-next-line
+  }, [])
 
   React.useEffect(() => { // Receipt Number Validation
     if (CR.no)
@@ -238,7 +323,7 @@ const NewCounterReceipt = () => {
 
         let response
         try {
-          response = await axios.post(`/api/counter-receipt`, {
+          response = await axios.put(`/api/counter-receipt/${id}`, {
             ...data,
             cr_group: [...crGroup]
           })
@@ -283,15 +368,6 @@ const NewCounterReceipt = () => {
     })
   }
 
-  const resetCounterReceiptHandler = () => {
-    setIsSaving(false)
-    setCrGroup([])
-    setData({
-      supplier: null,
-      remarks: ""
-    })
-  }
-
   const filterOptions = createFilterOptions({
     matchFrom: 'any',
     limit: 100
@@ -321,7 +397,7 @@ const NewCounterReceipt = () => {
               (option) => option.name
             }
             getOptionDisabled={
-              (option) => !crGroup.every((item) => option.references.map((item) => item.id).includes(item.type.id))
+              (option) => !crGroup.every((item) => option.references.map((a) => a.id).includes(item.type.id))
             }
             isOptionEqualToValue={
               (option, value) => option.id === value.id
@@ -368,30 +444,17 @@ const NewCounterReceipt = () => {
                 (validate.status && validate.data.includes('cr_no'))
               }
               disableElevation
-            > Save
+            > Update
             </LoadingButton>
 
-            {
-              Boolean(data.supplier) &&
-              <Button
-                variant="outlined"
-                color="error"
-                onClick={resetCounterReceiptHandler}
-                disableElevation
-              >
-                Clear
-              </Button>}
-
-            {
-              !Boolean(data.supplier) &&
-              <Button
-                variant="outlined"
-                color="error"
-                onClick={() => navigate(-1)}
-                disableElevation
-              >
-                Back
-              </Button>}
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => navigate(-1)}
+              disableElevation
+            >
+              Cancel
+            </Button>
           </Stack>
         </Stack>
       </Paper>
@@ -623,4 +686,4 @@ const NumberField = React.forwardRef((props, ref) => {
   )
 })
 
-export default NewCounterReceipt
+export default UpdateCounterReceipt

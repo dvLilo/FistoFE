@@ -8,7 +8,6 @@ import {
   Box,
   Paper,
   Typography,
-  TextField,
   InputAdornment,
   IconButton,
   TableContainer,
@@ -22,7 +21,8 @@ import {
   Tab,
   Stack,
   Chip,
-  Divider
+  Divider,
+  OutlinedInput
 } from '@mui/material'
 
 import {
@@ -240,12 +240,14 @@ const DocumentTagging = () => {
   return (
     <Box className="FstoBox-root">
       <Paper className="FstoPaperTable-root" elevation={1}>
-        <Box className="FstoBoxToolbar2-root">
-          <Box className="FstoBoxToolbar-left">
-            <Typography variant="heading">Tagging of Documents</Typography>
-          </Box>
+        <Stack className="FstoStackToolbar-root" justifyContent="space-between" gap={2}>
+          <Stack className="FstoStackToolbar-item" direction="row" alignItems="center" justifyContent="center" gap={2}>
+            <Typography variant="heading">
+              Tagging of Documents
+            </Typography>
+          </Stack>
 
-          <Box className="FstoBoxToolbar-right">
+          <Stack className="FstoStackToolbar-item" direction="row" alignItems="center" justifyContent="center" gap={1}>
             <Tabs
               className="FstoTabsToolbar-root"
               value={state}
@@ -266,47 +268,43 @@ const DocumentTagging = () => {
               <Tab className="FstoTab-root" label="Voided" value="tag-void" disableRipple />
             </Tabs>
 
-            <Stack className="FstoStackToolbar-root" direction="row">
-              <TextField
-                className="FstoTextFieldToolbar-root"
-                variant="outlined"
-                size="small"
-                autoComplete="off"
-                placeholder="Search"
-                value={search}
-                InputProps={{
-                  className: "FstoTextfieldSearch-root",
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search />
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        edge="end"
-                        size="small"
-                        disabled={!Boolean(search)}
-                        onClick={() => {
-                          setSearch("")
-                          searchData(null)
-                        }}
-                      >
-                        <Close fontSize="small" />
-                      </IconButton>
-                    </InputAdornment>
-                  )
-                }}
-                onChange={(e) => setSearch(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === "Enter") searchData(e.target.value)
-                }}
-              />
+            <OutlinedInput
+              className="FstoTextFieldSearch-root"
+              size="small"
+              autoComplete="off"
+              placeholder="Search"
+              value={search}
+              startAdornment={
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              }
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    edge="end"
+                    size="small"
+                    disabled={
+                      !Boolean(search)
+                    }
+                    onClick={() => {
+                      setSearch("")
+                      searchData(null)
+                    }}
+                  >
+                    <Close fontSize="small" />
+                  </IconButton>
+                </InputAdornment>
+              }
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") searchData(e.target.value)
+              }}
+            />
 
-              <DocumentTaggingFilter filterData={filterData} />
-            </Stack>
-          </Box>
-        </Box>
+            <DocumentTaggingFilter filterData={filterData} />
+          </Stack>
+        </Stack>
 
         <TableContainer className="FstoTableContainer-root">
           <Table className="FstoTable-root" size="small">

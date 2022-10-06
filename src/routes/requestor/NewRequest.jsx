@@ -245,6 +245,20 @@ const NewRequest = () => {
 
   const [prmGroup, setPrmGroup] = React.useState([])
   // eslint-disable-next-line
+  const [debitGroup, setDebitGroup] = React.useState([
+    {
+      pn_no: "1081200139502",
+      interest_from: "3/25/2022",
+      interest_to: "4/25/2022",
+      interest_rate: 0.0875,
+      no_of_days: 31,
+      outstanding_amount: 3935000,
+      principal_amount: 0,
+      interest_due: 29549.13,
+      cwt: 592.98,
+    }
+  ])
+  // eslint-disable-next-line
   const [poGroup, setPoGroup] = React.useState([])
 
   const [PO, setPO] = React.useState({
@@ -1363,6 +1377,8 @@ const NewRequest = () => {
     e.target.value = null
   }
 
+  const importAutoDebitHandler = (e) => { }
+
   const transformData = (ID) => {
     switch (ID) {
       case 1: // PAD - Post Acquisition Delivery
@@ -2068,7 +2084,7 @@ const NewRequest = () => {
                   )}
 
                 { // Document Number
-                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 5) &&
+                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 5 || data.document.id === 9) &&
                   (
                     <TextField
                       className="FstoTextfieldForm-root"
@@ -2117,7 +2133,7 @@ const NewRequest = () => {
                   )}
 
                 { // Request Date
-                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4 || data.document.id === 5 || data.document.id === 8) &&
+                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4 || data.document.id === 5 || data.document.id === 8 || data.document.id === 9) &&
                   (
                     <LocalizationProvider dateAdapter={DateAdapter}>
                       <DatePicker
@@ -2141,7 +2157,7 @@ const NewRequest = () => {
                   )}
 
                 { // Document Date
-                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 4 || data.document.id === 5 || data.document.id === 8) &&
+                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 4 || data.document.id === 5 || data.document.id === 8 || data.document.id === 9) &&
                   (
                     <LocalizationProvider dateAdapter={DateAdapter}>
                       <DatePicker
@@ -2175,7 +2191,7 @@ const NewRequest = () => {
                   )}
 
                 { //Document Amount
-                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 5 || data.document.id === 6 || data.document.id === 7 || data.document.id === 8) &&
+                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 5 || data.document.id === 6 || data.document.id === 7 || data.document.id === 8 || data.document.id === 9) &&
                   (
                     <TextField
                       className="FstoTextfieldForm-root"
@@ -2615,7 +2631,7 @@ const NewRequest = () => {
                   )}
 
                 { // Category
-                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4 || data.document.id === 5) &&
+                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4 || data.document.id === 5 || data.document.id === 9) &&
                   (
                     <Autocomplete
                       className="FstoSelectForm-root"
@@ -3757,6 +3773,120 @@ const NewRequest = () => {
               )}
 
             <ErrorDialog {...errorImport} />
+          </Paper>
+        )
+      }
+
+      {
+        (data.document.id === 9) &&
+        (
+          <Paper className="FstoPaperImport-root" elevation={1}>
+            <Stack direction="row" spacing={2}>
+              <Typography variant="heading">Attachment</Typography>
+
+              <Button
+                className="FstoButtonImport-root"
+                component="label"
+                variant="contained"
+                startIcon={<UploadFile />}
+                disableElevation
+              > Import
+                <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onChange={importAutoDebitHandler} hidden />
+              </Button>
+            </Stack>
+
+            <TableContainer className="FstoTableContainerImport-root">
+              <Table className="FstoTableImport-root">
+                <TableHead className="FstoTableHeadImport-root">
+                  <TableRow className="FstoTableRowImport-root">
+                    <TableCell className="FstoTableCellImport-root">PN No.</TableCell>
+                    <TableCell className="FstoTableCellImport-root">Interest From</TableCell>
+                    <TableCell className="FstoTableCellImport-root">Interest To</TableCell>
+                    <TableCell className="FstoTableCellImport-root">Interest Rate</TableCell>
+                    <TableCell className="FstoTableCellImport-root">No. of Days</TableCell>
+                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Outstanding Amount</TableCell>
+                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Principal Amount</TableCell>
+                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Interest Due</TableCell>
+                    <TableCell className="FstoTableCellImport-root" align="right">CWT</TableCell>
+                  </TableRow>
+                </TableHead>
+
+
+
+                <TableBody className="FstoTableBodyImport-root" sx={{ borderBottom: '3px solid #e0e0e0' }}>
+                  {
+                    debitGroup.map((data, index) => (
+                      <TableRow className="FstoTableRowImport-root" key={index}>
+                        <TableCell className="FstoTableCellImport-root">
+                          {data.pn_no}
+                        </TableCell>
+
+                        <TableCell className="FstoTableCellImport-root">
+                          {data.interest_from}
+                        </TableCell>
+
+                        <TableCell className="FstoTableCellImport-root">
+                          {data.interest_to}
+                        </TableCell>
+
+                        <TableCell className="FstoTableCellImport-root">
+                          {
+                            data.interest_rate.toLocaleString('default', {
+                              style: 'percent',
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
+                            })}
+                        </TableCell>
+
+                        <TableCell className="FstoTableCellImport-root">
+                          {data.no_of_days}
+                        </TableCell>
+
+                        <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                          {
+                            data.outstanding_amount.toLocaleString('default', {
+                              currency: 'PHP',
+                              style: 'currency',
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
+                            })}
+                        </TableCell>
+
+                        <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                          {
+                            data.principal_amount.toLocaleString('default', {
+                              currency: 'PHP',
+                              style: 'currency',
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
+                            })}
+                        </TableCell>
+
+                        <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                          {
+                            data.interest_due.toLocaleString('default', {
+                              currency: 'PHP',
+                              style: 'currency',
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
+                            })}
+                        </TableCell>
+
+                        <TableCell className="FstoTableCellImport-root" align="right">
+                          {
+                            data.cwt.toLocaleString('default', {
+                              currency: 'PHP',
+                              style: 'currency',
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
+                            })}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  }
+                </TableBody>
+              </Table>
+            </TableContainer>
           </Paper>
         )
       }

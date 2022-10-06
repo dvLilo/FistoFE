@@ -687,7 +687,24 @@ const Sandbox = () => {
 
         <Mui.Switch
           onChange={(e) => setLoading(e.target.checked)}
+          defaultChecked
         />
+
+        <Mui.Typography variant="h1">
+          Textfield and Button.
+        </Mui.Typography>
+
+        <Mui.Stack direction="row" alignItems="flex-start" gap={2}>
+          <Mui.TextField size="small" />
+
+          <Mui.TextField size="small" />
+
+          <Mui.TextField size="small" />
+
+          <Mui.TextField size="small" />
+
+          <Mui.Button variant="contained" disableElevation>Hello</Mui.Button>
+        </Mui.Stack>
 
       </Mui.Box>
     </React.Fragment>,

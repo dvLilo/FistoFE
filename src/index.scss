@@ -390,6 +390,31 @@ body {
   }
 }
 
+.FstoTableContainerCounter-root {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  padding: 10px;
+
+  // & .FstoTableCounter-root {}
+
+  & .FstoTableCellCounter-root.FstoTableCellCounter-head {
+    padding: 6px 10px;
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 0.55em;
+    font-weight: 300;
+  }
+
+  & .FstoTableCellCounter-root.FstoTableCellCounter-body {
+    padding: 6px 10px;
+
+    font-size: 0.85em;
+    font-weight: 400;
+    text-transform: capitalize;
+  }
+}
+
 .FstoPaperForm-root {
   flex-grow: 0;
   flex-shrink: 0;
@@ -654,7 +679,7 @@ body {
   display: flex;
   flex-direction: column;
 
-  margin-top: 64px;
+  margin-top: 1.25em;
 
   & .FstoBoxCounterReceipt-root {
     position: relative;
@@ -818,6 +843,8 @@ body {
   }
 }
 
+
+
 .FstoDialogPassword-root {
 
   & .FstoDialogPassword-content {
@@ -836,6 +863,8 @@ body {
     min-height: 190px;
   }
 }
+
+
 
 .FstoDialogTransaction-root {
 
@@ -978,6 +1007,52 @@ body {
   & .FstoTableRowCheque-root {
     height: 46px;
   }
+
+}
+
+
+
+.FstoDialogExport-root {
+
+  & .FstoBoxExport-root {
+    display: flex;
+    flex-direction: column;
+    min-height: 85vh;
+  }
+
+  & .FstoDialogExport-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  & .FstoDialogExport-content {
+    padding-top: 8px !important;
+    padding-left: 24px;
+    padding-right: 24px;
+
+    & .FstoStackExport-root {
+      align-items: flex-start;
+    }
+
+    & .FstoDividerExport-root {
+      margin-top: 24px;
+      margin-bottom: 24px;
+
+      border-bottom-width: medium;
+    }
+  }
+
+  & .FstoDialogExport-actions {
+    padding: 2em;
+  }
+
+
+
+  & .FstoPaperExport-root {
+    min-height: 85vh;
+  }
+
 
 }
 
