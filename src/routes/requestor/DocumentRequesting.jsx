@@ -20,14 +20,14 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  TableSortLabel,
   TablePagination,
   Tabs,
   Tab,
   Stack,
   Chip,
   Tooltip,
-  OutlinedInput
+  OutlinedInput,
+  Divider
 } from '@mui/material'
 
 import {
@@ -36,6 +36,8 @@ import {
   Add,
   Error
 } from '@mui/icons-material'
+
+import EmptyImage from '../../assets/img/empty.svg'
 
 import useToast from '../../hooks/useToast'
 import useTransactions from '../../hooks/useTransactions'
@@ -217,28 +219,32 @@ const DocumentRequesting = () => {
             <TableHead className="FstoTableHead-root">
               <TableRow className="FstoTableRow-root">
                 <TableCell className="FstoTableCell-root FstoTableCell-head">
-                  <TableSortLabel active={false}>TRANSACTION</TableSortLabel>
+                  TRANSACTION
                 </TableCell>
 
                 <TableCell className="FstoTableCell-root FstoTableCell-head">
-                  <TableSortLabel active={false}>REQUESTOR</TableSortLabel>
+                  REQUESTOR
                 </TableCell>
 
                 <TableCell className="FstoTableCell-root FstoTableCell-head">
-                  <TableSortLabel active={false}>CHARGING</TableSortLabel>
+                  CHARGING
                 </TableCell>
 
                 <TableCell className="FstoTableCell-root FstoTableCell-head">
-                  <TableSortLabel active={false}>AMOUNT DETAILS</TableSortLabel>
+                  AMOUNT DETAILS
                 </TableCell>
 
                 <TableCell className="FstoTableCell-root FstoTableCell-head">
-                  <TableSortLabel active={false}>PO DETAILS</TableSortLabel>
+                  PO DETAILS
                 </TableCell>
 
-                <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">STATUS</TableCell>
+                <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">
+                  STATUS
+                </TableCell>
 
-                <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">ACTIONS</TableCell>
+                <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">
+                  ACTIONS
+                </TableCell>
               </TableRow>
             </TableHead>
 
@@ -246,10 +252,6 @@ const DocumentRequesting = () => {
               {
                 status === 'loading'
                 && <TablePreloader row={3} />}
-
-              {
-                status === 'error'
-                && <TableRow><TableCell align="center" colSpan={7}>NO RECORDS FOUND</TableCell></TableRow>}
 
               {
                 status === 'success'
@@ -261,29 +263,29 @@ const DocumentRequesting = () => {
                   return (
                     <TableRow className="FstoTableRow-root" key={index} hover>
                       <TableCell className="FstoTableCell-root FstoTableCell-body">
-                        <Typography variant="button" sx={{ display: `flex`, alignItems: `center`, marginBottom: `5px`, fontWeight: 700, lineHeight: 1.25 }}>
+                        <Typography className="FstoTypography-root FstoTypography-transaction" variant="button">
                           {data.transaction_id}
                           &nbsp;&mdash;&nbsp;
                           {data.document_type}
                           {
                             data.document_id === 4 && data.payment_type.toLowerCase() === `partial` &&
-                            <Chip label={data.payment_type} size="small" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
+                            <Chip className="FstoChip-root FstoChip-payment" label={data.payment_type} size="small" />
                           }
                           {
                             Boolean(data.is_latest_transaction) &&
-                            <Chip label="Latest" size="small" color="primary" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
+                            <Chip className="FstoChip-root FstoChip-latest" label="Latest" size="small" color="primary" />
                           }
                           {
                             data.supplier.supplier_type.id === 1 &&
-                            <Chip label={data.supplier.supplier_type.name} size="small" color="secondary" sx={{ height: `20px`, marginLeft: `5px`, textTransform: `capitalize`, fontWeight: 500 }} />
+                            <Chip className="FstoChip-root FstoChip-priority" label={data.supplier.supplier_type.name} size="small" color="secondary" />
                           }
                         </Typography>
 
-                        <Typography variant="caption" sx={{ display: `flex`, alignItems: `center`, fontSize: `1.25em`, textTransform: `uppercase`, lineHeight: 1.55 }}>
+                        <Typography className="FstoTypography-root FstoTypography-supplier" variant="caption">
                           {data.supplier.name}
                         </Typography>
 
-                        <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1 }}>
+                        <Typography className="FstoTypography-root FstoTypography-remarks" variant="h6">
                           {
                             data.remarks
                               ? data.remarks
@@ -304,23 +306,40 @@ const DocumentRequesting = () => {
                       </TableCell>
 
                       <TableCell className="FstoTableCell-root FstoTableCell-body">
-                        <Typography variant="subtitle1" sx={{ textTransform: `capitalize` }}>{data.users.first_name.toLowerCase()} {data.users.middle_name.toLowerCase()} {data.users.last_name.toLowerCase()}</Typography>
-                        <Typography variant="subtitle2">{data.users.department[0].name}</Typography>
-                        <Typography variant="subtitle2">{data.users.position}</Typography>
+                        <Typography className="FstoTypography-root FstoTypography-requestor" variant="subtitle1">
+                          {data.users.first_name.toLowerCase()} {data.users.middle_name.toLowerCase()} {data.users.last_name.toLowerCase()}
+                        </Typography>
+
+                        <Typography variant="subtitle2">
+                          {data.users.department[0].name}
+                        </Typography>
+
+                        <Typography variant="subtitle2">
+                          {data.users.position}
+                        </Typography>
                       </TableCell>
 
                       <TableCell className="FstoTableCell-root FstoTableCell-body">
-                        <Typography variant="subtitle1">{data.company}</Typography>
-                        <Typography variant="subtitle2">{data.department}</Typography>
-                        <Typography variant="subtitle2">{data.location}</Typography>
+                        <Typography variant="subtitle1">
+                          {data.company}
+                        </Typography>
+
+                        <Typography variant="subtitle2">
+                          {data.department}
+                        </Typography>
+
+                        <Typography variant="subtitle2">
+                          {data.location}
+                        </Typography>
                       </TableCell>
 
                       <TableCell className="FstoTableCell-root FstoTableCell-body">
-                        <Typography variant="caption" sx={{ fontWeight: 500 }}>
+                        <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
                           {data.document_id !== 4 && data.document_no?.toUpperCase()}
                           {data.document_id === 4 && data.referrence_no?.toUpperCase()}
                         </Typography>
-                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
+
+                        <Typography className="FstoTypography-root FstoTypography-amount" variant="h6">
                           &#8369;
                           {data.document_id !== 4 && data.document_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
                           {data.document_id === 4 && data.referrence_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
@@ -329,18 +348,31 @@ const DocumentRequesting = () => {
 
                       <TableCell className="FstoTableCell-root FstoTableCell-body">
                         {
-                          data.po_details.length
-                            ? <React.Fragment>
-                              <Typography variant="caption" sx={{ fontWeight: 500 }}>{data.po_details[0].po_no.toUpperCase()}{data.po_details.length > 1 && '...'}</Typography>
-                              <Typography variant="h6" sx={{ fontWeight: 700 }}>&#8369;{data.po_details[0].po_total_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</Typography>
-                            </React.Fragment>
-                            : <React.Fragment>&mdash;</React.Fragment>
+                          Boolean(data.po_details.length) &&
+                          <React.Fragment>
+                            <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
+                              {data.po_details[0].po_no.toUpperCase()}
+                              {data.po_details.length > 1 && <React.Fragment>&nbsp;&bull;&bull;&bull;</React.Fragment>}
+                            </Typography>
+
+                            <Typography className="FstoTypography-root FstoTypography-amount" variant="h6">
+                              &#8369;
+                              {data.po_details[0].po_total_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                            </Typography>
+                          </React.Fragment>
+                        }
+
+                        {
+                          !Boolean(data.po_details.length) &&
+                          <React.Fragment>
+                            &mdash;
+                          </React.Fragment>
                         }
                       </TableCell>
 
                       <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
                         <Tooltip title="Hello world. Hello, Fisto!" placement="top" disableInteractive disableFocusListener arrow>
-                          <Chip label={data.status} size="small" color="warning" sx={{ textTransform: `capitalize`, fontWeight: 500 }} />
+                          <Chip className="FstoChip-root FstoChip-status" label={data.status} size="small" color="warning" />
                         </Tooltip>
                       </TableCell>
 
@@ -359,6 +391,17 @@ const DocumentRequesting = () => {
               }
             </TableBody>
           </Table>
+
+          {
+            status === 'error' &&
+            <React.Fragment>
+              <Divider variant="fullWidth" />
+
+              <Box className="FstoTableBox-root">
+                <img alt="No Data" src={EmptyImage} />
+                <Typography variant="body1">NO RECORDS FOUND</Typography>
+              </Box>
+            </React.Fragment>}
         </TableContainer>
 
 

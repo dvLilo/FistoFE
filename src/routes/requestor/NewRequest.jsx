@@ -245,19 +245,7 @@ const NewRequest = () => {
 
   const [prmGroup, setPrmGroup] = React.useState([])
   // eslint-disable-next-line
-  const [debitGroup, setDebitGroup] = React.useState([
-    {
-      pn_no: "1081200139502",
-      interest_from: "3/25/2022",
-      interest_to: "4/25/2022",
-      interest_rate: 0.0875,
-      no_of_days: 31,
-      outstanding_amount: 3935000,
-      principal_amount: 0,
-      interest_due: 29549.13,
-      cwt: 592.98,
-    }
-  ])
+  const [debitGroup, setDebitGroup] = React.useState([])
   // eslint-disable-next-line
   const [poGroup, setPoGroup] = React.useState([])
 
@@ -303,10 +291,9 @@ const NewRequest = () => {
 
         setDocumentTypes({ fetching: false, data: [] })
         toast({
-          open: true,
-          severity: "error",
           title: "Error!",
-          message: "Something went wrong whilst trying to connect to the server. Please try again later."
+          message: "Something went wrong whilst trying to connect to the server. Please try again later.",
+          severity: "error"
         })
       }
     })()
@@ -341,7 +328,9 @@ const NewRequest = () => {
         if (error.request.status !== 404)
           toast({
             title: "Error!",
-            message: "Something went wrong whilst validating user department."
+            message: "Something went wrong whilst validating user department.",
+            severity: "error",
+            duration: null
           })
       }
     })()
@@ -708,6 +697,25 @@ const NewRequest = () => {
           && data.document.pcf_batch.letter
           && data.document.pcf_batch.date
           && (!error.status || !Boolean(error.data.pcf_name))
+          ? false : true
+
+      case 9: // Auto Debit
+        return data.document.payment_type
+          && data.document.no
+          && data.document.date
+          && data.document.amount
+          && data.document.company
+          && data.document.department
+          && data.document.location
+          && data.document.supplier
+          && data.document.category
+          && debitGroup.length
+          && (
+            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) >= 0.00 &&
+            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) <= 1.00
+          )
+          && (!error.status || !Boolean(error.data.document_no))
+          && (!validate.status || !validate.data.includes('document_no'))
           ? false : true
 
       default:
@@ -1377,7 +1385,165 @@ const NewRequest = () => {
     e.target.value = null
   }
 
-  const importAutoDebitHandler = (e) => { }
+  const importAutoDebitHandler = (e) => {
+
+    const file = e.target.files[0]
+    const types = ["application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]
+
+    if (!!file) {
+      if (!types.includes(file.type))
+        return toast({
+          open: true,
+          severity: "error",
+          title: "Error!",
+          message: "Please select only excel file types and try again."
+        })
+
+      const reader = new FileReader()
+
+      reader.readAsArrayBuffer(file)
+      reader.onload = async (response) => {
+
+        const errors = []
+        const header = [
+          "pn_no",
+          "interest_from",
+          "interest_to",
+          "interest_rate",
+          "no_of_days",
+          "outstanding_amount",
+          "principal_amount",
+          "interest_due",
+          "cwt"
+        ]
+
+        const excelFile = response.target.result
+
+        const workbook = XLSX.read(excelFile, { type: 'buffer' })
+
+        const sheetname = workbook.SheetNames[0]
+        const worksheet = workbook.Sheets[sheetname]
+
+        const excelJson = XLSX.utils.sheet_to_json(worksheet, { raw: false, defval: "" })
+
+        // Transaform headers
+        excelJson.forEach((row) => {
+          Object.keys(row).forEach((key) => {
+            let newKey = key.trim().toLowerCase().replace(/[ ]/g, "_")
+            if (key !== newKey) {
+              row[newKey] = row[key]
+              delete row[key]
+            }
+          })
+        })
+
+        // Check empty
+        if (!excelJson.length)
+          return toast({
+            open: true,
+            severity: "error",
+            title: "Error!",
+            message: "Excel file is empty, please check your excel file and try again."
+          })
+
+        // Check headers
+        if (!Object.keys(excelJson[0]).every((item) => header.includes(item)))
+          return toast({
+            open: true,
+            severity: "error",
+            title: "Error!",
+            message: "Invalid excel template, please check your excel file and try again."
+          })
+
+        // Check empty cell
+        excelJson.forEach((item, itemIndex) => {
+          Object.entries(item).forEach((entry) => {
+            const [key, value] = entry
+
+            if (key !== "principal_amount")
+              if (value === "")
+                errors.push({
+                  line: itemIndex + 2,
+                  error_type: "empty",
+                  description: `${key.replace(/[_]/g, " ")} is empty.`
+                })
+          })
+        })
+
+        // Validate date for interest from and to
+        excelJson.forEach((item, itemIndex) => {
+          const interestFromTimestamp = new Date(item.interest_from)
+          const interestToTimestamp = new Date(item.interest_to)
+
+          if (!(interestFromTimestamp instanceof Date && !isNaN(interestFromTimestamp)))
+            errors.push({
+              line: itemIndex + 2,
+              error_type: "invalid",
+              description: `Interest from date is invalid.`
+            })
+
+          if (!(interestToTimestamp instanceof Date && !isNaN(interestToTimestamp)))
+            errors.push({
+              line: itemIndex + 2,
+              error_type: "invalid",
+              description: `Interest to date is invalid.`
+            })
+        })
+
+        // Validate amounts for outstanding, principal, interest due and cwt
+        excelJson.map((item) => {
+          const { outstanding_amount, principal_amount, interest_due, cwt } = item
+
+          return {
+            outstanding_amount,
+            principal_amount,
+            interest_due,
+            cwt
+          }
+        }).forEach((item, itemIndex) => {
+          Object.entries(item).forEach((entry) => {
+            const [key, value] = entry
+
+            if (isNaN(Number(value.replace(/[,]/gi, ''))))
+              errors.push({
+                line: itemIndex + 2,
+                error_type: "invalid",
+                description: `${key.replace(/[_]/g, " ")} is invalid.`
+              })
+          })
+        })
+
+
+        if (errors.length)
+          return setErrorImport(currentValue => ({
+            ...currentValue,
+            open: true,
+            data: {
+              message: "Import failed. Kindly check the errors.",
+              result: errors
+            }
+          }))
+
+
+        // Transforming data
+        const excelTransformed = excelJson.map((item) => ({
+          ...item,
+          cwt: parseFloat(item.cwt.replace(/[,]/gi, '')),
+          interest_due: parseFloat(item.interest_due.replace(/[,]/gi, '')),
+          interest_rate: parseFloat(item.interest_rate.replace(/[,]/gi, '')),
+          principal_amount: parseFloat(item.principal_amount.replace(/[,]/gi, '')),
+          outstanding_amount: parseFloat(item.outstanding_amount.replace(/[,]/gi, '')),
+
+          no_of_days: parseInt(item.no_of_days)
+        }))
+
+        setDebitGroup(excelTransformed)
+      }
+    }
+
+    // reset the import button
+    e.target.value = null
+  }
 
   const transformData = (ID) => {
     switch (ID) {
@@ -1565,12 +1731,36 @@ const NewRequest = () => {
           }
         }
 
+      case 9: // Auto Debit
+        return {
+          requestor: data.requestor,
+          document: {
+            id: data.document.id,
+            no: `ad#${data.document.no}`,
+            name: data.document.name,
+            amount: data.document.amount,
+            date: new Date(data.document.date).toISOString().slice(0, 10),
+            payment_type: data.document.payment_type,
+
+            company: data.document.company,
+            department: data.document.department,
+            location: data.document.location,
+            supplier: data.document.supplier,
+            category: data.document.category,
+
+            remarks: data.document.remarks
+          },
+          autoDebit_group: debitGroup
+        }
+
       default:
         return {}
     }
   }
 
   const truncateData = () => {
+    setDebitGroup([])
+
     setPrmGroup([])
 
     setPoGroup([])
@@ -2123,6 +2313,7 @@ const NewRequest = () => {
                             {data.document.id === 2 && "prmc#"}
                             {data.document.id === 3 && "prmm#"}
                             {data.document.id === 5 && "cb#"}
+                            {data.document.id === 9 && "ad#"}
                           </InputAdornment>
                       }}
                       InputLabelProps={{
@@ -2226,6 +2417,13 @@ const NewRequest = () => {
                           && !(
                             Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) >= 0.00 &&
                             Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) <= 1.00
+                          )) ||
+                        (
+                          Boolean(debitGroup.length) &&
+                          Boolean(data.document.amount)
+                          && !(
+                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) >= 0.00 &&
+                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) <= 1.00
                           ))
                       }
                       helperText={
@@ -2256,7 +2454,15 @@ const NewRequest = () => {
                             Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) >= 0.00 &&
                             Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) <= 1.00
                           )
-                          && "Document amount and principal amount is not equal.")
+                          && "Document amount and principal amount is not equal.") ||
+                        (
+                          Boolean(debitGroup.length) &&
+                          Boolean(data.document.amount)
+                          && !(
+                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) >= 0.00 &&
+                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) <= 1.00
+                          )
+                          && "Document amount and net of cwt amount is not equal.")
                       }
                       onChange={(e) => setData({
                         ...data,
@@ -2637,7 +2843,7 @@ const NewRequest = () => {
                       className="FstoSelectForm-root"
                       size="small"
                       filterOptions={filterOptions}
-                      options={DOCUMENT_TYPES.data.find(type => type.id === data.document.id).categories}
+                      options={DOCUMENT_TYPES.data.find(type => type.id === data.document.id)?.categories || []}
                       value={data.document.category}
                       renderInput={
                         props =>
@@ -3795,98 +4001,152 @@ const NewRequest = () => {
               </Button>
             </Stack>
 
-            <TableContainer className="FstoTableContainerImport-root">
-              <Table className="FstoTableImport-root">
-                <TableHead className="FstoTableHeadImport-root">
-                  <TableRow className="FstoTableRowImport-root">
-                    <TableCell className="FstoTableCellImport-root">PN No.</TableCell>
-                    <TableCell className="FstoTableCellImport-root">Interest From</TableCell>
-                    <TableCell className="FstoTableCellImport-root">Interest To</TableCell>
-                    <TableCell className="FstoTableCellImport-root">Interest Rate</TableCell>
-                    <TableCell className="FstoTableCellImport-root">No. of Days</TableCell>
-                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Outstanding Amount</TableCell>
-                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Principal Amount</TableCell>
-                    <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Interest Due</TableCell>
-                    <TableCell className="FstoTableCellImport-root" align="right">CWT</TableCell>
-                  </TableRow>
-                </TableHead>
+            {
+              Boolean(debitGroup.length) &&
+              (
+                <React.Fragment>
+                  <TableContainer className="FstoTableContainerImport-root">
+                    <Table className="FstoTableImport-root">
+                      <TableHead className="FstoTableHeadImport-root">
+                        <TableRow className="FstoTableRowImport-root">
+                          <TableCell className="FstoTableCellImport-root">PN No.</TableCell>
+                          <TableCell className="FstoTableCellImport-root">Interest From</TableCell>
+                          <TableCell className="FstoTableCellImport-root">Interest To</TableCell>
+                          <TableCell className="FstoTableCellImport-root">Interest Rate</TableCell>
+                          <TableCell className="FstoTableCellImport-root">No. of Days</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Outstanding Amount</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Principal Amount</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Interest Due</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right">CWT</TableCell>
+                        </TableRow>
+                      </TableHead>
 
 
 
-                <TableBody className="FstoTableBodyImport-root" sx={{ borderBottom: '3px solid #e0e0e0' }}>
-                  {
-                    debitGroup.map((data, index) => (
-                      <TableRow className="FstoTableRowImport-root" key={index}>
-                        <TableCell className="FstoTableCellImport-root">
-                          {data.pn_no}
-                        </TableCell>
+                      <TableBody className="FstoTableBodyImport-root" sx={{ borderBottom: '3px solid #e0e0e0' }}>
+                        {
+                          debitGroup.map((data, index) => (
+                            <TableRow className="FstoTableRowImport-root" key={index}>
+                              <TableCell className="FstoTableCellImport-root">
+                                {data.pn_no}
+                              </TableCell>
 
-                        <TableCell className="FstoTableCellImport-root">
-                          {data.interest_from}
-                        </TableCell>
+                              <TableCell className="FstoTableCellImport-root">
+                                {data.interest_from}
+                              </TableCell>
 
-                        <TableCell className="FstoTableCellImport-root">
-                          {data.interest_to}
-                        </TableCell>
+                              <TableCell className="FstoTableCellImport-root">
+                                {data.interest_to}
+                              </TableCell>
 
-                        <TableCell className="FstoTableCellImport-root">
-                          {
-                            data.interest_rate.toLocaleString('default', {
-                              style: 'percent',
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2
-                            })}
-                        </TableCell>
+                              <TableCell className="FstoTableCellImport-root">
+                                {`${data.interest_rate}%`}
+                              </TableCell>
 
-                        <TableCell className="FstoTableCellImport-root">
-                          {data.no_of_days}
-                        </TableCell>
+                              <TableCell className="FstoTableCellImport-root">
+                                {data.no_of_days}
+                              </TableCell>
 
-                        <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
-                          {
-                            data.outstanding_amount.toLocaleString('default', {
-                              currency: 'PHP',
-                              style: 'currency',
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2
-                            })}
-                        </TableCell>
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.outstanding_amount.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                  })}
+                              </TableCell>
 
-                        <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
-                          {
-                            data.principal_amount.toLocaleString('default', {
-                              currency: 'PHP',
-                              style: 'currency',
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2
-                            })}
-                        </TableCell>
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.principal_amount.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                  })}
+                              </TableCell>
 
-                        <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
-                          {
-                            data.interest_due.toLocaleString('default', {
-                              currency: 'PHP',
-                              style: 'currency',
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2
-                            })}
-                        </TableCell>
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.interest_due.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                  })}
+                              </TableCell>
 
-                        <TableCell className="FstoTableCellImport-root" align="right">
-                          {
-                            data.cwt.toLocaleString('default', {
-                              currency: 'PHP',
-                              style: 'currency',
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2
-                            })}
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  }
-                </TableBody>
-              </Table>
-            </TableContainer>
+                              <TableCell className="FstoTableCellImport-root" align="right">
+                                {
+                                  data.cwt.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                  })}
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        }
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total Principal Amount</Typography>
+                    <Typography variant="heading">
+                      {
+                        debitGroup.map((data) => data.principal_amount).reduce((a, b) => a + b, 0).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency',
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                    </Typography>
+                  </Box>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total Interest Amount</Typography>
+                    <Typography variant="heading">
+                      {
+                        debitGroup.map((data) => data.interest_due).reduce((a, b) => a + b, 0).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency',
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                    </Typography>
+                  </Box>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total CWT</Typography>
+                    <Typography variant="heading">
+                      {
+                        debitGroup.map((data) => data.cwt).reduce((a, b) => a + b, 0).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency',
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                    </Typography>
+                  </Box>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total Net of CWT</Typography>
+                    <Typography variant="heading">
+                      {
+                        debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency',
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                    </Typography>
+                  </Box>
+                </React.Fragment>
+              )
+            }
           </Paper>
         )
       }

@@ -391,9 +391,17 @@ const DocumentTagging = () => {
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
-                      <Typography variant="subtitle1">{item.company}</Typography>
-                      <Typography variant="subtitle2">{item.department}</Typography>
-                      <Typography variant="subtitle2">{item.location}</Typography>
+                      <Typography variant="subtitle1">
+                        {item.company}
+                      </Typography>
+
+                      <Typography variant="subtitle2">
+                        {item.department}
+                      </Typography>
+
+                      <Typography variant="subtitle2">
+                        {item.location}
+                      </Typography>
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
