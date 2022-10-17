@@ -2,6 +2,8 @@ import React from 'react'
 
 import moment from 'moment'
 
+import { useSelector } from 'react-redux'
+
 import {
   Alert,
   AlertTitle,
@@ -12,6 +14,9 @@ import {
   ListItem,
   Skeleton,
   Stack,
+  Step,
+  StepLabel,
+  Stepper,
   Typography
 } from '@mui/material'
 
@@ -27,6 +32,62 @@ const TransactionDialog = (props) => {
     onAccountTitleView = () => { },
     onChequeView = () => { }
   } = props
+
+  const user = useSelector((state) => state.user)
+
+  const process = [
+    "Tagging of Document",
+    "Creation of Voucher",
+    "Approval of Voucher",
+    "Transmittal of Document",
+    "Creation of Cheque",
+    "Releasing of Cheque",
+    "Filing of Voucher"
+  ]
+
+  const activeStep = (state = "") => {
+    if (Boolean(state.match(/tag/i)))
+      return 0
+
+    if (Boolean(state.match(/voucher/i)))
+      return 1
+
+    if (Boolean(state.match(/approve/i)))
+      return 2
+
+    if (Boolean(state.match(/transmit/i)))
+      return 3
+
+    if (Boolean(state.match(/cheque/i)))
+      return 4
+
+    if (Boolean(state.match(/release/i)))
+      return 5
+
+    if (Boolean(state.match(/file/i)))
+      return 6
+
+    return -1
+  }
+
+  const activeStatus = (status = "") => {
+    switch (status) {
+      case "tag":
+        return "tagged"
+
+      case "hold":
+        return "held"
+
+      case "transmit":
+        return "transmitted"
+
+      default:
+        if (status.endsWith("e"))
+          return `${status}d`
+
+        return `${status}ed`
+    }
+  }
 
   return (
     <React.Fragment>
@@ -45,7 +106,32 @@ const TransactionDialog = (props) => {
           </AlertTitle>
 
           Remarks: {data.reason.remarks ? <b>{data.reason.remarks}</b> : <i>None</i>}
-        </Alert>}
+        </Alert>
+      }
+
+      {
+        status === `success` && user && user.role.toLowerCase() === `requestor` &&
+        <Box className="FstoBoxTransactionSteps-root">
+          <Stepper activeStep={activeStep(data.transaction.status)} alternativeLabel>
+            {
+              process.map((item, index) => (
+                <Step key={index}>
+                  <StepLabel
+                    optional={
+                      activeStep(data.transaction.status) === index &&
+                      <Box sx={{ textAlign: 'center', marginTop: 1 }}>
+                        <Chip label={activeStatus(data.transaction.state)} color="info" size="small" sx={{ textTransform: 'capitalize', paddingLeft: 0.5, paddingRight: 0.5, fontSize: '0.76em' }} />
+                      </Box>
+                    }>
+                    {item}
+                  </StepLabel>
+                </Step>
+              ))
+            }
+          </Stepper>
+        </Box>
+      }
+
 
       <Box className="FstoBoxTransactionDetails-root">
         <Box className="FstoBoxTransactionDetails-content">
@@ -494,7 +580,7 @@ const TransactionDialog = (props) => {
             </React.Fragment>}
         </Box>
 
-        <Divider variant="middle" orientation="vertical" flexItem />
+        <Divider className="FstoDividerTransactionDetails-root" variant="middle" orientation="vertical" flexItem />
 
         <Box className="FstoBoxTransactionDetails-content">
           <Typography variant="h6" sx={{ fontWeight: 700 }}>Purchase Order</Typography>

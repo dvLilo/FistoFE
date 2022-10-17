@@ -34,7 +34,8 @@ import {
   Search,
   Close,
   Add,
-  Error
+  Error,
+  AccessTime
 } from '@mui/icons-material'
 
 import EmptyImage from '../../assets/img/empty.svg'
@@ -73,6 +74,7 @@ const DocumentRequesting = () => {
   const [view, setView] = React.useState({
     open: false,
     transaction: null,
+    onBack: undefined,
     onClose: () => setView(currentValue => ({
       ...currentValue,
       open: false
@@ -121,7 +123,8 @@ const DocumentRequesting = () => {
   const onView = (transaction) => setView(currentValue => ({
     ...currentValue,
     transaction,
-    open: true
+    open: true,
+    onBack: onView
   }))
 
   const onUpdate = (data) => {
@@ -136,6 +139,102 @@ const DocumentRequesting = () => {
     open: true
   }))
 
+  const getStatusMessage = (state) => {
+
+    const [process, subprocess, recipient] = state.split("-")
+
+    switch (process) {
+      case "tag":
+        if (subprocess === 'receive')
+          return "Receive by AP Tagging for tagging."
+
+        if (subprocess === 'tag')
+          return "Tagged by AP Tagging."
+
+        break
+
+      case "voucher":
+        if (subprocess === 'receive')
+          return "Receive by AP Associate for vouchering."
+
+        if (subprocess === 'voucher')
+          return "Vouchered by AP Associate."
+
+        break
+
+      case "approve":
+        if (subprocess === 'receive')
+          return "Receive by Approver for approval."
+
+        if (subprocess === 'voucher')
+          return "Approved by Approver."
+
+        break
+
+      case "transmit":
+        if (subprocess === 'receive')
+          return "Receive by AP Associate for transmittal."
+
+        if (subprocess === 'transmit')
+          return "Transmitted by AP Associate."
+
+        break
+
+      case "cheque":
+        if (subprocess === 'receive')
+          return "Receive by Treasury Associate for cheque creation."
+
+        if (subprocess === 'cheque')
+          return "Created cheque by Treasury Associate."
+
+        if (subprocess === 'release')
+          return "Released cheque by Treasury Associate."
+
+        if (subprocess === 'reverse')
+          return "Reversed cheque by Treasury Associate."
+
+        break
+
+      case "release":
+        if (subprocess === 'receive')
+          return "Receive by AP Tagging for releasing."
+
+        if (subprocess === 'release')
+          return "Released by AP Tagging."
+
+        break
+
+      case "file":
+        if (subprocess === 'receive')
+          return "Receive by AP Associate for voucher filing."
+
+        if (subprocess === 'file')
+          return "Filed by AP Associate."
+
+        break
+
+      case "reverse":
+        if (subprocess === 'request')
+          return "Requested return voucher by AP Tagging."
+
+        if (subprocess === 'receive' && recipient === 'approver')
+          return "Received by AP Associate for return voucher."
+
+        if (subprocess === 'approve')
+          return "Approved return voucher by AP Associate."
+
+        if (subprocess === 'receive' && recipient === 'requestor')
+          return "Received by AP Tagging for return voucher."
+
+        if (subprocess === 'return')
+          return "Returned by AP Tagging for reversal."
+
+        break
+
+      default:
+        return "Pending for tagging."
+    }
+  }
 
   return (
     <Box className="FstoBox-root">
@@ -293,16 +392,27 @@ const DocumentRequesting = () => {
                           }
                         </Typography>
 
-                        <Typography variant="caption" sx={{ display: `flex`, alignItems: `center`, lineHeight: 1.65 }}>
-                          Estimated Release Date:&nbsp;
-                          <strong>
-                            {estimatedReleaseDate.format("MMMM DD, YYYY")}
-                          </strong>&nbsp;
-                          <i>
-                            {currentDate.to(estimatedReleaseDate)}
-                          </i>
-                          {currentDate.to(estimatedReleaseDate).match(/ago/gi) && <Error color="error" fontSize="small" sx={{ marginLeft: `3px` }} />}
-                        </Typography>
+                        {
+                          !!data.state.match(/^pending|^tag|^voucher|^approve|^transmit|^cheque|^reverse/i) &&
+                          <Typography variant="caption" sx={{ display: `flex`, alignItems: `center`, lineHeight: 1.65 }}>
+                            Estimated Release Date:&nbsp;
+                            <strong>
+                              {estimatedReleaseDate.format("MMMM DD, YYYY")}
+                            </strong>&nbsp;
+                            <i>
+                              {currentDate.to(estimatedReleaseDate)}
+                            </i>
+                            {currentDate.to(estimatedReleaseDate).match(/ago/gi) && <Error color="error" fontSize="small" sx={{ marginLeft: `3px` }} />}
+                          </Typography>
+                        }
+
+                        {
+                          !!data.state.match(/^release|^file|^clear/i) &&
+                          <Typography className="FstoTypography-root FstoTypography-dates" variant="caption">
+                            <AccessTime sx={{ fontSize: `1.3em` }} />
+                            {moment(data.date_requested).format("MMMM DD, YYYY — hh:mm A")}
+                          </Typography>
+                        }
                       </TableCell>
 
                       <TableCell className="FstoTableCell-root FstoTableCell-body">
@@ -371,8 +481,8 @@ const DocumentRequesting = () => {
                       </TableCell>
 
                       <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                        <Tooltip title="Hello world. Hello, Fisto!" placement="top" disableInteractive disableFocusListener arrow>
-                          <Chip className="FstoChip-root FstoChip-status" label={data.status} size="small" color="warning" />
+                        <Tooltip title={getStatusMessage(data.state)} placement="top" disableInteractive disableFocusListener arrow>
+                          <Chip className="FstoChip-root FstoChip-status" label={data.status} size="small" color="primary" />
                         </Tooltip>
                       </TableCell>
 

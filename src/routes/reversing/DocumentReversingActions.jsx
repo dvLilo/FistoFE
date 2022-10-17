@@ -13,11 +13,11 @@ import {
   TaskOutlined as ReceiveIcon,
   VisibilityOutlined as ViewIcon,
   DescriptionOutlined as ManageIcon,
-  // ReplyOutlined as TransferIcon,
+  ReplyOutlined as TransferIcon,
   ReplyOutlined as CancelIcon
 } from '@mui/icons-material'
 
-const DocumentReversingActions = ({ data, state, onReceive, onManage, onView, onCancel }) => {
+const DocumentReversingActions = ({ data, state, onReceive, onTransfer, onManage, onView, onCancel }) => {
 
   const user = useSelector(state => state.user)
 
@@ -68,8 +68,8 @@ const DocumentReversingActions = ({ data, state, onReceive, onManage, onView, on
             <ReceiveIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Receive
           </MenuItem>}
 
-        {/* {
-          state === `pending-file` && user?.role === `AP Specialist` &&
+        {
+          (user?.role === `AP Specialist` && state === `pending-request`) &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -79,7 +79,7 @@ const DocumentReversingActions = ({ data, state, onReceive, onManage, onView, on
             dense
           >
             <TransferIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75, transform: `scaleX(-1)` }} /> Transfer
-          </MenuItem>} */}
+          </MenuItem>}
 
         {
           ((user?.role === `AP Tagging` && state === `pending-file`) || (user?.role === `AP Tagging` && state === `reverse-receive-requestor`) || state === `reverse-receive-approver`) &&

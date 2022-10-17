@@ -78,8 +78,8 @@ const FilterPopover = (props) => {
   const [anchor, setAnchor] = React.useState(null)
 
   const [filter, setFilter] = React.useState({
-    from: new Date(),
-    to: new Date(),
+    from: null,
+    to: null,
     types: [1, 2, 3, 4, 5, 6, 7, 8],
     suppliers: []
   })
@@ -110,8 +110,8 @@ const FilterPopover = (props) => {
 
   const filterClearHandler = () => {
     setFilter({
-      from: new Date(),
-      to: new Date(),
+      from: null,
+      to: null,
       types: [1, 2, 3, 4, 5, 6, 7, 8],
       suppliers: []
     })
@@ -122,6 +122,21 @@ const FilterPopover = (props) => {
       types: null,
       suppliers: null
     })
+  }
+
+  const filterCheckHandler = (e) => {
+    const check = e.target.checked
+
+    if (check)
+      setFilter(currentValue => ({
+        ...currentValue,
+        types: [...currentValue.types, parseInt(e.target.value)]
+      }))
+    else
+      setFilter(currentValue => ({
+        ...currentValue,
+        types: [...currentValue.types.filter(type => type !== parseInt(e.target.value))]
+      }))
   }
 
   return (
@@ -164,20 +179,7 @@ const FilterPopover = (props) => {
                     size="small"
                     value={item.id}
                     checked={filter.types.includes(item.id)}
-                    onChange={(e) => {
-                      const check = e.target.checked
-
-                      if (check)
-                        setFilter(currentValue => ({
-                          ...currentValue,
-                          types: [...currentValue.types, parseInt(e.target.value)]
-                        }))
-                      else
-                        setFilter(currentValue => ({
-                          ...currentValue,
-                          types: [...currentValue.types.filter((item) => item !== parseInt(e.target.value))]
-                        }))
-                    }}
+                    onChange={filterCheckHandler}
                   />
                 }
                 disableTypography
@@ -196,32 +198,10 @@ const FilterPopover = (props) => {
               from: value
             }))}
             renderInput={
-              (props) => <TextField {...props} className="FstoTextfieldFilter-root" label="From Date" variant="outlined" size="small" />
+              (props) => <TextField {...props} className="FstoTextfieldFilter-root" label="From Date" variant="outlined" size="small" sx={{ marginBottom: 2 }} fullWidth />
             }
             PopperProps={{
-              placement: "left",
-              modifiers: [
-                {
-                  name: 'flip',
-                  enabled: true,
-                  options: {
-                    altBoundary: true,
-                    rootBoundary: 'document',
-                    padding: 8,
-                  },
-                },
-                {
-                  name: 'preventOverflow',
-                  enabled: true,
-                  options: {
-                    altAxis: false,
-                    altBoundary: false,
-                    tether: false,
-                    rootBoundary: 'document',
-                    padding: 8,
-                  },
-                }
-              ]
+              placement: "left"
             }}
             showToolbar
           />
@@ -233,32 +213,10 @@ const FilterPopover = (props) => {
               to: value
             }))}
             renderInput={
-              (props) => <TextField {...props} className="FstoTextfieldFilter-root" label="To Date" variant="outlined" size="small" />
+              (props) => <TextField {...props} className="FstoTextfieldFilter-root" label="To Date" variant="outlined" size="small" fullWidth />
             }
             PopperProps={{
-              placement: "left",
-              modifiers: [
-                {
-                  name: 'flip',
-                  enabled: true,
-                  options: {
-                    altBoundary: true,
-                    rootBoundary: 'document',
-                    padding: 8,
-                  },
-                },
-                {
-                  name: 'preventOverflow',
-                  enabled: true,
-                  options: {
-                    altAxis: false,
-                    altBoundary: false,
-                    tether: false,
-                    rootBoundary: 'document',
-                    padding: 8,
-                  },
-                }
-              ]
+              placement: "left"
             }}
             showToolbar
           />

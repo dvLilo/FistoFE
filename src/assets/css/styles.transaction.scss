@@ -12,9 +12,22 @@
   }
 }
 
+.FstoBoxTransactionSteps-root {
+  padding-top: 1em;
+  padding-bottom: 3em;
+
+  overflow-x: auto;
+}
+
 .FstoBoxTransactionDetails-root {
   display: flex;
-  gap: 70px;
+  gap: 20px;
+  flex-direction: column;
+
+  @media (min-width: 992px) {
+    gap: 70px;
+    flex-direction: row;
+  }
 
   & .FstoBoxTransactionDetails-content {
     flex-basis: 0%;
@@ -46,6 +59,12 @@
     padding-top: 16px;
     padding-bottom: 16px;
   }
+
+  & .FstoDividerTransactionDetails-root {
+    border-bottom-width: thin;
+  }
+
+
 }
 
 .FstoBoxTransactionForm-root {

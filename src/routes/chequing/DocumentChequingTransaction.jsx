@@ -55,16 +55,19 @@ const DocumentChequingTransaction = (props) => {
 
   React.useEffect(() => {
     if (open && state === `cheque-receive` && status === `success` && !Boolean(chequeData.accounts.length)) {
-      const accounts = data.voucher.accounts[0].filter((item) => item.entry.toLowerCase() === `credit`).map((item) => ({
+      const accounts = data.cheque?.accounts || data.voucher.accounts[0].filter((item) => item.entry.toLowerCase() === `credit`).map((item) => ({
         entry: "Debit",
         account_title: item.account_title,
         amount: item.amount,
         remarks: item.remarks
       }))
 
+      const cheques = data.cheque?.cheques || []
+
       setChequeData(currentValue => ({
         ...currentValue,
-        accounts
+        accounts,
+        cheques
       }))
     }
 
@@ -339,6 +342,9 @@ const DocumentChequingTransaction = (props) => {
       open: true,
       onBack: onBack,
 
+      ...(Boolean(state.match(/-receive.*/)) && {
+        state: "release-"
+      }),
       ...(Boolean(state.match(/-release.*/)) && {
         cheques: data.cheque.cheques
       })
@@ -540,7 +546,7 @@ const DocumentChequingTransaction = (props) => {
         accounts={chequeData.accounts}
         onClear={clearHandler}
         onSubmit={
-          state.match(/-receive.*/)
+          !!state.match(/-receive.*/)
             ? onChequeManage
             : submitChequeHandler
         }

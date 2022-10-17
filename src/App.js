@@ -182,7 +182,55 @@ const App = () => {
             default: "#181818"
           }
         }
-      )
+      ),
+      pending: {
+        main: "#F79647",
+        light: "#F79647",
+        dark: "#F79647",
+        contrastText: "#F79647"
+      },
+      tag: {
+        main: "#578FFE",
+        light: "#578FFE",
+        dark: "#578FFE",
+        contrastText: "#578FFE"
+      },
+      voucher: {
+        main: "#7030A0",
+        light: "#7030A0",
+        dark: "#7030A0",
+        contrastText: "#7030A0"
+      },
+      approve: {
+        main: "#77933C",
+        light: "#77933C",
+        dark: "#77933C",
+        contrastText: "#77933C"
+      },
+      transmit: {
+        main: "#31859D",
+        light: "#31859D",
+        dark: "#31859D",
+        contrastText: "#31859D"
+      },
+      cheque: {
+        main: "#F79647",
+        light: "#F79647",
+        dark: "#F79647",
+        contrastText: "#F79647"
+      },
+      release: {
+        main: "#F4D836",
+        light: "#F4D836",
+        dark: "#F4D836",
+        contrastText: "#F4D836"
+      },
+      file: {
+        main: "#B66837",
+        light: "#B66837",
+        dark: "#B66837",
+        contrastText: "#B66837"
+      }
     },
     zIndex: {
       modal: 1400,

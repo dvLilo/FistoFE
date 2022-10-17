@@ -2,21 +2,43 @@ const statusColorProcess = (state) => {
   let color
   switch (state) {
     case `tag`:
-      color = `#3a2fa7`
+      color = `#HEXCOLORHERE`
       break;
 
-    case `receive`:
-      color = `#949494`
+    case `voucher`:
+      color = `#HEXCOLORHERE`
       break;
 
-    case `hold`:
-    case `return`:
-    case `void`:
-      color = `#ff5252`
+    case `approve`:
+      color = `#HEXCOLORHERE`
+      break;
+
+    case `transmit`:
+      color = `#HEXCOLORHERE`
+      break;
+
+    case `cheque`:
+      color = `#HEXCOLORHERE`
+      break;
+
+    case `release`:
+      color = `#HEXCOLORHERE`
+      break;
+
+    case `file`:
+      color = `#HEXCOLORHERE`
+      break;
+
+    case `reverse`:
+      color = `#HEXCOLORHERE`
+      break;
+
+    case `clear`:
+      color = `#HEXCOLORHERE`
       break;
 
     default:
-      color = `#ed6c02`
+      color = `#HEXCOLORHERE`
   }
 
   return color

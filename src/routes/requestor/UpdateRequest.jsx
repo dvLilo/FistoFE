@@ -245,6 +245,9 @@ const UpdateRequest = () => {
   })
 
   const [prmGroup, setPrmGroup] = React.useState([])
+
+  const [debitGroup, setDebitGroup] = React.useState([])
+
   // eslint-disable-next-line
   const [poGroup, setPoGroup] = React.useState([])
 
@@ -301,7 +304,153 @@ const UpdateRequest = () => {
           po_group: po_group_new
         }))
       }
-      catch (error) { }
+      catch (error) {
+        setDebitGroup([
+          {
+            "pn_no": "1081200139502",
+            "interest_from": "3/25/22",
+            "interest_to": "4/25/22",
+            "outstanding_amount": 3935000,
+            "interest_rate": 8.75,
+            "no_of_days": 31,
+            "principal_amount": 0,
+            "interest_due": 29649.13,
+            "cwt": 592.98
+          },
+          {
+            "pn_no": "1081200140188",
+            "interest_from": "3/25/22",
+            "interest_to": "4/25/22",
+            "outstanding_amount": 700000,
+            "interest_rate": 8.75,
+            "no_of_days": 31,
+            "principal_amount": 0,
+            "interest_due": 5274.31,
+            "cwt": 105.49
+          },
+          {
+            "pn_no": "1081200136587",
+            "interest_from": "3/25/22",
+            "interest_to": "4/25/22",
+            "outstanding_amount": 750000,
+            "interest_rate": 8.75,
+            "no_of_days": 31,
+            "principal_amount": 750000,
+            "interest_due": 5104.17,
+            "cwt": 102.08
+          },
+          {
+            "pn_no": "1081200143776",
+            "interest_from": "3/25/22",
+            "interest_to": "4/25/22",
+            "outstanding_amount": 2400000,
+            "interest_rate": 8.75,
+            "no_of_days": 31,
+            "principal_amount": 0,
+            "interest_due": 18083.33,
+            "cwt": 361.67
+          },
+          {
+            "pn_no": "1081200139267",
+            "interest_from": "3/25/22",
+            "interest_to": "4/25/22",
+            "outstanding_amount": 1575000,
+            "interest_rate": 8.75,
+            "no_of_days": 31,
+            "principal_amount": 0,
+            "interest_due": 11867.19,
+            "cwt": 237.34
+          },
+          {
+            "pn_no": "1089400013721",
+            "interest_from": "3/27/22",
+            "interest_to": "4/27/22",
+            "outstanding_amount": 1700000,
+            "interest_rate": 9,
+            "no_of_days": 31,
+            "principal_amount": 100000,
+            "interest_due": 13175,
+            "cwt": 263.5
+          },
+          {
+            "pn_no": "1081200146180",
+            "interest_from": "3/27/22",
+            "interest_to": "4/27/22",
+            "outstanding_amount": 2945000,
+            "interest_rate": 8.75,
+            "no_of_days": 31,
+            "principal_amount": 0,
+            "interest_due": 22189.76,
+            "cwt": 443.8
+          },
+          {
+            "pn_no": "1083400012412",
+            "interest_from": "3/28/22",
+            "interest_to": "4/28/22",
+            "outstanding_amount": 409259.41,
+            "interest_rate": 7.54,
+            "no_of_days": 31,
+            "principal_amount": 24074.07,
+            "interest_due": 2657.23,
+            "cwt": 53.14
+          }
+        ])
+
+        setData(currentValue => ({
+          requestor: {
+            "id": 2,
+            "id_prefix": "RDFFLFI",
+            "id_no": "10185",
+            "first_name": "VINCENT LOUIE",
+            "middle_name": "LAYNES",
+            "last_name": "ABAD",
+            "suffix": null,
+            "role": "Requestor",
+            "position": "System Developer",
+            "department": "Management Information System Common"
+          },
+          document: {
+            ...currentValue.document,
+
+            "id": 9,
+            "name": "Auto Debit",
+            "amount": 979914.19,
+            "date": "2022-10-10",
+            "payment_type": "Full",
+            "company": {
+              "id": 1,
+              "name": "RDF Corporate Services"
+            },
+            "department": {
+              "id": 14,
+              "name": "Treasury Common"
+            },
+            "location": {
+              "id": 5,
+              "name": "Common"
+            },
+            "supplier": {
+              "id": 55,
+              "name": "GUAGUA RURAL BANK (GR BANK)",
+              "references": [
+                {
+                  "id": 5,
+                  "type": "INTERNAL"
+                }
+              ]
+            },
+            "category": {
+              "id": 5,
+              "name": "common"
+            },
+            "remarks": "Statement of account as of April 2022"
+          },
+          transaction: {
+            "date_requested": "2022-10-10",
+          },
+          po_group: []
+        }))
+      }
     })()
 
     // eslint-disable-next-line
@@ -712,6 +861,24 @@ const UpdateRequest = () => {
           && data.document.pcf_batch.letter
           && data.document.pcf_batch.date
           && (!error.status || !Boolean(error.data.pcf_name))
+          ? false : true
+
+      case 9: // Auto Debit
+        return data.document.payment_type
+          && data.document.date
+          && data.document.amount
+          && data.document.company
+          && data.document.department
+          && data.document.location
+          && data.document.supplier
+          && data.document.category
+          && debitGroup.length
+          && (
+            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) >= 0.00 &&
+            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) <= 1.00
+          )
+          && (!error.status || !Boolean(error.data.document_no))
+          && (!validate.status || !validate.data.includes('document_no'))
           ? false : true
 
       default:
@@ -1389,6 +1556,166 @@ const UpdateRequest = () => {
     e.target.value = null
   }
 
+  const importAutoDebitHandler = (e) => {
+
+    const file = e.target.files[0]
+    const types = ["application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]
+
+    if (!!file) {
+      if (!types.includes(file.type))
+        return toast({
+          open: true,
+          severity: "error",
+          title: "Error!",
+          message: "Please select only excel file types and try again."
+        })
+
+      const reader = new FileReader()
+
+      reader.readAsArrayBuffer(file)
+      reader.onload = async (response) => {
+
+        const errors = []
+        const header = [
+          "pn_no",
+          "interest_from",
+          "interest_to",
+          "interest_rate",
+          "no_of_days",
+          "outstanding_amount",
+          "principal_amount",
+          "interest_due",
+          "cwt"
+        ]
+
+        const excelFile = response.target.result
+
+        const workbook = XLSX.read(excelFile, { type: 'buffer' })
+
+        const sheetname = workbook.SheetNames[0]
+        const worksheet = workbook.Sheets[sheetname]
+
+        const excelJson = XLSX.utils.sheet_to_json(worksheet, { raw: false, defval: "" })
+
+        // Transaform headers
+        excelJson.forEach((row) => {
+          Object.keys(row).forEach((key) => {
+            let newKey = key.trim().toLowerCase().replace(/[ ]/g, "_")
+            if (key !== newKey) {
+              row[newKey] = row[key]
+              delete row[key]
+            }
+          })
+        })
+
+        // Check empty
+        if (!excelJson.length)
+          return toast({
+            open: true,
+            severity: "error",
+            title: "Error!",
+            message: "Excel file is empty, please check your excel file and try again."
+          })
+
+        // Check headers
+        if (!Object.keys(excelJson[0]).every((item) => header.includes(item)))
+          return toast({
+            open: true,
+            severity: "error",
+            title: "Error!",
+            message: "Invalid excel template, please check your excel file and try again."
+          })
+
+        // Check empty cell
+        excelJson.forEach((item, itemIndex) => {
+          Object.entries(item).forEach((entry) => {
+            const [key, value] = entry
+
+            if (key !== "principal_amount")
+              if (value === "")
+                errors.push({
+                  line: itemIndex + 2,
+                  error_type: "empty",
+                  description: `${key.replace(/[_]/g, " ")} is empty.`
+                })
+          })
+        })
+
+        // Validate date for interest from and to
+        excelJson.forEach((item, itemIndex) => {
+          const interestFromTimestamp = new Date(item.interest_from)
+          const interestToTimestamp = new Date(item.interest_to)
+
+          if (!(interestFromTimestamp instanceof Date && !isNaN(interestFromTimestamp)))
+            errors.push({
+              line: itemIndex + 2,
+              error_type: "invalid",
+              description: `Interest from date is invalid.`
+            })
+
+          if (!(interestToTimestamp instanceof Date && !isNaN(interestToTimestamp)))
+            errors.push({
+              line: itemIndex + 2,
+              error_type: "invalid",
+              description: `Interest to date is invalid.`
+            })
+        })
+
+        // Validate amounts for outstanding, principal, interest due and cwt
+        excelJson.map((item) => {
+          const { outstanding_amount, principal_amount, interest_due, cwt } = item
+
+          return {
+            outstanding_amount,
+            principal_amount,
+            interest_due,
+            cwt
+          }
+        }).forEach((item, itemIndex) => {
+          Object.entries(item).forEach((entry) => {
+            const [key, value] = entry
+
+            if (isNaN(Number(value.replace(/[,]/gi, ''))))
+              errors.push({
+                line: itemIndex + 2,
+                error_type: "invalid",
+                description: `${key.replace(/[_]/g, " ")} is invalid.`
+              })
+          })
+        })
+
+
+        if (errors.length)
+          return setErrorImport(currentValue => ({
+            ...currentValue,
+            open: true,
+            data: {
+              message: "Import failed. Kindly check the errors.",
+              result: errors
+            }
+          }))
+
+
+        // Transforming data
+        const excelTransformed = excelJson.map((item) => ({
+          ...item,
+          cwt: parseFloat(item.cwt.replace(/[,]/gi, '')),
+          interest_due: parseFloat(item.interest_due.replace(/[,]/gi, '')),
+          interest_rate: parseFloat(item.interest_rate.replace(/[,]/gi, '')),
+          principal_amount: parseFloat(item.principal_amount.replace(/[,]/gi, '')),
+          outstanding_amount: parseFloat(item.outstanding_amount.replace(/[,]/gi, '')),
+
+          no_of_days: parseInt(item.no_of_days)
+        }))
+
+        setDebitGroup(excelTransformed)
+      }
+    }
+
+    // reset the import button
+    e.target.value = null
+  }
+
   const transformData = (ID) => {
     switch (ID) {
       case 1: // PAD - Post Acquisition Delivery
@@ -1603,12 +1930,35 @@ const UpdateRequest = () => {
           }
         }
 
+      case 9: // Auto Debit
+        return {
+          requestor: data.requestor,
+          document: {
+            id: data.document.id,
+            name: data.document.name,
+            amount: data.document.amount,
+            date: new Date(data.document.date).toISOString().slice(0, 10),
+            payment_type: data.document.payment_type,
+
+            company: data.document.company,
+            department: data.document.department,
+            location: data.document.location,
+            supplier: data.document.supplier,
+            category: data.document.category,
+
+            remarks: data.document.remarks
+          },
+          autoDebit_group: debitGroup
+        }
+
       default:
         return {}
     }
   }
 
   const truncateData = () => {
+    setDebitGroup([])
+
     setPrmGroup([])
 
     setPoGroup([])
@@ -1750,7 +2100,15 @@ const UpdateRequest = () => {
               message: "Transaction failed. Please try again.",
               duration: null
             })
+
+            return
           }
+
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to save this transaction. Please try again."
+          })
         }
 
         setIsSaving(false)
@@ -2192,8 +2550,8 @@ const UpdateRequest = () => {
                   />
                 </LocalizationProvider>
 
-                { // Request Date, Document Date
-                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 4 || data.document.id === 5 || data.document.id === 8) &&
+                { // Document Date
+                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 4 || data.document.id === 5 || data.document.id === 8 || data.document.id === 9) &&
                   (
                     <LocalizationProvider dateAdapter={DateAdapter}>
                       <DatePicker
@@ -2227,7 +2585,7 @@ const UpdateRequest = () => {
                   )}
 
                 { //Document Amount
-                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 5 || data.document.id === 6 || data.document.id === 7 || data.document.id === 8) &&
+                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 5 || data.document.id === 6 || data.document.id === 7 || data.document.id === 8 || data.document.id === 9) &&
                   (
                     <TextField
                       className="FstoTextfieldForm-root"
@@ -2238,21 +2596,76 @@ const UpdateRequest = () => {
                       value={data.document.amount}
                       disabled={data.document.id === 8}
                       error={
-                        Boolean(data.po_group.length) &&
-                        Boolean(data.document.amount)
-                        && !(
-                          Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                          Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 1.00
-                        )
+                        (
+                          Boolean(data.po_group.length) &&
+                          Boolean(data.document.amount)
+                          && !(
+                            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
+                            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 1.00
+                          )) ||
+                        (
+                          Boolean(prmGroup.length) &&
+                          Boolean(data.document.category) &&
+                          Boolean(data.document.category.name.match(/rental/i)) &&
+                          Boolean(data.document.amount)
+                          && !(
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) >= 0.00 &&
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) <= 1.00
+                          )) ||
+                        (
+                          Boolean(prmGroup.length) &&
+                          Boolean(data.document.category) &&
+                          Boolean(data.document.category.name.match(/loans|leasing/i)) &&
+                          Boolean(data.document.amount)
+                          && !(
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) >= 0.00 &&
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) <= 1.00
+                          )) ||
+                        (
+                          Boolean(debitGroup.length) &&
+                          Boolean(data.document.amount)
+                          && !(
+                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) >= 0.00 &&
+                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) <= 1.00
+                          ))
                       }
                       helperText={
-                        Boolean(data.po_group.length) &&
-                        Boolean(data.document.amount)
-                        && !(
-                          Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                          Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 1.00
-                        )
-                        && "Document amount and PO balance amount is not equal."
+                        (
+                          Boolean(data.po_group.length) &&
+                          Boolean(data.document.amount)
+                          && !(
+                            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
+                            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 1.00
+                          )
+                          && "Document amount and PO balance amount is not equal.") ||
+                        (
+                          Boolean(prmGroup.length) &&
+                          Boolean(data.document.category) &&
+                          Boolean(data.document.category.name.match(/rental/i)) &&
+                          Boolean(data.document.amount)
+                          && !(
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) >= 0.00 &&
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) <= 1.00
+                          )
+                          && "Document amount and gross amount is not equal.") ||
+                        (
+                          Boolean(prmGroup.length) &&
+                          Boolean(data.document.category) &&
+                          Boolean(data.document.category.name.match(/loans|leasing/i)) &&
+                          Boolean(data.document.amount)
+                          && !(
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) >= 0.00 &&
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) <= 1.00
+                          )
+                          && "Document amount and principal amount is not equal.") ||
+                        (
+                          Boolean(debitGroup.length) &&
+                          Boolean(data.document.amount)
+                          && !(
+                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) >= 0.00 &&
+                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) <= 1.00
+                          )
+                          && "Document amount and net of cwt amount is not equal.")
                       }
                       onChange={(e) => setData({
                         ...data,
@@ -2630,7 +3043,7 @@ const UpdateRequest = () => {
                 }
 
                 { // Category
-                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4 || data.document.id === 5) &&
+                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4 || data.document.id === 5 || data.document.id === 9) &&
                   (
                     <Autocomplete
                       className="FstoSelectForm-root"
@@ -3757,6 +4170,176 @@ const UpdateRequest = () => {
                   </Box>
                 </React.Fragment>
               )}
+
+            <ErrorDialog {...errorImport} />
+          </Paper>
+        )
+      }
+
+      {
+        (data.document.id === 9) &&
+        (
+          <Paper className="FstoPaperImport-root" elevation={1}>
+            <Stack direction="row" spacing={2}>
+              <Typography variant="heading">Attachment</Typography>
+
+              <Button
+                className="FstoButtonImport-root"
+                component="label"
+                variant="contained"
+                startIcon={<UploadFile />}
+                disableElevation
+              > Import
+                <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onChange={importAutoDebitHandler} hidden />
+              </Button>
+            </Stack>
+
+            {
+              Boolean(debitGroup.length) &&
+              (
+                <React.Fragment>
+                  <TableContainer className="FstoTableContainerImport-root">
+                    <Table className="FstoTableImport-root">
+                      <TableHead className="FstoTableHeadImport-root">
+                        <TableRow className="FstoTableRowImport-root">
+                          <TableCell className="FstoTableCellImport-root">PN No.</TableCell>
+                          <TableCell className="FstoTableCellImport-root">Interest From</TableCell>
+                          <TableCell className="FstoTableCellImport-root">Interest To</TableCell>
+                          <TableCell className="FstoTableCellImport-root">Interest Rate</TableCell>
+                          <TableCell className="FstoTableCellImport-root">No. of Days</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Outstanding Amount</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Principal Amount</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Interest Due</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right">CWT</TableCell>
+                        </TableRow>
+                      </TableHead>
+
+
+
+                      <TableBody className="FstoTableBodyImport-root" sx={{ borderBottom: '3px solid #e0e0e0' }}>
+                        {
+                          debitGroup.map((data, index) => (
+                            <TableRow className="FstoTableRowImport-root" key={index}>
+                              <TableCell className="FstoTableCellImport-root">
+                                {data.pn_no}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root">
+                                {data.interest_from}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root">
+                                {data.interest_to}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root">
+                                {`${data.interest_rate}%`}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root">
+                                {data.no_of_days}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.outstanding_amount.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                  })}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.principal_amount.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                  })}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.interest_due.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                  })}
+                              </TableCell>
+
+                              <TableCell className="FstoTableCellImport-root" align="right">
+                                {
+                                  data.cwt.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                  })}
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        }
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total Principal Amount</Typography>
+                    <Typography variant="heading">
+                      {
+                        debitGroup.map((data) => data.principal_amount).reduce((a, b) => a + b, 0).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency',
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                    </Typography>
+                  </Box>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total Interest Amount</Typography>
+                    <Typography variant="heading">
+                      {
+                        debitGroup.map((data) => data.interest_due).reduce((a, b) => a + b, 0).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency',
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                    </Typography>
+                  </Box>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total CWT</Typography>
+                    <Typography variant="heading">
+                      {
+                        debitGroup.map((data) => data.cwt).reduce((a, b) => a + b, 0).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency',
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                    </Typography>
+                  </Box>
+
+                  <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total Net of CWT</Typography>
+                    <Typography variant="heading">
+                      {
+                        debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency',
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                    </Typography>
+                  </Box>
+                </React.Fragment>
+              )
+            }
 
             <ErrorDialog {...errorImport} />
           </Paper>

@@ -307,13 +307,13 @@ const DocumentConfidentialApproving = () => {
     <Box className="FstoBox-root">
       <Paper className="FstoPaperTable-root" elevation={1}>
         <Stack className="FstoStackToolbar-root" justifyContent="space-between" gap={2}>
-          <Stack className="FstoStackToolbar-item" direction="row" alignItems="center" justifyContent="center" gap={2}>
+          <Stack className="FstoStackToolbar-item" direction="row" justifyContent="center" gap={2}>
             <Typography variant="heading">
               Transaction Approval
             </Typography>
           </Stack>
 
-          <Stack className="FstoStackToolbar-item" direction="row" alignItems="center" justifyContent="center" gap={1}>
+          <Stack className="FstoStackToolbar-item" direction="column" justifyContent="center" gap={1}>
             <Tabs
               className="FstoTabsToolbar-root"
               value={state}
@@ -333,41 +333,43 @@ const DocumentConfidentialApproving = () => {
               <Tab className="FstoTab-root" label="Returned" value="approve-return" disableRipple />
             </Tabs>
 
-            <OutlinedInput
-              className="FstoTextFieldSearch-root"
-              size="small"
-              autoComplete="off"
-              placeholder="Search"
-              value={search}
-              startAdornment={
-                <InputAdornment position="start">
-                  <Search />
-                </InputAdornment>
-              }
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton
-                    edge="end"
-                    size="small"
-                    disabled={
-                      !Boolean(search)
-                    }
-                    onClick={() => {
-                      setSearch("")
-                      searchData(null)
-                    }}
-                  >
-                    <Close fontSize="small" />
-                  </IconButton>
-                </InputAdornment>
-              }
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") searchData(e.target.value)
-              }}
-            />
+            <Stack direction="row" alignItems="center" justifyContent="center" gap={1}>
+              <OutlinedInput
+                className="FstoTextFieldSearch-root"
+                size="small"
+                autoComplete="off"
+                placeholder="Search"
+                value={search}
+                startAdornment={
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                }
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      edge="end"
+                      size="small"
+                      disabled={
+                        !Boolean(search)
+                      }
+                      onClick={() => {
+                        setSearch("")
+                        searchData(null)
+                      }}
+                    >
+                      <Close fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                }
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") searchData(e.target.value)
+                }}
+              />
 
-            <FilterPopover onFilter={filterData} />
+              <FilterPopover onFilter={filterData} />
+            </Stack>
           </Stack>
         </Stack>
 

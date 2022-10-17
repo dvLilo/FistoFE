@@ -44,16 +44,17 @@ import {
   REVERSE,
   RETURN,
   UNRETURN,
-  RECEIVE
+  RECEIVE,
+  TRANSFER
 } from '../../constants'
 
 import EmptyImage from '../../assets/img/empty.svg'
 
 import ReasonDialog from '../../components/ReasonDialog'
-// import TransferDialog from '../../components/TransferDialog'
+import TransferDialog from '../../components/TransferDialog'
 import TablePreloader from '../../components/TablePreloader'
+import FilterPopover from '../../components/FilterPopover'
 
-import DocumentReversingFilter from './DocumentReversingFilter'
 import DocumentReversingActions from './DocumentReversingActions'
 import DocumentReversingTransaction from './DocumentReversingTransaction'
 
@@ -91,16 +92,16 @@ const DocumentReversing = () => {
     }))
   })
 
-  // const [transfer, setTransfer] = React.useState({
-  //   open: false,
-  //   data: null,
-  //   process: null,
-  //   subprocess: null,
-  //   onClose: () => setTransfer(currentValue => ({
-  //     ...currentValue,
-  //     open: false
-  //   }))
-  // })
+  const [transfer, setTransfer] = React.useState({
+    open: false,
+    data: null,
+    process: null,
+    subprocess: null,
+    onClose: () => setTransfer(currentValue => ({
+      ...currentValue,
+      open: false
+    }))
+  })
 
   const [manage, setManage] = React.useState({
     open: false,
@@ -139,8 +140,9 @@ const DocumentReversing = () => {
         try {
           response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
             process: REVERSE,
-            // subprocess: RECEIVE
-            subprocess: user?.role === `AP Associate` ? `${RECEIVE}-approver` : `${RECEIVE}-requestor`
+            subprocess: user?.role === `AP Associate`
+              ? `${RECEIVE}-approver`
+              : `${RECEIVE}-requestor`
           })
 
           const { message } = response.data
@@ -163,15 +165,15 @@ const DocumentReversing = () => {
     })
   }
 
-  // const onTransfer = (data) => {
-  //   setTransfer(currentValue => ({
-  //     ...currentValue,
-  //     open: true,
-  //     process: TRANSMIT,
-  //     subprocess: TRANSFER,
-  //     data,
-  //   }))
-  // }
+  const onTransfer = (data) => {
+    setTransfer(currentValue => ({
+      ...currentValue,
+      open: true,
+      process: REVERSE,
+      subprocess: TRANSFER,
+      data,
+    }))
+  }
 
   const onReturn = (data) => {
     setReason(currentValue => ({
@@ -219,13 +221,13 @@ const DocumentReversing = () => {
     <Box className="FstoBox-root">
       <Paper className="FstoPaperTable-root" elevation={1}>
         <Stack className="FstoStackToolbar-root" justifyContent="space-between" gap={2}>
-          <Stack className="FstoStackToolbar-item" direction="row" alignItems="center" justifyContent="center" gap={2}>
+          <Stack className="FstoStackToolbar-item" direction="row" justifyContent="center" gap={2}>
             <Typography variant="heading">
               Reversal Request
             </Typography>
           </Stack>
 
-          <Stack className="FstoStackToolbar-item" direction="row" alignItems="center" justifyContent="center" gap={1}>
+          <Stack className="FstoStackToolbar-item" direction="column" justifyContent="center" gap={1}>
             <Tabs
               className="FstoTabsToolbar-root"
               value={state}
@@ -257,41 +259,43 @@ const DocumentReversing = () => {
               }
             </Tabs>
 
-            <OutlinedInput
-              className="FstoTextFieldSearch-root"
-              size="small"
-              autoComplete="off"
-              placeholder="Search"
-              value={search}
-              startAdornment={
-                <InputAdornment position="start">
-                  <Search />
-                </InputAdornment>
-              }
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton
-                    edge="end"
-                    size="small"
-                    disabled={
-                      !Boolean(search)
-                    }
-                    onClick={() => {
-                      setSearch("")
-                      searchData(null)
-                    }}
-                  >
-                    <Close fontSize="small" />
-                  </IconButton>
-                </InputAdornment>
-              }
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") searchData(e.target.value)
-              }}
-            />
+            <Stack direction="row" alignItems="center" justifyContent="center" gap={1}>
+              <OutlinedInput
+                className="FstoTextFieldSearch-root"
+                size="small"
+                autoComplete="off"
+                placeholder="Search"
+                value={search}
+                startAdornment={
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                }
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      edge="end"
+                      size="small"
+                      disabled={
+                        !Boolean(search)
+                      }
+                      onClick={() => {
+                        setSearch("")
+                        searchData(null)
+                      }}
+                    >
+                      <Close fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                }
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") searchData(e.target.value)
+                }}
+              />
 
-            <DocumentReversingFilter filterData={filterData} />
+              <FilterPopover onFilter={filterData} />
+            </Stack>
           </Stack>
         </Stack>
 
@@ -450,7 +454,7 @@ const DocumentReversing = () => {
                         data={item}
                         state={state}
                         onReceive={onReceive}
-                        // onTransfer={onTransfer}
+                        onTransfer={onTransfer}
                         onCancel={onUnreturn}
                         onManage={onManage}
                         onView={onView}
@@ -494,10 +498,10 @@ const DocumentReversing = () => {
           onReturn={onReturn}
         />
 
-        {/* <TransferDialog
+        <TransferDialog
           {...transfer}
           onSuccess={refetchData}
-        /> */}
+        />
 
         <ReasonDialog {...reason} />
       </Paper>

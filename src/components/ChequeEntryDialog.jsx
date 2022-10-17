@@ -215,7 +215,7 @@ const ChequeEntryDialog = (props) => {
       await axios.post(`/api/transactions/flow/validate-cheque-no`, {
         cheque_no: CQ.no,
         ...(
-          /cheque-cheque|return-return/i.test(state) && {
+          /cheque-cheque|cheque-receive|return-return/i.test(state) && {
             id: transaction?.id
           }
         )

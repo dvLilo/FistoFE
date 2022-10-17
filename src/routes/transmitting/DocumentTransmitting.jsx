@@ -50,8 +50,8 @@ import EmptyImage from '../../assets/img/empty.svg'
 
 import TransferDialog from '../../components/TransferDialog'
 import TablePreloader from '../../components/TablePreloader'
+import FilterPopover from '../../components/FilterPopover'
 
-import DocumentTransmittingFilter from './DocumentTransmittingFilter'
 import DocumentTransmittingActions from './DocumentTransmittingActions'
 import DocumentTransmittingTransaction from './DocumentTransmittingTransaction'
 
@@ -161,13 +161,13 @@ const DocumentTransmitting = () => {
     <Box className="FstoBox-root">
       <Paper className="FstoPaperTable-root" elevation={1}>
         <Stack className="FstoStackToolbar-root" justifyContent="space-between" gap={2}>
-          <Stack className="FstoStackToolbar-item" direction="row" alignItems="center" justifyContent="center" gap={2}>
+          <Stack className="FstoStackToolbar-item" direction="row" justifyContent="center" gap={2}>
             <Typography variant="heading">
               Transmittal of Document
             </Typography>
           </Stack>
 
-          <Stack className="FstoStackToolbar-item" direction="row" alignItems="center" justifyContent="center" gap={1}>
+          <Stack className="FstoStackToolbar-item" direction="column" justifyContent="center" gap={1}>
             <Tabs
               className="FstoTabsToolbar-root"
               value={state}
@@ -189,41 +189,43 @@ const DocumentTransmitting = () => {
               <Tab className="FstoTab-root" label="Transmitted" value="transmit-transmit" disableRipple />
             </Tabs>
 
-            <OutlinedInput
-              className="FstoTextFieldSearch-root"
-              size="small"
-              autoComplete="off"
-              placeholder="Search"
-              value={search}
-              startAdornment={
-                <InputAdornment position="start">
-                  <Search />
-                </InputAdornment>
-              }
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton
-                    edge="end"
-                    size="small"
-                    disabled={
-                      !Boolean(search)
-                    }
-                    onClick={() => {
-                      setSearch("")
-                      searchData(null)
-                    }}
-                  >
-                    <Close fontSize="small" />
-                  </IconButton>
-                </InputAdornment>
-              }
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") searchData(e.target.value)
-              }}
-            />
+            <Stack direction="row" alignItems="center" justifyContent="center" gap={1}>
+              <OutlinedInput
+                className="FstoTextFieldSearch-root"
+                size="small"
+                autoComplete="off"
+                placeholder="Search"
+                value={search}
+                startAdornment={
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                }
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      edge="end"
+                      size="small"
+                      disabled={
+                        !Boolean(search)
+                      }
+                      onClick={() => {
+                        setSearch("")
+                        searchData(null)
+                      }}
+                    >
+                      <Close fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                }
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") searchData(e.target.value)
+                }}
+              />
 
-            <DocumentTransmittingFilter filterData={filterData} />
+              <FilterPopover onFilter={filterData} />
+            </Stack>
           </Stack>
         </Stack>
 

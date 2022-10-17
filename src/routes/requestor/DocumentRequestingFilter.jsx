@@ -80,8 +80,8 @@ const DocumentRequestingFilter = (props) => {
   } = useUserDepartment()
 
   const [filter, setFilter] = React.useState({
-    from: new Date(),
-    to: new Date(),
+    from: null,
+    to: null,
     types: [1, 2, 3, 4, 5, 6, 7, 8],
     suppliers: [],
     departments: []
@@ -117,8 +117,8 @@ const DocumentRequestingFilter = (props) => {
 
   const filterClearHandler = () => {
     setFilter({
-      from: new Date(),
-      to: new Date(),
+      from: null,
+      to: null,
       types: [1, 2, 3, 4, 5, 6, 7, 8],
       suppliers: [],
       departments: []
@@ -132,6 +132,21 @@ const DocumentRequestingFilter = (props) => {
       suppliers: null,
       department: null
     })
+  }
+
+  const filterCheckHandler = (e) => {
+    const check = e.target.checked
+
+    if (check)
+      setFilter(currentValue => ({
+        ...currentValue,
+        types: [...currentValue.types, parseInt(e.target.value)]
+      }))
+    else
+      setFilter(currentValue => ({
+        ...currentValue,
+        types: [...currentValue.types.filter(type => type !== parseInt(e.target.value))]
+      }))
   }
 
   return (
@@ -159,7 +174,7 @@ const DocumentRequestingFilter = (props) => {
         onClose={filterCloseHandler}
         disablePortal
       >
-        <Typography className="FstoTypographyFilter-root">Document Types:</Typography>
+        <Typography className="FstoTypographyFilter-root" marginTop={2}>Document Types:</Typography>
         <FormGroup row>
           {
             DOCUMENT_TYPES.map((item) => (
@@ -172,20 +187,7 @@ const DocumentRequestingFilter = (props) => {
                     size="small"
                     value={item.id}
                     checked={filter.types.includes(item.id)}
-                    onChange={(e) => {
-                      const check = e.target.checked
-
-                      if (check)
-                        setFilter(currentValue => ({
-                          ...currentValue,
-                          types: [...currentValue.types, parseInt(e.target.value)]
-                        }))
-                      else
-                        setFilter(currentValue => ({
-                          ...currentValue,
-                          types: [...currentValue.types.filter(type => type !== parseInt(e.target.value))]
-                        }))
-                    }}
+                    onChange={filterCheckHandler}
                   />
                 }
                 disableTypography
@@ -211,33 +213,12 @@ const DocumentRequestingFilter = (props) => {
                   variant="outlined"
                   size="small"
                   label="From Date"
+                  sx={{
+                    marginBottom: 2
+                  }}
+                  fullWidth
                 />
             }
-            PopperProps={{
-              placement: "left",
-              modifiers: [
-                {
-                  name: 'flip',
-                  enabled: true,
-                  options: {
-                    altBoundary: true,
-                    rootBoundary: 'document',
-                    padding: 8,
-                  },
-                },
-                {
-                  name: 'preventOverflow',
-                  enabled: true,
-                  options: {
-                    altAxis: false,
-                    altBoundary: false,
-                    tether: false,
-                    rootBoundary: 'document',
-                    padding: 8,
-                  },
-                }
-              ]
-            }}
             showToolbar
           />
 
@@ -255,33 +236,9 @@ const DocumentRequestingFilter = (props) => {
                   variant="outlined"
                   size="small"
                   label="To Date"
+                  fullWidth
                 />
             }
-            PopperProps={{
-              placement: "left",
-              modifiers: [
-                {
-                  name: 'flip',
-                  enabled: true,
-                  options: {
-                    altBoundary: true,
-                    rootBoundary: 'document',
-                    padding: 8,
-                  },
-                },
-                {
-                  name: 'preventOverflow',
-                  enabled: true,
-                  options: {
-                    altAxis: false,
-                    altBoundary: false,
-                    tether: false,
-                    rootBoundary: 'document',
-                    padding: 8,
-                  },
-                }
-              ]
-            }}
             showToolbar
           />
         </LocalizationProvider>
@@ -290,7 +247,7 @@ const DocumentRequestingFilter = (props) => {
 
         <Typography className="FstoTypographyFilter-root">Supplier:</Typography>
         <Autocomplete
-          className="FstoSelectForm-root"
+          // className="FstoSelectForm-root"
           size="small"
           limitTags={5}
           filterOptions={filterOptions}
@@ -341,7 +298,7 @@ const DocumentRequestingFilter = (props) => {
 
             <Typography className="FstoTypographyFilter-root">Department:</Typography>
             <Autocomplete
-              className="FstoSelectForm-root"
+              // className="FstoSelectForm-root"
               size="small"
               limitTags={5}
               filterOptions={filterOptions}

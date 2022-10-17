@@ -244,8 +244,9 @@ const NewRequest = () => {
   })
 
   const [prmGroup, setPrmGroup] = React.useState([])
-  // eslint-disable-next-line
+
   const [debitGroup, setDebitGroup] = React.useState([])
+
   // eslint-disable-next-line
   const [poGroup, setPoGroup] = React.useState([])
 
@@ -701,7 +702,6 @@ const NewRequest = () => {
 
       case 9: // Auto Debit
         return data.document.payment_type
-          && data.document.no
           && data.document.date
           && data.document.amount
           && data.document.company
@@ -1736,7 +1736,6 @@ const NewRequest = () => {
           requestor: data.requestor,
           document: {
             id: data.document.id,
-            no: `ad#${data.document.no}`,
             name: data.document.name,
             amount: data.document.amount,
             date: new Date(data.document.date).toISOString().slice(0, 10),
@@ -1900,7 +1899,15 @@ const NewRequest = () => {
               message: "Transaction failed. Please try again.",
               duration: null
             })
+
+            return
           }
+
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to save this transaction. Please try again."
+          })
         }
 
         setIsSaving(false)
@@ -2274,7 +2281,7 @@ const NewRequest = () => {
                   )}
 
                 { // Document Number
-                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 5 || data.document.id === 9) &&
+                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 5) &&
                   (
                     <TextField
                       className="FstoTextfieldForm-root"
@@ -4144,9 +4151,13 @@ const NewRequest = () => {
                         })}
                     </Typography>
                   </Box>
+
+
                 </React.Fragment>
               )
             }
+
+            <ErrorDialog {...errorImport} />
           </Paper>
         )
       }

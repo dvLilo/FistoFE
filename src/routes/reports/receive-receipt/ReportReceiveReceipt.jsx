@@ -43,7 +43,7 @@ const ReportReceiveReceipt = () => {
     <Box className="FstoBox-root">
       <Paper className="FstoPaperTable-root" elevation={1}>
         <Stack className="FstoStackToolbar-root" justifyContent="space-between" gap={2}>
-          <Stack className="FstoStackToolbar-item" direction="row" alignItems="center" justifyContent="center" gap={2}>
+          <Stack className="FstoStackToolbar-item" direction="row" justifyContent="center" gap={2}>
             <Typography variant="heading">
               Received Receipt Report
             </Typography>
@@ -61,42 +61,44 @@ const ReportReceiveReceipt = () => {
             </ButtonGroup>
           </Stack>
 
-          <Stack className="FstoStackToolbar-item" direction="row" alignItems="center" justifyContent="center" gap={1}>
-            <OutlinedInput
-              className="FstoTextFieldSearch-root"
-              size="small"
-              autoComplete="off"
-              placeholder="Search"
-              value={search}
-              startAdornment={
-                <InputAdornment position="start">
-                  <Search />
-                </InputAdornment>
-              }
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton
-                    edge="end"
-                    size="small"
-                    disabled={
-                      !Boolean(search)
-                    }
-                    onClick={() => {
-                      setSearch("")
-                      // searchData(null)
-                    }}
-                  >
-                    <Close fontSize="small" />
-                  </IconButton>
-                </InputAdornment>
-              }
-              onChange={(e) => setSearch(e.target.value)}
-            // onKeyPress={(e) => {
-            //   if (e.key === "Enter") searchData(e.target.value)
-            // }}
-            />
+          <Stack className="FstoStackToolbar-item" direction="column" alignItems="center" justifyContent="center" gap={1}>
+            <Stack direction="row" alignItems="center" justifyContent="center" gap={1}>
+              <OutlinedInput
+                className="FstoTextFieldSearch-root"
+                size="small"
+                autoComplete="off"
+                placeholder="Search"
+                value={search}
+                startAdornment={
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                }
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      edge="end"
+                      size="small"
+                      disabled={
+                        !Boolean(search)
+                      }
+                      onClick={() => {
+                        setSearch("")
+                        // searchData(null)
+                      }}
+                    >
+                      <Close fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                }
+                onChange={(e) => setSearch(e.target.value)}
+              // onKeyPress={(e) => {
+              //   if (e.key === "Enter") searchData(e.target.value)
+              // }}
+              />
 
-            <FilterPopover />
+              <FilterPopover />
+            </Stack>
           </Stack>
         </Stack>
 

@@ -233,6 +233,8 @@ body {
   min-height: 30px;
   margin-bottom: 5px;
 
+  align-self: center;
+
   .FstoTabsIndicator-root.MuiTabs-indicator {
     background-color: transparent;
     display: flex;
@@ -826,9 +828,9 @@ body {
   }
 
   & .FstoTextfieldFilter-root {
-    width: 45%;
-    margin-left: 2.5%;
-    margin-right: 2.5%;
+    // width: 95%;
+    // margin-left: 2.5%;
+    // margin-right: 2.5%;
   }
 
   & .FstoButtonFilter-root {
@@ -1078,6 +1080,11 @@ body {
     @media (min-width: 992px) {
       flex-direction: row;
       align-items: flex-end;
+
+      & .FstoStackToolbar-item {
+        flex-direction: row;
+        align-items: center;
+      }
     }
   }
 }
