@@ -91,7 +91,7 @@ const Sidebar = () => {
 
           <img className="FstoSidebar-logo" src={FistoLogo} alt="Fistó App" />
 
-          {
+          { // Masterlist
             !!user &&
             (!!user.role.match(/administrator/i) && user.permissions.includes(0)) &&
             <Accordion defaultExpanded={/administrator/i.test(user.role)} elevation={0} square disableGutters>
@@ -123,8 +123,9 @@ const Sidebar = () => {
             </Accordion>
           }
 
-          {
+          { // Documents
             !!user &&
+            (user.permissions.includes(1) || user.permissions.includes(19) || user.permissions.includes(20) || user.permissions.includes(21) || user.permissions.includes(22)) &&
             <Accordion defaultExpanded={/tagging|requestor/i.test(user.role)} elevation={0} square disableGutters>
               <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
                 <DocumentIcon />
@@ -142,9 +143,9 @@ const Sidebar = () => {
             </Accordion>
           }
 
-          {
+          { // Voucher
             !!user &&
-            (!!user.role.match(/administrator|ap associate|specialist/i) || (!!user.role.match(/tagging/i) && (user.permissions.includes(10) || user.permissions.includes(12)))) &&
+            (!!user.role.match(/ap associate|specialist/i) || (!!user.role.match(/tagging/i) && (user.permissions.includes(10) || user.permissions.includes(12)))) &&
             <Accordion defaultExpanded={/associate|specialist/i.test(user.role)} elevation={0} square disableGutters>
               <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
                 <VoucherIcon />
@@ -167,9 +168,9 @@ const Sidebar = () => {
             </Accordion>
           }
 
-          {
+          { // Cheque
             !!user &&
-            (!!user.role.match(/administrator|treasury/i) || (!!user.role.match(/tagging|associate|specialist/i) && user.permissions.includes(6))) &&
+            (!!user.role.match(/treasury/i) || (!!user.role.match(/tagging|associate|specialist/i) && user.permissions.includes(6))) &&
             <Accordion defaultExpanded={/treasury/i.test(user.role)} elevation={0} square disableGutters>
               <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
                 <ChequeIcon />
@@ -192,9 +193,9 @@ const Sidebar = () => {
             </Accordion>
           }
 
-          {
+          { // Approval
             !!user &&
-            !!user.role.match(/administrator|approver/i) &&
+            !!user.role.match(/approver/i) &&
             <Accordion defaultExpanded={/approver/i.test(user.role)} elevation={0} square disableGutters>
               <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
                 <ApprovalIcon />
@@ -209,9 +210,9 @@ const Sidebar = () => {
             </Accordion>
           }
 
-          {
+          { // Confidential
             !!user &&
-            !!user.role.match(/administrator|approver/i) &&
+            !!user.role.match(/approver/i) &&
             <Accordion elevation={0} square disableGutters>
               <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
                 <ConfidentialIcon />
@@ -226,11 +227,23 @@ const Sidebar = () => {
                 {user.permissions.includes(18)
                   && <RouterLink className="FstoSidebarLink-root" to="/confidential/approving">Transaction Approval</RouterLink>
                 }
+
+                {user.permissions.includes(15)
+                  && <RouterLink className="FstoSidebarLink-root" to="/confidential/vouchering">Transmittal of Documents</RouterLink>
+                }
+
+                {user.permissions.includes(15)
+                  && <RouterLink className="FstoSidebarLink-root" to="/confidential/vouchering">Releasing of Cheque</RouterLink>
+                }
+
+                {user.permissions.includes(15)
+                  && <RouterLink className="FstoSidebarLink-root" to="/confidential/vouchering">Filing of Voucher</RouterLink>
+                }
               </AccordionDetails>
             </Accordion>
           }
 
-          {
+          { // Reports
             !!user &&
             <Accordion elevation={0} square disableGutters>
               <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>

@@ -99,7 +99,7 @@ const CompaniesTable = (props) => {
             ? <Preloader row={5} col={7} />
             : data
               ? data.sort(comparator(order, orderBy)).map((data, index) => (
-                <TableRow className="FstoTableRowMasterlist-root" key={index}>
+                <TableRow className="FstoTableRowMasterlist-root" key={index} hover>
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body" align="center">
                     {data.id}
                   </TableCell>

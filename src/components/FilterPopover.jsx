@@ -61,6 +61,10 @@ const DOCUMENT_TYPES = [
   {
     id: 8,
     type: "PCF"
+  },
+  {
+    id: 9,
+    type: "Auto Debit"
   }
 ]
 
@@ -80,7 +84,7 @@ const FilterPopover = (props) => {
   const [filter, setFilter] = React.useState({
     from: null,
     to: null,
-    types: [1, 2, 3, 4, 5, 6, 7, 8],
+    types: [1, 2, 3, 4, 5, 6, 7, 8, 9],
     suppliers: []
   })
 
@@ -112,7 +116,7 @@ const FilterPopover = (props) => {
     setFilter({
       from: null,
       to: null,
-      types: [1, 2, 3, 4, 5, 6, 7, 8],
+      types: [1, 2, 3, 4, 5, 6, 7, 8, 9],
       suppliers: []
     })
 
@@ -190,6 +194,7 @@ const FilterPopover = (props) => {
         <Divider className="FstoDividerFilter-root" variant="middle" />
 
         <Typography className="FstoTypographyFilter-root">Transaction Date:</Typography>
+
         <LocalizationProvider dateAdapter={DateAdapter}>
           <DatePicker
             value={filter.from}
@@ -225,6 +230,7 @@ const FilterPopover = (props) => {
         <Divider className="FstoDividerFilter-root" variant="middle" />
 
         <Typography className="FstoTypographyFilter-root">Supplier:</Typography>
+
         <Autocomplete
           className="FstoSelectForm-root"
           size="small"
@@ -235,11 +241,6 @@ const FilterPopover = (props) => {
           loading={
             SUPPLIER_STATUS === 'loading'
           }
-          sx={{
-            width: '95%',
-            marginLeft: '2.5%',
-            marginRight: '2.5%'
-          }}
           renderInput={
             (props) => <TextField {...props} label="Supplier" variant="outlined" />
           }
@@ -267,7 +268,9 @@ const FilterPopover = (props) => {
           className="FstoButtonFilter-root"
           variant="contained"
           color="primary"
-          size="small"
+          sx={{
+            marginLeft: 1
+          }}
           onClick={filterSubmitHandler}
           disableElevation
         > Apply
@@ -276,7 +279,6 @@ const FilterPopover = (props) => {
         <Button
           className="FstoButtonFilter-root"
           variant="text"
-          size="small"
           onClick={filterClearHandler}
         > Clear All Filters
         </Button>

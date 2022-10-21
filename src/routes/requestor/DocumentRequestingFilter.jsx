@@ -206,19 +206,11 @@ const DocumentRequestingFilter = (props) => {
               from: value
             }))}
             renderInput={
-              props =>
-                <TextField
-                  {...props}
-                  className="FstoTextfieldFilter-root"
-                  variant="outlined"
-                  size="small"
-                  label="From Date"
-                  sx={{
-                    marginBottom: 2
-                  }}
-                  fullWidth
-                />
+              (props) => <TextField {...props} className="FstoTextfieldFilter-root" label="From Date" variant="outlined" size="small" sx={{ marginBottom: 2 }} fullWidth />
             }
+            PopperProps={{
+              placement: "left"
+            }}
             showToolbar
           />
 
@@ -229,16 +221,11 @@ const DocumentRequestingFilter = (props) => {
               to: value
             }))}
             renderInput={
-              props =>
-                <TextField
-                  {...props}
-                  className="FstoTextfieldFilter-root"
-                  variant="outlined"
-                  size="small"
-                  label="To Date"
-                  fullWidth
-                />
+              (props) => <TextField {...props} className="FstoTextfieldFilter-root" label="To Date" variant="outlined" size="small" fullWidth />
             }
+            PopperProps={{
+              placement: "left"
+            }}
             showToolbar
           />
         </LocalizationProvider>
@@ -247,7 +234,7 @@ const DocumentRequestingFilter = (props) => {
 
         <Typography className="FstoTypographyFilter-root">Supplier:</Typography>
         <Autocomplete
-          // className="FstoSelectForm-root"
+          className="FstoSelectForm-root"
           size="small"
           limitTags={5}
           filterOptions={filterOptions}
@@ -256,28 +243,14 @@ const DocumentRequestingFilter = (props) => {
           loading={
             SUPPLIER_STATUS === 'loading'
           }
-          sx={{
-            width: '95%',
-            marginLeft: '2.5%',
-            marginRight: '2.5%'
-          }}
           renderInput={
-            props =>
-              <TextField
-                {...props}
-                variant="outlined"
-                label="Supplier"
-              />
+            (props) => <TextField {...props} label="Supplier" variant="outlined" />
           }
           PaperComponent={
-            props =>
-              <Paper
-                {...props}
-                sx={{ textTransform: 'capitalize' }}
-              />
+            (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
           }
           getOptionLabel={
-            option => option.name
+            (option) => option.name
           }
           isOptionEqualToValue={
             (option, value) => option.id === value.id
@@ -298,7 +271,7 @@ const DocumentRequestingFilter = (props) => {
 
             <Typography className="FstoTypographyFilter-root">Department:</Typography>
             <Autocomplete
-              // className="FstoSelectForm-root"
+              className="FstoSelectForm-root"
               size="small"
               limitTags={5}
               filterOptions={filterOptions}
@@ -307,28 +280,14 @@ const DocumentRequestingFilter = (props) => {
               loading={
                 USERDEPARTMENT_STATUS === 'loading'
               }
-              sx={{
-                width: '95%',
-                marginLeft: '2.5%',
-                marginRight: '2.5%'
-              }}
               renderInput={
-                props =>
-                  <TextField
-                    {...props}
-                    variant="outlined"
-                    label="Department"
-                  />
+                (props) => <TextField {...props} label="Department" variant="outlined" />
               }
               PaperComponent={
-                props =>
-                  <Paper
-                    {...props}
-                    sx={{ textTransform: 'capitalize' }}
-                  />
+                (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
               }
               getOptionLabel={
-                option => option.name
+                (option) => option.name
               }
               isOptionEqualToValue={
                 (option, value) => option.id === value.id
@@ -350,17 +309,20 @@ const DocumentRequestingFilter = (props) => {
           className="FstoButtonFilter-root"
           variant="contained"
           color="primary"
-          size="small"
+          sx={{
+            marginLeft: 1
+          }}
           onClick={filterSubmitHandler}
           disableElevation
-        >Apply</Button>
+        > Apply
+        </Button>
 
         <Button
           className="FstoButtonFilter-root"
           variant="text"
-          size="small"
           onClick={filterClearHandler}
-        >Clear All Filters</Button>
+        > Clear All Filters
+        </Button>
       </Popover>
     </React.Fragment>
   )

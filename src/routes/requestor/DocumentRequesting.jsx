@@ -44,10 +44,10 @@ import useToast from '../../hooks/useToast'
 import useTransactions from '../../hooks/useTransactions'
 
 import TablePreloader from '../../components/TablePreloader'
-import ReasonDialog from '../../components/ReasonDialog'
 
 import DocumentRequestingActions from './DocumentRequestingActions'
 import DocumentRequestingFilter from './DocumentRequestingFilter'
+import DocumentRequestingReason from './DocumentRequestingReason'
 import DocumentRequestingTransaction from './DocumentRequestingTransaction'
 
 const DocumentRequesting = () => {
@@ -530,7 +530,7 @@ const DocumentRequesting = () => {
 
         <DocumentRequestingTransaction {...view} />
 
-        <ReasonDialog onSuccess={refetchData} {...reason} />
+        <DocumentRequestingReason onSuccess={refetchData} {...reason} />
       </Paper>
     </Box>
   )
