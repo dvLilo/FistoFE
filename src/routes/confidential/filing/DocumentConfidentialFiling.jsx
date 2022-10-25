@@ -39,8 +39,8 @@ import useConfirm from '../../../hooks/useConfirm'
 import useTransactions from '../../../hooks/useTransactions'
 
 import {
-  TRANSMIT,
-  RECEIVE
+  FILE,
+  RECEIVE,
 } from '../../../constants'
 
 import EmptyImage from '../../../assets/img/empty.svg'
@@ -48,10 +48,10 @@ import EmptyImage from '../../../assets/img/empty.svg'
 import FilterPopover from '../../../components/FilterPopover'
 import TablePreloader from '../../../components/TablePreloader'
 
-import DocumentConfidentialTransmittingActions from './DocumentConfidentialTransmittingActions'
-import DocumentConfidentialTransmittingTransaction from './DocumentConfidentialTransmittingTransaction'
+import DocumentConfidentialFilingTransaction from './DocumentConfidentialFilingTransaction'
+import DocumentConfidentialFilingActions from './DocumentConfidentialFilingActions'
 
-const DocumentConfidentialTransmitting = () => {
+const DocumentConfidentialFiling = () => {
 
   const {
     // status,
@@ -94,7 +94,7 @@ const DocumentConfidentialTransmitting = () => {
       ...currentValue,
       transaction,
       open: true,
-      onBack: onManage
+      onBack: onView
     }))
   }
 
@@ -106,7 +106,7 @@ const DocumentConfidentialTransmitting = () => {
         let response
         try {
           response = await axios.post(`/api/transactions/flow/update-transaction/DELETE-ME-LATER/${ID}`, {
-            process: TRANSMIT,
+            process: FILE,
             subprocess: RECEIVE
           })
 
@@ -168,7 +168,7 @@ const DocumentConfidentialTransmitting = () => {
         referrence_amount: null,
         status: "pending",
         ...(Boolean(state.match(/-receive.*/)) && { status: "receive" }),
-        ...(Boolean(state.match(/-transmit.*/)) && { status: "transmit" }),
+        ...(Boolean(state.match(/-file.*/)) && { status: "file" }),
         users: {
           id: 2,
           first_name: "VINCENT LOUIE",
@@ -210,7 +210,7 @@ const DocumentConfidentialTransmitting = () => {
         <Stack className="FstoStackToolbar-root" justifyContent="space-between" gap={2}>
           <Stack className="FstoStackToolbar-item" direction="row" justifyContent="center" gap={2}>
             <Typography variant="heading">
-              Transmittal of Confidential Document
+              Filing of Confidential Voucher
             </Typography>
           </Stack>
 
@@ -228,8 +228,8 @@ const DocumentConfidentialTransmitting = () => {
               }}
             >
               <Tab className="FstoTab-root" label="Pending" value="pending" disableRipple />
-              <Tab className="FstoTab-root" label="Received" value="transmit-receive" disableRipple />
-              <Tab className="FstoTab-root" label="Transmitted" value="transmit-transmit" disableRipple />
+              <Tab className="FstoTab-root" label="Received" value="file-receive" disableRipple />
+              <Tab className="FstoTab-root" label="Filed" value="file-file" disableRipple />
             </Tabs>
 
             <Stack direction="row" alignItems="center" justifyContent="center" gap={1}>
@@ -423,7 +423,7 @@ const DocumentConfidentialTransmitting = () => {
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                      <DocumentConfidentialTransmittingActions
+                      <DocumentConfidentialFilingActions
                         data={item}
                         state={state}
                         onReceive={onReceive}
@@ -462,7 +462,7 @@ const DocumentConfidentialTransmitting = () => {
           showLastButton
         />
 
-        <DocumentConfidentialTransmittingTransaction
+        <DocumentConfidentialFilingTransaction
           {...manage}
           state={state}
           refetchData={refetchData}
@@ -472,4 +472,4 @@ const DocumentConfidentialTransmitting = () => {
   )
 }
 
-export default DocumentConfidentialTransmitting
+export default DocumentConfidentialFiling

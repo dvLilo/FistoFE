@@ -39,19 +39,22 @@ import useConfirm from '../../../hooks/useConfirm'
 import useTransactions from '../../../hooks/useTransactions'
 
 import {
-  TRANSMIT,
-  RECEIVE
+  RELEASE,
+  RECEIVE,
+  RETURN,
+  UNRETURN
 } from '../../../constants'
 
 import EmptyImage from '../../../assets/img/empty.svg'
 
+import ReasonDialog from '../../../components/ReasonDialog'
 import FilterPopover from '../../../components/FilterPopover'
 import TablePreloader from '../../../components/TablePreloader'
 
-import DocumentConfidentialTransmittingActions from './DocumentConfidentialTransmittingActions'
-import DocumentConfidentialTransmittingTransaction from './DocumentConfidentialTransmittingTransaction'
+import DocumentConfidentialReleasingActions from './DocumentConfidentialReleasingActions'
+import DocumentConfidentialReleasingTransaction from './DocumentConfidentialReleasingTransaction'
 
-const DocumentConfidentialTransmitting = () => {
+const DocumentConfidentialReleasing = () => {
 
   const {
     // status,
@@ -69,6 +72,18 @@ const DocumentConfidentialTransmitting = () => {
 
   const [search, setSearch] = React.useState("")
   const [state, setState] = React.useState("pending")
+
+  const [reason, setReason] = React.useState({
+    open: false,
+    data: null,
+    process: null,
+    subprocess: null,
+    onSuccess: refetchData,
+    onClose: () => setReason(currentValue => ({
+      ...currentValue,
+      open: false
+    }))
+  })
 
   const [manage, setManage] = React.useState({
     open: false,
@@ -94,7 +109,7 @@ const DocumentConfidentialTransmitting = () => {
       ...currentValue,
       transaction,
       open: true,
-      onBack: onManage
+      onBack: onView
     }))
   }
 
@@ -106,7 +121,7 @@ const DocumentConfidentialTransmitting = () => {
         let response
         try {
           response = await axios.post(`/api/transactions/flow/update-transaction/DELETE-ME-LATER/${ID}`, {
-            process: TRANSMIT,
+            process: RELEASE,
             subprocess: RECEIVE
           })
 
@@ -124,6 +139,48 @@ const DocumentConfidentialTransmitting = () => {
             severity: "error",
             title: "Error!",
             message: "Something went wrong whilst trying to receive transaction. Please try again later."
+          })
+        }
+      }
+    })
+  }
+
+  const onReturn = (data) => {
+    setReason(currentValue => ({
+      ...currentValue,
+      open: true,
+      process: RELEASE,
+      subprocess: RETURN,
+      data,
+    }))
+  }
+
+  const onUnreturn = (ID) => {
+    confirm({
+      open: true,
+      wait: true,
+      onConfirm: async () => {
+        let response
+        try {
+          response = await axios.post(`/api/transactions/flow/update-transaction/DELETE-ME-LATER/${ID}`, {
+            process: RELEASE,
+            subprocess: UNRETURN
+          })
+
+          const { message } = response.data
+
+          refetchData()
+          toast({
+            message,
+            title: "Success!"
+          })
+        } catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to cancel return transaction. Please try again later."
           })
         }
       }
@@ -168,7 +225,8 @@ const DocumentConfidentialTransmitting = () => {
         referrence_amount: null,
         status: "pending",
         ...(Boolean(state.match(/-receive.*/)) && { status: "receive" }),
-        ...(Boolean(state.match(/-transmit.*/)) && { status: "transmit" }),
+        ...(Boolean(state.match(/-release.*/)) && { status: "release" }),
+        ...(Boolean(state.match(/-return.*/)) && { status: "return" }),
         users: {
           id: 2,
           first_name: "VINCENT LOUIE",
@@ -210,7 +268,7 @@ const DocumentConfidentialTransmitting = () => {
         <Stack className="FstoStackToolbar-root" justifyContent="space-between" gap={2}>
           <Stack className="FstoStackToolbar-item" direction="row" justifyContent="center" gap={2}>
             <Typography variant="heading">
-              Transmittal of Confidential Document
+              Releasing of Confidential Cheque
             </Typography>
           </Stack>
 
@@ -228,8 +286,9 @@ const DocumentConfidentialTransmitting = () => {
               }}
             >
               <Tab className="FstoTab-root" label="Pending" value="pending" disableRipple />
-              <Tab className="FstoTab-root" label="Received" value="transmit-receive" disableRipple />
-              <Tab className="FstoTab-root" label="Transmitted" value="transmit-transmit" disableRipple />
+              <Tab className="FstoTab-root" label="Received" value="release-receive" disableRipple />
+              <Tab className="FstoTab-root" label="Released" value="release-release" disableRipple />
+              <Tab className="FstoTab-root" label="Returned" value="release-return" disableRipple />
             </Tabs>
 
             <Stack direction="row" alignItems="center" justifyContent="center" gap={1}>
@@ -423,10 +482,11 @@ const DocumentConfidentialTransmitting = () => {
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                      <DocumentConfidentialTransmittingActions
+                      <DocumentConfidentialReleasingActions
                         data={item}
                         state={state}
                         onReceive={onReceive}
+                        onCancel={onUnreturn}
                         onManage={onManage}
                         onView={onView}
                       />
@@ -462,14 +522,17 @@ const DocumentConfidentialTransmitting = () => {
           showLastButton
         />
 
-        <DocumentConfidentialTransmittingTransaction
+        <DocumentConfidentialReleasingTransaction
           {...manage}
           state={state}
           refetchData={refetchData}
+          onReturn={onReturn}
         />
+
+        <ReasonDialog {...reason} />
       </Paper>
     </Box>
   )
 }
 
-export default DocumentConfidentialTransmitting
+export default DocumentConfidentialReleasing

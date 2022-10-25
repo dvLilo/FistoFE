@@ -75,6 +75,9 @@ import DocumentReturning from './routes/returning/DocumentReturning'
 // Confidential
 import DocumentConfidentialVouchering from './routes/confidential/vouchering/DocumentConfidentialVouchering'
 import DocumentConfidentialApproving from './routes/confidential/approving/DocumentConfidentialApproving'
+import DocumentConfidentialTransmitting from './routes/confidential/transmitting/DocumentConfidentialTransmitting'
+import DocumentConfidentialReleasing from './routes/confidential/releasing/DocumentConfidentialReleasing'
+import DocumentConfidentialFiling from './routes/confidential/filing/DocumentConfidentialFiling'
 
 // Counter Receipt
 import DocumentCounterReceiptCreating from './routes/countering/DocumentCounterReceiptCreating'
@@ -378,6 +381,24 @@ const App = () => {
             <Route exact path="/confidential/approving" element={<ProtectedRoute permission={18} />}>
               <Route index exact strict
                 element={<DocumentConfidentialApproving />}
+              />
+            </Route>
+
+            <Route exact path="/confidential/transmitting" element={<ProtectedRoute permission={13} />}>
+              <Route index exact strict
+                element={<DocumentConfidentialTransmitting />}
+              />
+            </Route>
+
+            <Route exact path="/confidential/releasing" element={<ProtectedRoute permission={13} />}>
+              <Route index exact strict
+                element={<DocumentConfidentialReleasing />}
+              />
+            </Route>
+
+            <Route exact path="/confidential/filing" element={<ProtectedRoute permission={13} />}>
+              <Route index exact strict
+                element={<DocumentConfidentialFiling />}
               />
             </Route>
 

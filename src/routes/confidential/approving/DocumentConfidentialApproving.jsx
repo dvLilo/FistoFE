@@ -22,6 +22,7 @@ import {
   Tab,
   Stack,
   Chip,
+  Divider,
   OutlinedInput
 } from '@mui/material'
 
@@ -44,6 +45,8 @@ import {
   RETURN,
   UNRETURN
 } from '../../../constants'
+
+import EmptyImage from '../../../assets/img/empty.svg'
 
 import FilterPopover from '../../../components/FilterPopover'
 import ReasonDialog from '../../../components/ReasonDialog'
@@ -409,10 +412,6 @@ const DocumentConfidentialApproving = () => {
                 && <TablePreloader row={3} />}
 
               {
-                status === 'error'
-                && <TableRow><TableCell align="center" colSpan={7}>NO RECORDS FOUND</TableCell></TableRow>}
-
-              {
                 status === 'success'
                 && data.data.map((item, index) => (
                   <TableRow className="FstoTableRow-root" key={index} hover>
@@ -502,6 +501,18 @@ const DocumentConfidentialApproving = () => {
                 ))}
             </TableBody>
           </Table>
+
+          {
+            status === 'error' &&
+            <React.Fragment>
+              <Divider variant="fullWidth" />
+
+              <Box className="FstoTableBox-root">
+                <img alt="No Data" src={EmptyImage} />
+                <Typography variant="body1">NO RECORDS FOUND</Typography>
+              </Box>
+            </React.Fragment>}
+
         </TableContainer>
 
         <TablePagination

@@ -228,16 +228,16 @@ const Sidebar = () => {
                   && <RouterLink className="FstoSidebarLink-root" to="/confidential/approving">Transaction Approval</RouterLink>
                 }
 
-                {user.permissions.includes(15)
-                  && <RouterLink className="FstoSidebarLink-root" to="/confidential/vouchering">Transmittal of Documents</RouterLink>
+                {user.permissions.includes(13)
+                  && <RouterLink className="FstoSidebarLink-root" to="/confidential/transmitting">Transmittal of Documents</RouterLink>
                 }
 
-                {user.permissions.includes(15)
-                  && <RouterLink className="FstoSidebarLink-root" to="/confidential/vouchering">Releasing of Cheque</RouterLink>
+                {user.permissions.includes(16)
+                  && <RouterLink className="FstoSidebarLink-root" to="/confidential/releasing">Releasing of Cheque</RouterLink>
                 }
 
-                {user.permissions.includes(15)
-                  && <RouterLink className="FstoSidebarLink-root" to="/confidential/vouchering">Filing of Voucher</RouterLink>
+                {user.permissions.includes(14)
+                  && <RouterLink className="FstoSidebarLink-root" to="/confidential/filing">Filing of Voucher</RouterLink>
                 }
               </AccordionDetails>
             </Accordion>

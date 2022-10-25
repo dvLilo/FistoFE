@@ -136,20 +136,24 @@ const NewUser = () => {
     ],
     confidential: [
       {
-        id: 13,
-        name: "Creation of Confidential Voucher"
-      },
-      {
         id: 15,
         name: "Tagging and Vouchering"
+      },
+      {
+        id: 18,
+        name: "Approval of Confidential Voucher"
+      },
+      {
+        id: 13,
+        name: "Transmittal of Confidential Document"
       },
       {
         id: 16,
         name: "Releasing of Confidential Cheque"
       },
       {
-        id: 18,
-        name: "Approval of Confidential Voucher"
+        id: 14,
+        name: "Filing of Confidential Voucher"
       }
     ],
     administrator: [
