@@ -47,6 +47,9 @@ import {
   RETURN,
   HOLD,
   VOID,
+
+  TAG,
+  VOUCHER,
   CHEQUE,
   RELEASE
 } from '../../constants'
@@ -137,7 +140,7 @@ const DocumentReturning = () => {
     setReason(currentValue => ({
       ...currentValue,
       open: true,
-      process: REVERSE,
+      process: getProcess(user?.role),
       subprocess: HOLD,
       data,
     }))
@@ -147,7 +150,7 @@ const DocumentReturning = () => {
     setReason(currentValue => ({
       ...currentValue,
       open: true,
-      process: REVERSE,
+      process: getProcess(user?.role),
       subprocess: VOID,
       data,
     }))
@@ -157,7 +160,7 @@ const DocumentReturning = () => {
     setReason(currentValue => ({
       ...currentValue,
       open: true,
-      process: REVERSE,
+      process: getProcess(user?.role),
       subprocess: RETURN,
       data,
     }))
@@ -199,6 +202,26 @@ const DocumentReturning = () => {
         }
       }
     })
+  }
+
+
+  const getProcess = (role) => {
+    switch (role) {
+      case "AP Tagging":
+        return TAG
+
+      case "AP Associate":
+        return VOUCHER
+
+      case "AP Specialist":
+        return VOUCHER
+
+      case "Treasury Associate":
+        return CHEQUE
+
+      default:
+        return REVERSE
+    }
   }
 
   return (

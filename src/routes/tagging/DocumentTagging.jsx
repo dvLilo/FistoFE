@@ -89,6 +89,7 @@ const DocumentTagging = () => {
   const [manage, setManage] = React.useState({
     open: false,
     transaction: null,
+    onBack: undefined,
     onClose: () => setManage(currentValue => ({
       ...currentValue,
       open: false
@@ -131,7 +132,8 @@ const DocumentTagging = () => {
     setManage(currentValue => ({
       ...currentValue,
       transaction,
-      open: true
+      open: true,
+      onBack: onManage
     }))
   }
 
@@ -139,7 +141,8 @@ const DocumentTagging = () => {
     setManage(currentValue => ({
       ...currentValue,
       transaction,
-      open: true
+      open: true,
+      onBack: onView
     }))
   }
 

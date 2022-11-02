@@ -125,7 +125,7 @@ const Sidebar = () => {
 
           { // Documents
             !!user &&
-            (user.permissions.includes(1) || user.permissions.includes(19) || user.permissions.includes(20) || user.permissions.includes(21) || user.permissions.includes(22)) &&
+            (user.permissions.includes(1) || user.permissions.includes(6) || user.permissions.includes(7) || user.permissions.includes(8) || user.permissions.includes(19) || user.permissions.includes(20) || user.permissions.includes(21) || user.permissions.includes(22)) &&
             <Accordion defaultExpanded={/tagging|requestor/i.test(user.role)} elevation={0} square disableGutters>
               <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
                 <DocumentIcon />

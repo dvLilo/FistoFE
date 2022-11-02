@@ -19,6 +19,7 @@ import useTransaction from '../../hooks/useTransaction'
 
 import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
+import ChequeEntryDialog from '../../components/ChequeEntryDialog'
 
 const DocumentTransmittingTransaction = (props) => {
 
@@ -59,6 +60,17 @@ const DocumentTransmittingTransaction = (props) => {
     onClose: () => setViewAccountTitle(currentValue => ({
       ...currentValue,
       open: false
+    }))
+  })
+
+  const [viewCheque, setViewCheque] = React.useState({
+    open: false,
+    state: null,
+    transaction: null,
+    onBack: undefined,
+    onClose: () => setViewCheque(currentValue => ({
+      ...currentValue,
+      open: false,
     }))
   })
 
@@ -109,6 +121,18 @@ const DocumentTransmittingTransaction = (props) => {
     }))
   }
 
+  const onChequeView = () => {
+    onClose()
+
+    setViewCheque(currentValue => ({
+      ...currentValue,
+      state: "-release",
+      transaction,
+      open: true,
+      onBack: onBack
+    }))
+  }
+
   return (
     <React.Fragment>
       <Dialog
@@ -130,7 +154,7 @@ const DocumentTransmittingTransaction = (props) => {
         </DialogTitle>
 
         <DialogContent className="FstoDialogTransaction-content">
-          <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} />
+          <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
         </DialogContent>
 
         {
@@ -147,8 +171,13 @@ const DocumentTransmittingTransaction = (props) => {
       </Dialog>
 
       <AccountTitleDialog
+        accounts={data?.cheque?.accounts || data?.voucher?.accounts}
         {...viewAccountTitle}
-        accounts={data?.voucher.accounts[0]}
+      />
+
+      <ChequeEntryDialog
+        cheques={data?.cheque?.cheques}
+        {...viewCheque}
       />
     </React.Fragment>
   )

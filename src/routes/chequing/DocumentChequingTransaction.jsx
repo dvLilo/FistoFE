@@ -55,7 +55,7 @@ const DocumentChequingTransaction = (props) => {
 
   React.useEffect(() => {
     if (open && state === `cheque-receive` && status === `success` && !Boolean(chequeData.accounts.length)) {
-      const accounts = data.cheque?.accounts || data.voucher.accounts[0].filter((item) => item.entry.toLowerCase() === `credit`).map((item) => ({
+      const accounts = Boolean(data.cheque.accounts.length) ? data.cheque.accounts : data.voucher.accounts.filter((item) => item.entry.toLowerCase() === `credit`).map((item) => ({
         entry: "Debit",
         account_title: item.account_title,
         amount: item.amount,
@@ -71,11 +71,11 @@ const DocumentChequingTransaction = (props) => {
       }))
     }
 
-    if (open && (state === `cheque-cheque` || state === `return-return`) && status === `success`) {
+    if (open && (state === `cheque-cheque` || state === `cheque-hold` || state === `cheque-return` || state === `cheque-void` || state === `return-return`) && status === `success`) {
       setChequeData(currentValue => ({
         ...currentValue,
-        accounts: data.cheque?.accounts,
-        cheques: data.cheque?.cheques
+        accounts: data.cheque.accounts || data.voucher.accounts,
+        cheques: data.cheque.cheques
       }))
     }
 
@@ -278,7 +278,9 @@ const DocumentChequingTransaction = (props) => {
 
       ...(Boolean(state.match(/-receive|-hold|cheque-return|-void.*/)) && {
         state: "transmit-",
-        accounts: data.voucher.accounts[0]
+        accounts: Boolean(data.cheque.accounts.length)
+          ? data.cheque.accounts
+          : data.voucher.accounts
       }),
       ...(Boolean(state.match(/-release|return-.*/)) && {
         state: "transmit-",
@@ -342,7 +344,7 @@ const DocumentChequingTransaction = (props) => {
       open: true,
       onBack: onBack,
 
-      ...(Boolean(state.match(/-receive.*/)) && {
+      ...(Boolean(state.match(/-receive|-hold|cheque-return|-void.*/)) && {
         state: "release-"
       }),
       ...(Boolean(state.match(/-release.*/)) && {

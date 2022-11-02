@@ -25,6 +25,7 @@ import useTransaction from '../../hooks/useTransaction'
 
 import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
+import ChequeEntryDialog from '../../components/ChequeEntryDialog'
 
 const DocumentApprovingTransaction = (props) => {
 
@@ -95,6 +96,17 @@ const DocumentApprovingTransaction = (props) => {
     }))
   })
 
+  const [viewCheque, setViewCheque] = React.useState({
+    open: false,
+    state: null,
+    transaction: null,
+    onBack: undefined,
+    onClose: () => setViewCheque(currentValue => ({
+      ...currentValue,
+      open: false,
+    }))
+  })
+
   const clearHandler = () => {
     setApprovalData(currentValue => ({
       ...currentValue,
@@ -154,12 +166,26 @@ const DocumentApprovingTransaction = (props) => {
     onReturn(transaction)
   }
 
+
   const onAccountTitleView = () => {
     onClose()
 
     setViewAccountTitle(currentValue => ({
       ...currentValue,
       state,
+      transaction,
+      open: true,
+      onBack: onBack
+    }))
+  }
+
+
+  const onChequeView = () => {
+    onClose()
+
+    setViewCheque(currentValue => ({
+      ...currentValue,
+      state: "-release",
       transaction,
       open: true,
       onBack: onBack
@@ -187,7 +213,7 @@ const DocumentApprovingTransaction = (props) => {
         </DialogTitle>
 
         <DialogContent className="FstoDialogTransaction-content">
-          <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} />
+          <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
 
           {
             (state === `approve-receive` || state === `approve-approve`) &&
@@ -275,8 +301,13 @@ const DocumentApprovingTransaction = (props) => {
       </Dialog>
 
       <AccountTitleDialog
+        accounts={data?.cheque?.accounts || data?.voucher?.accounts}
         {...viewAccountTitle}
-        accounts={data?.voucher?.accounts[0]}
+      />
+
+      <ChequeEntryDialog
+        cheques={data?.cheque?.cheques}
+        {...viewCheque}
       />
     </React.Fragment>
   )

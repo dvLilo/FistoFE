@@ -36,6 +36,7 @@ import useTransaction from '../../hooks/useTransaction'
 
 import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
+import ChequeEntryDialog from '../../components/ChequeEntryDialog'
 
 const NumberField = React.forwardRef(function NumberField(props, ref) {
   const { onChange, ...rest } = props
@@ -109,7 +110,7 @@ const DocumentVoucheringTransaction = (props) => {
   }, [open])
 
   React.useEffect(() => {
-    if (open && state === `voucher-receive` && APPROVER_STATUS === `success`) {
+    if (open && state === `voucher-receive` && APPROVER_STATUS === `success` && (status === `success` && !Boolean(data.voucher.approver))) {
       if (transaction.document_amount <= 500000.00 || transaction.referrence_amount <= 500000.00) {
         setVoucherData(currentValue => ({
           ...currentValue,
@@ -133,24 +134,27 @@ const DocumentVoucheringTransaction = (props) => {
     }
 
     // eslint-disable-next-line
-  }, [open, APPROVER_STATUS])
+  }, [open, status, APPROVER_STATUS])
 
   React.useEffect(() => {
-    if (open && status === `success` && !!state.match(/-voucher|-hold|-return|-void/i)) {
+    if (open && status === `success` && !Boolean(voucherData.tax.receipt_type) && !Boolean(voucherData.voucher.no)) {
       setVoucherData(currentValue => ({
         ...currentValue,
         tax: {
           receipt_type: data.voucher.tax?.receipt_type || "",
           percentage_tax: data.voucher.tax?.percentage_tax || "",
-          withholding_tax: data.voucher.tax?.witholding_tax || "",
-          net_amount: data.voucher.tax?.net_amount || ""
+          withholding_tax: data.voucher.tax?.witholding_tax || null,
+          net_amount: data.voucher.tax?.net_amount || null
         },
         voucher: {
-          no: data.voucher?.no,
+          no: data.voucher?.no || "",
           month: data.voucher?.month
         },
-        approver: data.voucher?.approver,
-        accounts: data.voucher?.accounts[0]
+        accounts: data.voucher?.accounts,
+
+        ...(Boolean(data.voucher?.approver) && {
+          approver: data.voucher?.approver
+        })
       }))
     }
 
@@ -192,6 +196,17 @@ const DocumentVoucheringTransaction = (props) => {
     onClose: () => setManageAccountTitle(currentValue => ({
       ...currentValue,
       open: false
+    }))
+  })
+
+  const [viewCheque, setViewCheque] = React.useState({
+    open: false,
+    state: null,
+    transaction: null,
+    onBack: undefined,
+    onClose: () => setViewCheque(currentValue => ({
+      ...currentValue,
+      open: false,
     }))
   })
 
@@ -308,7 +323,7 @@ const DocumentVoucheringTransaction = (props) => {
       transaction,
       open: true,
       onBack: onBack,
-      ...(Boolean(state.match(/-hold|-return|-void.*/)) && {
+      ...(Boolean(state.match(/-receive|-hold|-return|-void.*/)) && {
         state: "transmit-"
       })
     }))
@@ -346,6 +361,20 @@ const DocumentVoucheringTransaction = (props) => {
       ]
     }))
   }
+
+
+  const onChequeView = () => {
+    onClose()
+
+    setViewCheque(currentValue => ({
+      ...currentValue,
+      state: "-release",
+      transaction,
+      open: true,
+      onBack: onBack
+    }))
+  }
+
 
   const checkVoucherHandler = async (e) => {
     if (error.status && error.data.voucher_no) {
@@ -416,7 +445,7 @@ const DocumentVoucheringTransaction = (props) => {
         </DialogTitle>
 
         <DialogContent className="FstoDialogTransaction-content">
-          <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} />
+          <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
 
           {
             (state === `voucher-receive` || state === `voucher-voucher` || state === `return-return`) &&
@@ -693,6 +722,11 @@ const DocumentVoucheringTransaction = (props) => {
         onUpdate={onAccountTitleUpdate}
         onRemove={onAccountTitleRemove}
         {...manageAccountTitle}
+      />
+
+      <ChequeEntryDialog
+        cheques={data?.cheque?.cheques}
+        {...viewCheque}
       />
     </React.Fragment>
   )
