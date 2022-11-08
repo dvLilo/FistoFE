@@ -366,7 +366,6 @@ body {
 
   & .FstoChip-status {
     min-width: 60px;
-    color: #f0f0f0;
   }
 }
 
@@ -1093,11 +1092,22 @@ body {
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
+  appearance: none;
   margin: 0;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px rgba(0, 0, 0, 0) inset !important;
+  -moz-box-shadow: 0 0 0px 1000px rgba(0, 0, 0, 0) inset !important;
+  box-shadow: 0 0 0px 1000px rgba(0, 0, 0, 0) inset !important;
+  transition: background-color 86400s ease-in-out 86400s !important;
 }
 
 input[type=number] {
   -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 ::-webkit-scrollbar {

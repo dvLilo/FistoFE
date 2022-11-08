@@ -3,7 +3,7 @@ import React from 'react'
 import axios from 'axios'
 
 import moment from 'moment'
-import business from 'moment-business'
+// import business from 'moment-business'
 
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -34,7 +34,7 @@ import {
   Search,
   Close,
   Add,
-  Error,
+  // Error,
   AccessTime
 } from '@mui/icons-material'
 
@@ -356,8 +356,8 @@ const DocumentRequesting = () => {
                 status === 'success'
                 && data.data.map((data, index) => {
 
-                  const currentDate = moment()
-                  const estimatedReleaseDate = business.addWeekDays(moment(data.date_requested), data.supplier.supplier_type.transaction_days)
+                  // const currentDate = moment()
+                  // const estimatedReleaseDate = business.addWeekDays(moment(data.date_requested), data.supplier.supplier_type.transaction_days)
 
                   return (
                     <TableRow className="FstoTableRow-root" key={index} hover>
@@ -392,6 +392,7 @@ const DocumentRequesting = () => {
                           }
                         </Typography>
 
+                        {/*
                         {
                           !!data.state.match(/^pending|^tag|^voucher|^approve|^transmit|^cheque|^reverse/i) &&
                           <Typography variant="caption" sx={{ display: `flex`, alignItems: `center`, lineHeight: 1.65 }}>
@@ -413,6 +414,12 @@ const DocumentRequesting = () => {
                             {moment(data.date_requested).format("MMMM DD, YYYY — hh:mm A")}
                           </Typography>
                         }
+                        */}
+
+                        <Typography className="FstoTypography-root FstoTypography-dates" variant="caption">
+                          <AccessTime sx={{ fontSize: `1.3em` }} />
+                          {moment(data.date_requested).format("MMMM DD, YYYY — hh:mm A")}
+                        </Typography>
                       </TableCell>
 
                       <TableCell className="FstoTableCell-root FstoTableCell-body">

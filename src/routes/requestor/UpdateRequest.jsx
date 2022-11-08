@@ -1239,7 +1239,7 @@ const UpdateRequest = () => {
           const header = ["period_covered", "gross_amount", "wht", "net_of_amount", "cheque_date"]
 
           // Check headers
-          if (!Object.keys(excelJson[0]).every((item) => header.includes(item)))
+          if (!Object.keys(excelJson[0]).every((item) => header.includes(item)) || Object.keys(excelJson[0]).length !== header.length)
             return toast({
               open: true,
               severity: "error",
@@ -1339,7 +1339,7 @@ const UpdateRequest = () => {
           const header = ["principal", "interest", "cwt", "net_of_amount", "cheque_date"]
 
           // Check headers
-          if (!Object.keys(excelJson[0]).every((item) => header.includes(item)))
+          if (!Object.keys(excelJson[0]).every((item) => header.includes(item)) || Object.keys(excelJson[0]).length !== header.length)
             return toast({
               open: true,
               severity: "error",
@@ -1441,7 +1441,7 @@ const UpdateRequest = () => {
           const header = ["amortization", "interest", "cwt", "principal", "net_of_amount", "cheque_date"]
 
           // Check headers
-          if (!Object.keys(excelJson[0]).every((item) => header.includes(item)))
+          if (!Object.keys(excelJson[0]).every((item) => header.includes(item)) || Object.keys(excelJson[0]).length !== header.length)
             return toast({
               open: true,
               severity: "error",
@@ -3601,7 +3601,7 @@ const UpdateRequest = () => {
         </form>
       </Paper>
 
-      {
+      { // Purchase Order Attachment
         (data.document.id === 1 || data.document.id === 4 || data.document.id === 5) &&
         (
           <Paper className="FstoPaperAttachment-root" elevation={1}>
@@ -3832,7 +3832,7 @@ const UpdateRequest = () => {
       }
 
 
-      {
+      { // PRM Multiple Attachment
         (data.document.id === 3) &&
         (
           <Paper className="FstoPaperImport-root" elevation={1}>
@@ -4176,7 +4176,7 @@ const UpdateRequest = () => {
         )
       }
 
-      {
+      { // Auto Debit Attachment
         (data.document.id === 9) &&
         (
           <Paper className="FstoPaperImport-root" elevation={1}>

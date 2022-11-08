@@ -9,10 +9,9 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  CircularProgress
 } from '@mui/material'
-
-import { LoadingButton } from '@mui/lab'
 
 import CloseIcon from '@mui/icons-material/CloseRounded'
 import WarningIcon from '@mui/icons-material/WarningAmberRounded'
@@ -128,20 +127,20 @@ const ReverseDialog = (props) => {
         > No
         </Button>
 
-        <LoadingButton
+        <Button
           className="FstoDialogActionsReason-button"
           variant="contained"
-          loadingPosition="start"
-          loading={isSaving}
-          startIcon={<></>}
           onClick={reverseSubmitHandler}
+          startIcon={
+            isSaving && <CircularProgress color="inherit" size={16} thickness={4} />
+          }
           disabled={
-            !Boolean(reverse.id) &&
-            !Boolean(reverse.description)
+            isSaving ||
+            (!Boolean(reverse.id) && !Boolean(reverse.description))
           }
           disableElevation
         > Yes
-        </LoadingButton>
+        </Button>
       </DialogActions>
     </Dialog>
   )

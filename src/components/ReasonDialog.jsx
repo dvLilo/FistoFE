@@ -11,10 +11,9 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  CircularProgress
 } from '@mui/material'
-
-import { LoadingButton } from '@mui/lab'
 
 import CloseIcon from '@mui/icons-material/CloseRounded'
 import WarningIcon from '@mui/icons-material/WarningAmberRounded'
@@ -182,20 +181,20 @@ const ReasonDialog = (props) => {
         > No
         </Button>
 
-        <LoadingButton
+        <Button
           className="FstoDialogActionsReason-button"
           variant="contained"
-          loadingPosition="start"
-          loading={isSaving}
-          startIcon={<></>}
           onClick={reasonSubmitHandler}
+          startIcon={
+            isSaving && <CircularProgress color="inherit" size={16} thickness={4} />
+          }
           disabled={
-            !Boolean(reason.id) &&
-            !Boolean(reason.description)
+            isSaving ||
+            (!Boolean(reason.id) && !Boolean(reason.description))
           }
           disableElevation
         > Yes
-        </LoadingButton>
+        </Button>
       </DialogActions>
     </Dialog>
   )

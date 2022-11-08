@@ -586,7 +586,7 @@
 //         </Mui.Button>
 
 //         <Mui.TableContainer component={Mui.Paper} sx={{ minHeight: `400px`, overflowX: `hidden` }}>
-//           <Mui.Table>
+//           <Mui.Table sx={{ borderCollapse: `separate`, borderSpacing: `0 20px` }}>
 //             <Mui.TableHead>
 //               <Mui.TableRow>
 //                 <Mui.TableCell>ID</Mui.TableCell>
@@ -674,6 +674,8 @@
 
 // import * as Mui from '@mui/material'
 
+// import { LoadingButton } from '@mui/lab'
+
 // const Sandbox = () => {
 
 //   const [loading, setLoading] = React.useState(true)
@@ -683,28 +685,30 @@
 //       <Mui.Typography variant="h2" align="center">Hello world</Mui.Typography>
 //       <Mui.Box sx={{ display: `flex`, flexDirection: `column`, alignItems: `center`, paddingTop: `3em` }}>
 
-//         <Mui.Button variant="contained" size="large" startIcon={loading && <Mui.CircularProgress color="inherit" size={16} />} disabled={loading}>Hello world.</Mui.Button>
+//         <Mui.Button variant="outlined" size="large" startIcon={loading && <Mui.CircularProgress color="inherit" size={16} thickness={4} />} disabled={loading} disableElevation>Hello world.</Mui.Button>
+
+//         <Mui.Divider variant="middle" sx={{ marginY: 3 }} flexItem />
+
+//         <LoadingButton
+//           variant="contained"
+//           size="large"
+//           startIcon={<span style={{ backgroundColor: "#00000000", display: "block", width: "16px", height: "16px" }} />}
+//           // endIcon={<span style={{ backgroundColor: "#00000000", display: "block", width: "16px", height: "16px" }} />}
+//           loadingPosition="start"
+//           loading={loading}
+//           sx={{
+//             paddingLeft: 2,
+//             paddingRight: 4
+//           }}
+//           disableElevation
+//         >
+//           Hello again.
+//         </LoadingButton>
 
 //         <Mui.Switch
 //           onChange={(e) => setLoading(e.target.checked)}
 //           defaultChecked
 //         />
-
-//         <Mui.Typography variant="h1">
-//           Textfield and Button.
-//         </Mui.Typography>
-
-//         <Mui.Stack direction="row" alignItems="flex-start" gap={2}>
-//           <Mui.TextField size="small" />
-
-//           <Mui.TextField size="small" />
-
-//           <Mui.TextField size="small" />
-
-//           <Mui.TextField size="small" />
-
-//           <Mui.Button variant="contained" disableElevation>Hello</Mui.Button>
-//         </Mui.Stack>
 
 //       </Mui.Box>
 //     </React.Fragment>,

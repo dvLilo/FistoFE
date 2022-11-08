@@ -305,7 +305,7 @@ const DocumentReversingTransaction = (props) => {
                       DISTRIBUTE_STATUS === 'loading'
                     }
                     renderInput={
-                      (props) => <TextField {...props} label="Distribute To..." variant="outlined" />
+                      (props) => <TextField {...props} label="Request To..." variant="outlined" />
                     }
                     PaperComponent={
                       (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />

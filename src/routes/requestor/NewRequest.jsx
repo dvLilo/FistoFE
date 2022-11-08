@@ -1068,7 +1068,7 @@ const NewRequest = () => {
           const header = ["period_covered", "gross_amount", "wht", "net_of_amount", "cheque_date"]
 
           // Check headers
-          if (!Object.keys(excelJson[0]).every((item) => header.includes(item)))
+          if (!Object.keys(excelJson[0]).every((item) => header.includes(item)) || Object.keys(excelJson[0]).length !== header.length)
             return toast({
               open: true,
               severity: "error",
@@ -1168,7 +1168,7 @@ const NewRequest = () => {
           const header = ["principal", "interest", "cwt", "net_of_amount", "cheque_date"]
 
           // Check headers
-          if (!Object.keys(excelJson[0]).every((item) => header.includes(item)))
+          if (!Object.keys(excelJson[0]).every((item) => header.includes(item)) || Object.keys(excelJson[0]).length !== header.length)
             return toast({
               open: true,
               severity: "error",
@@ -1270,7 +1270,7 @@ const NewRequest = () => {
           const header = ["amortization", "interest", "cwt", "principal", "net_of_amount", "cheque_date"]
 
           // Check headers
-          if (!Object.keys(excelJson[0]).every((item) => header.includes(item)))
+          if (!Object.keys(excelJson[0]).every((item) => header.includes(item)) || Object.keys(excelJson[0]).length !== header.length)
             return toast({
               open: true,
               severity: "error",

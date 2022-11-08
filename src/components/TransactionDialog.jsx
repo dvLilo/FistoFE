@@ -70,6 +70,15 @@ const TransactionDialog = (props) => {
     return -1
   }
 
+  const activeComplete = (state = "") => {
+    const [process, subprocess] = state.split("-")
+
+    if (process === subprocess)
+      return true
+
+    return false
+  }
+
   const activeStatus = (status = "") => {
     switch (status) {
       case "tag":
@@ -115,7 +124,10 @@ const TransactionDialog = (props) => {
           <Stepper activeStep={activeStep(data.transaction.status)} alternativeLabel>
             {
               process.map((item, index) => (
-                <Step key={index}>
+                <Step
+                  {...(activeStep(data.transaction.status) === index && { completed: activeComplete(data.transaction.status) })}
+                  key={index}
+                >
                   <StepLabel
                     optional={
                       activeStep(data.transaction.status) === index &&
