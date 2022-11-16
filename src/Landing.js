@@ -92,9 +92,11 @@ const Landing = () => {
       dispatch(SET_AUTH())
       dispatch(SET_USER(user))
 
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+
       const encryptedUser = CryptoJS.AES.encrypt(JSON.stringify(user), process.env.REACT_APP_SECRET_KEY).toString()
 
-      window.localStorage.setItem('token', JSON.stringify(token))
+      window.localStorage.setItem('token', token)
       window.localStorage.setItem('user', encryptedUser)
 
       const REDIRECT = handleRedirect(user.role)

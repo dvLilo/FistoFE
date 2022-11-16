@@ -504,7 +504,9 @@ const DocumentVoucheringTransaction = (props) => {
                       ...currentValue,
                       tax: {
                         ...currentValue.tax,
-                        percentage_tax: e.target.value
+                        percentage_tax: e.target.value,
+                        // withholding_tax: (((transaction.referrence_amount || transaction.document_amount) * parseFloat(e.target.value)) / 100).toFixed(2),
+                        // net_amount: ((((transaction.referrence_amount || transaction.document_amount) * parseFloat(e.target.value)) / 100) - (transaction.referrence_amount || transaction.document_amount)).toFixed(2)
                       }
                     }))}
                     fullWidth

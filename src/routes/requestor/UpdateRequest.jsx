@@ -279,7 +279,9 @@ const UpdateRequest = () => {
         const po_group_new = po_group.map((item) => {
           const data = {
             ...item,
-            batch: !item.is_add,
+            ...(document.payment_type === 'Partial' && {
+              batch: !item.is_add
+            }),
             balance: item.previous_balance,
           }
 
@@ -305,151 +307,14 @@ const UpdateRequest = () => {
         }))
       }
       catch (error) {
-        setDebitGroup([
-          {
-            "pn_no": "1081200139502",
-            "interest_from": "3/25/22",
-            "interest_to": "4/25/22",
-            "outstanding_amount": 3935000,
-            "interest_rate": 8.75,
-            "no_of_days": 31,
-            "principal_amount": 0,
-            "interest_due": 29649.13,
-            "cwt": 592.98
-          },
-          {
-            "pn_no": "1081200140188",
-            "interest_from": "3/25/22",
-            "interest_to": "4/25/22",
-            "outstanding_amount": 700000,
-            "interest_rate": 8.75,
-            "no_of_days": 31,
-            "principal_amount": 0,
-            "interest_due": 5274.31,
-            "cwt": 105.49
-          },
-          {
-            "pn_no": "1081200136587",
-            "interest_from": "3/25/22",
-            "interest_to": "4/25/22",
-            "outstanding_amount": 750000,
-            "interest_rate": 8.75,
-            "no_of_days": 31,
-            "principal_amount": 750000,
-            "interest_due": 5104.17,
-            "cwt": 102.08
-          },
-          {
-            "pn_no": "1081200143776",
-            "interest_from": "3/25/22",
-            "interest_to": "4/25/22",
-            "outstanding_amount": 2400000,
-            "interest_rate": 8.75,
-            "no_of_days": 31,
-            "principal_amount": 0,
-            "interest_due": 18083.33,
-            "cwt": 361.67
-          },
-          {
-            "pn_no": "1081200139267",
-            "interest_from": "3/25/22",
-            "interest_to": "4/25/22",
-            "outstanding_amount": 1575000,
-            "interest_rate": 8.75,
-            "no_of_days": 31,
-            "principal_amount": 0,
-            "interest_due": 11867.19,
-            "cwt": 237.34
-          },
-          {
-            "pn_no": "1089400013721",
-            "interest_from": "3/27/22",
-            "interest_to": "4/27/22",
-            "outstanding_amount": 1700000,
-            "interest_rate": 9,
-            "no_of_days": 31,
-            "principal_amount": 100000,
-            "interest_due": 13175,
-            "cwt": 263.5
-          },
-          {
-            "pn_no": "1081200146180",
-            "interest_from": "3/27/22",
-            "interest_to": "4/27/22",
-            "outstanding_amount": 2945000,
-            "interest_rate": 8.75,
-            "no_of_days": 31,
-            "principal_amount": 0,
-            "interest_due": 22189.76,
-            "cwt": 443.8
-          },
-          {
-            "pn_no": "1083400012412",
-            "interest_from": "3/28/22",
-            "interest_to": "4/28/22",
-            "outstanding_amount": 409259.41,
-            "interest_rate": 7.54,
-            "no_of_days": 31,
-            "principal_amount": 24074.07,
-            "interest_due": 2657.23,
-            "cwt": 53.14
-          }
-        ])
+        console.log("Fisto Error Status", error.request)
 
-        setData(currentValue => ({
-          requestor: {
-            "id": 2,
-            "id_prefix": "RDFFLFI",
-            "id_no": "10185",
-            "first_name": "VINCENT LOUIE",
-            "middle_name": "LAYNES",
-            "last_name": "ABAD",
-            "suffix": null,
-            "role": "Requestor",
-            "position": "System Developer",
-            "department": "Management Information System Common"
-          },
-          document: {
-            ...currentValue.document,
-
-            "id": 9,
-            "name": "Auto Debit",
-            "amount": 979914.19,
-            "date": "2022-10-10",
-            "payment_type": "Full",
-            "company": {
-              "id": 1,
-              "name": "RDF Corporate Services"
-            },
-            "department": {
-              "id": 14,
-              "name": "Treasury Common"
-            },
-            "location": {
-              "id": 5,
-              "name": "Common"
-            },
-            "supplier": {
-              "id": 55,
-              "name": "GUAGUA RURAL BANK (GR BANK)",
-              "references": [
-                {
-                  "id": 5,
-                  "type": "INTERNAL"
-                }
-              ]
-            },
-            "category": {
-              "id": 5,
-              "name": "common"
-            },
-            "remarks": "Statement of account as of April 2022"
-          },
-          transaction: {
-            "date_requested": "2022-10-10",
-          },
-          po_group: []
-        }))
+        toast({
+          open: true,
+          severity: "error",
+          title: "Error!",
+          message: "Something went wrong whilst trying to connect to the server. Please try again later."
+        })
       }
     })()
 
@@ -485,7 +350,7 @@ const UpdateRequest = () => {
   }, [])
 
   React.useEffect(() => {
-    if (user.id && data.requestor.id && user.id !== data.requestor.id) {
+    if ((user.id && data.requestor.id && user.id !== data.requestor.id) || (user.id && data.requestor.id && user.id === data.requestor.id && data.transaction.state !== 'pending' && data.transaction.state !== 'return')) {
       truncateData()
       toast({
         open: true,
@@ -495,7 +360,7 @@ const UpdateRequest = () => {
       })
     }
     // eslint-disable-next-line
-  }, [user.id, data.requestor.id])
+  }, [user.id, data.requestor.id, data.transaction.state])
 
   const {
     status: COMPANY_STATUS,

@@ -447,7 +447,7 @@ const DocumentTagging = () => {
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                      <Chip className="FstoChip-root FstoChip-status" label={item.status} size="small" sx={{ backgroundColor: statusColor(item.status) }} />
+                      <Chip className="FstoChip-root FstoChip-status" label={item.status} size="small" color="primary" sx={{ backgroundColor: statusColor(item.status) }} />
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">

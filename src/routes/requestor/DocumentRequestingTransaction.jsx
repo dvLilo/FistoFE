@@ -90,7 +90,7 @@ const DocumentRequestingTransaction = (props) => {
         PaperProps={{
           className: "FstoPaperTransaction-root"
         }}
-        onClose={onClose}
+        // onClose={onClose}
         fullWidth
         disablePortal
       >

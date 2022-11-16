@@ -439,6 +439,7 @@ const DocumentReturning = () => {
                       <Chip
                         className="FstoChip-root FstoChip-status"
                         size="small"
+                        color="primary"
                         label={item.status}
                         sx={{
                           backgroundColor: statusColor(item.status)

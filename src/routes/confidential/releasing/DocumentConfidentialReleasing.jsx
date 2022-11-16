@@ -372,7 +372,7 @@ const DocumentConfidentialReleasing = () => {
                   <TableRow className="FstoTableRow-root" key={index} hover>
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
                       <Typography className="FstoTypography-root FstoTypography-transaction" variant="button">
-                        TAG#${item.tag_no}&nbsp;&mdash;&nbsp;{item.document_type}
+                        TAG#{item.tag_no}&nbsp;&mdash;&nbsp;{item.document_type}
                         {
                           item.document_id === 4 && item.payment_type.toLowerCase() === `partial` &&
                           <Chip className="FstoChip-root FstoChip-payment" label={item.payment_type} size="small" />

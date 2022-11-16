@@ -35,7 +35,9 @@ import {
   Close,
   Add,
   // Error,
-  AccessTime
+  AccessTime,
+  DensitySmall,
+  DensityMedium
 } from '@mui/icons-material'
 
 import EmptyImage from '../../assets/img/empty.svg'
@@ -70,6 +72,7 @@ const DocumentRequesting = () => {
   const [active, setActive] = React.useState(true)
   const [state, setState] = React.useState("pending")
   const [search, setSearch] = React.useState("")
+  const [density, setDensity] = React.useState("small") // small or large
 
   const [view, setView] = React.useState({
     open: false,
@@ -310,204 +313,384 @@ const DocumentRequesting = () => {
             />
 
             <DocumentRequestingFilter filterData={filterData} />
+
+            <IconButton
+              onClick={() => setDensity(currentValue => {
+                if (currentValue === 'small')
+                  return "large"
+
+                return "small"
+              })}
+            >
+              {density === 'small' ? <DensitySmall /> : <DensityMedium />}
+            </IconButton>
           </Stack>
         </Stack>
 
         <TableContainer className="FstoTableContainer-root">
-          <Table className="FstoTable-root" size="small">
-            <TableHead className="FstoTableHead-root">
-              <TableRow className="FstoTableRow-root">
-                <TableCell className="FstoTableCell-root FstoTableCell-head">
-                  TRANSACTION
-                </TableCell>
+          {
+            density === 'large' &&
+            <React.Fragment>
+              <Table className="FstoTable-root" size="small">
+                <TableHead className="FstoTableHead-root">
+                  <TableRow className="FstoTableRow-root">
+                    <TableCell className="FstoTableCell-root FstoTableCell-head">
+                      TRANSACTION
+                    </TableCell>
 
-                <TableCell className="FstoTableCell-root FstoTableCell-head">
-                  REQUESTOR
-                </TableCell>
+                    <TableCell className="FstoTableCell-root FstoTableCell-head">
+                      REQUESTOR
+                    </TableCell>
 
-                <TableCell className="FstoTableCell-root FstoTableCell-head">
-                  CHARGING
-                </TableCell>
+                    <TableCell className="FstoTableCell-root FstoTableCell-head">
+                      CHARGING
+                    </TableCell>
 
-                <TableCell className="FstoTableCell-root FstoTableCell-head">
-                  AMOUNT DETAILS
-                </TableCell>
+                    <TableCell className="FstoTableCell-root FstoTableCell-head">
+                      AMOUNT DETAILS
+                    </TableCell>
 
-                <TableCell className="FstoTableCell-root FstoTableCell-head">
-                  PO DETAILS
-                </TableCell>
+                    <TableCell className="FstoTableCell-root FstoTableCell-head">
+                      PO DETAILS
+                    </TableCell>
 
-                <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">
-                  STATUS
-                </TableCell>
+                    <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">
+                      STATUS
+                    </TableCell>
 
-                <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">
-                  ACTIONS
-                </TableCell>
-              </TableRow>
-            </TableHead>
+                    <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">
+                      ACTIONS
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
 
-            <TableBody className="FstoTableBody-root">
-              {
-                status === 'loading'
-                && <TablePreloader row={3} />}
+                <TableBody className="FstoTableBody-root">
+                  {
+                    status === 'loading'
+                    && <TablePreloader row={3} />}
 
-              {
-                status === 'success'
-                && data.data.map((data, index) => {
+                  {
+                    status === 'success'
+                    && data.data.map((data, index) => {
 
-                  // const currentDate = moment()
-                  // const estimatedReleaseDate = business.addWeekDays(moment(data.date_requested), data.supplier.supplier_type.transaction_days)
+                      // const currentDate = moment()
+                      // const estimatedReleaseDate = business.addWeekDays(moment(data.date_requested), data.supplier.supplier_type.transaction_days)
 
-                  return (
-                    <TableRow className="FstoTableRow-root" key={index} hover>
-                      <TableCell className="FstoTableCell-root FstoTableCell-body">
-                        <Typography className="FstoTypography-root FstoTypography-transaction" variant="button">
-                          {data.transaction_id}
-                          &nbsp;&mdash;&nbsp;
-                          {data.document_type}
-                          {
-                            data.document_id === 4 && data.payment_type.toLowerCase() === `partial` &&
-                            <Chip className="FstoChip-root FstoChip-payment" label={data.payment_type} size="small" />
-                          }
-                          {
-                            Boolean(data.is_latest_transaction) &&
-                            <Chip className="FstoChip-root FstoChip-latest" label="Latest" size="small" color="primary" />
-                          }
-                          {
-                            data.supplier.supplier_type.id === 1 &&
-                            <Chip className="FstoChip-root FstoChip-priority" label={data.supplier.supplier_type.name} size="small" color="secondary" />
-                          }
-                        </Typography>
+                      return (
+                        <TableRow className="FstoTableRow-root" key={index} hover>
+                          <TableCell className="FstoTableCell-root FstoTableCell-body">
+                            <Typography className="FstoTypography-root FstoTypography-transaction" variant="button">
+                              {data.transaction_id}
+                              &nbsp;&mdash;&nbsp;
+                              {data.document_type}
+                              {
+                                data.document_id === 4 && data.payment_type.toLowerCase() === `partial` &&
+                                <Chip className="FstoChip-root FstoChip-payment" label={data.payment_type} size="small" />
+                              }
+                              {
+                                Boolean(data.is_latest_transaction) &&
+                                <Chip className="FstoChip-root FstoChip-latest" label="Latest" size="small" color="primary" />
+                              }
+                              {
+                                data.supplier.supplier_type.id === 1 &&
+                                <Chip className="FstoChip-root FstoChip-priority" label={data.supplier.supplier_type.name} size="small" color="secondary" />
+                              }
+                            </Typography>
 
-                        <Typography className="FstoTypography-root FstoTypography-supplier" variant="caption">
-                          {data.supplier.name}
-                        </Typography>
+                            <Typography className="FstoTypography-root FstoTypography-supplier" variant="caption">
+                              {data.supplier.name}
+                            </Typography>
 
-                        <Typography className="FstoTypography-root FstoTypography-remarks" variant="h6">
-                          {
-                            data.remarks
-                              ? data.remarks
-                              : <React.Fragment>&mdash;</React.Fragment>
-                          }
-                        </Typography>
+                            <Typography className="FstoTypography-root FstoTypography-remarks" variant="h6">
+                              {
+                                data.remarks
+                                  ? data.remarks
+                                  : <React.Fragment>&mdash;</React.Fragment>
+                              }
+                            </Typography>
 
-                        {/*
-                        {
-                          !!data.state.match(/^pending|^tag|^voucher|^approve|^transmit|^cheque|^reverse/i) &&
-                          <Typography variant="caption" sx={{ display: `flex`, alignItems: `center`, lineHeight: 1.65 }}>
-                            Estimated Release Date:&nbsp;
-                            <strong>
-                              {estimatedReleaseDate.format("MMMM DD, YYYY")}
-                            </strong>&nbsp;
-                            <i>
-                              {currentDate.to(estimatedReleaseDate)}
-                            </i>
-                            {currentDate.to(estimatedReleaseDate).match(/ago/gi) && <Error color="error" fontSize="small" sx={{ marginLeft: `3px` }} />}
-                          </Typography>
-                        }
+                            {/*
+                            {
+                              !!data.state.match(/^pending|^tag|^voucher|^approve|^transmit|^cheque|^reverse/i) &&
+                              <Typography variant="caption" sx={{ display: `flex`, alignItems: `center`, lineHeight: 1.65 }}>
+                                Estimated Release Date:&nbsp;
+                                <strong>
+                                  {estimatedReleaseDate.format("MMMM DD, YYYY")}
+                                </strong>&nbsp;
+                                <i>
+                                  {currentDate.to(estimatedReleaseDate)}
+                                </i>
+                                {currentDate.to(estimatedReleaseDate).match(/ago/gi) && <Error color="error" fontSize="small" sx={{ marginLeft: `3px` }} />}
+                              </Typography>
+                            }
 
-                        {
-                          !!data.state.match(/^release|^file|^clear/i) &&
-                          <Typography className="FstoTypography-root FstoTypography-dates" variant="caption">
-                            <AccessTime sx={{ fontSize: `1.3em` }} />
-                            {moment(data.date_requested).format("MMMM DD, YYYY — hh:mm A")}
-                          </Typography>
-                        }
-                        */}
+                            {
+                              !!data.state.match(/^release|^file|^clear/i) &&
+                              <Typography className="FstoTypography-root FstoTypography-dates" variant="caption">
+                                <AccessTime sx={{ fontSize: `1.3em` }} />
+                                {moment(data.date_requested).format("MMMM DD, YYYY — hh:mm A")}
+                              </Typography>
+                            }
+                            */}
 
-                        <Typography className="FstoTypography-root FstoTypography-dates" variant="caption">
-                          <AccessTime sx={{ fontSize: `1.3em` }} />
-                          {moment(data.date_requested).format("MMMM DD, YYYY — hh:mm A")}
-                        </Typography>
-                      </TableCell>
+                            <Typography className="FstoTypography-root FstoTypography-dates" variant="caption">
+                              <AccessTime sx={{ fontSize: `1.3em` }} />
+                              {moment(data.date_requested).format("MMMM DD, YYYY — hh:mm A")}
+                            </Typography>
+                          </TableCell>
 
-                      <TableCell className="FstoTableCell-root FstoTableCell-body">
-                        <Typography className="FstoTypography-root FstoTypography-requestor" variant="subtitle1">
-                          {data.users.first_name.toLowerCase()} {data.users.middle_name.toLowerCase()} {data.users.last_name.toLowerCase()}
-                        </Typography>
+                          <TableCell className="FstoTableCell-root FstoTableCell-body">
+                            <Typography className="FstoTypography-root FstoTypography-requestor" variant="subtitle1">
+                              {data.users.first_name.toLowerCase()} {data.users.middle_name.toLowerCase()} {data.users.last_name.toLowerCase()}
+                            </Typography>
 
-                        <Typography variant="subtitle2">
-                          {data.users.department[0].name}
-                        </Typography>
+                            <Typography variant="subtitle2">
+                              {data.users.department[0].name}
+                            </Typography>
 
-                        <Typography variant="subtitle2">
-                          {data.users.position}
-                        </Typography>
-                      </TableCell>
+                            <Typography variant="subtitle2">
+                              {data.users.position}
+                            </Typography>
+                          </TableCell>
 
-                      <TableCell className="FstoTableCell-root FstoTableCell-body">
-                        <Typography variant="subtitle1">
-                          {data.company}
-                        </Typography>
+                          <TableCell className="FstoTableCell-root FstoTableCell-body">
+                            <Typography variant="subtitle1">
+                              {data.company}
+                            </Typography>
 
-                        <Typography variant="subtitle2">
-                          {data.department}
-                        </Typography>
+                            <Typography variant="subtitle2">
+                              {data.department}
+                            </Typography>
 
-                        <Typography variant="subtitle2">
-                          {data.location}
-                        </Typography>
-                      </TableCell>
+                            <Typography variant="subtitle2">
+                              {data.location}
+                            </Typography>
+                          </TableCell>
 
-                      <TableCell className="FstoTableCell-root FstoTableCell-body">
-                        <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
-                          {data.document_id !== 4 && data.document_no?.toUpperCase()}
-                          {data.document_id === 4 && data.referrence_no?.toUpperCase()}
-                        </Typography>
-
-                        <Typography className="FstoTypography-root FstoTypography-amount" variant="h6">
-                          &#8369;
-                          {data.document_id !== 4 && data.document_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
-                          {data.document_id === 4 && data.referrence_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
-                        </Typography>
-                      </TableCell>
-
-                      <TableCell className="FstoTableCell-root FstoTableCell-body">
-                        {
-                          Boolean(data.po_details.length) &&
-                          <React.Fragment>
+                          <TableCell className="FstoTableCell-root FstoTableCell-body">
                             <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
-                              {data.po_details[0].po_no.toUpperCase()}
-                              {data.po_details.length > 1 && <React.Fragment>&nbsp;&bull;&bull;&bull;</React.Fragment>}
+                              {data.document_id !== 4 && data.document_no?.toUpperCase()}
+                              {data.document_id === 4 && data.referrence_no?.toUpperCase()}
                             </Typography>
 
                             <Typography className="FstoTypography-root FstoTypography-amount" variant="h6">
                               &#8369;
-                              {data.po_details[0].po_total_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                              {data.document_id !== 4 && data.document_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                              {data.document_id === 4 && data.referrence_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
                             </Typography>
-                          </React.Fragment>
-                        }
+                          </TableCell>
 
-                        {
-                          !Boolean(data.po_details.length) &&
-                          <React.Fragment>
-                            &mdash;
-                          </React.Fragment>
-                        }
-                      </TableCell>
+                          <TableCell className="FstoTableCell-root FstoTableCell-body">
+                            {
+                              Boolean(data.po_details.length) &&
+                              <React.Fragment>
+                                <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
+                                  {data.po_details[0].po_no.toUpperCase()}
+                                  {data.po_details.length > 1 && <React.Fragment>&nbsp;&bull;&bull;&bull;</React.Fragment>}
+                                </Typography>
 
-                      <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                        <Tooltip title={getStatusMessage(data.state)} placement="top" disableInteractive disableFocusListener arrow>
-                          <Chip className="FstoChip-root FstoChip-status" label={data.status} size="small" color="primary" />
-                        </Tooltip>
-                      </TableCell>
+                                <Typography className="FstoTypography-root FstoTypography-amount" variant="h6">
+                                  &#8369;
+                                  {data.po_details[0].po_total_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                                </Typography>
+                              </React.Fragment>
+                            }
 
-                      <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                        <DocumentRequestingActions
-                          state={state}
-                          data={data}
-                          onView={onView}
-                          onUpdate={onUpdate}
-                          onVoid={onVoid}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  )
-                })
-              }
-            </TableBody>
-          </Table>
+                            {
+                              !Boolean(data.po_details.length) &&
+                              <React.Fragment>
+                                &mdash;
+                              </React.Fragment>
+                            }
+                          </TableCell>
+
+                          <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
+                            <Tooltip title={getStatusMessage(data.state)} placement="top" disableInteractive disableFocusListener arrow>
+                              <Chip className="FstoChip-root FstoChip-status" label={data.status} size="small" color="primary" />
+                            </Tooltip>
+                          </TableCell>
+
+                          <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
+                            <DocumentRequestingActions
+                              state={state}
+                              data={data}
+                              onView={onView}
+                              onUpdate={onUpdate}
+                              onVoid={onVoid}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                </TableBody>
+              </Table>
+            </React.Fragment>
+          }
+
+          {
+            density === 'small' &&
+            <React.Fragment>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell className="FstoTableHead-root">
+                      DATE REQUESTED
+                    </TableCell>
+
+                    <TableCell className="FstoTableHead-root">
+                      TRANSACTION NO.
+                    </TableCell>
+
+                    <TableCell className="FstoTableHead-root">
+                      DOCUMENT
+                    </TableCell>
+
+                    <TableCell className="FstoTableHead-root">
+                      COMPANY
+                    </TableCell>
+
+                    <TableCell className="FstoTableHead-root">
+                      SUPPLIER
+                    </TableCell>
+
+                    <TableCell className="FstoTableHead-root">
+                      PO NO.
+                    </TableCell>
+
+                    <TableCell className="FstoTableHead-root" align="right">
+                      PO AMOUNT
+                    </TableCell>
+
+                    <TableCell className="FstoTableHead-root" align="right">
+                      AMOUNT
+                    </TableCell>
+
+                    <TableCell className="FstoTableHead-root" align="center">
+                      STATUS
+                    </TableCell>
+
+                    <TableCell className="FstoTableHead-root" align="center">
+                      ACTIONS
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+
+                <TableBody>
+                  {
+                    status === 'success'
+                    && data.data.map((data, index) => {
+                      return (
+                        <TableRow hover key={index}>
+                          <TableCell className="FstoTableData-root">
+                            {
+                              moment(data.date_requested).format("MMM. DD, YYYY hh:mm A")
+                            }
+                          </TableCell>
+
+                          <TableCell className="FstoTableData-root">
+                            {data.transaction_id}
+                            {
+                              data.tag_no
+                              && <Chip className="FstoChip-root FstoChip-latest" label={`Tag#${data.tag_no}`} size="small" color="info" />
+                            }
+                          </TableCell>
+
+                          <TableCell className="FstoTableData-root">
+                            {data.document_type}
+                            {
+                              data.payment_type === 'Partial'
+                              && <Chip className="FstoChip-root FstoChip-payment" label={data.payment_type} size="small" />
+                            }
+                            {
+                              Boolean(data.is_latest_transaction) &&
+                              <Chip className="FstoChip-root FstoChip-latest" label="Latest" size="small" color="primary" />
+                            }
+                          </TableCell>
+
+                          <TableCell className="FstoTableData-root">
+                            <Box
+                              sx={{
+                                width: '100%',
+                                maxWidth: '230px',
+                                whiteSpace: 'nowrap',
+                                textOverflow: 'ellipsis',
+                                overflow: 'hidden'
+                              }}
+                            >
+                              {data.company}
+                            </Box>
+                          </TableCell>
+
+                          <TableCell className="FstoTableData-root">
+                            <Box
+                              sx={{
+                                width: '100%',
+                                maxWidth: '230px',
+                                whiteSpace: 'nowrap',
+                                textOverflow: 'ellipsis',
+                                overflow: 'hidden'
+                              }}
+                            >
+                              {data.supplier.name}
+                            </Box>
+                          </TableCell>
+
+                          <TableCell className="FstoTableData-root">
+                            {
+                              Boolean(data.po_details.length) &&
+                              <React.Fragment>
+                                {data.po_details[0].po_no.toUpperCase()}
+                                {
+                                  data.po_details.length > 1
+                                  && <React.Fragment>&nbsp;&bull;&bull;&bull;</React.Fragment>}
+                              </React.Fragment>
+                            }
+
+                            {
+                              !Boolean(data.po_details.length)
+                              && <React.Fragment>&mdash;</React.Fragment>
+                            }
+                          </TableCell>
+
+                          <TableCell className="FstoTableData-root" align="right">
+                            {
+                              Boolean(data.po_details.length) &&
+                              data.po_details[0].po_total_amount.toLocaleString('default', { style: 'currency', currency: 'PHP', maximumFractionDigits: 2, minimumFractionDigits: 2 })
+                            }
+
+                            {
+                              !Boolean(data.po_details.length)
+                              && <React.Fragment>&mdash;</React.Fragment>
+                            }
+                          </TableCell>
+
+                          <TableCell className="FstoTableData-root" align="right">
+                            {
+                              data.referrence_amount?.toLocaleString('default', { style: 'currency', currency: 'PHP', maximumFractionDigits: 2, minimumFractionDigits: 2 }) ||
+                              data.document_amount?.toLocaleString('default', { style: 'currency', currency: 'PHP', maximumFractionDigits: 2, minimumFractionDigits: 2 })
+                            }
+                          </TableCell>
+
+                          <TableCell className="FstoTableData-root" align="center">
+                            <Chip className="FstoChip-root FstoChip-status" label={data.state} size="small" color="warning" />
+                          </TableCell>
+
+                          <TableCell className="FstoTableData-root" align="center">
+                            <DocumentRequestingActions
+                              state={state}
+                              data={data}
+                              onView={onView}
+                              onUpdate={onUpdate}
+                              onVoid={onVoid}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                </TableBody>
+              </Table>
+            </React.Fragment>
+          }
 
           {
             status === 'error' &&
