@@ -46,25 +46,25 @@ const TransactionDialog = (props) => {
   ]
 
   const activeStep = (state = "") => {
-    if (Boolean(state.match(/tag/i)))
+    if (Boolean(state.match(/^tag/i)))
       return 0
 
-    if (Boolean(state.match(/voucher/i)))
+    if (Boolean(state.match(/^voucher/i)))
       return 1
 
-    if (Boolean(state.match(/approve/i)))
+    if (Boolean(state.match(/^approve/i)))
       return 2
 
-    if (Boolean(state.match(/transmit/i)))
+    if (Boolean(state.match(/^transmit/i)))
       return 3
 
-    if (Boolean(state.match(/cheque/i)))
+    if (Boolean(state.match(/^cheque/i)))
       return 4
 
-    if (Boolean(state.match(/release/i)))
+    if (Boolean(state.match(/^release/i)))
       return 5
 
-    if (Boolean(state.match(/file/i)))
+    if (Boolean(state.match(/^file/i)))
       return 6
 
     return -1

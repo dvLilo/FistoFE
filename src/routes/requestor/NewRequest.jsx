@@ -2,6 +2,8 @@ import React from 'react'
 
 import axios from 'axios'
 
+import moment from 'moment'
+
 import * as XLSX from 'xlsx'
 
 import { useNavigate } from 'react-router-dom'
@@ -407,33 +409,33 @@ const NewRequest = () => {
     // eslint-disable-next-line 
   }, [data.document.id])
 
-  const [PETTYCASHFUND_LIST, setPettyCashFundList] = React.useState([])
-  React.useEffect(() => {
-    (async () => {
-      if (data.document.id === 8) {
-        let response
-        try {
-          response = await axios.get(`http://localhost:5000/stalwart`)
+  // const [PETTYCASHFUND_LIST, setPettyCashFundList] = React.useState([])
+  // React.useEffect(() => {
+  //   (async () => {
+  //     if (data.document.id === 8) {
+  //       let response
+  //       try {
+  //         response = await axios.get(`http://localhost:5000/stalwart`)
 
-          const { data } = response
+  //         const { data } = response
 
-          setPettyCashFundList(data)
-        }
-        catch (error) {
-          console.log("Fisto Error Status", error.request)
+  //         setPettyCashFundList(data)
+  //       }
+  //       catch (error) {
+  //         console.log("Fisto Error Status", error.request)
 
-          toast({
-            open: true,
-            severity: "error",
-            title: "Error!",
-            message: "Something went wrong whilst trying to connect to the server. Please try again later."
-          })
-        }
-      }
-    })()
+  //         toast({
+  //           open: true,
+  //           severity: "error",
+  //           title: "Error!",
+  //           message: "Something went wrong whilst trying to connect to the server. Please try again later."
+  //         })
+  //       }
+  //     }
+  //   })()
 
-    // eslint-disable-next-line
-  }, [data.document.id])
+  //   // eslint-disable-next-line
+  // }, [data.document.id])
 
 
   React.useEffect(() => { // Reference Number Validation
@@ -452,6 +454,28 @@ const NewRequest = () => {
 
     // eslint-disable-next-line
   }, [data.document.payment_type, data.document.company])
+
+  React.useEffect(() => { // PCF Validation
+    if (data.document.id === 8
+      && data.document.supplier
+      && data.document.pcf_batch.letter
+      && data.document.pcf_batch.date
+    ) {
+      checkPettyCashFundNameHandler()
+      setData({
+        ...data,
+        document: {
+          ...data.document,
+          pcf_batch: {
+            ...data.document.pcf_batch,
+            name: 'RF' + moment(data.document.pcf_batch.date).format("YYMM") + ' - ' + data.document.pcf_batch.letter + ' ' + data.document.supplier?.name
+          },
+        }
+      })
+    }
+
+    // eslint-disable-next-line
+  }, [data.document.supplier, data.document.pcf_batch.letter, data.document.pcf_batch.date])
 
 
   React.useEffect(() => { // Utility Account Number Auto Select
@@ -498,6 +522,8 @@ const NewRequest = () => {
           ...currentValue.data,
           from_date: undefined,
           to_date: undefined,
+          document_company: undefined,
+          document_supplier: undefined,
           payroll_type: undefined,
           payroll_clients: undefined,
           payroll_category: undefined,
@@ -505,7 +531,7 @@ const NewRequest = () => {
       }))
 
     // eslint-disable-next-line
-  }, [data.document.from, data.document.to, data.document.payroll.type, data.document.payroll.category, data.document.payroll.clients])
+  }, [data.document.from, data.document.to, data.document.company, data.document.supplier, data.document.payroll.type, data.document.payroll.category, data.document.payroll.clients])
 
   React.useEffect(() => { // For Utility Error
     if (data.document.id === 6 && error.status)
@@ -696,7 +722,10 @@ const NewRequest = () => {
           && data.document.pcf_batch.name
           && data.document.pcf_batch.letter
           && data.document.pcf_batch.date
-          && (!error.status || !Boolean(error.data.pcf_name))
+          && (!error.status || !Boolean(error.data.pcf_letter))
+          && (!error.status || !Boolean(error.data.pcf_date))
+          && (!error.status || !Boolean(error.data.document_company))
+          && (!validate.status || !validate.data.includes('pcf_name'))
           ? false : true
 
       case 9: // Auto Debit
@@ -827,33 +856,81 @@ const NewRequest = () => {
     }))
   }
 
-  const checkPettyCashFundNameHandler = async (name) => {
-    if (error.status && error.data.pcf_name) {
-      delete error.data.pcf_name
+  // const checkPettyCashFundNameHandler = async (name) => {
+  //   if (error.status && error.data.pcf_name) {
+  //     delete error.data.pcf_name
+  //     setError(currentValue => ({
+  //       ...currentValue,
+  //       data: error.data
+  //     }))
+  //   }
+
+  //   try {
+  //     await axios.post(`/api/transactions/validate-pcf-name`, {
+  //       pcf_name: name
+  //     })
+  //   }
+  //   catch (error) {
+  //     if (error.request.status === 422) {
+  //       const { errors } = error.response.data
+
+  //       setError(currentValue => ({
+  //         status: true,
+  //         data: {
+  //           ...currentValue.data,
+  //           pcf_name: errors["pcf_batch.name"]
+  //         }
+  //       }))
+  //     }
+  //   }
+  // }
+
+  const checkPettyCashFundNameHandler = async () => {
+    if (error.status && error.data.document_supplier && error.data.pcf_letter && error.data.pcf_date) {
+      delete error.data.pcf_letter
+      delete error.data.pcf_date
+      delete error.data.document_supplier
       setError(currentValue => ({
         ...currentValue,
         data: error.data
       }))
     }
 
+    setValidate(currentValue => ({
+      status: true,
+      data: [
+        ...currentValue.data, 'pcf_name'
+      ]
+    }))
+
     try {
       await axios.post(`/api/transactions/validate-pcf-name`, {
-        pcf_name: name
+        pcf_name: `RF${moment(data.document.pcf_batch.date).format("YYMM")} - ${data.document.pcf_batch.letter} ${data.document.supplier.name}`
       })
     }
     catch (error) {
       if (error.request.status === 422) {
-        const { errors } = error.response.data
+        // const { errors } = error.response.data
 
         setError(currentValue => ({
           status: true,
           data: {
             ...currentValue.data,
-            pcf_name: errors["pcf_batch.name"]
+            // document_supplier: errors["document.supplier.id"],
+            // pcf_letter: errors["pcf_batch.letter"],
+            // pcf_date: errors["pcf_batch.date"],
+            document_supplier: ["Supplier already exist."],
+            pcf_letter: ["PCF letter already exist."],
+            pcf_date: ["PCF date already exist."],
           }
         }))
       }
     }
+
+    setValidate(currentValue => ({
+      ...currentValue,
+      data: currentValue.data.filter((data) => data !== 'pcf_name')
+    }))
   }
 
   const addPurchaseOrderHandler = () => {
@@ -1813,7 +1890,7 @@ const NewRequest = () => {
         },
 
         pcf_batch: {
-          name: null,
+          // name: null,
           letter: null,
           date: null
         },
@@ -1878,9 +1955,10 @@ const NewRequest = () => {
                 document_no: errors["document.no"],
                 document_company: errors["document.company.id"],
                 document_department: errors["document.department.id"],
+                document_supplier: errors["document.supplier.id"],
 
-                pcf_date: errors["document.pcf_batch.date"],
-                pcf_letter: errors["document.pcf_batch.letter"],
+                pcf_date: errors["pcf_batch.date"],
+                pcf_letter: errors["pcf_batch.letter"],
 
                 payroll_type: errors["document.payroll.type"],
                 payroll_clients: errors["document.payroll.clients"],
@@ -2054,6 +2132,7 @@ const NewRequest = () => {
                   (data.document.id === 8) &&
                   (
                     <React.Fragment>
+                      {/*
                       <Autocomplete
                         className="FstoSelectForm-root"
                         size="small"
@@ -2112,6 +2191,7 @@ const NewRequest = () => {
                         disablePortal
                         disableClearable
                       />
+                      */}
 
                       <Autocomplete
                         className="FstoSelectForm-root"
@@ -2129,9 +2209,13 @@ const NewRequest = () => {
                                 && Boolean(error.data.pcf_letter)
                               }
                               helperText={
-                                error.status
-                                && error.data.pcf_letter
-                                && error.data.pcf_letter[0]
+                                (error.status
+                                  && error.data.pcf_letter
+                                  && error.data.pcf_letter[0])
+                                ||
+                                (validate.status
+                                  && validate.data.includes('pcf_name')
+                                  && "Please wait...")
                               }
                             />
                         }
@@ -2159,7 +2243,6 @@ const NewRequest = () => {
                           }
                         })}
                         fullWidth
-                        disabled
                         disablePortal
                         disableClearable
                       />
@@ -2191,15 +2274,19 @@ const NewRequest = () => {
                                   && Boolean(error.data.pcf_date)
                                 }
                                 helperText={
-                                  error.status
-                                  && error.data.pcf_date
-                                  && error.data.pcf_date[0]
+                                  (error.status
+                                    && error.data.pcf_date
+                                    && error.data.pcf_date[0])
+                                  ||
+                                  (validate.status
+                                    && validate.data.includes('pcf_name')
+                                    && "Please wait...")
                                 }
+                                onKeyPress={(e) => e.preventDefault()}
                                 fullWidth
                               />
                           }
                           showToolbar
-                          disabled
                         />
                       </LocalizationProvider>
                     </React.Fragment>
@@ -2359,7 +2446,6 @@ const NewRequest = () => {
                     <LocalizationProvider dateAdapter={DateAdapter}>
                       <DatePicker
                         value={data.document.date}
-                        disabled={data.document.id === 8}
                         maxDate={new Date()}
                         onChange={(value) => setData({
                           ...data,
@@ -2397,7 +2483,6 @@ const NewRequest = () => {
                       autoComplete="off"
                       size="small"
                       value={data.document.amount}
-                      disabled={data.document.id === 8}
                       error={
                         (
                           Boolean(data.po_group.length) &&
@@ -2637,13 +2722,7 @@ const NewRequest = () => {
                   className="FstoSelectForm-root"
                   size="small"
                   filterOptions={filterOptions}
-                  options={
-                    Boolean(SUPPLIER_LIST.length)
-                      ? data.document.id === 8
-                        ? SUPPLIER_LIST.filter(row => row.name.match(/PCF.*/) ? row : null)
-                        : SUPPLIER_LIST
-                      : []
-                  }
+                  options={SUPPLIER_LIST || []}
                   value={data.document.supplier}
                   loading={
                     SUPPLIER_STATUS === 'loading'
@@ -2654,6 +2733,19 @@ const NewRequest = () => {
                         {...props}
                         variant="outlined"
                         label="Supplier"
+                        error={
+                          error.status
+                          && Boolean(error.data.document_supplier)
+                        }
+                        helperText={
+                          (error.status
+                            && error.data.document_supplier
+                            && error.data.document_supplier[0])
+                          ||
+                          (validate.status
+                            && validate.data.includes('pcf_name')
+                            && "Please wait...")
+                        }
                       />
                   }
                   PaperComponent={
@@ -2692,9 +2784,6 @@ const NewRequest = () => {
                       )
                     }
                   })}
-                  disabled={
-                    data.document.id === 8 && Boolean(data.document.supplier)
-                  }
                   fullWidth
                   disablePortal
                   disableClearable

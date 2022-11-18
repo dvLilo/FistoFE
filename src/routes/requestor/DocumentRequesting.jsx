@@ -46,6 +46,7 @@ import useToast from '../../hooks/useToast'
 import useTransactions from '../../hooks/useTransactions'
 
 import TablePreloader from '../../components/TablePreloader'
+import Preloader from '../../components/Preloader'
 
 import DocumentRequestingActions from './DocumentRequestingActions'
 import DocumentRequestingFilter from './DocumentRequestingFilter'
@@ -149,7 +150,7 @@ const DocumentRequesting = () => {
     switch (process) {
       case "tag":
         if (subprocess === 'receive')
-          return "Receive by AP Tagging for tagging."
+          return "Received by AP Tagging for tagging."
 
         if (subprocess === 'tag')
           return "Tagged by AP Tagging."
@@ -158,7 +159,7 @@ const DocumentRequesting = () => {
 
       case "voucher":
         if (subprocess === 'receive')
-          return "Receive by AP Associate for vouchering."
+          return "Received by AP Associate for vouchering."
 
         if (subprocess === 'voucher')
           return "Vouchered by AP Associate."
@@ -167,7 +168,7 @@ const DocumentRequesting = () => {
 
       case "approve":
         if (subprocess === 'receive')
-          return "Receive by Approver for approval."
+          return "Received by Approver for approval."
 
         if (subprocess === 'voucher')
           return "Approved by Approver."
@@ -176,7 +177,7 @@ const DocumentRequesting = () => {
 
       case "transmit":
         if (subprocess === 'receive')
-          return "Receive by AP Associate for transmittal."
+          return "Received by AP Associate for transmittal."
 
         if (subprocess === 'transmit')
           return "Transmitted by AP Associate."
@@ -185,7 +186,7 @@ const DocumentRequesting = () => {
 
       case "cheque":
         if (subprocess === 'receive')
-          return "Receive by Treasury Associate for cheque creation."
+          return "Received by Treasury Associate for cheque creation."
 
         if (subprocess === 'cheque')
           return "Created cheque by Treasury Associate."
@@ -200,7 +201,7 @@ const DocumentRequesting = () => {
 
       case "release":
         if (subprocess === 'receive')
-          return "Receive by AP Tagging for releasing."
+          return "Received by AP Tagging for releasing."
 
         if (subprocess === 'release')
           return "Released by AP Tagging."
@@ -209,7 +210,7 @@ const DocumentRequesting = () => {
 
       case "file":
         if (subprocess === 'receive')
-          return "Receive by AP Associate for voucher filing."
+          return "Received by AP Associate for voucher filing."
 
         if (subprocess === 'file')
           return "Filed by AP Associate."
@@ -236,6 +237,30 @@ const DocumentRequesting = () => {
 
       default:
         return "Pending for tagging."
+    }
+  }
+
+  const getStateMessage = (state) => {
+    if (state.toLowerCase() === 'pending')
+      return state
+
+    const [process, subprocess] = state.split("-")
+
+    switch (subprocess) {
+      case "tag":
+        return `${process} • tagged`
+
+      case "hold":
+        return `${process} • held`
+
+      case "transmit":
+        return `${process} • transmitted`
+
+      default:
+        if (subprocess.endsWith("e"))
+          return `${process} • ${subprocess}d`
+
+        return `${process} • ${subprocess}ed`
     }
   }
 
@@ -530,7 +555,7 @@ const DocumentRequesting = () => {
           {
             density === 'small' &&
             <React.Fragment>
-              <Table size="small">
+              <Table>
                 <TableHead>
                   <TableRow>
                     <TableCell className="FstoTableHead-root">
@@ -576,6 +601,10 @@ const DocumentRequesting = () => {
                 </TableHead>
 
                 <TableBody>
+                  {
+                    status === 'loading'
+                    && <Preloader col={10} row={6} />}
+
                   {
                     status === 'success'
                     && data.data.map((data, index) => {
@@ -672,7 +701,9 @@ const DocumentRequesting = () => {
                           </TableCell>
 
                           <TableCell className="FstoTableData-root" align="center">
-                            <Chip className="FstoChip-root FstoChip-status" label={data.state} size="small" color="warning" />
+                            <Tooltip title={getStatusMessage(data.state)} placement="top" disableInteractive disableFocusListener arrow>
+                              <Chip className="FstoChip-root FstoChip-status" label={getStateMessage(data.state)} size="small" color="warning" />
+                            </Tooltip>
                           </TableCell>
 
                           <TableCell className="FstoTableData-root" align="center">
