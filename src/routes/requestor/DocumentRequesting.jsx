@@ -73,7 +73,7 @@ const DocumentRequesting = () => {
   const [active, setActive] = React.useState(true)
   const [state, setState] = React.useState("pending")
   const [search, setSearch] = React.useState("")
-  const [density, setDensity] = React.useState("small") // small or large
+  const [density, setDensity] = React.useState("small")
 
   const [view, setView] = React.useState({
     open: false,
@@ -245,6 +245,9 @@ const DocumentRequesting = () => {
       return state
 
     const [process, subprocess] = state.split("-")
+
+    if (process === 'requestor' && subprocess === 'void')
+      return `voided`
 
     switch (subprocess) {
       case "tag":

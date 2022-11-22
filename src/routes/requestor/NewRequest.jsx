@@ -589,7 +589,7 @@ const NewRequest = () => {
           && data.po_group.length
           && (
             Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 0.99
+            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
           )
           && (!error.status || !Boolean(error.data.document_no))
           && (!error.status || !Boolean(error.data.po_no))
@@ -625,8 +625,8 @@ const NewRequest = () => {
           )
           && prmGroup.length
           && (
-            (data.document.category.name.match(/rental/i) && Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) >= 0.00 && Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) <= 0.99) ||
-            (data.document.category.name.match(/loans|leasing/i) && Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) >= 0.00 && Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) <= 0.99)
+            (data.document.category.name.match(/rental/i) && Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) >= 0.00 && Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) < 1.00) ||
+            (data.document.category.name.match(/loans|leasing/i) && Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) >= 0.00 && Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) < 1.00)
           )
           && (!error.status || !Boolean(error.data.document_no))
           && (!validate.status || !validate.data.includes('document_no'))
@@ -650,7 +650,7 @@ const NewRequest = () => {
               ? data.document.reference.amount <= data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
               : (
                 Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 0.99
+                Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
               )
           )
           && (!error.status || !Boolean(error.data.reference_no))
@@ -673,7 +673,7 @@ const NewRequest = () => {
           && data.po_group.length
           && (
             Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 0.99
+            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
           )
           && (!error.status || !Boolean(error.data.document_no))
           && (!error.status || !Boolean(error.data.po_no))
@@ -740,7 +740,7 @@ const NewRequest = () => {
           && debitGroup.length
           && (
             Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) >= 0.00 &&
-            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) <= 0.99
+            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) < 1.00
           )
           && (!error.status || !Boolean(error.data.document_no))
           && (!validate.status || !validate.data.includes('document_no'))
@@ -2489,7 +2489,7 @@ const NewRequest = () => {
                           Boolean(data.document.amount)
                           && !(
                             Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 0.99
+                            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
                           )) ||
                         (
                           Boolean(prmGroup.length) &&
@@ -2498,7 +2498,7 @@ const NewRequest = () => {
                           Boolean(data.document.amount)
                           && !(
                             Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) <= 0.99
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) < 1.00
                           )) ||
                         (
                           Boolean(prmGroup.length) &&
@@ -2507,14 +2507,14 @@ const NewRequest = () => {
                           Boolean(data.document.amount)
                           && !(
                             Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) <= 0.99
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) < 1.00
                           )) ||
                         (
                           Boolean(debitGroup.length) &&
                           Boolean(data.document.amount)
                           && !(
                             Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) <= 0.99
+                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) < 1.00
                           ))
                       }
                       helperText={
@@ -2523,7 +2523,7 @@ const NewRequest = () => {
                           Boolean(data.document.amount)
                           && !(
                             Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 0.99
+                            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
                           )
                           && "Document amount and PO balance amount is not equal.") ||
                         (
@@ -2533,7 +2533,7 @@ const NewRequest = () => {
                           Boolean(data.document.amount)
                           && !(
                             Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) <= 0.99
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) < 1.00
                           )
                           && "Document amount and gross amount is not equal.") ||
                         (
@@ -2543,7 +2543,7 @@ const NewRequest = () => {
                           Boolean(data.document.amount)
                           && !(
                             Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) <= 0.99
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) < 1.00
                           )
                           && "Document amount and principal amount is not equal.") ||
                         (
@@ -2551,7 +2551,7 @@ const NewRequest = () => {
                           Boolean(data.document.amount)
                           && !(
                             Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) <= 0.99
+                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) < 1.00
                           )
                           && "Document amount and net of cwt amount is not equal.")
                       }
@@ -2893,7 +2893,7 @@ const NewRequest = () => {
                               ? data.document.reference.amount > data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
                               : !(
                                 Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                                Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 0.99
+                                Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
                               )
                           )
                         }
@@ -2905,7 +2905,7 @@ const NewRequest = () => {
                               ? data.document.reference.amount > data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
                               : !(
                                 Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                                Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 0.99
+                                Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
                               )
                           )
                           && "Reference amount and PO balance amount is not equal."

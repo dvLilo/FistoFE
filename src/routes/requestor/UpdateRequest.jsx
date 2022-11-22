@@ -2,6 +2,8 @@ import React from 'react'
 
 import axios from 'axios'
 
+import moment from 'moment'
+
 import * as XLSX from 'xlsx'
 
 import { useNavigate, useParams } from 'react-router-dom'
@@ -432,35 +434,33 @@ const UpdateRequest = () => {
     // eslint-disable-next-line 
   }, [data.document.id])
 
-  const [PETTYCASHFUND_LIST, setPettyCashFundList] = React.useState([])
-  React.useEffect(() => {
-    (async () => {
-      if (data.document.id === 8) {
-        let response
-        try {
-          response = await axios.get(`http://localhost:5000/stalwart`)
+  // const [PETTYCASHFUND_LIST, setPettyCashFundList] = React.useState([])
+  // React.useEffect(() => {
+  //   (async () => {
+  //     if (data.document.id === 8) {
+  //       let response
+  //       try {
+  //         response = await axios.get(`http://localhost:5000/stalwart`)
 
-          const { data } = response
+  //         const { data } = response
 
-          setPettyCashFundList(data)
-        }
-        catch (error) {
-          console.log("Fisto Error Status", error.request)
+  //         setPettyCashFundList(data)
+  //       }
+  //       catch (error) {
+  //         console.log("Fisto Error Status", error.request)
 
-          toast({
-            open: true,
-            severity: "error",
-            title: "Error!",
-            message: "Something went wrong whilst trying to connect to the server. Please try again later."
-          })
-        }
-      }
-    })()
+  //         toast({
+  //           open: true,
+  //           severity: "error",
+  //           title: "Error!",
+  //           message: "Something went wrong whilst trying to connect to the server. Please try again later."
+  //         })
+  //       }
+  //     }
+  //   })()
 
-    // eslint-disable-next-line
-  }, [data.document.id])
-
-
+  //   // eslint-disable-next-line
+  // }, [data.document.id])
 
 
   React.useEffect(() => { // Reference Number Validation
@@ -479,6 +479,28 @@ const UpdateRequest = () => {
 
     // eslint-disable-next-line
   }, [data.document.payment_type, data.document.company])
+
+  React.useEffect(() => { // PCF Validation
+    if (data.document.id === 8
+      && data.document.supplier
+      && data.document.pcf_batch.letter
+      && data.document.pcf_batch.date
+    ) {
+      checkPettyCashFundNameHandler()
+      setData({
+        ...data,
+        document: {
+          ...data.document,
+          pcf_batch: {
+            ...data.document.pcf_batch,
+            name: 'RF' + moment(data.document.pcf_batch.date).format("YYMM") + ' - ' + data.document.pcf_batch.letter + ' ' + data.document.supplier?.name
+          },
+        }
+      })
+    }
+
+    // eslint-disable-next-line
+  }, [data.document.supplier, data.document.pcf_batch.letter, data.document.pcf_batch.date])
 
 
   React.useEffect(() => { // Utility Account Number Auto Select
@@ -592,7 +614,7 @@ const UpdateRequest = () => {
           && data.po_group.length
           && (
             Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 1.00
+            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
           )
           && (!error.status || !Boolean(error.data.document_no))
           && (!error.status || !Boolean(error.data.po_no))
@@ -628,8 +650,8 @@ const UpdateRequest = () => {
           )
           && prmGroup.length
           && (
-            (data.document.category.name.match(/rental/i) && Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) >= 0.00 && Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) <= 1.00) ||
-            (data.document.category.name.match(/loans|leasing/i) && Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) >= 0.00 && Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) <= 1.00)
+            (data.document.category.name.match(/rental/i) && Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) >= 0.00 && Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) < 1.00) ||
+            (data.document.category.name.match(/loans|leasing/i) && Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) >= 0.00 && Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) < 1.00)
           )
           && (!error.status || !Boolean(error.data.document_no))
           && (!validate.status || !validate.data.includes('document_no'))
@@ -653,7 +675,7 @@ const UpdateRequest = () => {
               ? data.document.reference.amount <= data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
               : (
                 Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 1.00
+                Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
               )
           )
           && (!error.status || !Boolean(error.data.reference_no))
@@ -676,7 +698,7 @@ const UpdateRequest = () => {
           && data.po_group.length
           && (
             Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 1.00
+            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
           )
           && (!error.status || !Boolean(error.data.document_no))
           && (!error.status || !Boolean(error.data.po_no))
@@ -725,7 +747,10 @@ const UpdateRequest = () => {
           && data.document.pcf_batch.name
           && data.document.pcf_batch.letter
           && data.document.pcf_batch.date
-          && (!error.status || !Boolean(error.data.pcf_name))
+          && (!error.status || !Boolean(error.data.pcf_letter))
+          && (!error.status || !Boolean(error.data.pcf_date))
+          && (!error.status || !Boolean(error.data.document_company))
+          && (!validate.status || !validate.data.includes('pcf_name'))
           ? false : true
 
       case 9: // Auto Debit
@@ -740,7 +765,7 @@ const UpdateRequest = () => {
           && debitGroup.length
           && (
             Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) >= 0.00 &&
-            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) <= 1.00
+            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) < 1.00
           )
           && (!error.status || !Boolean(error.data.document_no))
           && (!validate.status || !validate.data.includes('document_no'))
@@ -858,34 +883,83 @@ const UpdateRequest = () => {
     }))
   }
 
-  const checkPettyCashFundNameHandler = async (name) => {
-    if (error.status && error.data.pcf_name) {
-      delete error.data.pcf_name
+  // const checkPettyCashFundNameHandler = async (name) => {
+  //   if (error.status && error.data.pcf_name) {
+  //     delete error.data.pcf_name
+  //     setError(currentValue => ({
+  //       ...currentValue,
+  //       data: error.data
+  //     }))
+  //   }
+
+  //   try {
+  //     await axios.post(`/api/transactions/validate-pcf-name`, {
+  //       transaction_id: data.transaction.id,
+  //       pcf_name: name
+  //     })
+  //   }
+  //   catch (error) {
+  //     if (error.request.status === 422) {
+  //       const { errors } = error.response.data
+
+  //       setError(currentValue => ({
+  //         status: true,
+  //         data: {
+  //           ...currentValue.data,
+  //           pcf_name: errors["pcf_batch.name"]
+  //         }
+  //       }))
+  //     }
+  //   }
+  // }
+
+  const checkPettyCashFundNameHandler = async () => {
+    if (error.status && error.data.document_supplier && error.data.pcf_letter && error.data.pcf_date) {
+      delete error.data.pcf_letter
+      delete error.data.pcf_date
+      delete error.data.document_supplier
       setError(currentValue => ({
         ...currentValue,
         data: error.data
       }))
     }
 
+    setValidate(currentValue => ({
+      status: true,
+      data: [
+        ...currentValue.data, 'pcf_name'
+      ]
+    }))
+
     try {
       await axios.post(`/api/transactions/validate-pcf-name`, {
         transaction_id: data.transaction.id,
-        pcf_name: name
+        pcf_name: `RF${moment(data.document.pcf_batch.date).format("YYMM")} - ${data.document.pcf_batch.letter} ${data.document.supplier.name}`
       })
     }
     catch (error) {
       if (error.request.status === 422) {
-        const { errors } = error.response.data
+        // const { errors } = error.response.data
 
         setError(currentValue => ({
           status: true,
           data: {
             ...currentValue.data,
-            pcf_name: errors["pcf_batch.name"]
+            // document_supplier: errors["document.supplier.id"],
+            // pcf_letter: errors["pcf_batch.letter"],
+            // pcf_date: errors["pcf_batch.date"],
+            document_supplier: ["Supplier already exist."],
+            pcf_letter: ["PCF letter already exist."],
+            pcf_date: ["PCF date already exist."],
           }
         }))
       }
     }
+
+    setValidate(currentValue => ({
+      ...currentValue,
+      data: currentValue.data.filter((data) => data !== 'pcf_name')
+    }))
   }
 
   const addPurchaseOrderHandler = () => {
@@ -1945,9 +2019,10 @@ const UpdateRequest = () => {
                 document_no: errors["document.no"],
                 document_company: errors["document.company.id"],
                 document_department: errors["document.department.id"],
+                document_supplier: errors["document.supplier.id"],
 
-                pcf_date: errors["document.pcf_batch.date"],
-                pcf_letter: errors["document.pcf_batch.letter"],
+                pcf_date: errors["pcf_batch.date"],
+                pcf_letter: errors["pcf_batch.letter"],
 
                 payroll_type: errors["document.payroll.type"],
                 payroll_clients: errors["document.payroll.clients"],
@@ -1966,7 +2041,7 @@ const UpdateRequest = () => {
               duration: null
             })
 
-            return
+            return setIsSaving(false)
           }
 
           toast({
@@ -2120,6 +2195,7 @@ const UpdateRequest = () => {
                   (data.document.id === 8) &&
                   (
                     <React.Fragment>
+                      {/*
                       <Autocomplete
                         className="FstoSelectForm-root"
                         size="small"
@@ -2178,6 +2254,7 @@ const UpdateRequest = () => {
                         disablePortal
                         disableClearable
                       />
+                      */}
 
                       <Autocomplete
                         className="FstoSelectForm-root"
@@ -2195,9 +2272,13 @@ const UpdateRequest = () => {
                                 && Boolean(error.data.pcf_letter)
                               }
                               helperText={
-                                error.status
-                                && error.data.pcf_letter
-                                && error.data.pcf_letter[0]
+                                (error.status
+                                  && error.data.pcf_letter
+                                  && error.data.pcf_letter[0])
+                                ||
+                                (validate.status
+                                  && validate.data.includes('pcf_name')
+                                  && "Please wait...")
                               }
                             />
                         }
@@ -2225,7 +2306,6 @@ const UpdateRequest = () => {
                           }
                         })}
                         fullWidth
-                        disabled
                         disablePortal
                         disableClearable
                       />
@@ -2257,15 +2337,19 @@ const UpdateRequest = () => {
                                   && Boolean(error.data.pcf_date)
                                 }
                                 helperText={
-                                  error.status
-                                  && error.data.pcf_date
-                                  && error.data.pcf_date[0]
+                                  (error.status
+                                    && error.data.pcf_date
+                                    && error.data.pcf_date[0])
+                                  ||
+                                  (validate.status
+                                    && validate.data.includes('pcf_name')
+                                    && "Please wait...")
                                 }
+                                onKeyPress={(e) => e.preventDefault()}
                                 fullWidth
                               />
                           }
                           showToolbar
-                          disabled
                         />
                       </LocalizationProvider>
                     </React.Fragment>
@@ -2395,25 +2479,29 @@ const UpdateRequest = () => {
                     />
                   )}
 
-                <LocalizationProvider dateAdapter={DateAdapter}>
-                  <DatePicker
-                    value={data.transaction.date_requested}
-                    onChange={(value) => { }}
-                    renderInput={
-                      props =>
-                        <TextField
-                          {...props}
-                          className="FstoTextfieldForm-root"
-                          variant="outlined"
-                          size="small"
-                          label="Request Date"
-                          autoComplete="off"
-                          fullWidth
-                        />
-                    }
-                    readOnly
-                  />
-                </LocalizationProvider>
+                { // Request Date
+                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4 || data.document.id === 5 || data.document.id === 8 || data.document.id === 9) &&
+                  (
+                    <LocalizationProvider dateAdapter={DateAdapter}>
+                      <DatePicker
+                        value={data.transaction.date_requested}
+                        onChange={(value) => { }}
+                        renderInput={
+                          props =>
+                            <TextField
+                              {...props}
+                              className="FstoTextfieldForm-root"
+                              variant="outlined"
+                              size="small"
+                              label="Request Date"
+                              autoComplete="off"
+                              fullWidth
+                            />
+                        }
+                        readOnly
+                      />
+                    </LocalizationProvider>
+                  )}
 
                 { // Document Date
                   (data.document.id === 1 || data.document.id === 2 || data.document.id === 4 || data.document.id === 5 || data.document.id === 8 || data.document.id === 9) &&
@@ -2421,7 +2509,6 @@ const UpdateRequest = () => {
                     <LocalizationProvider dateAdapter={DateAdapter}>
                       <DatePicker
                         value={data.document.date}
-                        disabled={data.document.id === 8}
                         maxDate={new Date()}
                         onChange={(value) => setData({
                           ...data,
@@ -2459,14 +2546,13 @@ const UpdateRequest = () => {
                       autoComplete="off"
                       size="small"
                       value={data.document.amount}
-                      disabled={data.document.id === 8}
                       error={
                         (
                           Boolean(data.po_group.length) &&
                           Boolean(data.document.amount)
                           && !(
                             Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 1.00
+                            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
                           )) ||
                         (
                           Boolean(prmGroup.length) &&
@@ -2475,7 +2561,7 @@ const UpdateRequest = () => {
                           Boolean(data.document.amount)
                           && !(
                             Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) <= 1.00
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) < 1.00
                           )) ||
                         (
                           Boolean(prmGroup.length) &&
@@ -2484,14 +2570,14 @@ const UpdateRequest = () => {
                           Boolean(data.document.amount)
                           && !(
                             Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) <= 1.00
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) < 1.00
                           )) ||
                         (
                           Boolean(debitGroup.length) &&
                           Boolean(data.document.amount)
                           && !(
                             Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) <= 1.00
+                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) < 1.00
                           ))
                       }
                       helperText={
@@ -2500,7 +2586,7 @@ const UpdateRequest = () => {
                           Boolean(data.document.amount)
                           && !(
                             Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 1.00
+                            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
                           )
                           && "Document amount and PO balance amount is not equal.") ||
                         (
@@ -2510,7 +2596,7 @@ const UpdateRequest = () => {
                           Boolean(data.document.amount)
                           && !(
                             Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) <= 1.00
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) < 1.00
                           )
                           && "Document amount and gross amount is not equal.") ||
                         (
@@ -2520,7 +2606,7 @@ const UpdateRequest = () => {
                           Boolean(data.document.amount)
                           && !(
                             Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) <= 1.00
+                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) < 1.00
                           )
                           && "Document amount and principal amount is not equal.") ||
                         (
@@ -2528,7 +2614,7 @@ const UpdateRequest = () => {
                           Boolean(data.document.amount)
                           && !(
                             Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) <= 1.00
+                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) < 1.00
                           )
                           && "Document amount and net of cwt amount is not equal.")
                       }
@@ -2716,6 +2802,19 @@ const UpdateRequest = () => {
                         {...props}
                         variant="outlined"
                         label="Supplier"
+                        error={
+                          error.status
+                          && Boolean(error.data.document_supplier)
+                        }
+                        helperText={
+                          (error.status
+                            && error.data.document_supplier
+                            && error.data.document_supplier[0])
+                          ||
+                          (validate.status
+                            && validate.data.includes('pcf_name')
+                            && "Please wait...")
+                        }
                       />
                   }
                   PaperComponent={
@@ -2754,9 +2853,6 @@ const UpdateRequest = () => {
                       )
                     }
                   })}
-                  disabled={
-                    data.document.id === 8 && Boolean(data.document.supplier)
-                  }
                   fullWidth
                   disablePortal
                   disableClearable
@@ -2868,7 +2964,7 @@ const UpdateRequest = () => {
                               ? data.document.reference.amount > data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
                               : !(
                                 Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                                Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 1.00
+                                Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
                               )
                           )
                         }
@@ -2880,7 +2976,7 @@ const UpdateRequest = () => {
                               ? data.document.reference.amount > data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
                               : !(
                                 Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                                Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) <= 1.00
+                                Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
                               )
                           )
                           && "Reference amount and PO balance amount is not equal."

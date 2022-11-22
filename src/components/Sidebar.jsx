@@ -14,7 +14,7 @@ import {
   AccordionDetails,
   Backdrop,
   Typography,
-  Chip
+  // Chip
 } from '@mui/material'
 
 import {
@@ -135,7 +135,7 @@ const Sidebar = () => {
               <AccordionDetails>
                 {user.permissions.includes(1) && <RouterLink className="FstoSidebarLink-root" to="/request">Creation of Request</RouterLink>}
                 {user.permissions.includes(21) && <RouterLink className="FstoSidebarLink-root" to="/counter-receipt/creating">Creation of Counter Receipt</RouterLink>}
-                {user.permissions.includes(20) && <RouterLink className="FstoSidebarLink-root" to="/document/tagging">Tagging of Documents <Chip className="FstoSidebarChip-root" color="primary" label="99+" size="small" /></RouterLink>}
+                {user.permissions.includes(20) && <RouterLink className="FstoSidebarLink-root" to="/document/tagging">Tagging of Documents {/*<Chip className="FstoSidebarChip-root" color="primary" label="99+" size="small" />*/}</RouterLink>}
                 {user.permissions.includes(19) && <RouterLink className="FstoSidebarLink-root" to="/document/transmitting">Transmittal of Documents</RouterLink>}
                 {user.permissions.includes(22) && <RouterLink className="FstoSidebarLink-root" to="/counter-receipt/monitoring">Monitoring of Counter Receipt</RouterLink>}
                 <RouterLink className="FstoSidebarLink-root" to="/document/returned-documents">Returned Documents</RouterLink>
