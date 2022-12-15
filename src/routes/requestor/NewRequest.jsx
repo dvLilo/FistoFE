@@ -57,6 +57,7 @@ import useLocations from '../../hooks/useLocations'
 import usePayrollClents from '../../hooks/usePayrollClents'
 import usePayrollCategories from '../../hooks/usePayrollCategories'
 import useAccountNumbers from '../../hooks/useAccountNumbers'
+import useCreditCard from '../../hooks/useCreditCard'
 import useUtilityCategories from '../../hooks/useUtilityCategories'
 import useUtilityLocations from '../../hooks/useUtilityLocations'
 
@@ -380,6 +381,16 @@ const NewRequest = () => {
   }, [data.document.id])
 
   const {
+    refetch: fetchCreditCards,
+    status: CREDIT_CARDS_STATUS,
+    data: CREDIT_CARDS_LIST
+  } = useCreditCard()
+  React.useEffect(() => {
+    if (data.document.id === 6) fetchCreditCards()
+    // eslint-disable-next-line 
+  }, [data.document.id])
+
+  const {
     refetch: fetchUtilityCategories,
     status: UTILITY_CATEGORIES_STATUS,
     data: UTILITY_CATEGORIES_LIST
@@ -393,11 +404,11 @@ const NewRequest = () => {
     refetch: fetchUtilityLocations,
     status: UTILITY_LOCATIONS_STATUS,
     data: UTILITY_LOCATIONS_LIST
-  } = useUtilityLocations()
+  } = useUtilityLocations(data.document.utility.category?.id)
   React.useEffect(() => {
     if (data.document.id === 6) fetchUtilityLocations()
     // eslint-disable-next-line 
-  }, [data.document.id])
+  }, [data.document.id, data.document.utility.category?.id])
 
   const {
     refetch: fetchPayrollCategories,
@@ -588,8 +599,8 @@ const NewRequest = () => {
           && data.document.category
           && data.po_group.length
           && (
-            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
+            Math.abs(data.document.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) >= 0.00 &&
+            Math.abs(data.document.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) < 1.00
           )
           && (!error.status || !Boolean(error.data.document_no))
           && (!error.status || !Boolean(error.data.po_no))
@@ -625,8 +636,8 @@ const NewRequest = () => {
           )
           && prmGroup.length
           && (
-            (data.document.category.name.match(/rental/i) && Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) >= 0.00 && Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) < 1.00) ||
-            (data.document.category.name.match(/loans|leasing/i) && Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) >= 0.00 && Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) < 1.00)
+            (data.document.category.name.match(/rental/i) && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.gross_amount, 0)).toFixed(2) >= 0.00 && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.gross_amount, 0)).toFixed(2) < 1.00) ||
+            (data.document.category.name.match(/loans|leasing/i) && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.principal, 0)).toFixed(2) >= 0.00 && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.principal, 0)).toFixed(2) < 1.00)
           )
           && (!error.status || !Boolean(error.data.document_no))
           && (!validate.status || !validate.data.includes('document_no'))
@@ -672,8 +683,8 @@ const NewRequest = () => {
           && data.document.capex_no
           && data.po_group.length
           && (
-            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
+            Math.abs(data.document.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) >= 0.00 &&
+            Math.abs(data.document.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) < 1.00
           )
           && (!error.status || !Boolean(error.data.document_no))
           && (!error.status || !Boolean(error.data.po_no))
@@ -1675,7 +1686,6 @@ const NewRequest = () => {
             name: data.document.name,
             payment_type: data.document.payment_type,
             amount: data.document.amount,
-            date: new Date(data.document.date).toISOString().slice(0, 10),
 
             batch_no: data.document.batch_no,
             release_date: new Date(data.document.release_date).toISOString().slice(0, 10),
@@ -1940,7 +1950,7 @@ const NewRequest = () => {
         }
         catch (error) {
           if (error.request.status === 422) {
-            const { errors } = error.response.data
+            const { errors = [], result = [] } = error.response.data
 
             setError(currentValue => ({
               status: true,
@@ -1953,6 +1963,7 @@ const NewRequest = () => {
                 to_date: errors["document.to"],
 
                 document_no: errors["document.no"],
+                document_date: errors["document.date"],
                 document_company: errors["document.company.id"],
                 document_department: errors["document.department.id"],
                 document_supplier: errors["document.supplier.id"],
@@ -1968,6 +1979,16 @@ const NewRequest = () => {
                 utility_category: errors["document.utility.category.id"]
               }
             }))
+
+            if (data.document.id === 3 && result.length)
+              setErrorImport(currentValue => ({
+                ...currentValue,
+                open: true,
+                data: {
+                  message: "Import failed. Kindly check the errors.",
+                  result
+                }
+              }))
 
             toast({
               open: true,
@@ -2463,6 +2484,15 @@ const NewRequest = () => {
                               size="small"
                               label="Document Date"
                               autoComplete="off"
+                              error={
+                                error.status
+                                && Boolean(error.data.document_date)
+                              }
+                              helperText={
+                                error.status
+                                && error.data.document_date
+                                && error.data.document_date[0]
+                              }
                               onKeyPress={(e) => e.preventDefault()}
                               fullWidth
                             />
@@ -2488,8 +2518,8 @@ const NewRequest = () => {
                           Boolean(data.po_group.length) &&
                           Boolean(data.document.amount)
                           && !(
-                            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
+                            Math.abs(data.document.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) >= 0.00 &&
+                            Math.abs(data.document.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) < 1.00
                           )) ||
                         (
                           Boolean(prmGroup.length) &&
@@ -2497,8 +2527,8 @@ const NewRequest = () => {
                           Boolean(data.document.category.name.match(/rental/i)) &&
                           Boolean(data.document.amount)
                           && !(
-                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) < 1.00
+                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.gross_amount, 0)).toFixed(2) >= 0.00 &&
+                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.gross_amount, 0)).toFixed(2) < 1.00
                           )) ||
                         (
                           Boolean(prmGroup.length) &&
@@ -2506,8 +2536,8 @@ const NewRequest = () => {
                           Boolean(data.document.category.name.match(/loans|leasing/i)) &&
                           Boolean(data.document.amount)
                           && !(
-                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) < 1.00
+                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.principal, 0)).toFixed(2) >= 0.00 &&
+                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.principal, 0)).toFixed(2) < 1.00
                           )) ||
                         (
                           Boolean(debitGroup.length) &&
@@ -2522,8 +2552,8 @@ const NewRequest = () => {
                           Boolean(data.po_group.length) &&
                           Boolean(data.document.amount)
                           && !(
-                            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
+                            Math.abs(data.document.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) >= 0.00 &&
+                            Math.abs(data.document.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) < 1.00
                           )
                           && "Document amount and PO balance amount is not equal.") ||
                         (
@@ -2532,8 +2562,8 @@ const NewRequest = () => {
                           Boolean(data.document.category.name.match(/rental/i)) &&
                           Boolean(data.document.amount)
                           && !(
-                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.gross_amount).reduce((a, b) => a + b, 0)) < 1.00
+                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.gross_amount, 0)).toFixed(2) >= 0.00 &&
+                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.gross_amount, 0)).toFixed(2) < 1.00
                           )
                           && "Document amount and gross amount is not equal.") ||
                         (
@@ -2542,8 +2572,8 @@ const NewRequest = () => {
                           Boolean(data.document.category.name.match(/loans|leasing/i)) &&
                           Boolean(data.document.amount)
                           && !(
-                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - prmGroup.map((prm) => prm.principal).reduce((a, b) => a + b, 0)) < 1.00
+                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.principal, 0)).toFixed(2) >= 0.00 &&
+                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.principal, 0)).toFixed(2) < 1.00
                           )
                           && "Document amount and principal amount is not equal.") ||
                         (
@@ -3153,17 +3183,17 @@ const NewRequest = () => {
                         size="small"
                         filterOptions={filterOptions}
                         options={
-                          Boolean(ACCOUNT_NUMBERS_LIST?.length)
-                            ? data.document.supplier && data.document.utility.category && data.document.utility.location
+                          Boolean(data.document.utility.category) && data.document.utility.category.id === 4
+                            ? (CREDIT_CARDS_LIST || [])
+                            : data.document.supplier && data.document.utility.category && data.document.utility.location
                               ? ACCOUNT_NUMBERS_LIST.filter(row => row.supplier.id === data.document.supplier.id && row.category.id === data.document.utility.category.id && row.location.id === data.document.utility.location.id)
                               : data.document.supplier || data.document.utility.category || data.document.utility.location
                                 ? ACCOUNT_NUMBERS_LIST.filter(row => row.supplier.id === data.document.supplier?.id || row.category.id === data.document.utility.category?.id || row.location.id === data.document.utility.location?.id)
-                                : ACCOUNT_NUMBERS_LIST
-                            : []
+                                : (ACCOUNT_NUMBERS_LIST || [])
                         }
                         value={data.document.utility.account_no}
                         loading={
-                          ACCOUNT_NUMBERS_STATUS === 'loading'
+                          ACCOUNT_NUMBERS_STATUS === 'loading' || CREDIT_CARDS_STATUS === 'loading'
                         }
                         renderInput={
                           props =>
@@ -3687,7 +3717,7 @@ const NewRequest = () => {
                   </Box>
 
                   {
-                    data.document.amount && (data.document.id === 1 || data.document.id === 5)
+                    Boolean(data.document.amount) && (data.document.id === 1 || data.document.id === 5)
                     &&
                     <Box className="FstoPurchaseOrderBox-variance">
                       <Typography sx={{ fontSize: '1em' }}>Document Amount</Typography>
@@ -3696,7 +3726,7 @@ const NewRequest = () => {
                   }
 
                   {
-                    data.document.reference.amount && data.document.id === 4
+                    Boolean(data.document.reference.amount) && data.document.id === 4
                     &&
                     <Box className="FstoPurchaseOrderBox-variance">
                       <Typography sx={{ fontSize: '1em' }}>Reference Amount</Typography>
@@ -3707,7 +3737,7 @@ const NewRequest = () => {
                   <Divider sx={{ marginTop: 2, marginBottom: 2 }} />
 
                   {
-                    data.document.amount && (data.document.id === 1 || data.document.id === 5)
+                    Boolean(data.document.amount) && (data.document.id === 1 || data.document.id === 5)
                     &&
                     <Box className="FstoPurchaseOrderBox-variance">
                       <Typography variant="heading">Variance</Typography>
@@ -3718,7 +3748,7 @@ const NewRequest = () => {
                   }
 
                   {
-                    data.document.reference.amount && data.document.id === 4
+                    Boolean(data.document.reference.amount) && data.document.id === 4
                     &&
                     <Box className="FstoPurchaseOrderBox-variance">
                       <Typography variant="heading">Variance</Typography>

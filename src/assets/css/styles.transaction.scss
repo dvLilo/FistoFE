@@ -58,6 +58,10 @@
   & .FstoListItemTransactionDetails-alt {
     padding-top: 16px;
     padding-bottom: 16px;
+
+    &:last-of-type {
+      border: 0
+    }
   }
 
   & .FstoDividerTransactionDetails-root {

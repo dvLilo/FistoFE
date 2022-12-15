@@ -76,14 +76,15 @@ const UpdateCounterReceipt = () => {
   })
 
   const [data, setData] = React.useState({
+    transaction: null,
     supplier: null,
     remarks: ""
   })
 
   const [CR, setCR] = React.useState({
-    no: "",
-    type: null,
-    date: null,
+    receipt_no: "",
+    receipt_type: null,
+    date_transaction: null,
     amount: null,
     department: null,
 
@@ -94,88 +95,39 @@ const UpdateCounterReceipt = () => {
   const [crGroup, setCrGroup] = React.useState([])
 
 
-  // React.useEffect(() => { // Fetch Counter Receipt
-  //   (async () => {
-  //     let response
-  //     try {
-  //       response = await axios.get(`/api/counter-receipt/${id}`)
+  React.useEffect(() => { // Fetch Counter Receipt
+    (async () => {
+      let response
+      try {
+        response = await axios.get(`/api/counter-receipts/${id}`)
 
-  //       const {
-  //         supplier,
-  //         remarks,
-  //         cr_group
-  //       } = response.data.result
+        const {
+          transaction,
+          supplier,
+          remarks,
+          counter_receipt
+        } = response.data.result
 
-  //       setCrGroup([...cr_group])
-  //       setData({ supplier, remarks })
-  //     }
-  //     catch (error) { }
-  //   })()
+        setCrGroup([...counter_receipt])
+        setData({ transaction, supplier, remarks })
+      }
+      catch (error) {
+        console.log("Fisto Error Status", error.request)
 
-  //   // eslint-disable-next-line
-  // }, [])
-
-  React.useEffect(() => { // Simulate FAKE Fetch Counter Receipt
-    setTimeout(() => {
-      setData({
-        supplier: {
-          id: 38,
-          name: "8 SOURCES, INC.",
-          references: [
-            {
-              id: 1,
-              type: "CR"
-            },
-            {
-              id: 2,
-              type: "OR"
-            },
-            {
-              id: 4,
-              type: "SI"
-            }
-          ]
-        },
-        remarks: ""
-      })
-
-      setCrGroup([
-        {
-          id: 1,
-          department: {
-            id: 12,
-            name: "Management Information System Common"
-          },
-          type: {
-            id: 4,
-            type: "SI"
-          },
-          no: "REF#10001",
-          amount: 10000,
-          date: "10/03/2022"
-        },
-        {
-          id: 2,
-          department: {
-            id: 12,
-            name: "Management Information System Common"
-          },
-          type: {
-            id: 2,
-            type: "OR"
-          },
-          no: "REF#10002",
-          amount: 13000,
-          date: "10/03/2022"
-        }
-      ])
-    }, 1000);
+        toast({
+          open: true,
+          severity: "error",
+          title: "Error!",
+          message: "Something went wrong whilst trying to connect to the server. Please try again later."
+        })
+      }
+    })()
 
     // eslint-disable-next-line
   }, [])
 
   React.useEffect(() => { // Receipt Number Validation
-    if (CR.no)
+    if (CR.receipt_no)
       checkCounterReceiptHandler()
 
     // eslint-disable-next-line
@@ -190,9 +142,9 @@ const UpdateCounterReceipt = () => {
           ...currentValue.map((item, index) => {
             if (CR.index === index)
               return {
-                no: CR.no,
-                type: CR.type,
-                date: CR.date,
+                receipt_no: CR.receipt_no,
+                receipt_type: CR.receipt_type,
+                date_transaction: CR.date_transaction,
                 amount: CR.amount,
                 department: CR.department,
               }
@@ -205,20 +157,20 @@ const UpdateCounterReceipt = () => {
       setCrGroup(currentValue => {
         return [
           {
-            no: CR.no,
-            type: CR.type,
-            date: CR.date,
-            amount: CR.amount,
             department: CR.department,
+            receipt_type: CR.receipt_type,
+            receipt_no: CR.receipt_no,
+            date_transaction: CR.date_transaction,
+            amount: CR.amount
           },
           ...currentValue,
         ]
       })
 
     setCR({
-      no: "",
-      type: null,
-      date: null,
+      receipt_no: "",
+      receipt_type: null,
+      date_transaction: null,
       amount: NaN,
       department: null,
 
@@ -228,7 +180,7 @@ const UpdateCounterReceipt = () => {
   }
 
   const checkCounterReceiptHandler = async () => {
-    if (!CR.no) return
+    if (!CR.receipt_no) return
 
     if (error.status && error.data.cr_no) {
       delete error.data.cr_no
@@ -238,7 +190,7 @@ const UpdateCounterReceipt = () => {
       }))
     }
 
-    if (CR.no && !data.supplier) {
+    if (CR.receipt_no && !data.supplier) {
       return setError({
         status: true,
         data: {
@@ -250,7 +202,7 @@ const UpdateCounterReceipt = () => {
       })
     }
 
-    const exist = crGroup.some((item) => item.no === CR.no)
+    const exist = crGroup.some((item) => item.no === CR.receipt_no)
     if (exist && !CR.update) {
       return setError({
         status: true,
@@ -271,8 +223,9 @@ const UpdateCounterReceipt = () => {
         ]
       }))
 
-      await axios.post(`/api/transactions/flow/validate-receipt-no`, {
-        no: CR.no,
+      await axios.post(`/api/counter-receipts/validate-receipt-no`, {
+        receipt_no: CR.receipt_no,
+        transaction_id: data.transaction.id,
         supplier_id: data.supplier.id
       })
     }
@@ -284,7 +237,7 @@ const UpdateCounterReceipt = () => {
           status: true,
           data: {
             ...currentValue.data,
-            cr_no: errors["cr.no"]
+            cr_no: errors["counter_receipt.receipt_no"]
           }
         }))
       }
@@ -323,13 +276,14 @@ const UpdateCounterReceipt = () => {
 
         let response
         try {
-          response = await axios.put(`/api/counter-receipt/${id}`, {
+          response = await axios.put(`/api/counter-receipts/${id}`, {
             ...data,
-            cr_group: [...crGroup]
+            counter_receipt: [...crGroup]
           })
 
           const { message } = response.data
 
+          navigate(-1)
           toast({
             message,
             title: "Success!"
@@ -397,7 +351,7 @@ const UpdateCounterReceipt = () => {
               (option) => option.name
             }
             getOptionDisabled={
-              (option) => !crGroup.every((item) => option.references.map((a) => a.id).includes(item.type.id))
+              (option) => !crGroup.every((item) => option.references.map((a) => a.id).includes(item.receipt_type.id))
             }
             isOptionEqualToValue={
               (option, value) => option.id === value.id
@@ -492,8 +446,11 @@ const UpdateCounterReceipt = () => {
 
           <Autocomplete
             size="small"
-            options={data.supplier?.references || []}
-            value={CR.type}
+            // options={data.supplier?.references || []}
+            options={
+              SUPPLIER_LIST?.find((item) => item.id === data.supplier?.id)?.references || []
+            }
+            value={CR.receipt_type}
             renderInput={
               (props) => <TextField {...props} label="Type" variant="outlined" />
             }
@@ -505,7 +462,7 @@ const UpdateCounterReceipt = () => {
             }
             onChange={(e, value) => setCR(currentValue => ({
               ...currentValue,
-              type: value
+              receipt_type: value
             }))}
             sx={{
               minWidth: 128
@@ -520,7 +477,7 @@ const UpdateCounterReceipt = () => {
             variant="outlined"
             autoComplete="off"
             size="small"
-            value={CR.no}
+            value={CR.receipt_no}
             error={
               error.status
               && Boolean(error.data.cr_no)
@@ -536,7 +493,7 @@ const UpdateCounterReceipt = () => {
             }
             onChange={(e) => setCR(currentValue => ({
               ...currentValue,
-              no: e.target.value
+              receipt_no: e.target.value
             }))}
             onBlur={checkCounterReceiptHandler}
             disabled={false}
@@ -545,10 +502,10 @@ const UpdateCounterReceipt = () => {
 
           <LocalizationProvider dateAdapter={DateAdapter}>
             <DatePicker
-              value={CR.date}
+              value={CR.date_transaction}
               onChange={(value) => setCR(currentValue => ({
                 ...currentValue,
-                date: moment(value).format("MM/DD/YYYY")
+                date_transaction: moment(value).format("YYYY-MM-DD")
               }))}
               renderInput={
                 (props) => <TextField {...props} label="Date" variant="outlined" size="small" onKeyPress={(e) => e.preventDefault()} fullWidth />
@@ -586,9 +543,9 @@ const UpdateCounterReceipt = () => {
               minWidth: 96
             }}
             disabled={
-              !Boolean(CR.no) ||
-              !Boolean(CR.type) ||
-              !Boolean(CR.date) ||
+              !Boolean(CR.receipt_no) ||
+              !Boolean(CR.receipt_type) ||
+              !Boolean(CR.date_transaction) ||
               !Boolean(CR.amount) ||
               !Boolean(CR.department) ||
               (error.status && Boolean(error.data.cr_no))
@@ -613,21 +570,21 @@ const UpdateCounterReceipt = () => {
                 <Stack className="FstoStackCounterReceipt-root short" direction="column">
                   <Typography variant="subtitle2">Type</Typography>
                   <Typography className="FstoTypographyCounterReceipts-root" variant="h6">
-                    {item.type.type}
+                    {item.receipt_type.type}
                   </Typography>
                 </Stack>
 
                 <Stack className="FstoStackCounterReceipt-root" direction="column">
                   <Typography variant="subtitle2">Receipt No.</Typography>
                   <Typography className="FstoTypographyCounterReceipts-root" variant="h6">
-                    {item.no}
+                    {item.receipt_no}
                   </Typography>
                 </Stack>
 
                 <Stack className="FstoStackCounterReceipt-root short" direction="column">
                   <Typography variant="subtitle2">Date</Typography>
                   <Typography className="FstoTypographyCounterReceipts-root" variant="h6">
-                    {item.date}
+                    {moment(item.date_transaction).format("MM/DD/YYYY")}
                   </Typography>
                 </Stack>
 

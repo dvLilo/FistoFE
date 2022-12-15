@@ -57,6 +57,9 @@ import DocumentTransmitting from './routes/transmitting/DocumentTransmitting'
 // Chequing
 import DocumentChequing from './routes/chequing/DocumentChequing'
 
+// Debiting
+import DocumentDebiting from './routes/debiting/DocumentDebiting'
+
 // Releasing
 import DocumentReleasing from './routes/releasing/DocumentReleasing'
 
@@ -95,6 +98,9 @@ import FistoProvider from './contexts/FistoContext'
 import PasswordContextProvider from './contexts/PasswordContext'
 
 import { QueryClient, QueryClientProvider } from 'react-query'
+
+// Experimental Refactored Transction Request
+import TransactionRequest from './routes/requestor/TransactionRequest'
 
 // Create a client
 const queryClient = new QueryClient()
@@ -325,6 +331,8 @@ const App = () => {
               />
               <Route exact strict path="new-request" element={<NewRequest />} />
               <Route exact strict path="update-request/:id" element={<UpdateRequest />} />
+
+              <Route exact strict path="transaction-request" element={<TransactionRequest />} />
             </Route>
 
             <Route exact path="/document/returned-documents" element={<ProtectedRoute />}>
@@ -416,6 +424,16 @@ const App = () => {
                 element={
                   <PasswordContextProvider>
                     <DocumentChequing />
+                  </PasswordContextProvider>
+                }
+              />
+            </Route>
+
+            <Route exact path="/cheque/debiting" element={<ProtectedRoute permission={9} />}>
+              <Route index exact strict
+                element={
+                  <PasswordContextProvider>
+                    <DocumentDebiting />
                   </PasswordContextProvider>
                 }
               />

@@ -110,7 +110,7 @@ const DocumentVoucheringTransaction = (props) => {
   }, [open])
 
   React.useEffect(() => {
-    if (open && state === `voucher-receive` && APPROVER_STATUS === `success` && (status === `success` && !Boolean(data.voucher.approver))) {
+    if (open && state === `voucher-receive` && APPROVER_STATUS === `success` && (status === `success` && !Boolean(data.voucher?.approver))) {
       if (transaction.document_amount <= 500000.00 || transaction.referrence_amount <= 500000.00) {
         setVoucherData(currentValue => ({
           ...currentValue,
@@ -141,14 +141,14 @@ const DocumentVoucheringTransaction = (props) => {
       setVoucherData(currentValue => ({
         ...currentValue,
         tax: {
-          receipt_type: data.voucher.tax?.receipt_type || "",
-          percentage_tax: data.voucher.tax?.percentage_tax || "",
-          withholding_tax: data.voucher.tax?.witholding_tax || null,
-          net_amount: data.voucher.tax?.net_amount || null
+          receipt_type: data.voucher?.tax?.receipt_type || "",
+          percentage_tax: data.voucher?.tax?.percentage_tax || "",
+          withholding_tax: data.voucher?.tax?.witholding_tax || null,
+          net_amount: data.voucher?.tax?.net_amount || null
         },
         voucher: {
           no: data.voucher?.no || "",
-          month: data.voucher?.month
+          month: data.voucher?.month || null
         },
         accounts: data.voucher?.accounts,
 

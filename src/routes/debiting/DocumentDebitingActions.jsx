@@ -1,7 +1,5 @@
 import React from 'react'
 
-import { useSelector } from 'react-redux'
-
 import {
   IconButton,
   Menu,
@@ -10,22 +8,13 @@ import {
 
 import {
   MoreHoriz as MoreIcon,
-  Visibility as ViewIcon,
-  Edit as UpdateIcon,
-  RemoveCircle as VoidIcon
+  TaskOutlined as ReceiveIcon,
+  VisibilityOutlined as ViewIcon,
+  DescriptionOutlined as ManageIcon,
+  ReplyOutlined as CancelIcon
 } from '@mui/icons-material'
 
-const DocumentRequestingActions = (props) => {
-
-  const user = useSelector(state => state.user)
-
-  const {
-    state,
-    data,
-    onView = () => { },
-    onUpdate = () => { },
-    onVoid = () => { }
-  } = props
+const DocumentDebitingActions = ({ data, state, onReceive, onManage, onView, onCancel }) => {
 
   const [anchor, setAnchor] = React.useState(null)
 
@@ -62,48 +51,59 @@ const DocumentRequestingActions = (props) => {
         disablePortal
       >
         {
-          (state === `pending` || state === `requestor-void`)
-          &&
-          <MenuItem dense
+          state === `pending` &&
+          <MenuItem
+            sx={{ fontWeight: 500 }}
+            onClick={() => {
+              onReceive(data.id)
+              actionCloseHandler()
+            }}
+            dense
+          >
+            <ReceiveIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Receive
+          </MenuItem>}
+
+        {
+          (state === `cheque-receive` || state === `cheque-cheque`) &&
+          <MenuItem
+            sx={{ fontWeight: 500 }}
+            onClick={() => {
+              onManage(data)
+              actionCloseHandler()
+            }}
+            dense
+          >
+            <ManageIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Manage
+          </MenuItem>}
+
+        {
+          (state === `cheque-file` || state === `cheque-hold` || state === `cheque-return` || state === `cheque-void`) &&
+          <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
               onView(data)
               actionCloseHandler()
             }}
+            dense
           >
             <ViewIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> View
           </MenuItem>}
 
         {
-          (state === `pending`)
-          &&
-          <MenuItem dense
+          state === `cheque-return` &&
+          <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
-              onUpdate(data)
+              onCancel(data.id)
               actionCloseHandler()
             }}
-            disabled={user?.id !== data.users_id || (data.document_id === 4 && data.payment_type.toLowerCase() === `partial` && !data.is_latest_transaction) || data.status.toLowerCase() !== `pending`}
+            dense
           >
-            <UpdateIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Edit
-          </MenuItem>}
-
-        {
-          (state === `pending`)
-          &&
-          <MenuItem dense
-            sx={{ fontWeight: 500 }}
-            onClick={() => {
-              onVoid(data)
-              actionCloseHandler()
-            }}
-            disabled={user?.id !== data.users_id || (data.document_id === 4 && data.payment_type.toLowerCase() === `partial` && !data.is_latest_transaction) || data.status.toLowerCase() !== `pending`}
-          >
-            <VoidIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Void
+            <CancelIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Cancel
           </MenuItem>}
       </Menu>
     </React.Fragment>
   )
 }
 
-export default DocumentRequestingActions
+export default DocumentDebitingActions

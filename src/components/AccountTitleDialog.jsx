@@ -345,10 +345,10 @@ const AccountTitleDialog = (props) => {
                         {
                           Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|counter-.*/)) &&
                           <TableCell align="right" size="small">
-                            <IconButton onClick={() => editAccountTitleHandler(item, index)} disabled={Boolean(state) && Boolean(state.match(/cheque-|clear-|return-.*/)) && !Boolean(index)}>
+                            <IconButton onClick={() => editAccountTitleHandler(item, index)} disabled={Boolean(state) && Boolean(state.match(/cheque-|clear-|return-.*/)) && Boolean(item.entry.match(/debit.*/i))}>
                               <EditIcon fontSize="small" />
                             </IconButton>
-                            <IconButton onClick={() => removeAccountTitleHandler(index)} disabled={Boolean(state) && Boolean(state.match(/cheque-|clear-|return-.*/)) && !Boolean(index)}>
+                            <IconButton onClick={() => removeAccountTitleHandler(index)} disabled={Boolean(state) && Boolean(state.match(/cheque-|clear-|return-.*/)) && Boolean(item.entry.match(/debit.*/i))}>
                               <DeleteIcon fontSize="small" />
                             </IconButton>
                           </TableCell>

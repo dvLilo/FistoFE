@@ -84,7 +84,7 @@ const DocumentCounterReceiptMonitoringActions = (props) => {
         disablePortal
       >
         {
-          state === 'counter-pending' &&
+          state === 'pending' &&
           <MenuItem
             className="FstoMenuItemAction-root"
             onClick={actionReceiveHandler}
@@ -109,7 +109,7 @@ const DocumentCounterReceiptMonitoringActions = (props) => {
           </MenuItem>}
 
         {
-          Boolean(/process|unprocess/i.test(state)) &&
+          state === 'monitoring-receive' &&
           <MenuItem
             className="FstoMenuItemAction-root"
             onClick={actionReturnHandler}
@@ -120,7 +120,7 @@ const DocumentCounterReceiptMonitoringActions = (props) => {
           </MenuItem>}
 
         {
-          state === 'counter-return' &&
+          state === 'monitoring-return' &&
           <MenuItem
             className="FstoMenuItemAction-root"
             onClick={actionCancelhandler}

@@ -20,7 +20,6 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  TableSortLabel,
   TablePagination,
   Tabs,
   Tab,
@@ -34,8 +33,8 @@ import {
   Search,
   Close,
   AccessTime,
-  DensitySmall,
-  DensityMedium
+  // DensitySmall,
+  // DensityMedium
 } from '@mui/icons-material'
 
 import statusColor from '../../colors/statusColor'
@@ -98,7 +97,7 @@ const DocumentReturning = () => {
 
   const [search, setSearch] = React.useState("")
   const [state, setState] = React.useState("return-return")
-  const [density, setDensity] = React.useState("small")
+  // const [density, setDensity] = React.useState("small")
 
   const [reason, setReason] = React.useState({
     open: false,
@@ -253,7 +252,7 @@ const DocumentReturning = () => {
             >
               <Tab className="FstoTab-root" label="Returned" value="return-return" disableRipple />
               {
-                user?.role !== `Treasury Associate` &&
+                user?.role !== `Requestor` && user?.role !== `Treasury Associate` &&
                 [
                   <Tab className="FstoTab-root" key="Hold" label="Hold" value="return-hold" disableRipple />,
                   <Tab className="FstoTab-root" key="Voided" label="Voided" value="return-void" disableRipple />
@@ -297,7 +296,7 @@ const DocumentReturning = () => {
 
               <FilterPopover onFilter={filterData} />
 
-              {
+              {/* {
                 user?.role === `Requestor` &&
                 <IconButton
                   onClick={() => setDensity(currentValue => {
@@ -309,36 +308,37 @@ const DocumentReturning = () => {
                 >
                   {density === 'small' ? <DensitySmall /> : <DensityMedium />}
                 </IconButton>
-              }
+              } */}
             </Stack>
           </Stack>
         </Stack>
 
         <TableContainer className="FstoTableContainer-root">
           {
-            ((density === 'large' && user?.role === `Requestor`) || user?.role !== `Requestor`) &&
+            // ((density === 'large' && user?.role === `Requestor`) || user?.role !== `Requestor`) &&
+            user?.role !== `Requestor` &&
             <React.Fragment>
               <Table className="FstoTable-root" size="small">
                 <TableHead className="FstoTableHead-root">
                   <TableRow className="FstoTableRow-root">
                     <TableCell className="FstoTableCell-root FstoTableCell-head">
-                      <TableSortLabel active={false}>TRANSACTION</TableSortLabel>
+                      TRANSACTION
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-head">
-                      <TableSortLabel active={false}>REQUESTOR</TableSortLabel>
+                      REQUESTOR
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-head">
-                      <TableSortLabel active={false}>CHARGING</TableSortLabel>
+                      CHARGING
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-head">
-                      <TableSortLabel active={false}>AMOUNT DETAILS</TableSortLabel>
+                      AMOUNT DETAILS
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-head">
-                      <TableSortLabel active={false}>PO DETAILS</TableSortLabel>
+                      PO DETAILS
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">STATUS</TableCell>
@@ -488,7 +488,8 @@ const DocumentReturning = () => {
 
 
           {
-            density === 'small' && user?.role === `Requestor` &&
+            // density === 'small' && user?.role === `Requestor` &&
+            user?.role === `Requestor` &&
             <React.Fragment>
               <Table>
                 <TableHead>
@@ -538,7 +539,7 @@ const DocumentReturning = () => {
                 <TableBody>
                   {
                     status === 'loading'
-                    && <Preloader col={10} row={6} />}
+                    && <Preloader size="medium" col={10} row={6} />}
 
                   {
                     status === 'success'

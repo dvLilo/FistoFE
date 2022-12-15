@@ -2,16 +2,16 @@ import React from 'react'
 
 import { TableRow, TableCell, Skeleton } from '@mui/material'
 
-const Preloader = ({ row, col }) => {
+const Preloader = ({ row, col, size = "small" }) => {
   const arrRow = [...Array(row)]
   const arrCol = [...Array(col)]
 
   return (
-    arrRow.map((row, index) => (
+    arrRow.map((_, index) => (
       <TableRow key={index}>
         {
-          arrCol.map((col, index) => (
-            <TableCell key={index} sx={{ py: 1 }}>
+          arrCol.map((_, index) => (
+            <TableCell key={index} size={size}>
               <Skeleton variant="text" />
             </TableCell>
           ))

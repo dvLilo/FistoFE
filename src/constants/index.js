@@ -16,6 +16,7 @@ export const RELEASE = `release`
 export const FILE = `file`
 export const CLEAR = `clear`
 export const COUNTER = `counter`
+export const MONITORING = `monitoring`
 
 // transaction flow sub-process
 export const PENDING = `pending`

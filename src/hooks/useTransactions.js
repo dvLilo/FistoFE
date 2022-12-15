@@ -6,7 +6,7 @@ import { useQuery } from 'react-query'
 
 import useToast from './useToast'
 
-const useTransactions = (URL, STATE = "pending") => {
+const useTransactions = (URL, STATE = "pending", MEMO = 0) => {
 
   const toast = useToast()
 
@@ -19,7 +19,8 @@ const useTransactions = (URL, STATE = "pending") => {
     to: null,
     suppliers: null,
     types: null,
-    department: null
+    department: null,
+    is_auto_debit: MEMO
   })
 
   const fetchData = async () => {
@@ -33,7 +34,8 @@ const useTransactions = (URL, STATE = "pending") => {
         suppliers: params.suppliers ? JSON.stringify(params.suppliers) : params.suppliers,
         transaction_from: params.from ? new Date(params.from).toISOString().slice(0, 10) : null,
         transaction_to: params.to ? new Date(params.to).toISOString().slice(0, 10) : null,
-        document_ids: params.types ? JSON.stringify(params.types) : params.types
+        document_ids: params.types ? JSON.stringify(params.types) : params.types,
+        is_auto_debit: params.is_auto_debit
       }
     })
   }

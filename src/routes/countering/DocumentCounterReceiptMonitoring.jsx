@@ -35,14 +35,13 @@ import {
 import EmptyImage from '../../assets/img/empty.svg'
 
 import {
-  COUNTER,
+  MONITORING,
   RECEIVE,
   RETURN,
   UNRETURN
 } from '../../constants'
 
 import Preloader from '../../components/Preloader'
-import ReasonDialog from '../../components/ReasonDialog'
 
 import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
@@ -52,25 +51,26 @@ import DocumentCounterReceiptFilter from './DocumentCounterReceiptFilter'
 import DocumentCounterReceiptExport from './DocumentCounterReceiptExport'
 import DocumentCounterReceiptTransaction from './DocumentCounterReceiptTransaction'
 import DocumentCounterReceiptMonitoringActions from './DocumentCounterReceiptMonitoringActions'
+import DocumentCounterReceiptReason from './DocumentCounterReceiptReason'
 
 const DocumentCounterReceiptMonitoring = () => {
 
   const {
-    // status,
-    // data,
+    status,
+    data,
     refetchData,
     searchData,
     filterData,
     changeStatus,
     changePage,
     changeRows
-  } = useCounterReceipts("/api/counter-receipts", "counter-pending")
+  } = useCounterReceipts("/api/counter-receipts")
 
   const toast = useToast()
   const confirm = useConfirm()
 
   const [search, setSearch] = React.useState("")
-  const [state, setState] = React.useState("counter-pending")
+  const [state, setState] = React.useState("pending")
 
   const [reasonProps, setReason] = React.useState({
     open: false,
@@ -109,8 +109,8 @@ const DocumentCounterReceiptMonitoring = () => {
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/counter-receipt/${ID}`, {
-            process: COUNTER,
+          response = await axios.post(`/api/counter-receipts/flow/${ID}`, {
+            process: MONITORING,
             subprocess: RECEIVE
           })
 
@@ -147,7 +147,7 @@ const DocumentCounterReceiptMonitoring = () => {
     setReason(currentValue => ({
       ...currentValue,
       open: true,
-      process: COUNTER,
+      process: MONITORING,
       subprocess: RETURN,
       data,
     }))
@@ -160,8 +160,8 @@ const DocumentCounterReceiptMonitoring = () => {
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/counter-receipt/${ID}`, {
-            process: COUNTER,
+          response = await axios.post(`/api/counter-receipts/flow/${ID}`, {
+            process: MONITORING,
             subprocess: UNRETURN
           })
 
@@ -191,78 +191,6 @@ const DocumentCounterReceiptMonitoring = () => {
       open: true
     }))
   }
-
-
-  const status = 'success'
-  const data = [
-    {
-      id: 1,
-      no: 1001,
-      date: "10/03/2022",
-      receipt: {
-        type: "SI",
-        no: "REF#10001",
-        amount: 10000,
-        date: "10/03/2022"
-      },
-      supplier: {
-        id: 38,
-        name: "8 SOURCES, INC."
-      },
-      department: {
-        id: 12,
-        name: "Management Information System Common"
-      },
-      memo: null,
-      status: "pending",
-      state: "counter-pending",
-
-      ...(Boolean(state.match(/counter-receive/i)) && {
-        status: "unprocessed",
-        state: "counter-unprocess"
-      }),
-      ...(Boolean(state.match(/counter-return/i)) && {
-        status: "return",
-        state: "counter-return"
-      })
-    },
-    {
-      id: 2,
-      no: 1001,
-      date: "10/03/2022",
-      receipt: {
-        type: "OR",
-        no: "REF#10002",
-        amount: 13000,
-        date: "10/03/2022"
-      },
-      supplier: {
-        id: 38,
-        name: "8 SOURCES, INC."
-      },
-      department: {
-        id: 12,
-        name: "Management Information System Common"
-      },
-      memo: null,
-      status: "pending",
-      state: "counter-pending",
-
-      ...(Boolean(state.match(/counter-receive/i)) && {
-        transaction: {
-          id: 1,
-          document_amount: 50000,
-          referrence_amount: null
-        },
-        status: "processed",
-        state: "counter-process"
-      }),
-      ...(Boolean(state.match(/counter-return/i)) && {
-        status: "return",
-        state: "counter-return"
-      })
-    }
-  ]
 
 
   return (
@@ -297,9 +225,9 @@ const DocumentCounterReceiptMonitoring = () => {
                 children: <span className="FstoTabsIndicator-root" />
               }}
             >
-              <Tab className="FstoTab-root" label="Pending" value="counter-pending" disableRipple />
-              <Tab className="FstoTab-root" label="Received" value="counter-receive" disableRipple />
-              <Tab className="FstoTab-root" label="Returned" value="counter-return" disableRipple />
+              <Tab className="FstoTab-root" label="Pending" value="pending" disableRipple />
+              <Tab className="FstoTab-root" label="Received" value="monitoring-receive" disableRipple />
+              <Tab className="FstoTab-root" label="Returned" value="monitoring-return" disableRipple />
             </Tabs>
 
             <Stack direction="row" alignItems="center" justifyContent="center" gap={1}>
@@ -374,12 +302,12 @@ const DocumentCounterReceiptMonitoring = () => {
                   DEPARTMENT
                 </TableCell>
 
-                <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-head">
+                <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-head" align="right">
                   AMOUNT
                 </TableCell>
 
                 {
-                  state !== 'counter-pending' &&
+                  state !== 'pending' &&
                   <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-head">
                     MEMO NOTICE
                   </TableCell>}
@@ -397,44 +325,43 @@ const DocumentCounterReceiptMonitoring = () => {
             <TableBody className="FstoTableBodyCounter-root">
               {
                 status === 'loading'
-                && <Preloader col={11} row={3} />}
+                && <Preloader col={state === 'pending' ? 10 : 11} row={3} />}
 
               {
                 status === 'success'
-                && data.map((item, index) => (
+                && data.data.map((item, index) => (
                   <TableRow className="FstoTableRowCounter-root" key={index}>
                     <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body">
-                      {moment(item.date).format("MM/DD/YYYY")}
+                      {moment(item.date_countered).format("MM/DD/YYYY")}
                     </TableCell>
 
                     <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body">
-                      {/* <Chip label={item.no} color="primary" size="small" /> */}
-                      {item.no}
+                      {item.counter_receipt_no}
                     </TableCell>
 
                     <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body">
-                      {moment(item.receipt.date).format("MM/DD/YYYY")}
+                      {moment(item.date_transaction).format("MM/DD/YYYY")}
                     </TableCell>
 
                     <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body">
-                      {item.receipt.type}
+                      {item.receipt_type}
                     </TableCell>
 
                     <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body">
-                      {item.receipt.no}
+                      {item.receipt_no}
                     </TableCell>
 
                     <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body">
-                      {item.supplier.name}
+                      {item.supplier}
                     </TableCell>
 
                     <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body">
-                      {item.department.name}
+                      {item.department}
                     </TableCell>
 
-                    <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body">
+                    <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body" align="right">
                       {
-                        item.receipt.amount.toLocaleString("default", {
+                        item.amount.toLocaleString("default", {
                           style: "currency",
                           currency: "PHP",
                           minimumFractionDigits: 2,
@@ -443,7 +370,7 @@ const DocumentCounterReceiptMonitoring = () => {
                     </TableCell>
 
                     {
-                      state !== 'counter-pending' &&
+                      state !== 'pending' &&
                       <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body">
                         {
                           item.memo
@@ -453,7 +380,7 @@ const DocumentCounterReceiptMonitoring = () => {
                       </TableCell>}
 
                     <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body" align="center">
-                      <Chip label={item.status} size="small" />
+                      <Chip label={item.counter_receipt_status} size="small" />
                     </TableCell>
 
                     <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body" align="center">
@@ -486,12 +413,9 @@ const DocumentCounterReceiptMonitoring = () => {
         <TablePagination
           className="FstoTablePagination-root"
           component="div"
-          // count={data ? data.total : 0}
-          // page={data ? data.current_page - 1 : 0}
-          // rowsPerPage={data ? data.per_page : 10}
-          count={0}
-          page={0}
-          rowsPerPage={10}
+          count={data ? data.total : 0}
+          page={data ? data.current_page - 1 : 0}
+          rowsPerPage={data ? data.per_page : 10}
           rowsPerPageOptions={[10, 20, 50, 100]}
           onPageChange={(e, page) => changePage(page)}
           onRowsPerPageChange={(e) => changeRows(e.target.value)}
@@ -506,7 +430,7 @@ const DocumentCounterReceiptMonitoring = () => {
 
         <DocumentCounterReceiptExport {...exportProps} />
 
-        <ReasonDialog {...reasonProps} />
+        <DocumentCounterReceiptReason {...reasonProps} />
 
 
       </Paper>

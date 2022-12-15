@@ -8,7 +8,7 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
-  Button
+  Button,
 } from '@mui/material'
 
 import CloseIcon from '@mui/icons-material/Close'
@@ -49,7 +49,7 @@ const DocumentTransmittingTransaction = (props) => {
 
   const [transmittalData] = React.useState({
     process: "transmit",
-    subprocess: "transmit",
+    subprocess: "transmit"
   })
 
   const [viewAccountTitle, setViewAccountTitle] = React.useState({

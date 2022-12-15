@@ -4,16 +4,16 @@ import { useQuery } from 'react-query'
 
 import useToast from './useToast'
 
-const useUtilityLocations = (ID) => {
+const useBanks = (ID = 0) => {
 
   const toast = useToast()
 
-  const fetchUtilityLocationsList = async () => {
-    return await axios.get(`/api/dropdown/utility-locations`, {
+  const fetchBankList = async () => {
+    return await axios.get(`/api/dropdown/bank-account-title`, {
       params: {
         status: 1,
         paginate: 0,
-        category: ID
+        account_title_id: ID
       }
     })
   }
@@ -23,10 +23,9 @@ const useUtilityLocations = (ID) => {
     status,
     data,
     error
-  } = useQuery(["UTILITY_LOCATIONS", ID], fetchUtilityLocationsList, {
-    enabled: false,
+  } = useQuery(["BANKS", ID], fetchBankList, {
     refetchOnWindowFocus: false,
-    select: (response) => response.data.result.utility_locations,
+    select: (response) => response.data.result.banks,
     onError: (error) => {
       if (error.request.status !== 404)
         toast({
@@ -41,4 +40,4 @@ const useUtilityLocations = (ID) => {
   return { refetch, status, data, error }
 }
 
-export default useUtilityLocations
+export default useBanks

@@ -25,7 +25,7 @@ const useCreditCard = () => {
   } = useQuery("CREDIT_CARDS", fetchCreditCardList, {
     enabled: false,
     refetchOnWindowFocus: false,
-    select: (response) => response.data.result.credit_card,
+    select: (response) => response.data.result.account_numbers,
     onError: (error) => {
       if (error.request.status !== 404)
         toast({

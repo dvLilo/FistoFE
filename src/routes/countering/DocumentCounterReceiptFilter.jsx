@@ -70,7 +70,6 @@ const DocumentCounterReceiptFilter = (props) => {
     onFilter({
       from: filter.from,
       to: filter.to,
-      types: filter.types,
       suppliers: filter.suppliers.length ? filter.suppliers.map((item) => item.id) : null,
       departments: filter.departments.length ? filter.departments.map((item) => item.id) : null
     })
@@ -100,8 +99,6 @@ const DocumentCounterReceiptFilter = (props) => {
         <FilterIcon />
       </IconButton>
 
-
-
       <Popover
         className="FstoPopoverFilter-root"
         open={open}
@@ -130,7 +127,7 @@ const DocumentCounterReceiptFilter = (props) => {
               from: value
             }))}
             renderInput={
-              (props) => <TextField {...props} className="FstoTextfieldFilter-root" label="From Date" variant="outlined" size="small" />
+              (props) => <TextField {...props} className="FstoTextfieldFilter-root" label="From Date" variant="outlined" size="small" sx={{ marginBottom: 2 }} fullWidth />
             }
             PopperProps={{
               placement: "left",
@@ -167,7 +164,7 @@ const DocumentCounterReceiptFilter = (props) => {
               to: value
             }))}
             renderInput={
-              (props) => <TextField {...props} className="FstoTextfieldFilter-root" label="To Date" variant="outlined" size="small" />
+              (props) => <TextField {...props} className="FstoTextfieldFilter-root" label="To Date" variant="outlined" size="small" sx={{ marginBottom: 2 }} fullWidth />
             }
             PopperProps={{
               placement: "left",

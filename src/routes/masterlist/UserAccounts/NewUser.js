@@ -132,6 +132,10 @@ const NewUser = () => {
       {
         id: 8,
         name: "Clearing of Cheque"
+      },
+      {
+        id: 9,
+        name: "Creation of Debit Memo"
       }
     ],
     confidential: [

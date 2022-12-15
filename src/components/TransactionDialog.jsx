@@ -13,7 +13,6 @@ import {
   List,
   ListItem,
   Skeleton,
-  Stack,
   Step,
   StepLabel,
   Stepper,
@@ -98,11 +97,18 @@ const TransactionDialog = (props) => {
     }
   }
 
+  if (status === `error`)
+    return (
+      <React.Fragment>
+        No data found.
+      </React.Fragment>
+    )
+
   return (
     <React.Fragment>
 
       {
-        status === `success` && (data.transaction.state === `hold` || data.transaction.state === `return` || data.transaction.state === `void` || data.transaction.state === `request`) &&
+        status === `success` && Boolean(data.reason.id && data.reason.description && data.reason.remarks) && Boolean(data.transaction.state.match(/hold|return|void|request|receive-approver|receive-requestor|approve/i)) &&
         <Alert
           className="FstoAlertTransactionDetails-root"
           severity={data.transaction.state === `void` ? "error" : "info"}
@@ -348,6 +354,83 @@ const TransactionDialog = (props) => {
                 </ListItem>}
 
               {
+                data.document.batch_no &&
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Batch No.:</span>
+                  <strong>{data.document.batch_no}</strong>
+                </ListItem>}
+
+              {
+                data.document.prm_multiple_from && data.document.prm_multiple_to &&
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Period Covered:</span>
+                  <strong>{moment(data.document.prm_multiple_from).format("MM/DD/YYYY")} - {moment(data.document.prm_multiple_to).format("MM/DD/YYYY")}</strong>
+                </ListItem>}
+
+              {
+                data.document.release_date &&
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Release Date:</span>
+                  <strong>{moment(data.document.release_date).format("MM/DD/YYYY")}</strong>
+                </ListItem>}
+
+              {
+                data.document.cheque_date &&
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Cheque Date:</span>
+                  <strong>{moment(data.document.cheque_date).format("MM/DD/YYYY")}</strong>
+                </ListItem>}
+
+              {
+                data.document.amortization &&
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Amortization:</span>
+                  <strong>&#8369;{data.document.amortization.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                </ListItem>}
+
+              {
+                data.document.gross_amount &&
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Gross Amount:</span>
+                  <strong>&#8369;{data.document.gross_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                </ListItem>}
+
+              {
+                data.document.principal &&
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Principal Amount:</span>
+                  <strong>&#8369;{data.document.principal.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                </ListItem>}
+
+              {
+                data.document.interest &&
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Interest:</span>
+                  <strong>&#8369;{data.document.interest.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                </ListItem>}
+
+              {
+                data.document.witholding_tax &&
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Withholding Tax:</span>
+                  <strong>&#8369;{data.document.witholding_tax.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                </ListItem>}
+
+              {
+                data.document.cwt &&
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Withholding Tax:</span>
+                  <strong>&#8369;{data.document.cwt.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                </ListItem>}
+
+              {
+                data.document.net_of_amount &&
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Net Amount:</span>
+                  <strong>&#8369;{data.document.net_of_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                </ListItem>}
+
+              {
                 data.document.category &&
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Category:</span>
@@ -464,7 +547,7 @@ const TransactionDialog = (props) => {
 
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Percentage Tax:</span>
-                    <strong>&#8369;{data.voucher.tax.percentage_tax?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                    <strong>{data.voucher.tax.percentage_tax?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}%</strong>
                   </ListItem>
 
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
@@ -572,7 +655,7 @@ const TransactionDialog = (props) => {
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Date Created:</span>
-                  <strong>{data.cheque.date}</strong>
+                  <strong>{moment(data.cheque.date).format("MM/DD/YYYY")}</strong>
                 </ListItem>
 
                 {
@@ -594,141 +677,187 @@ const TransactionDialog = (props) => {
 
         <Divider className="FstoDividerTransactionDetails-root" variant="middle" orientation="vertical" flexItem />
 
-        <Box className="FstoBoxTransactionDetails-content">
-          <Typography variant="h6" sx={{ fontWeight: 700 }}>Purchase Order</Typography>
-
-          {
-            status === `loading` &&
-            <List dense>
-              <ListItem className="FstoListItemTransactionDetails-root" dense>
+        { // Preloader for PO and Attachment
+          status === `loading` &&
+          <React.Fragment>
+            <Box className="FstoBoxTransactionDetails-content">
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>
                 <Skeleton variant="text" width="50%" />
-                <Skeleton variant="text" width="70%" />
-              </ListItem>
+              </Typography>
 
-              <ListItem className="FstoListItemTransactionDetails-root" dense>
-                <Skeleton variant="text" width="65%" />
-                <Skeleton variant="text" width="75%" />
-              </ListItem>
-            </List>}
-          {
-            status === `success` && Boolean(data.po_group.length) && data.document.payment_type.toLowerCase() === `partial` &&
-            <List dense>
-              <ListItem className="FstoListItemTransactionDetails-root" dense>
-                <span>Balance:</span>
-                <strong>&#8369;{data.po_group[0].balance.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
-              </ListItem>
+              <List dense>
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span><Skeleton variant="text" width="50%" /></span>
+                  <strong><Skeleton variant="text" width="70%" /></strong>
+                </ListItem>
 
-              <ListItem className="FstoListItemTransactionDetails-root" dense>
-                <span>Total Amount:</span>
-                <strong>&#8369;{data.po_group.map((data) => data.amount).reduce((a, b) => a + b).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
-              </ListItem>
-            </List>}
-          {
-            status === `success` && Boolean(data.po_group.length) && data.document.payment_type.toLowerCase() === `full` &&
-            <List dense>
-              <ListItem className="FstoListItemTransactionDetails-root" dense>
-                <span>Balance:</span>
-                <strong>&#8369;{(data.po_group.map((data) => data.amount).reduce((a, b) => a + b) - (data.document.amount || data.document.reference.amount)).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
-              </ListItem>
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span><Skeleton variant="text" width="50%" /></span>
+                  <strong><Skeleton variant="text" width="70%" /></strong>
+                </ListItem>
+              </List>
 
-              <ListItem className="FstoListItemTransactionDetails-root" dense>
-                <span>Total Amount:</span>
-                <strong>&#8369;{data.po_group.map((data) => data.amount).reduce((a, b) => a + b).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
-              </ListItem>
-            </List>}
-          {
-            status === `success` && !Boolean(data.po_group.length) &&
-            <Typography sx={{ marginLeft: 2, marginTop: 1, marginBottom: 1 }}>
-              No PO attached.
-            </Typography>}
+              <Divider variant="middle" />
 
+              <List dense sx={{ marginTop: 3 }}>
+                <ListItem className="FstoListItemTransactionDetails-root FstoListItemTransactionDetails-alt" dense divider>
+                  <span><Skeleton variant="text" width="50%" /></span>
+                  <strong><Skeleton variant="text" width="70%" /></strong>
 
+                  <span><Skeleton variant="text" width="50%" /></span>
+                  <strong><Skeleton variant="text" width="70%" /></strong>
+                </ListItem>
 
+                <ListItem className="FstoListItemTransactionDetails-root FstoListItemTransactionDetails-alt" dense divider>
+                  <span><Skeleton variant="text" width="50%" /></span>
+                  <strong><Skeleton variant="text" width="70%" /></strong>
 
-          <Divider variant="middle" />
+                  <span><Skeleton variant="text" width="50%" /></span>
+                  <strong><Skeleton variant="text" width="70%" /></strong>
+                </ListItem>
 
+                <ListItem className="FstoListItemTransactionDetails-root FstoListItemTransactionDetails-alt" dense divider>
+                  <span><Skeleton variant="text" width="50%" /></span>
+                  <strong><Skeleton variant="text" width="70%" /></strong>
 
+                  <span><Skeleton variant="text" width="50%" /></span>
+                  <strong><Skeleton variant="text" width="70%" /></strong>
+                </ListItem>
+              </List>
+            </Box>
+          </React.Fragment>}
 
+        { // Attachment
+          status === `success` && data.document.id === 9 &&
+          <React.Fragment>
+            <Box className="FstoBoxTransactionDetails-content">
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>Attachment</Typography>
 
-          {
-            status === `loading` &&
-            <List dense sx={{ marginTop: 3 }}>
-              <ListItem className="FstoListItemTransactionDetails-root FstoListItemTransactionDetails-alt" dense divider>
-                <Skeleton variant="text" width="50%" />
-                <Skeleton variant="text" width="50%" />
+              <List dense>
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Total Principal:</span>
+                  <strong>&#8369;{data.autoDebit_group.reduce((a, b) => a + b.principal_amount, 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                </ListItem>
 
-                <Skeleton variant="text" width="60%" />
-                <Skeleton variant="text" width="65%" />
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Total Interest:</span>
+                  <strong>&#8369;{data.autoDebit_group.reduce((a, b) => a + b.interest_due, 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                </ListItem>
 
-                <Skeleton variant="text" width="50%" />
-                <Stack direction="row" spacing={1}>
-                  <Skeleton variant="text" width="20%" />
-                  <Skeleton variant="text" width="20%" />
-                  <Skeleton variant="text" width="20%" />
-                </Stack>
-              </ListItem>
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Total CWT:</span>
+                  <strong>&#8369;{data.autoDebit_group.reduce((a, b) => a + b.cwt, 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                </ListItem>
 
-              <ListItem className="FstoListItemTransactionDetails-root FstoListItemTransactionDetails-alt" dense divider>
-                <Skeleton variant="text" width="50%" />
-                <Skeleton variant="text" width="50%" />
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Total Net of CWT:</span>
+                  <strong>&#8369;{data.autoDebit_group.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                </ListItem>
+              </List>
 
-                <Skeleton variant="text" width="60%" />
-                <Skeleton variant="text" width="65%" />
+              <Divider variant="middle" />
 
-                <Skeleton variant="text" width="50%" />
-                <Stack direction="row" spacing={1}>
-                  <Skeleton variant="text" width="20%" />
-                  <Skeleton variant="text" width="20%" />
-                  <Skeleton variant="text" width="20%" />
-                </Stack>
-              </ListItem>
+              <List dense sx={{ marginTop: 3 }}>
+                {
+                  data.autoDebit_group.map((item, index) => {
+                    return (
+                      <ListItem className="FstoListItemTransactionDetails-root FstoListItemTransactionDetails-alt" key={index} dense divider>
+                        <span>PN No.:</span>
+                        <strong>{item.pn_no}</strong>
 
-              <ListItem className="FstoListItemTransactionDetails-root FstoListItemTransactionDetails-alt" dense divider>
-                <Skeleton variant="text" width="50%" />
-                <Skeleton variant="text" width="50%" />
+                        <span>Principal Amount:</span>
+                        <strong>&#8369;{item.principal_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
 
-                <Skeleton variant="text" width="60%" />
-                <Skeleton variant="text" width="65%" />
+                        <span>Interest:</span>
+                        <strong>&#8369;{item.interest_due.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
 
-                <Skeleton variant="text" width="50%" />
-                <Stack direction="row" spacing={1}>
-                  <Skeleton variant="text" width="20%" />
-                  <Skeleton variant="text" width="20%" />
-                  <Skeleton variant="text" width="20%" />
-                </Stack>
-              </ListItem>
-            </List>}
-          {
-            status === `success` && Boolean(data.po_group.length) &&
-            <List dense sx={{ marginTop: 3 }}>
+                        <span>CWT:</span>
+                        <strong>&#8369;{item.cwt.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+
+                        <span>Net of Amount:</span>
+                        <strong>&#8369;{((item.principal_amount + item.interest_due) - item.cwt).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                      </ListItem>
+                    )
+                  })
+                }
+              </List>
+            </Box>
+          </React.Fragment>}
+
+        { // PO
+          status === `success` && data.document.id !== 9 &&
+          <React.Fragment>
+            <Box className="FstoBoxTransactionDetails-content">
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>Purchase Order</Typography>
+
               {
-                data.po_group.map((item, index) => {
-                  return (
-                    <ListItem className="FstoListItemTransactionDetails-root FstoListItemTransactionDetails-alt" key={index} dense divider>
-                      <span>PO No.:</span>
-                      <strong style={{ display: `flex`, alignItems: `center` }}>
-                        {item.no.toUpperCase()}
-                        {
-                          item.amount === item.previous_balance &&
-                          <Chip label="New" size="small" color="primary" sx={{ height: `20px`, marginLeft: `5px`, fontWeight: 500 }} />
-                        }
-                      </strong>
+                status === `success` && Boolean(data.po_group.length) && data.document.payment_type.toLowerCase() === `partial` &&
+                <List dense>
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Balance:</span>
+                    <strong>&#8369;{data.po_group[0].balance.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                  </ListItem>
 
-                      <span>PO Amount.:</span>
-                      <strong>&#8369;{item.amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Total Amount:</span>
+                    <strong>&#8369;{data.po_group.reduce((a, b) => a + b.amount, 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                  </ListItem>
+                </List>}
+              {
+                status === `success` && Boolean(data.po_group.length) && data.document.payment_type.toLowerCase() === `full` &&
+                <List dense>
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Balance:</span>
+                    <strong>&#8369;{(data.po_group.reduce((a, b) => a + b.amount, 0) - (data.document.amount || data.document.reference.amount)).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                  </ListItem>
 
-                      <span>PO Balance.:</span>
-                      <strong>&#8369;{item.previous_balance.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Total Amount:</span>
+                    <strong>&#8369;{data.po_group.reduce((a, b) => a + b.amount, 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                  </ListItem>
+                </List>}
+              {
+                status === `success` && !Boolean(data.po_group.length) &&
+                <Typography sx={{ marginLeft: 2, marginTop: 1, marginBottom: 1 }}>
+                  No PO attached.
+                </Typography>}
 
-                      <span>RR No.:</span>
-                      <strong>
-                        {item.rr_no.map((no, index) => <Chip label={no.toUpperCase()} size="small" key={index} sx={{ marginRight: `3px`, marginBottom: `3px` }} />)}
-                      </strong>
-                    </ListItem>
-                  )
-                })}
-            </List>}
-        </Box>
+              <Divider variant="middle" />
+
+              {
+                status === `success` && Boolean(data.po_group.length) &&
+                <List dense sx={{ marginTop: 3 }}>
+                  {
+                    data.po_group.map((item, index) => {
+                      return (
+                        <ListItem className="FstoListItemTransactionDetails-root FstoListItemTransactionDetails-alt" key={index} dense divider>
+                          <span>PO No.:</span>
+                          <strong style={{ display: `flex`, alignItems: `center` }}>
+                            {item.no.toUpperCase()}
+                            {
+                              item.amount === item.previous_balance &&
+                              <Chip label="New" size="small" color="primary" sx={{ height: `20px`, marginLeft: `5px`, fontWeight: 500 }} />
+                            }
+                          </strong>
+
+                          <span>PO Amount.:</span>
+                          <strong>&#8369;{item.amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+
+                          <span>PO Balance.:</span>
+                          <strong>&#8369;{item.previous_balance.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+
+                          <span>RR No.:</span>
+                          <strong>
+                            {item.rr_no.map((no, index) => <Chip label={no.toUpperCase()} size="small" key={index} sx={{ marginRight: `3px`, marginBottom: `3px` }} />)}
+                          </strong>
+                        </ListItem>
+                      )
+                    })}
+                </List>}
+            </Box>
+          </React.Fragment>}
+
+
       </Box>
     </React.Fragment >
   )

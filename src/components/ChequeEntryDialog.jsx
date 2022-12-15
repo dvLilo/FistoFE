@@ -40,6 +40,8 @@ import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 
+import useBanks from '../hooks/useBanks'
+
 const TYPE_LIST = [
   {
     id: 1,
@@ -48,17 +50,6 @@ const TYPE_LIST = [
   {
     id: 2,
     name: "Debit Memo"
-  }
-]
-
-const BANK_LIST = [
-  {
-    id: 1,
-    name: "AUB Angeles Branch"
-  },
-  {
-    id: 2,
-    name: "AUB Telebastagan Branch"
   }
 ]
 
@@ -91,6 +82,7 @@ const ChequeEntryDialog = (props) => {
     open = false,
     state = null,
     transaction = null,
+    accounts = [],
     cheques = [],
     onInsert = () => { },
     onUpdate = () => { },
@@ -100,6 +92,17 @@ const ChequeEntryDialog = (props) => {
     onClose = () => { },
     onSubmit = () => { }
   } = props
+
+  const {
+    refetch: fetchBanks,
+    status: BANKS_STATUS,
+    data: BANKS_LIST
+  } = useBanks(accounts.find((item) => item.entry.toLowerCase() === `credit`)?.account_title?.id)
+  React.useEffect(() => {
+    if (open) fetchBanks()
+
+    // eslint-disable-next-line 
+  }, [open])
 
   const [CQ, setCQ] = React.useState({
     update: false,
@@ -290,8 +293,11 @@ const ChequeEntryDialog = (props) => {
             <Autocomplete
               className="FstoSelectForm-root"
               size="small"
-              options={BANK_LIST || []}
+              options={BANKS_LIST || []}
               value={CQ.bank}
+              loading={
+                BANKS_STATUS === 'loading'
+              }
               renderInput={
                 (props) => <TextField {...props} label="Bank" variant="outlined" />
               }

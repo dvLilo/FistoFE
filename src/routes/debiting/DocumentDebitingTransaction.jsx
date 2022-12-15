@@ -20,16 +20,15 @@ import useTransaction from '../../hooks/useTransaction'
 import TransactionDialog from '../../components/TransactionDialog'
 import ChequeEntryDialog from '../../components/ChequeEntryDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
-import ReverseDialog from '../../components/ReverseDialog'
 
-const DocumentChequingTransaction = (props) => {
+const DocumentDebitingTransaction = (props) => {
 
   const {
     state,
     open = false,
     transaction = null,
     refetchData = () => { },
-    onRelease = () => { },
+    onFile = () => { },
     onHold = () => { },
     onUnhold = () => { },
     onReturn = () => { },
@@ -89,16 +88,6 @@ const DocumentChequingTransaction = (props) => {
     cheques: []
   })
 
-  const [reversalData, setReversalData] = React.useState({
-    process: "cheque",
-    subprocess: "reverse",
-    reason: {
-      id: null,
-      description: "",
-      remarks: ""
-    }
-  })
-
   const [manageAccountTitle, setManageAccountTitle] = React.useState({
     open: false,
     state: null,
@@ -129,30 +118,11 @@ const DocumentChequingTransaction = (props) => {
     })
   })
 
-  const [manageReverse, setManageReverse] = React.useState({
-    open: false,
-    state: null,
-    transaction: null,
-    onClose: () => setManageReverse(currentValue => ({
-      ...currentValue,
-      open: false
-    }))
-  })
-
   const clearHandler = () => {
     setChequeData(currentValue => ({
       ...currentValue,
       accounts: [],
       cheques: []
-    }))
-
-    setReversalData(currentValue => ({
-      ...currentValue,
-      reason: {
-        id: null,
-        description: "",
-        remarks: ""
-      }
     }))
   }
 
@@ -193,43 +163,9 @@ const DocumentChequingTransaction = (props) => {
     })
   }
 
-  const submitReverseHandler = () => {
+  const submitFileHandler = () => {
     onClose()
-    confirm({
-      open: true,
-      wait: true,
-      onConfirm: async () => {
-        const { accounts, cheques } = chequeData
-
-        let response
-        try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, { ...reversalData, accounts, cheques })
-
-          const { message } = response.data
-
-          refetchData()
-          clearHandler()
-          toast({
-            message,
-            title: "Success!"
-          })
-        }
-        catch (error) {
-          console.log("Fisto Error Status", error.request)
-
-          toast({
-            severity: "error",
-            title: "Error!",
-            message: "Something went wrong whilst trying to save the cheque details. Please try again."
-          })
-        }
-      }
-    })
-  }
-
-  const submitReleaseHandler = () => {
-    onClose()
-    onRelease(transaction.id)
+    onFile(transaction.id)
   }
 
   const submitHoldHandler = () => {
@@ -386,67 +322,6 @@ const DocumentChequingTransaction = (props) => {
     }))
   }
 
-
-
-  const onReversalManage = () => {
-    onClose()
-
-    setManageReverse(currentValue => ({
-      ...currentValue,
-      state,
-      transaction,
-      open: true
-    }))
-
-    if (!reversalData.reason.id && !reversalData.reason.description) {
-      const accounts = data?.cheque?.accounts.filter((item) => item.entry.toLowerCase() === `debit`)
-      setChequeData(currentValue => ({
-        ...currentValue,
-        accounts,
-        cheques: []
-      }))
-    }
-  }
-
-  const onReversalSelect = (data) => {
-    setReversalData(currentValue => ({
-      ...currentValue,
-      reason: {
-        ...currentValue.reason,
-        id: data.id,
-        description: data.description
-      }
-    }))
-  }
-
-  const onReversalChange = (data) => {
-    setReversalData(currentValue => ({
-      ...currentValue,
-      reason: {
-        ...currentValue.reason,
-        remarks: data
-      }
-    }))
-  }
-
-  const onReversalSubmit = () => {
-    setManageAccountTitle(currentValue => ({
-      ...currentValue,
-      transaction,
-      open: true,
-      state: "cheque-receive",
-
-      onBack: onReversalManage,
-      onSubmit: () => setManageCheque(currentValue => ({
-        ...currentValue,
-        transaction,
-        open: true,
-        state: "cheque-receive",
-        onBack: onReversalSubmit
-      }))
-    }))
-  }
-
   return (
     <React.Fragment>
       <Dialog
@@ -489,17 +364,9 @@ const DocumentChequingTransaction = (props) => {
               <React.Fragment>
                 <Button
                   variant="contained"
-                  onClick={submitReleaseHandler}
+                  onClick={submitFileHandler}
                   disableElevation
-                > Release
-                </Button>
-
-                <Button
-                  variant="outlined"
-                  color="error"
-                  onClick={onReversalManage}
-                  disableElevation
-                > Reverse
+                > File
                 </Button>
               </React.Fragment>
             }
@@ -562,27 +429,14 @@ const DocumentChequingTransaction = (props) => {
         accounts={chequeData.accounts}
         cheques={chequeData.cheques}
         onClear={clearHandler}
-        onSubmit={
-          reversalData.reason.id && reversalData.reason.description
-            ? submitReverseHandler
-            : submitChequeHandler
-        }
+        onSubmit={submitChequeHandler}
         onInsert={onChequeInsert}
         onUpdate={onChequeUpdate}
         onRemove={onChequeRemove}
         {...manageCheque}
       />
-
-      <ReverseDialog
-        reverse={reversalData.reason}
-        onClear={clearHandler}
-        onSubmit={onReversalSubmit}
-        onSelect={onReversalSelect}
-        onChange={onReversalChange}
-        {...manageReverse}
-      />
     </React.Fragment>
   )
 }
 
-export default DocumentChequingTransaction
+export default DocumentDebitingTransaction

@@ -51,13 +51,13 @@ const Landing = () => {
 
   React.useEffect(() => {
     if (session && user) {
-      const REDIRECT = handleRedirect(user.role)
+      const REDIRECT = handleRedirect(user.role, user.permissions)
       navigate(REDIRECT, { replace: true })
     }
     // eslint-disable-next-line
   }, [])
 
-  const handleRedirect = (role) => {
+  const handleRedirect = (role, permissions) => {
     switch (role.toLowerCase()) {
       case 'requestor':
         return `/request`
@@ -70,7 +70,12 @@ const Landing = () => {
         return `/voucher/vouchering`
 
       case 'treasury associate':
-        return `/cheque/chequing`
+        if (permissions.includes(7))
+          return `/cheque/chequing`
+
+        if (permissions.includes(9))
+          return `/cheque/debiting`
+        break
 
       case 'approver':
         return `/approval`
@@ -99,7 +104,7 @@ const Landing = () => {
       window.localStorage.setItem('token', token)
       window.localStorage.setItem('user', encryptedUser)
 
-      const REDIRECT = handleRedirect(user.role)
+      const REDIRECT = handleRedirect(user.role, user.permissions)
       navigate(REDIRECT, {
         state: {
           default_password: credential.username === credential.password ? true : false

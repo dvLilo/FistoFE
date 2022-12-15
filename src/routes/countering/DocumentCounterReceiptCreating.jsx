@@ -43,31 +43,31 @@ import {
 } from '../../constants'
 
 import Preloader from '../../components/Preloader'
-import ReasonDialog from '../../components/ReasonDialog'
 
 import useCounterReceipts from '../../hooks/useCounterReceipts'
 
 import DocumentCounterReceiptFilter from './DocumentCounterReceiptFilter'
 import DocumentCounterReceiptCreatingActions from './DocumentCounterReceiptCreatingActions'
-import DocumentCounterReceiptTransaction from './DocumentCounterReceiptTransaction'
+import DocumentCounterReceiptReason from './DocumentCounterReceiptReason'
+
 
 const DocumentCounterReceiptCreating = () => {
 
   const {
-    // status,
-    // data,
+    status,
+    data,
     refetchData,
     searchData,
     filterData,
     changeStatus,
     changePage,
     changeRows
-  } = useCounterReceipts("/api/counter-receipts", "counter-request")
+  } = useCounterReceipts("/api/counter-receipts")
 
   const navigate = useNavigate()
 
   const [search, setSearch] = React.useState("")
-  const [state, setState] = React.useState("counter-request")
+  const [state, setState] = React.useState("pending")
 
   const [reason, setReason] = React.useState({
     open: false,
@@ -80,25 +80,6 @@ const DocumentCounterReceiptCreating = () => {
       open: false
     }))
   })
-
-  const [view, setView] = React.useState({
-    open: false,
-    transaction: null,
-    onBack: undefined,
-    onClose: () => setView(currentValue => ({
-      ...currentValue,
-      open: false
-    }))
-  })
-
-  const onView = (transaction) => {
-    setView(currentValue => ({
-      ...currentValue,
-      transaction,
-      open: true,
-      onBack: onView
-    }))
-  }
 
   const onUpdate = (data) => {
     const { id } = data
@@ -115,121 +96,6 @@ const DocumentCounterReceiptCreating = () => {
       data,
     }))
   }
-
-
-  const status = 'success'
-  const data = [
-    {
-      id: 1,
-      no: 1001,
-      date: "10/03/2022",
-      receipt: {
-        type: "SI",
-        no: "REF#10001",
-        amount: 10000,
-        date: "10/03/2022"
-      },
-      supplier: {
-        id: 38,
-        name: "8 SOURCES, INC."
-      },
-      department: {
-        id: 12,
-        name: "Management Information System Common"
-      },
-      status: "pending",
-      state: "counter-pending",
-
-      ...(Boolean(state.match(/counter-void/i)) && {
-        status: "voided",
-        state: "counter-void"
-      }),
-    },
-    {
-      id: 2,
-      no: 1001,
-      date: "10/03/2022",
-      receipt: {
-        type: "OR",
-        no: "REF#10002",
-        amount: 13000,
-        date: "10/03/2022"
-      },
-      supplier: {
-        id: 38,
-        name: "8 SOURCES, INC."
-      },
-      department: {
-        id: 12,
-        name: "Management Information System Common"
-      },
-      status: "pending",
-      state: "counter-pending",
-
-      ...(Boolean(state.match(/counter-void/i)) && {
-        status: "voided",
-        state: "counter-void"
-      }),
-    },
-    {
-      id: 3,
-      no: 1002,
-      date: "10/03/2022",
-      receipt: {
-        type: "INTERNAL",
-        no: "REF#456",
-        amount: 8000,
-        date: "09/26/2022"
-      },
-      supplier: {
-        id: 1,
-        name: "1ST ADVENUE ADVERTISING"
-      },
-      department: {
-        id: 1,
-        name: "Management Information System Common"
-      },
-      status: "unprocessed",
-      state: "counter-unprocess",
-
-      ...(Boolean(state.match(/counter-void/i)) && {
-        status: "voided",
-        state: "counter-void"
-      }),
-    },
-    {
-      id: 4,
-      no: 1003,
-      date: "10/03/2022",
-      transaction: {
-        id: 1,
-        document_amount: 50000,
-        referrence_amount: null
-      },
-      receipt: {
-        type: "INTERNAL",
-        no: "REF#789",
-        amount: 9000,
-        date: "09/26/2022"
-      },
-      supplier: {
-        id: 1,
-        name: "1ST ADVENUE ADVERTISING"
-      },
-      department: {
-        id: 1,
-        name: "Management Information System Common"
-      },
-      status: "processed",
-      state: "counter-process",
-
-      ...(Boolean(state.match(/counter-void/i)) && {
-        status: "voided",
-        state: "counter-void"
-      }),
-    }
-  ]
-
 
   return (
     <Box className="FstoBox-root">
@@ -264,7 +130,7 @@ const DocumentCounterReceiptCreating = () => {
                 children: <span className="FstoTabsIndicator-root" />
               }}
             >
-              <Tab className="FstoTab-root" label="Requested" value="counter-request" disableRipple />
+              <Tab className="FstoTab-root" label="Requested" value="pending" disableRipple />
               <Tab className="FstoTab-root" label="Voided" value="counter-void" disableRipple />
             </Tabs>
 
@@ -309,7 +175,7 @@ const DocumentCounterReceiptCreating = () => {
         </Stack>
 
         <TableContainer className="FstoTableContainer-root FstoTableContainerCounter-root">
-          <Table className="FstoTableCounter-root" size="small">
+          <Table className="FstoTableCounter-root">
             <TableHead className="FstoTableHeadCounter-root">
               <TableRow className="FstoTableRowCounter-root">
                 <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-head">
@@ -340,7 +206,7 @@ const DocumentCounterReceiptCreating = () => {
                   DEPARTMENT
                 </TableCell>
 
-                <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-head">
+                <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-head" align="right">
                   AMOUNT
                 </TableCell>
 
@@ -357,44 +223,43 @@ const DocumentCounterReceiptCreating = () => {
             <TableBody className="FstoTableBodyCounter-root">
               {
                 status === 'loading'
-                && <Preloader col={11} row={3} />}
+                && <Preloader col={10} row={3} />}
 
               {
                 status === 'success'
-                && data.map((item, index) => (
+                && data.data.map((item, index) => (
                   <TableRow className="FstoTableRowCounter-root" key={index}>
                     <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body">
-                      {moment(item.date).format("MM/DD/YYYY")}
+                      {moment(item.date_countered).format("MM/DD/YYYY")}
                     </TableCell>
 
                     <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body">
-                      {/* <Chip label={item.no} color="primary" size="small" /> */}
-                      {item.no}
+                      {item.counter_receipt_no}
                     </TableCell>
 
                     <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body">
-                      {moment(item.receipt.date).format("MM/DD/YYYY")}
+                      {moment(item.date_transaction).format("MM/DD/YYYY")}
                     </TableCell>
 
                     <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body">
-                      {item.receipt.type}
+                      {item.receipt_type}
                     </TableCell>
 
                     <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body">
-                      {item.receipt.no}
+                      {item.receipt_no}
                     </TableCell>
 
                     <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body">
-                      {item.supplier.name}
+                      {item.supplier}
                     </TableCell>
 
                     <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body">
-                      {item.department.name}
+                      {item.department}
                     </TableCell>
 
-                    <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body">
+                    <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body" align="right">
                       {
-                        item.receipt.amount.toLocaleString("default", {
+                        item.amount.toLocaleString("default", {
                           style: "currency",
                           currency: "PHP",
                           minimumFractionDigits: 2,
@@ -411,7 +276,6 @@ const DocumentCounterReceiptCreating = () => {
                         data={item}
                         state={item.state}
                         onUpdate={onUpdate}
-                        onView={onView}
                         onVoid={onVoid}
                       />
                     </TableCell>
@@ -435,12 +299,9 @@ const DocumentCounterReceiptCreating = () => {
         <TablePagination
           className="FstoTablePagination-root"
           component="div"
-          // count={data ? data.total : 0}
-          // page={data ? data.current_page - 1 : 0}
-          // rowsPerPage={data ? data.per_page : 10}
-          count={0}
-          page={0}
-          rowsPerPage={10}
+          count={data ? data.total : 0}
+          page={data ? data.current_page - 1 : 0}
+          rowsPerPage={data ? data.per_page : 10}
           rowsPerPageOptions={[10, 20, 50, 100]}
           onPageChange={(e, page) => changePage(page)}
           onRowsPerPageChange={(e) => changeRows(e.target.value)}
@@ -448,12 +309,7 @@ const DocumentCounterReceiptCreating = () => {
           showLastButton
         />
 
-        <DocumentCounterReceiptTransaction
-          {...view}
-          state={state}
-        />
-
-        <ReasonDialog {...reason} />
+        <DocumentCounterReceiptReason {...reason} />
       </Paper>
     </Box>
   )

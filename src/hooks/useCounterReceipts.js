@@ -18,7 +18,7 @@ const useCounterReceipts = (URL, STATE = "pending") => {
     from: null,
     to: null,
     suppliers: null,
-    department: null
+    departments: null
   })
 
   const fetchData = async () => {
@@ -28,7 +28,7 @@ const useCounterReceipts = (URL, STATE = "pending") => {
         page: params.page,
         rows: params.rows,
         search: params.search,
-        department: params.department ? JSON.stringify(params.department) : params.department,
+        departments: params.departments ? JSON.stringify(params.departments) : params.departments,
         suppliers: params.suppliers ? JSON.stringify(params.suppliers) : params.suppliers,
         transaction_from: params.from ? new Date(params.from).toISOString().slice(0, 10) : null,
         transaction_to: params.to ? new Date(params.to).toISOString().slice(0, 10) : null
@@ -51,7 +51,7 @@ const useCounterReceipts = (URL, STATE = "pending") => {
       from,
       to,
       suppliers,
-      department
+      departments
     } = data
 
     if (status === 'loading') return
@@ -62,7 +62,7 @@ const useCounterReceipts = (URL, STATE = "pending") => {
       from,
       to,
       suppliers,
-      department
+      departments
     }))
   }
 
@@ -84,7 +84,7 @@ const useCounterReceipts = (URL, STATE = "pending") => {
   }))
 
   const { status, data, error, refetch: refetchData } = useQuery(
-    ["counter_receipt", params.search, params.state, params.page, params.rows, params.from, params.to, params.department, params.suppliers],
+    ["counter_receipt", params.search, params.state, params.page, params.rows, params.from, params.to, params.departments, params.suppliers],
     fetchData,
     {
       retry: false,

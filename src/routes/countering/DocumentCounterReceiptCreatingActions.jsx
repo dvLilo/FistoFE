@@ -8,7 +8,6 @@ import {
 
 import {
   MoreHoriz as MoreIcon,
-  Visibility as ViewIcon,
   Edit as UpdateIcon,
   RemoveCircle as VoidIcon
 } from '@mui/icons-material'
@@ -21,7 +20,6 @@ const DocumentCounterReceiptCreatingActions = (props) => {
     data = null,
     state = "processed",
     onUpdate = () => { },
-    onView = () => { },
     onVoid = () => { },
   } = props
 
@@ -37,11 +35,6 @@ const DocumentCounterReceiptCreatingActions = (props) => {
 
   const actionUpdateHandler = () => {
     onUpdate(data)
-    actionCloseHandler()
-  }
-
-  const actionViewHandler = () => {
-    onView(data.transaction)
     actionCloseHandler()
   }
 
@@ -77,23 +70,9 @@ const DocumentCounterReceiptCreatingActions = (props) => {
       >
         <MenuItem
           className="FstoMenuItemAction-root"
-          onClick={actionViewHandler}
-          disabled={
-            state === 'counter-pending' ||
-            state === 'counter-unprocess' ||
-            state === 'counter-void'
-          }
-          dense
-        >
-          <ViewIcon className="FstoIconAction-root" />
-          View
-        </MenuItem>
-
-        <MenuItem
-          className="FstoMenuItemAction-root"
           onClick={actionUpdateHandler}
           disabled={
-            state !== 'counter-pending'
+            state !== 'pending'
           }
           dense
         >
@@ -105,7 +84,7 @@ const DocumentCounterReceiptCreatingActions = (props) => {
           className="FstoMenuItemAction-root"
           onClick={actionVoidHandler}
           disabled={
-            state !== 'counter-pending'
+            state !== 'pending'
           }
           dense
         >

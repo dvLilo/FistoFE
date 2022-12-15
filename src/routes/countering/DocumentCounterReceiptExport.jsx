@@ -96,7 +96,7 @@ const DocumentCounterReceiptExport = (props) => {
   ])
 
   const [filter, setFilter] = React.useState({
-    status: "",
+    status: null,
     departments: [],
     suppliers: [],
     to: null,

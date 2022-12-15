@@ -33,3 +33,26 @@ export const HIDE_SIDEBAR = () => {
     type: 'HIDE_SIDEBAR'
   }
 }
+
+export const ADD_PO = (object = null) => {
+  return {
+    type: 'ADD_PO',
+    payload: object
+  }
+}
+
+export const UPDATE_PO = (index, object = null) => {
+  return {
+    type: 'UPDATE_PO',
+    payload: {
+      index: index,
+      data: object
+    }
+  }
+}
+
+export const RESET_PO = () => {
+  return {
+    type: 'RESET_PO'
+  }
+}
