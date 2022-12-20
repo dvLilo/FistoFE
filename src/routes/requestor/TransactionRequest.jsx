@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 
 import moment from 'moment'
 
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { RESET_PO } from '../../actions'
 
 import * as yup from 'yup'
@@ -50,6 +50,8 @@ import TransactionAttachment from './TransactionAttachment'
 
 const TransactionRequest = () => {
 
+  const attachment = useSelector((state) => state.po)
+
   const {
     watch,
     reset,
@@ -72,13 +74,15 @@ const TransactionRequest = () => {
       category: null,
       date: null,
       amount: undefined,
-      remarks: null
+      remarks: null,
+      attachment: []
     }
   })
 
   // console.log(errors)
   // console.log(watch("document"))
   // console.log(watch())
+  console.log(watch("attachment"))
 
   const dispatch = useDispatch()
 
@@ -106,6 +110,12 @@ const TransactionRequest = () => {
     status: SUPPLIER_STATUS,
     data: SUPPLIER_LIST = []
   } = useSuppliers()
+
+  useEffect(() => {
+    setValue("attachment", attachment)
+
+    // eslint-disable-next-line
+  }, [attachment])
 
   useEffect(() => {
     return () => {
@@ -520,7 +530,14 @@ const schema = yup.object().shape({
     id: yup.number().required(),
     name: yup.string().required()
   }).required().label("Category"),
-  remarks: yup.string().label("Remarks")
+  remarks: yup.string().label("Remarks"),
+  attachment: yup.array().of(
+    yup.object().shape({
+      no: yup.string().typeError("PO number is invalid.").required().label("PO number"),
+      amount: yup.number().typeError("PO amount is invalid.").required("PO amount is required.").label("PO amount"),
+      rr: yup.array().label("RR number"),
+    }).noUnknown()
+  ),
 }).required()
 
 const NumberField = React.forwardRef((props, ref) => {

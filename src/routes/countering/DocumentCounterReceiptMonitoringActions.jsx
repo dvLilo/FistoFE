@@ -44,7 +44,7 @@ const DocumentCounterReceiptMonitoringActions = (props) => {
   }
 
   const actionViewHandler = () => {
-    onView(data.transaction)
+    onView(data)
     actionCloseHandler()
   }
 
@@ -95,13 +95,14 @@ const DocumentCounterReceiptMonitoringActions = (props) => {
           </MenuItem>}
 
         {
-          Boolean(/process|unprocess/i.test(state)) &&
+          // Boolean(/process|unprocess/i.test(state)) &&
+          state !== 'pending' &&
           <MenuItem
             className="FstoMenuItemAction-root"
             onClick={actionViewHandler}
-            disabled={
-              state !== 'counter-process'
-            }
+            // disabled={
+            //   state !== 'counter-process'
+            // }
             dense
           >
             <ViewIcon className="FstoIconAction-root" />

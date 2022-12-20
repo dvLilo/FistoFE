@@ -99,7 +99,7 @@ const UpdateCounterReceipt = () => {
     (async () => {
       let response
       try {
-        response = await axios.get(`/api/counter-receipts/${id}`)
+        response = await axios.get(`/api/counter-receipts/edit/${id}`)
 
         const {
           transaction,
@@ -260,7 +260,7 @@ const UpdateCounterReceipt = () => {
     setCrGroup(currentValue => {
       return [
         ...currentValue.filter((item) => {
-          return item.no !== data.no
+          return item.receipt_no !== data.receipt_no
         })
       ]
     })

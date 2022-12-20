@@ -9,7 +9,7 @@ import {
 
 import CloseIcon from '@mui/icons-material/Close'
 
-import useTransaction from '../../hooks/useTransaction'
+import useCounterReceipt from '../../hooks/useCounterReceipt'
 
 import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
@@ -29,7 +29,7 @@ const DocumentCounterReceiptTransaction = (props) => {
     data,
     status,
     refetch: fetchTransaction
-  } = useTransaction(transaction?.id)
+  } = useCounterReceipt(transaction?.id)
 
   React.useEffect(() => {
     if (open) fetchTransaction()
@@ -118,7 +118,7 @@ const DocumentCounterReceiptTransaction = (props) => {
         accounts={
           Boolean(data?.cheque)
             ? data?.cheque?.accounts
-            : data?.voucher?.accounts[0]
+            : data?.voucher?.accounts
         }
       />
 

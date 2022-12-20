@@ -1,5 +1,7 @@
 import React from 'react'
 
+import axios from 'axios'
+
 import moment from 'moment'
 
 import * as XLSX from 'xlsx'
@@ -54,46 +56,7 @@ const DocumentCounterReceiptExport = (props) => {
     data: DEPARTMENT_LIST = []
   } = useDepartments()
 
-  const [data, setData] = React.useState([
-    {
-      id: 1,
-      no: 1001,
-      receipt: {
-        type: "SI",
-        no: "REF#10001",
-        amount: 10000,
-        date: "10/03/2022"
-      },
-      supplier: {
-        id: 38,
-        name: "8 SOURCES, INC."
-      },
-      department: {
-        id: 12,
-        name: "Management Information System Common"
-      },
-      receiver: null
-    },
-    {
-      id: 2,
-      no: 1001,
-      receipt: {
-        type: "SI",
-        no: "REF#10002",
-        amount: 13000,
-        date: "10/03/2022"
-      },
-      supplier: {
-        id: 38,
-        name: "8 SOURCES, INC."
-      },
-      department: {
-        id: 12,
-        name: "Management Information System Common"
-      },
-      receiver: null
-    }
-  ])
+  const [data, setData] = React.useState([])
 
   const [filter, setFilter] = React.useState({
     status: null,
@@ -133,6 +96,30 @@ const DocumentCounterReceiptExport = (props) => {
     })
   }
 
+  const generateCounterReceiptHandler = async () => {
+    let response
+    try {
+      response = await axios.get(`/api/counter-receipts`, {
+        params: {
+          page: 1,
+          rows: 10000,
+
+          state: "monitoring-receive",
+          transaction_to: filter.to,
+          transaction_from: filter.from,
+          counter_receipt_status: filter.status,
+          department: JSON.stringify(filter.departments.map((item) => item.id)),
+          suppliers: JSON.stringify(filter.suppliers.map((item) => item.id))
+        }
+      })
+
+      setData(response.data.result.data)
+      // console.log(response.data)
+    } catch (error) {
+
+    }
+  }
+
   const exportCounterReceiptHandler = () => {
     const excelHeader = {
       header: [
@@ -148,13 +135,13 @@ const DocumentCounterReceiptExport = (props) => {
     }
     const excelData = data.map((item) => {
       return {
-        "Counter Receipt No.": item.no,
-        "Date Transact": item.receipt.date,
-        "Receipt Type": item.receipt.type,
-        "Receipt No.": item.receipt.no,
-        "Amount": item.receipt.amount,
-        "Supplier": item.supplier.name,
-        "Department": item.department.name,
+        "Counter Receipt No.": item.counter_receipt_no,
+        "Date Transact": item.date_transaction,
+        "Receipt Type": item.receipt_type,
+        "Receipt No.": item.receipt_no,
+        "Amount": item.amount,
+        "Supplier": item.supplier,
+        "Department": item.department,
         "Receiver": item.receiver
       }
     })
@@ -167,7 +154,7 @@ const DocumentCounterReceiptExport = (props) => {
       { wpx: 105 },
       { wpx: 100 },
       { wpx: 120 },
-      { wpx: 120 },
+      { wpx: 90 },
       { wpx: 300 },
       { wpx: 300 },
       { wpx: 300 }
@@ -289,7 +276,7 @@ const DocumentCounterReceiptExport = (props) => {
                 value={filter.from}
                 onChange={(value) => setFilter(currentValue => ({
                   ...currentValue,
-                  from: moment(value).format("MM/DD/YYYY")
+                  from: moment(value).format("YYYY-MM-DD")
                 }))}
                 renderInput={
                   (props) => <TextField {...props} label="From Date" variant="outlined" size="small" fullWidth />
@@ -302,7 +289,7 @@ const DocumentCounterReceiptExport = (props) => {
                 value={filter.to}
                 onChange={(value) => setFilter(currentValue => ({
                   ...currentValue,
-                  to: moment(value).format("MM/DD/YYYY")
+                  to: moment(value).format("YYYY-MM-DD")
                 }))}
                 renderInput={
                   (props) => <TextField {...props} label="To Date" variant="outlined" size="small" fullWidth />
@@ -318,6 +305,7 @@ const DocumentCounterReceiptExport = (props) => {
                 fontSize: 'inherit',
                 minWidth: 96
               }}
+              onClick={generateCounterReceiptHandler}
               disableElevation
             >
               Generate
@@ -353,24 +341,24 @@ const DocumentCounterReceiptExport = (props) => {
                   data.map((item, index) => (
                     <TableRow key={index}>
                       <TableCell>
-                        {item.no}
+                        {item.counter_receipt_no}
                       </TableCell>
 
                       <TableCell>
-                        {item.receipt.date}
+                        {item.date_transaction}
                       </TableCell>
 
                       <TableCell>
-                        {item.receipt.type}
+                        {item.receipt_type}
                       </TableCell>
 
                       <TableCell>
-                        {item.receipt.no}
+                        {item.receipt_no}
                       </TableCell>
 
                       <TableCell align="right">
                         {
-                          item.receipt.amount.toLocaleString("default", {
+                          item.amount.toLocaleString("default", {
                             style: "currency",
                             currency: "PHP",
                             minimumFractionDigits: 2,
@@ -379,11 +367,11 @@ const DocumentCounterReceiptExport = (props) => {
                       </TableCell>
 
                       <TableCell>
-                        {item.supplier.name}
+                        {item.supplier}
                       </TableCell>
 
                       <TableCell>
-                        {item.department.name}
+                        {item.department}
                       </TableCell>
 
                       <TableCell>

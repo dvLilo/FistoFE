@@ -64,13 +64,13 @@ const DocumentCounterReceiptMonitoring = () => {
     changeStatus,
     changePage,
     changeRows
-  } = useCounterReceipts("/api/counter-receipts")
+  } = useCounterReceipts("/api/counter-receipts", "pending-monitoring")
 
   const toast = useToast()
   const confirm = useConfirm()
 
   const [search, setSearch] = React.useState("")
-  const [state, setState] = React.useState("pending")
+  const [state, setState] = React.useState("pending-monitoring")
 
   const [reasonProps, setReason] = React.useState({
     open: false,
@@ -225,7 +225,7 @@ const DocumentCounterReceiptMonitoring = () => {
                 children: <span className="FstoTabsIndicator-root" />
               }}
             >
-              <Tab className="FstoTab-root" label="Pending" value="pending" disableRipple />
+              <Tab className="FstoTab-root" label="Pending" value="pending-monitoring" disableRipple />
               <Tab className="FstoTab-root" label="Received" value="monitoring-receive" disableRipple />
               <Tab className="FstoTab-root" label="Returned" value="monitoring-return" disableRipple />
             </Tabs>

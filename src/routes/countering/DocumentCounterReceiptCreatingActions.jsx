@@ -72,7 +72,8 @@ const DocumentCounterReceiptCreatingActions = (props) => {
           className="FstoMenuItemAction-root"
           onClick={actionUpdateHandler}
           disabled={
-            state !== 'pending'
+            state !== 'pending' &&
+            state !== 'monitoring-return'
           }
           dense
         >
@@ -84,7 +85,8 @@ const DocumentCounterReceiptCreatingActions = (props) => {
           className="FstoMenuItemAction-root"
           onClick={actionVoidHandler}
           disabled={
-            state !== 'pending'
+            state !== 'pending' &&
+            state !== 'monitoring-return'
           }
           dense
         >

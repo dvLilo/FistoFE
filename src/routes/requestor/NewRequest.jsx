@@ -27,7 +27,9 @@ import {
   TableHead,
   TableBody,
   TableRow,
-  TableCell
+  TableCell,
+  FormControlLabel,
+  Checkbox
 } from '@mui/material'
 
 import {
@@ -216,7 +218,8 @@ const NewRequest = () => {
         id: null,
         type: "",
         no: "",
-        amount: null
+        amount: null,
+        allowable: 0
       },
 
       pcf_batch: {
@@ -658,11 +661,13 @@ const NewRequest = () => {
           && data.po_group.length
           && (
             data.document.payment_type === "Partial"
-              ? data.document.reference.amount <= data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
-              : (
-                Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
-              )
+              ? data.document.reference.amount <= data.po_group.reduce((a, b) => a + b.balance, 0).toFixed(2)
+              : data.document.reference.allowable
+                ? data.document.reference.allowable
+                : (
+                  Math.abs(data.document.reference.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) >= 0.00 &&
+                  Math.abs(data.document.reference.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) < 1.00
+                )
           )
           && (!error.status || !Boolean(error.data.reference_no))
           && (!error.status || !Boolean(error.data.po_no))
@@ -750,8 +755,8 @@ const NewRequest = () => {
           && data.document.category
           && debitGroup.length
           && (
-            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) >= 0.00 &&
-            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) < 1.00
+            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)).toFixed(2) >= 0.00 &&
+            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)).toFixed(2) < 1.00
           )
           && (!error.status || !Boolean(error.data.document_no))
           && (!validate.status || !validate.data.includes('document_no'))
@@ -844,7 +849,7 @@ const NewRequest = () => {
     try {
       await axios.post(`/api/transactions/validate-reference-no`, {
         company_id: data.document.company.id,
-        reference_no: `ref#${data.document.reference.no}`
+        reference_no: data.document.reference.no
       })
     }
     catch (error) {
@@ -1715,10 +1720,7 @@ const NewRequest = () => {
             location: data.document.location,
             supplier: data.document.supplier,
 
-            reference: {
-              ...data.document.reference,
-              no: `ref#${data.document.reference.no}`
-            },
+            reference: data.document.reference,
 
             category: data.document.category,
 
@@ -1732,7 +1734,6 @@ const NewRequest = () => {
           requestor: data.requestor,
           document: {
             id: data.document.id,
-            no: `cb#${data.document.no}`,
             capex_no: data.document.capex_no,
             name: data.document.name,
             payment_type: data.document.payment_type,
@@ -1896,7 +1897,8 @@ const NewRequest = () => {
           id: null,
           type: "",
           no: "",
-          amount: null
+          amount: null,
+          allowable: 0
         },
 
         pcf_batch: {
@@ -1963,10 +1965,13 @@ const NewRequest = () => {
                 to_date: errors["document.to"],
 
                 document_no: errors["document.no"],
+                document_capex: errors["document.capex_no"],
                 document_date: errors["document.date"],
                 document_company: errors["document.company.id"],
                 document_department: errors["document.department.id"],
+                document_location: errors["document.location.id"],
                 document_supplier: errors["document.supplier.id"],
+                document_category: errors["document.category.id"],
 
                 pcf_date: errors["pcf_batch.date"],
                 pcf_letter: errors["pcf_batch.letter"],
@@ -2388,7 +2393,7 @@ const NewRequest = () => {
                   )}
 
                 { // Document Number
-                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 5) &&
+                  (data.document.id === 1 || data.document.id === 2 || data.document.id === 3) &&
                   (
                     <TextField
                       className="FstoTextfieldForm-root"
@@ -2721,6 +2726,15 @@ const NewRequest = () => {
                         {...props}
                         variant="outlined"
                         label="Location"
+                        error={
+                          error.status
+                          && Boolean(error.data.document_location)
+                        }
+                        helperText={
+                          error.status
+                          && error.data.document_location
+                          && error.data.document_location[0]
+                        }
                       />
                   }
                   PaperComponent={
@@ -2898,10 +2912,6 @@ const NewRequest = () => {
                           }
                         })}
                         onBlur={checkReferenceNumberHandler}
-                        InputProps={{
-                          startAdornment: data.document.reference.no &&
-                            <InputAdornment className="FstoAdrmentForm-root" position="start">ref#</InputAdornment>
-                        }}
                         InputLabelProps={{
                           className: "FstoLabelForm-root"
                         }}
@@ -2922,8 +2932,12 @@ const NewRequest = () => {
                             data.document.payment_type === "Partial"
                               ? data.document.reference.amount > data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
                               : !(
-                                Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                                Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
+                                data.document.reference.allowable
+                                  ? data.document.reference.allowable
+                                  : (
+                                    Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
+                                    Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
+                                  )
                               )
                           )
                         }
@@ -2934,8 +2948,12 @@ const NewRequest = () => {
                             data.document.payment_type === "Partial"
                               ? data.document.reference.amount > data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
                               : !(
-                                Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                                Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
+                                data.document.reference.allowable
+                                  ? data.document.reference.allowable
+                                  : (
+                                    Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
+                                    Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
+                                  )
                               )
                           )
                           && "Reference amount and PO balance amount is not equal."
@@ -2958,6 +2976,33 @@ const NewRequest = () => {
                         }}
                         fullWidth
                       />
+
+                      {
+                        (data.document.payment_type === "Full") &&
+                        (
+                          <FormControlLabel
+                            label="With allowable"
+                            checked={!!data.document.reference.allowable}
+                            value={data.document.reference.allowable}
+                            onChange={(e) => setData(currentValue => ({
+                              ...currentValue,
+                              document: {
+                                ...currentValue.document,
+                                reference: {
+                                  ...currentValue.document.reference,
+                                  allowable: e.target.checked ? 1 : 0
+                                }
+                              }
+                            }))}
+                            sx={{
+                              marginTop: '-1.25em'
+                            }}
+                            control={
+                              <Checkbox />
+                            }
+                            disableTypography
+                          />
+                        )}
                     </React.Fragment>
                   )}
 
@@ -2976,6 +3021,15 @@ const NewRequest = () => {
                             {...props}
                             variant="outlined"
                             label="Category"
+                            error={
+                              error.status
+                              && Boolean(error.data.document_category)
+                            }
+                            helperText={
+                              error.status
+                              && error.data.document_category
+                              && error.data.document_category[0]
+                            }
                           />
                       }
                       PaperComponent={
@@ -3458,6 +3512,15 @@ const NewRequest = () => {
                       autoComplete="off"
                       size="small"
                       value={data.document.capex_no}
+                      error={
+                        error.status
+                        && Boolean(error.data.document_capex)
+                      }
+                      helperText={
+                        error.status
+                        && error.data.document_capex
+                        && error.data.document_capex[0]
+                      }
                       onChange={(e) => setData({
                         ...data,
                         document: {
@@ -3658,8 +3721,7 @@ const NewRequest = () => {
                   (error.status && Boolean(error.data.po_no)) ||
                   (validate.status && validate.data.includes('po_no')) ||
                   !Boolean(PO.no) ||
-                  !Boolean(PO.amount) ||
-                  !Boolean(PO.rr_no.length)
+                  !Boolean(PO.amount)
                 }
                 disableElevation
               >
@@ -3693,7 +3755,13 @@ const NewRequest = () => {
 
                             <Stack className="FstoPurchaseOrderStack-root" direction="row">
                               <Typography variant="subtitle2">R.R. Number</Typography>
-                              <Typography className="FstoPurchaseOrderTypography-root" variant="h6">{data.rr_no.join(", ")}</Typography>
+                              <Typography className="FstoPurchaseOrderTypography-root" variant="h6">
+                                {
+                                  data.rr_no.length
+                                    ? data.rr_no.join(", ")
+                                    : <>&mdash;</>
+                                }
+                              </Typography>
                             </Stack>
 
                             <Stack direction="row" spacing={1}>
