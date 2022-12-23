@@ -17,6 +17,8 @@ const useTransactions = (URL, STATE = "pending", MEMO = 0) => {
     search: null,
     from: null,
     to: null,
+    cheque_from: null,
+    cheque_to: null,
     suppliers: null,
     types: null,
     department: null,
@@ -34,6 +36,8 @@ const useTransactions = (URL, STATE = "pending", MEMO = 0) => {
         suppliers: params.suppliers ? JSON.stringify(params.suppliers) : params.suppliers,
         transaction_from: params.from ? new Date(params.from).toISOString().slice(0, 10) : null,
         transaction_to: params.to ? new Date(params.to).toISOString().slice(0, 10) : null,
+        cheque_from: params.cheque_from ? new Date(params.cheque_from).toISOString().slice(0, 10) : null,
+        cheque_to: params.cheque_to ? new Date(params.cheque_to).toISOString().slice(0, 10) : null,
         document_ids: params.types ? JSON.stringify(params.types) : params.types,
         is_auto_debit: params.is_auto_debit
       }
@@ -54,6 +58,8 @@ const useTransactions = (URL, STATE = "pending", MEMO = 0) => {
     const {
       from,
       to,
+      cheque_from,
+      cheque_to,
       types,
       suppliers,
       department
@@ -66,6 +72,8 @@ const useTransactions = (URL, STATE = "pending", MEMO = 0) => {
       page: 1,
       from,
       to,
+      cheque_from,
+      cheque_to,
       types,
       suppliers,
       department
@@ -90,7 +98,7 @@ const useTransactions = (URL, STATE = "pending", MEMO = 0) => {
   }))
 
   const { status, data, error, refetch: refetchData } = useQuery(
-    ["transactions", params.search, params.state, params.page, params.rows, params.from, params.to, params.types, params.department, params.suppliers],
+    ["transactions", params.search, params.state, params.page, params.rows, params.from, params.to, params.cheque_from, params.cheque_to, params.types, params.department, params.suppliers],
     fetchData,
     {
       retry: false,

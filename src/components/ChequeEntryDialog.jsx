@@ -50,6 +50,14 @@ const TYPE_LIST = [
   {
     id: 2,
     name: "Debit Memo"
+  },
+  {
+    id: 3,
+    name: "Telegraphic"
+  },
+  {
+    id: 4,
+    name: "Managers Cheque"
   }
 ]
 
@@ -324,6 +332,7 @@ const ChequeEntryDialog = (props) => {
               variant="outlined"
               autoComplete="off"
               size="small"
+              type="number"
               value={CQ.no}
               error={
                 error.status
@@ -339,6 +348,7 @@ const ChequeEntryDialog = (props) => {
                   && "Please wait...")
               }
               onBlur={checkChequeHandler}
+              onKeyDown={(e) => ["E", "e", ".", "+", "-"].includes(e.key) && e.preventDefault()}
               onChange={(e) => setCQ(currentValue => ({
                 ...currentValue,
                 no: e.target.value

@@ -66,33 +66,31 @@ const DOCUMENT_TYPES = [
 
 const DocumentChequingFilter = (props) => {
 
-
-
-  const { filterData } = props
+  const {
+    onFilter = () => { }
+  } = props
 
   const {
     status: SUPPLIER_STATUS,
     data: SUPPLIER_LIST
   } = useSuppliers()
 
-  const [filter, setFilter] = React.useState({
-    from: new Date(),
-    to: new Date(),
-    types: [1, 2, 3, 4, 5, 6, 7, 8],
-    suppliers: [],
-    departments: []
-  })
-
   const [anchor, setAnchor] = React.useState(null)
-  const open = Boolean(anchor)
+
+  const [filter, setFilter] = React.useState({
+    from: null,
+    to: null,
+    types: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    suppliers: []
+  })
 
   const filterOptions = createFilterOptions({
     matchFrom: 'any',
     limit: 100
   })
 
-  const filterOpenHandler = (event) => {
-    setAnchor(event.currentTarget)
+  const filterOpenHandler = (e) => {
+    setAnchor(e.currentTarget)
   }
 
   const filterCloseHandler = () => {
@@ -100,12 +98,11 @@ const DocumentChequingFilter = (props) => {
   }
 
   const filterSubmitHandler = () => {
-    filterData({
-      from: filter.from,
-      to: filter.to,
+    onFilter({
+      cheque_from: filter.from,
+      cheque_to: filter.to,
       types: filter.types,
-      suppliers: filter.suppliers.length ? filter.suppliers.map((item) => item.id) : null,
-      department: filter.departments.length ? filter.departments.map((item) => item.name) : null
+      suppliers: filter.suppliers.length ? filter.suppliers.map((item) => item.id) : null
     })
 
     filterCloseHandler()
@@ -113,21 +110,33 @@ const DocumentChequingFilter = (props) => {
 
   const filterClearHandler = () => {
     setFilter({
-      from: new Date(),
-      to: new Date(),
-      types: [1, 2, 3, 4, 5, 6, 7, 8],
-      suppliers: [],
-      departments: []
-    })
-
-    filterData({
-      filter: 0,
       from: null,
       to: null,
-      types: null,
-      suppliers: null,
-      department: null
+      types: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+      suppliers: []
     })
+
+    onFilter({
+      cheque_from: null,
+      cheque_to: null,
+      types: null,
+      suppliers: null
+    })
+  }
+
+  const filterCheckHandler = (e) => {
+    const check = e.target.checked
+
+    if (check)
+      setFilter(currentValue => ({
+        ...currentValue,
+        types: [...currentValue.types, parseInt(e.target.value)]
+      }))
+    else
+      setFilter(currentValue => ({
+        ...currentValue,
+        types: [...currentValue.types.filter(type => type !== parseInt(e.target.value))]
+      }))
   }
 
   return (
@@ -138,7 +147,9 @@ const DocumentChequingFilter = (props) => {
 
       <Popover
         className="FstoPopoverFilter-root"
-        open={open}
+        open={
+          Boolean(anchor)
+        }
         anchorEl={anchor}
         anchorOrigin={{
           vertical: 'bottom',
@@ -168,20 +179,7 @@ const DocumentChequingFilter = (props) => {
                     size="small"
                     value={item.id}
                     checked={filter.types.includes(item.id)}
-                    onChange={(e) => {
-                      const check = e.target.checked
-
-                      if (check)
-                        setFilter(currentValue => ({
-                          ...currentValue,
-                          types: [...currentValue.types, parseInt(e.target.value)]
-                        }))
-                      else
-                        setFilter(currentValue => ({
-                          ...currentValue,
-                          types: [...currentValue.types.filter(type => type !== parseInt(e.target.value))]
-                        }))
-                    }}
+                    onChange={filterCheckHandler}
                   />
                 }
                 disableTypography
@@ -191,7 +189,8 @@ const DocumentChequingFilter = (props) => {
 
         <Divider className="FstoDividerFilter-root" variant="middle" />
 
-        <Typography className="FstoTypographyFilter-root">Transaction Date:</Typography>
+        <Typography className="FstoTypographyFilter-root">Cheque Date:</Typography>
+
         <LocalizationProvider dateAdapter={DateAdapter}>
           <DatePicker
             value={filter.from}
@@ -200,39 +199,10 @@ const DocumentChequingFilter = (props) => {
               from: value
             }))}
             renderInput={
-              props =>
-                <TextField
-                  {...props}
-                  className="FstoTextfieldFilter-root"
-                  variant="outlined"
-                  size="small"
-                  label="From Date"
-                />
+              (props) => <TextField {...props} className="FstoTextfieldFilter-root" label="From Date" variant="outlined" size="small" sx={{ marginBottom: 2 }} fullWidth />
             }
             PopperProps={{
-              placement: "left",
-              modifiers: [
-                {
-                  name: 'flip',
-                  enabled: true,
-                  options: {
-                    altBoundary: true,
-                    rootBoundary: 'document',
-                    padding: 8,
-                  },
-                },
-                {
-                  name: 'preventOverflow',
-                  enabled: true,
-                  options: {
-                    altAxis: false,
-                    altBoundary: false,
-                    tether: false,
-                    rootBoundary: 'document',
-                    padding: 8,
-                  },
-                }
-              ]
+              placement: "left"
             }}
             showToolbar
           />
@@ -244,39 +214,10 @@ const DocumentChequingFilter = (props) => {
               to: value
             }))}
             renderInput={
-              props =>
-                <TextField
-                  {...props}
-                  className="FstoTextfieldFilter-root"
-                  variant="outlined"
-                  size="small"
-                  label="To Date"
-                />
+              (props) => <TextField {...props} className="FstoTextfieldFilter-root" label="To Date" variant="outlined" size="small" fullWidth />
             }
             PopperProps={{
-              placement: "left",
-              modifiers: [
-                {
-                  name: 'flip',
-                  enabled: true,
-                  options: {
-                    altBoundary: true,
-                    rootBoundary: 'document',
-                    padding: 8,
-                  },
-                },
-                {
-                  name: 'preventOverflow',
-                  enabled: true,
-                  options: {
-                    altAxis: false,
-                    altBoundary: false,
-                    tether: false,
-                    rootBoundary: 'document',
-                    padding: 8,
-                  },
-                }
-              ]
+              placement: "left"
             }}
             showToolbar
           />
@@ -285,6 +226,7 @@ const DocumentChequingFilter = (props) => {
         <Divider className="FstoDividerFilter-root" variant="middle" />
 
         <Typography className="FstoTypographyFilter-root">Supplier:</Typography>
+
         <Autocomplete
           className="FstoSelectForm-root"
           size="small"
@@ -295,28 +237,14 @@ const DocumentChequingFilter = (props) => {
           loading={
             SUPPLIER_STATUS === 'loading'
           }
-          sx={{
-            width: '95%',
-            marginLeft: '2.5%',
-            marginRight: '2.5%'
-          }}
           renderInput={
-            props =>
-              <TextField
-                {...props}
-                variant="outlined"
-                label="Supplier"
-              />
+            (props) => <TextField {...props} label="Supplier" variant="outlined" />
           }
           PaperComponent={
-            props =>
-              <Paper
-                {...props}
-                sx={{ textTransform: 'capitalize' }}
-              />
+            (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
           }
           getOptionLabel={
-            option => option.name
+            (option) => option.name
           }
           isOptionEqualToValue={
             (option, value) => option.id === value.id
@@ -336,7 +264,9 @@ const DocumentChequingFilter = (props) => {
           className="FstoButtonFilter-root"
           variant="contained"
           color="primary"
-          size="small"
+          sx={{
+            marginLeft: 1
+          }}
           onClick={filterSubmitHandler}
           disableElevation
         > Apply
@@ -345,7 +275,6 @@ const DocumentChequingFilter = (props) => {
         <Button
           className="FstoButtonFilter-root"
           variant="text"
-          size="small"
           onClick={filterClearHandler}
         > Clear All Filters
         </Button>

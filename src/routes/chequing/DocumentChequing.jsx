@@ -53,10 +53,10 @@ import EmptyImage from '../../assets/img/empty.svg'
 
 import ReasonDialog from '../../components/ReasonDialog'
 import TablePreloader from '../../components/TablePreloader'
-import FilterPopover from '../../components/FilterPopover'
 
 import DocumentChequingActions from './DocumentChequingActions'
 import DocumentChequingTransaction from './DocumentChequingTransaction'
+import DocumentChequingFilter from './DocumentChequingFilter'
 
 const DocumentChequing = () => {
 
@@ -342,7 +342,7 @@ const DocumentChequing = () => {
                 }}
               />
 
-              <FilterPopover onFilter={filterData} />
+              <DocumentChequingFilter onFilter={filterData} />
             </Stack>
           </Stack>
         </Stack>

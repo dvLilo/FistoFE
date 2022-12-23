@@ -4,8 +4,6 @@ import axios from 'axios'
 
 import moment from 'moment'
 
-import NumberFormat from 'react-number-format'
-
 import DateAdapter from '@mui/lab/AdapterDateFns'
 
 import {
@@ -37,29 +35,6 @@ import useTransaction from '../../hooks/useTransaction'
 import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
 import ChequeEntryDialog from '../../components/ChequeEntryDialog'
-
-const NumberField = React.forwardRef(function NumberField(props, ref) {
-  const { onChange, ...rest } = props
-
-  return (
-    <NumberFormat
-      {...rest}
-      getInputRef={ref}
-      onValueChange={(values) => {
-        onChange({
-          target: {
-            name: props.name,
-            value: values.value,
-          }
-        })
-      }}
-      prefix="₱"
-      allowNegative={false}
-      thousandSeparator
-      isNumericString
-    />
-  )
-})
 
 const RECEIPT_TYPE_LIST = [
   {
@@ -137,15 +112,10 @@ const DocumentVoucheringTransaction = (props) => {
   }, [open, status, APPROVER_STATUS])
 
   React.useEffect(() => {
-    if (open && status === `success` && !Boolean(voucherData.tax.receipt_type) && !Boolean(voucherData.voucher.no)) {
+    if (open && status === `success` && !Boolean(voucherData.receipt_type) && !Boolean(voucherData.voucher.no)) {
       setVoucherData(currentValue => ({
         ...currentValue,
-        tax: {
-          receipt_type: data.voucher?.tax?.receipt_type || "",
-          percentage_tax: data.voucher?.tax?.percentage_tax || "",
-          withholding_tax: data.voucher?.tax?.witholding_tax || null,
-          net_amount: data.voucher?.tax?.net_amount || null
-        },
+        receipt_type: data.voucher?.receipt_type || "",
         voucher: {
           no: data.voucher?.no || "",
           month: data.voucher?.month || null
@@ -174,12 +144,7 @@ const DocumentVoucheringTransaction = (props) => {
   const [voucherData, setVoucherData] = React.useState({
     process: "voucher",
     subprocess: "voucher",
-    tax: {
-      receipt_type: "",
-      percentage_tax: "",
-      withholding_tax: null,
-      net_amount: null
-    },
+    receipt_type: "",
     voucher: {
       no: "",
       month: null,
@@ -213,12 +178,7 @@ const DocumentVoucheringTransaction = (props) => {
   const clearHandler = () => {
     setVoucherData(currentValue => ({
       ...currentValue,
-      tax: {
-        receipt_type: "",
-        percentage_tax: "",
-        withholding_tax: null,
-        net_amount: null
-      },
+      receipt_type: "",
       voucher: {
         no: "",
         month: null,
@@ -458,7 +418,7 @@ const DocumentVoucheringTransaction = (props) => {
                     className="FstoSelectForm-root"
                     size="small"
                     options={RECEIPT_TYPE_LIST}
-                    value={RECEIPT_TYPE_LIST.find((row) => row.name === voucherData.tax.receipt_type) || null}
+                    value={RECEIPT_TYPE_LIST.find((row) => row.name === voucherData.receipt_type) || null}
                     renderInput={
                       (props) => <TextField {...props} label="Type of Receipt" variant="outlined" />
                     }
@@ -473,93 +433,15 @@ const DocumentVoucheringTransaction = (props) => {
                     }
                     onChange={(e, value) => setVoucherData(currentValue => ({
                       ...currentValue,
-                      tax: {
-                        ...currentValue.tax,
-                        receipt_type: value.name,
-                        percentage_tax: "",
-                        withholding_tax: "",
-                        net_amount: ""
-                      }
+                      receipt_type: value.name
                     }))}
                     fullWidth
                     disablePortal
                     disableClearable
                   />
 
-                  <TextField
-                    className="FstoTextfieldForm-root"
-                    label="Percentage Tax"
-                    variant="outlined"
-                    autoComplete="off"
-                    size="small"
-                    type="number"
-                    value={voucherData.tax.percentage_tax}
-                    disabled={
-                      !Boolean(voucherData.tax.receipt_type) || voucherData.tax.receipt_type === `Unofficial`
-                    }
-                    onKeyPress={
-                      (e) => ["E", "e", ".", "+", "-"].includes(e.key) && e.preventDefault()
-                    }
-                    onChange={(e) => setVoucherData(currentValue => ({
-                      ...currentValue,
-                      tax: {
-                        ...currentValue.tax,
-                        percentage_tax: e.target.value,
-                        // withholding_tax: (((transaction.referrence_amount || transaction.document_amount) * parseFloat(e.target.value)) / 100).toFixed(2),
-                        // net_amount: ((((transaction.referrence_amount || transaction.document_amount) * parseFloat(e.target.value)) / 100) - (transaction.referrence_amount || transaction.document_amount)).toFixed(2)
-                      }
-                    }))}
-                    fullWidth
-                  />
+                  <Divider variant="middle" sx={{ margin: "1.25em" }} />
 
-                  <TextField
-                    className="FstoTextfieldForm-root"
-                    label="Withholding Tax"
-                    variant="outlined"
-                    autoComplete="off"
-                    size="small"
-                    value={voucherData.tax.withholding_tax}
-                    disabled={
-                      !Boolean(voucherData.tax.receipt_type) || voucherData.tax.receipt_type === `Unofficial`
-                    }
-                    InputProps={{
-                      inputComponent: NumberField
-                    }}
-                    onChange={(e) => setVoucherData(currentValue => ({
-                      ...currentValue,
-                      tax: {
-                        ...currentValue.tax,
-                        withholding_tax: e.target.value
-                      }
-                    }))}
-                    fullWidth
-                  />
-
-                  <TextField
-                    className="FstoTextfieldForm-root"
-                    label="Net of Amount"
-                    variant="outlined"
-                    autoComplete="off"
-                    size="small"
-                    value={voucherData.tax.net_amount}
-                    disabled={
-                      !Boolean(voucherData.tax.receipt_type) || voucherData.tax.receipt_type === `Unofficial`
-                    }
-                    InputProps={{
-                      inputComponent: NumberField
-                    }}
-                    onChange={(e) => setVoucherData(currentValue => ({
-                      ...currentValue,
-                      tax: {
-                        ...currentValue.tax,
-                        net_amount: e.target.value
-                      }
-                    }))}
-                    fullWidth
-                  />
-                </Box>
-
-                <Box className="FstoBoxTransactionForm-content">
                   <LocalizationProvider dateAdapter={DateAdapter}>
                     <DatePicker
                       views={['month', 'year']}
@@ -660,16 +542,12 @@ const DocumentVoucheringTransaction = (props) => {
                 }
                 disabled={
                   !Boolean(voucherData.approver) ||
-                  !Boolean(voucherData.tax.receipt_type) ||
+                  !Boolean(voucherData.receipt_type) ||
                   !Boolean(voucherData.voucher.no) ||
                   !Boolean(voucherData.voucher.month) ||
 
                   (error.status && Boolean(error.data.voucher_no)) ||
-                  (validate.status && Boolean(validate.data.includes('voucher_no'))) ||
-
-                  (voucherData.tax.receipt_type === `Official` && !Boolean(voucherData.tax.net_amount)) ||
-                  (voucherData.tax.receipt_type === `Official` && !Boolean(voucherData.tax.percentage_tax)) ||
-                  (voucherData.tax.receipt_type === `Official` && !Boolean(voucherData.tax.withholding_tax))
+                  (validate.status && Boolean(validate.data.includes('voucher_no')))
                 }
                 disableElevation
               > {state === `voucher-receive` ? "Approve" : "Save"}

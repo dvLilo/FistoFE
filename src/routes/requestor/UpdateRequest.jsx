@@ -284,12 +284,19 @@ const UpdateRequest = () => {
           autoDebit_group
         } = response.data.result
 
+        const isBatch = po_group.every((item) => !item.is_add)
+
         const po_group_new = po_group.map((item) => {
           const data = {
             ...item,
-            ...(document.payment_type === 'Partial' && {
-              batch: !item.is_add
-            }),
+            ...(
+              document.payment_type === 'Partial'
+              && (
+                isBatch
+                  ? { batch: item.is_add }
+                  : { batch: !item.is_add }
+              )
+            ),
             balance: item.previous_balance,
           }
 
@@ -3085,7 +3092,7 @@ const UpdateRequest = () => {
                               }
                             }))}
                             sx={{
-                              marginBottom: '-1.25em'
+                              marginTop: '-1.25em'
                             }}
                             control={
                               <Checkbox />

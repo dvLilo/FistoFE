@@ -13,6 +13,7 @@ import {
   List,
   ListItem,
   Skeleton,
+  Stack,
   Step,
   StepLabel,
   Stepper,
@@ -95,6 +96,10 @@ const TransactionDialog = (props) => {
 
         return `${status}ed`
     }
+  }
+
+  const formatDates = (date) => {
+    return moment(date).format("MMM. DD, YYYY HH:mm A")
   }
 
   if (status === `error`)
@@ -252,7 +257,7 @@ const TransactionDialog = (props) => {
 
 
           <Divider className="FstoDividerTransactionDetails-root" textAlign="left">
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>Transaction</Typography>
+            <Typography variant="h6" sx={{ display: "inline-block", fontWeight: 700 }}>Transaction</Typography>
           </Divider>
 
           {
@@ -291,6 +296,14 @@ const TransactionDialog = (props) => {
           {
             status === `success` &&
             <List className="FstoListTransactionDetails-root" dense>
+              <ListItem className="FstoListItemTransactionDetails-root" dense>
+                <span>Date Received:</span>
+                <Stack direction="column">
+                  <strong>Dec. 25, 2022 12:00 AM <Chip label="Tagged" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
+                  <strong>Dec. 25, 2022 12:00 AM <Chip label="Released" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
+                </Stack>
+              </ListItem>
+
               {
                 Boolean(data.tag) && Boolean(data.tag.no) &&
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
@@ -303,9 +316,17 @@ const TransactionDialog = (props) => {
                 <strong>{data.transaction.no.toUpperCase()}</strong>
               </ListItem>
 
+              {
+                Boolean(data.tag) && Boolean(data.tag.no) &&
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Date Tagged:</span>
+                  <strong>December 25, 2022 12:00 AM</strong>
+                  {/* <strong>{dates(data.tag.dates.tagged)}</strong> */}
+                </ListItem>}
+
               <ListItem className="FstoListItemTransactionDetails-root" dense>
                 <span>Date Requested:</span>
-                <strong>{moment(data.transaction.date_requested).format("MM/DD/YYYY")}</strong>
+                <strong>{formatDates(data.transaction.date_requested)}</strong>
               </ListItem>
 
               <ListItem className="FstoListItemTransactionDetails-root" dense>
@@ -336,7 +357,7 @@ const TransactionDialog = (props) => {
                 data.document.from && data.document.to &&
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Coverage Date:</span>
-                  <strong>{moment(data.document.from).format("MM/DD/YYYY")} - {moment(data.document.to).format("MM/DD/YYYY")}</strong>
+                  <strong>{formatDates(data.document.from)} - {formatDates(data.document.to)}</strong>
                 </ListItem>}
 
               {
@@ -350,7 +371,7 @@ const TransactionDialog = (props) => {
                 data.document.date &&
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Document Date:</span>
-                  <strong>{moment(data.document.date).format("MM/DD/YYYY")}</strong>
+                  <strong>{moment(data.document.date).format("MMM. DD, YYYY")}</strong>
                 </ListItem>}
 
               {
@@ -364,21 +385,21 @@ const TransactionDialog = (props) => {
                 data.document.prm_multiple_from && data.document.prm_multiple_to &&
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Period Covered:</span>
-                  <strong>{moment(data.document.prm_multiple_from).format("MM/DD/YYYY")} - {moment(data.document.prm_multiple_to).format("MM/DD/YYYY")}</strong>
+                  <strong>{formatDates(data.document.prm_multiple_from)} - {formatDates(data.document.prm_multiple_to)}</strong>
                 </ListItem>}
 
               {
                 data.document.release_date &&
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Release Date:</span>
-                  <strong>{moment(data.document.release_date).format("MM/DD/YYYY")}</strong>
+                  <strong>{formatDates(data.document.release_date)}</strong>
                 </ListItem>}
 
               {
                 data.document.cheque_date &&
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Cheque Date:</span>
-                  <strong>{moment(data.document.cheque_date).format("MM/DD/YYYY")}</strong>
+                  <strong>{formatDates(data.document.cheque_date)}</strong>
                 </ListItem>}
 
               {
@@ -579,6 +600,16 @@ const TransactionDialog = (props) => {
 
               <List className="FstoListTransactionDetails-root" dense>
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Date Received:</span>
+                  <Stack direction="column">
+                    <strong>Dec. 25, 2022 12:00 AM <Chip label="Vouchered" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
+                    <strong>Dec. 25, 2022 12:00 AM <Chip label="Approved" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
+                    <strong>Dec. 25, 2022 12:00 AM <Chip label="Transmitted" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
+                    <strong>Dec. 25, 2022 12:00 AM <Chip label="Filed" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
+                  </Stack>
+                </ListItem>
+
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Voucher No.:</span>
                   <strong>{data.voucher.no}</strong>
                 </ListItem>
@@ -590,14 +621,32 @@ const TransactionDialog = (props) => {
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Date Vouchered:</span>
-                  <strong>{moment(data.voucher.date).format("MM/DD/YYYY")}</strong>
+                  <strong>{formatDates(data.voucher.date)}</strong>
+                  {/* <strong>{formatDates(data.voucher.dates.vouchered)}</strong> */}
                 </ListItem>
+
+                {
+                  data.approve && data.approve.status === `approve-approve` &&
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Date Approved:</span>
+                    <strong>Dec. 25, 2022 12:00 AM</strong>
+                    {/* <strong>{formatDates(data.approve.dates.approved)}</strong> */}
+                  </ListItem>}
+
+                {
+                  data.transmit && data.transmit.status === `transmit-transmit` &&
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Date Transmitted:</span>
+                    <strong>Dec. 25, 2022 12:00 AM</strong>
+                    {/* <strong>{formatDates(data.transmit.dates.transmitted)}</strong> */}
+                  </ListItem>}
 
                 {
                   data.file && data.file.status === `file-file` &&
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Date Filed:</span>
-                    <strong>{moment(data.file.date).format("MM/DD/YYYY")}</strong>
+                    <strong>{formatDates(data.file.date)}</strong>
+                    {/* <strong>{formatDates(data.file.dates.filed)}</strong> */}
                   </ListItem>}
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
@@ -633,6 +682,14 @@ const TransactionDialog = (props) => {
 
               <List className="FstoListTransactionDetails-root" dense>
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Date Received:</span>
+                  <Stack direction="column">
+                    <strong>Dec. 25, 2022 12:00 AM <Chip label="Created" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
+                    <strong>Dec. 25, 2022 12:00 AM <Chip label="Cleared" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
+                  </Stack>
+                </ListItem>
+
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Bank Name:</span>
                   <strong>
                     {data.cheque.cheques.length <= 1 ? data.cheque.cheques[0].bank.name : `${data.cheque.cheques[0].bank.name}...`}
@@ -655,21 +712,32 @@ const TransactionDialog = (props) => {
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Date Created:</span>
-                  <strong>{moment(data.cheque.date).format("MM/DD/YYYY")}</strong>
+                  <strong>{formatDates(data.cheque.date)}</strong>
+                  {/* <strong>{formatDates(data.cheque.dates.created)}</strong> */}
                 </ListItem>
 
-                {
-                  data.release && data.release.status === `release-release` &&
-                  <ListItem className="FstoListItemTransactionDetails-root" dense>
-                    <span>Date Released:</span>
-                    <strong>{moment(data.release.date).format("MM/DD/YYYY")}</strong>
-                  </ListItem>}
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Date Released:</span>
+                  <Stack direction="column">
+                    <strong>{formatDates(data.cheque.date)}  <Chip label="Internal" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
+                    {/* <strong>{formatDates(data.cheque.dates.released)}  <Chip label="Internal" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong> */}
+                    {
+                      data.release && data.release.status === `release-release` &&
+                      <strong>{formatDates(data.release.date)}  <Chip label="External" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}
+                    {/* <strong>{formatDates(data.release.dates.released)}  <Chip label="External" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong> */}
+                  </Stack>
+                </ListItem>
+
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Date Cleared:</span>
+                  <strong>Dec. 25, 2022 12:00 AM</strong>
+                </ListItem>
 
                 {
                   data.clear && data.clear.status === `clear-clear` &&
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Date Cleared:</span>
-                    <strong>{moment(data.clear.date).format("MM/DD/YYYY")}</strong>
+                    <strong>{formatDates(data.clear.date)}</strong>
                   </ListItem>}
               </List>
             </React.Fragment>}

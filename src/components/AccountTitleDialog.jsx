@@ -237,9 +237,9 @@ const AccountTitleDialog = (props) => {
               getOptionLabel={
                 (option) => option.name
               }
-              getOptionDisabled={
-                (option) => accounts.some((item) => item.account_title.id === option.id)
-              }
+              // getOptionDisabled={
+              //   (option) => accounts.some((item) => item.account_title.id === option.id)
+              // }
               isOptionEqualToValue={
                 (option, value) => option.id === value.id
               }
