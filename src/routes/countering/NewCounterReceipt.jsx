@@ -165,7 +165,7 @@ const NewCounterReceipt = () => {
       })
     }
 
-    const exist = crGroup.some((item) => item.no === CR.receipt_no)
+    const exist = crGroup.some((item) => item.receipt_no === CR.receipt_no)
     if (exist && !CR.update) {
       return setError({
         status: true,
@@ -186,7 +186,7 @@ const NewCounterReceipt = () => {
         ]
       }))
 
-      await axios.post(`/api/counter-receipts/validate-receipt-no`, {
+      await axios.post(`/api/counter-receipts/validate`, {
         receipt_no: CR.receipt_no,
         supplier_id: data.supplier.id
       })
@@ -199,7 +199,7 @@ const NewCounterReceipt = () => {
           status: true,
           data: {
             ...currentValue.data,
-            cr_no: errors["counter_receipt.receipt_no"]
+            cr_no: errors["receipt_no"]
           }
         }))
       }

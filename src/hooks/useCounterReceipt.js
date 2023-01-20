@@ -9,7 +9,7 @@ const useCounterReceipt = (ID) => {
   const toast = useToast()
 
   const fetchData = async () => {
-    return await axios.get(`/api/counter-receipts/view/${ID}`)
+    return await axios.get(`/api/counter-receipts/receipt/${ID}`)
   }
 
   const { refetch, status, data, error } = useQuery(

@@ -8,6 +8,7 @@ import {
 
 import {
   MoreHoriz as MoreIcon,
+  Visibility as ViewIcon,
   Edit as UpdateIcon,
   RemoveCircle as VoidIcon
 } from '@mui/icons-material'
@@ -19,6 +20,7 @@ const DocumentCounterReceiptCreatingActions = (props) => {
   const {
     data = null,
     state = "processed",
+    onView = () => { },
     onUpdate = () => { },
     onVoid = () => { },
   } = props
@@ -33,6 +35,11 @@ const DocumentCounterReceiptCreatingActions = (props) => {
     setAnchor(null)
   }
 
+  const actionViewHandler = () => {
+    onView(data)
+    actionCloseHandler()
+  }
+
   const actionUpdateHandler = () => {
     onUpdate(data)
     actionCloseHandler()
@@ -45,7 +52,7 @@ const DocumentCounterReceiptCreatingActions = (props) => {
 
   return (
     <React.Fragment>
-      <IconButton size="small" onClick={actionOpenHandler} disabled={state === 'counter-void'}>
+      <IconButton size="small" onClick={actionOpenHandler}>
         <MoreIcon />
       </IconButton>
 
@@ -70,29 +77,40 @@ const DocumentCounterReceiptCreatingActions = (props) => {
       >
         <MenuItem
           className="FstoMenuItemAction-root"
-          onClick={actionUpdateHandler}
+          onClick={actionViewHandler}
           disabled={
-            state !== 'pending' &&
-            state !== 'monitoring-return'
+            state !== 'monitoring-return' &&
+            state !== 'counter-void'
           }
           dense
         >
-          <UpdateIcon className="FstoIconAction-root" />
-          Edit
+          <ViewIcon className="FstoIconAction-root" />
+          View
         </MenuItem>
 
-        <MenuItem
-          className="FstoMenuItemAction-root"
-          onClick={actionVoidHandler}
-          disabled={
-            state !== 'pending' &&
-            state !== 'monitoring-return'
-          }
-          dense
-        >
-          <VoidIcon className="FstoIconAction-root" />
-          Void
-        </MenuItem>
+        {
+          state !== `counter-void` &&
+          <MenuItem
+            className="FstoMenuItemAction-root"
+            onClick={actionUpdateHandler}
+            dense
+          >
+            <UpdateIcon className="FstoIconAction-root" />
+            Edit
+          </MenuItem>
+        }
+
+        {
+          state !== `counter-void` &&
+          <MenuItem
+            className="FstoMenuItemAction-root"
+            onClick={actionVoidHandler}
+            dense
+          >
+            <VoidIcon className="FstoIconAction-root" />
+            Void
+          </MenuItem>
+        }
       </Menu>
     </React.Fragment>
   )

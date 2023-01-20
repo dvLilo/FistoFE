@@ -418,7 +418,7 @@ const AccountTitleDialog = (props) => {
         </Button>
 
         {
-          Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|counter-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/approve-|transmit-|cheque-|release-|file-|reverse-|pending-|counter-.*/)) &&
           <Button
             variant="contained"
             onClick={submitAccountTitleHandler}

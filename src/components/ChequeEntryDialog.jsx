@@ -39,6 +39,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
+import ErrorIcon from '@mui/icons-material/Error';
 
 import useBanks from '../hooks/useBanks'
 
@@ -97,6 +98,7 @@ const ChequeEntryDialog = (props) => {
     onRemove = () => { },
     onBack = () => { },
     onClear = () => { },
+    onView = () => { },
     onClose = () => { },
     onSubmit = () => { }
   } = props
@@ -105,7 +107,7 @@ const ChequeEntryDialog = (props) => {
     refetch: fetchBanks,
     status: BANKS_STATUS,
     data: BANKS_LIST
-  } = useBanks(accounts.find((item) => item.entry.toLowerCase() === `credit`)?.account_title?.id)
+  } = useBanks()
   React.useEffect(() => {
     if (open) fetchBanks()
 
@@ -204,6 +206,11 @@ const ChequeEntryDialog = (props) => {
     clearChequeHandler()
   }
 
+  const viewAccountTitleHandler = () => {
+    onClose()
+    onView()
+  }
+
   const checkChequeHandler = async (e) => {
     if (error.status && error.data.cheque_no) {
       delete error.data.cheque_no
@@ -221,6 +228,19 @@ const ChequeEntryDialog = (props) => {
         ...currentValue.data, 'cheque_no'
       ]
     }))
+
+    const check = cheques.some((item) => item.no === CQ.no)
+    if (check && !CQ.update) {
+      setError(currentValue => ({
+        status: true,
+        data: {
+          ...currentValue.data,
+          cheque_no: [
+            "Cheque number already in the list."
+          ]
+        }
+      }))
+    }
 
     try {
       await axios.post(`/api/transactions/flow/validate-cheque-no`, {
@@ -272,7 +292,7 @@ const ChequeEntryDialog = (props) => {
       <DialogContent className="FstoDialogCheque-content">
         {
           Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|return|release-|counter-.*/)) &&
-          <Box className="FstoBoxCheque-root" sx={{ marginBottom: 5 }}>
+          <Box className="FstoBoxCheque-root">
             <Autocomplete
               className="FstoSelectForm-root"
               size="small"
@@ -387,7 +407,6 @@ const ChequeEntryDialog = (props) => {
             />
 
             <Button
-              className=""
               variant="contained"
               startIcon={
                 CQ.update ? <EditIcon /> : <AddIcon />
@@ -411,6 +430,24 @@ const ChequeEntryDialog = (props) => {
         {
           Boolean(cheques.length) &&
           <React.Fragment>
+            <Button
+              sx={{ float: "right", marginTop: 1, marginBottom: 2 }}
+              color={
+                accounts.some((item) => Boolean(item.entry.match(/credit/i))) && accounts.reduce((a, b) => a + b.amount / 2, 0) === (transaction?.document_amount || transaction?.referrence_amount)
+                  ? "primary"
+                  : "error"
+              }
+              startIcon={
+                (
+                  !accounts.some((item) => Boolean(item.entry.match(/credit/i))) ||
+                  !Boolean(accounts.reduce((a, b) => a + b.amount / 2, 0) === (transaction?.document_amount || transaction?.referrence_amount))
+                )
+                && <ErrorIcon />
+              }
+              onClick={viewAccountTitleHandler}
+            > View Account Title Details
+            </Button>
+
             <TableContainer sx={{ marginBottom: 5 }}>
               <Table>
                 <TableHead>
@@ -518,7 +555,12 @@ const ChequeEntryDialog = (props) => {
             onClick={submitChequehandler}
             disabled={
               !Boolean(cheques.length) ||
-              !(cheques.map((item) => item.amount).reduce((a, b) => a + b, 0) === (transaction?.document_amount || transaction?.referrence_amount))
+              !Boolean(accounts.length) ||
+              !accounts.some((item) => item.entry.toLowerCase() === `debit`) ||
+              !accounts.some((item) => item.entry.toLowerCase() === `credit`) ||
+              !(accounts.filter((item) => item.entry.toLowerCase() === `debit`).reduce((a, b) => a + b.amount, 0) === (transaction?.document_amount || transaction?.referrence_amount)) ||
+              !(accounts.filter((item) => item.entry.toLowerCase() === `credit`).reduce((a, b) => a + b.amount, 0) === (transaction?.document_amount || transaction?.referrence_amount)) ||
+              !(cheques.reduce((a, b) => a + b.amount, 0) === (transaction?.document_amount || transaction?.referrence_amount))
             }
             disableElevation
           > {state?.match(/receive.*/) ? "Submit" : "Save"}

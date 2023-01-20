@@ -76,12 +76,13 @@ const UpdateCounterReceipt = () => {
   })
 
   const [data, setData] = React.useState({
-    transaction: null,
+    no: null,
     supplier: null,
     remarks: ""
   })
 
   const [CR, setCR] = React.useState({
+    id: null,
     receipt_no: "",
     receipt_type: null,
     date_transaction: null,
@@ -99,17 +100,17 @@ const UpdateCounterReceipt = () => {
     (async () => {
       let response
       try {
-        response = await axios.get(`/api/counter-receipts/edit/${id}`)
+        response = await axios.get(`/api/counter-receipts/counter/${id}`)
 
         const {
-          transaction,
+          no,
           supplier,
           remarks,
           counter_receipt
         } = response.data.result
 
         setCrGroup([...counter_receipt])
-        setData({ transaction, supplier, remarks })
+        setData({ no, supplier, remarks })
       }
       catch (error) {
         console.log("Fisto Error Status", error.request)
@@ -142,11 +143,12 @@ const UpdateCounterReceipt = () => {
           ...currentValue.map((item, index) => {
             if (CR.index === index)
               return {
-                receipt_no: CR.receipt_no,
-                receipt_type: CR.receipt_type,
-                date_transaction: CR.date_transaction,
-                amount: CR.amount,
+                id: CR.id,
                 department: CR.department,
+                receipt_type: CR.receipt_type,
+                receipt_no: CR.receipt_no,
+                date_transaction: CR.date_transaction,
+                amount: CR.amount
               }
 
             return item
@@ -157,6 +159,7 @@ const UpdateCounterReceipt = () => {
       setCrGroup(currentValue => {
         return [
           {
+            id: null,
             department: CR.department,
             receipt_type: CR.receipt_type,
             receipt_no: CR.receipt_no,
@@ -168,6 +171,7 @@ const UpdateCounterReceipt = () => {
       })
 
     setCR({
+      id: null,
       receipt_no: "",
       receipt_type: null,
       date_transaction: null,
@@ -202,7 +206,7 @@ const UpdateCounterReceipt = () => {
       })
     }
 
-    const exist = crGroup.some((item) => item.no === CR.receipt_no)
+    const exist = crGroup.some((item) => item.receipt_no === CR.receipt_no)
     if (exist && !CR.update) {
       return setError({
         status: true,
@@ -223,9 +227,9 @@ const UpdateCounterReceipt = () => {
         ]
       }))
 
-      await axios.post(`/api/counter-receipts/validate-receipt-no`, {
+      await axios.post(`/api/counter-receipts/validate`, {
+        id: CR.id,
         receipt_no: CR.receipt_no,
-        transaction_id: data.transaction.id,
         supplier_id: data.supplier.id
       })
     }
@@ -237,7 +241,7 @@ const UpdateCounterReceipt = () => {
           status: true,
           data: {
             ...currentValue.data,
-            cr_no: errors["counter_receipt.receipt_no"]
+            cr_no: errors["receipt_no"]
           }
         }))
       }
@@ -446,7 +450,6 @@ const UpdateCounterReceipt = () => {
 
           <Autocomplete
             size="small"
-            // options={data.supplier?.references || []}
             options={
               SUPPLIER_LIST?.find((item) => item.id === data.supplier?.id)?.references || []
             }

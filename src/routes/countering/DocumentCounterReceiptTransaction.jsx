@@ -10,10 +10,12 @@ import {
 import CloseIcon from '@mui/icons-material/Close'
 
 import useCounterReceipt from '../../hooks/useCounterReceipt'
+import useTransaction from '../../hooks/useTransaction'
 
 import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
 import ChequeEntryDialog from '../../components/ChequeEntryDialog'
+import CounterReceiptDialog from '../../components/CounterReceiptDialog'
 
 const DocumentCounterReceiptTransaction = (props) => {
 
@@ -26,13 +28,22 @@ const DocumentCounterReceiptTransaction = (props) => {
   } = props
 
   const {
-    data,
-    status,
-    refetch: fetchTransaction
+    data: COUNTER_DATA,
+    status: COUNTER_STATUS,
+    refetch: fetchCounterReceipt
   } = useCounterReceipt(transaction?.id)
 
+  const {
+    data: TRANSACTION_DATA,
+    status: TRANSACTION_STATUS,
+    refetch: fetchTransaction
+  } = useTransaction(transaction?.transaction_id)
+
   React.useEffect(() => {
-    if (open) fetchTransaction()
+    if (open) {
+      if (transaction.transaction_id) fetchTransaction()
+      else fetchCounterReceipt()
+    }
 
     // eslint-disable-next-line
   }, [open])
@@ -104,27 +115,39 @@ const DocumentCounterReceiptTransaction = (props) => {
         </DialogTitle>
 
         <DialogContent className="FstoDialogTransaction-content">
-          <TransactionDialog
-            data={data}
-            status={status}
-            onAccountTitleView={onAccountTitleView}
-            onChequeView={onChequeView}
-          />
+          {
+            transaction?.transaction_id !== null
+            &&
+            <TransactionDialog
+              data={TRANSACTION_DATA}
+              status={TRANSACTION_STATUS}
+              onAccountTitleView={onAccountTitleView}
+              onChequeView={onChequeView}
+            />}
+
+          {
+            transaction?.transaction_id === null
+            &&
+            <CounterReceiptDialog
+              data={COUNTER_DATA}
+              status={COUNTER_STATUS}
+            />}
+
         </DialogContent>
       </Dialog>
 
       <AccountTitleDialog
         {...viewAccountTitle}
         accounts={
-          Boolean(data?.cheque)
-            ? data?.cheque?.accounts
-            : data?.voucher?.accounts
+          Boolean(TRANSACTION_DATA?.cheque)
+            ? TRANSACTION_DATA?.cheque?.accounts
+            : TRANSACTION_DATA?.voucher?.accounts
         }
       />
 
       <ChequeEntryDialog
         {...viewCheque}
-        cheques={data?.cheque?.cheques}
+        cheques={TRANSACTION_DATA?.cheque?.cheques}
       />
     </React.Fragment>
   )

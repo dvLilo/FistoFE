@@ -4,7 +4,7 @@ import { useQuery } from 'react-query'
 
 import useToast from './useToast'
 
-const useBanks = (ID = 0) => {
+const useBanks = () => {
 
   const toast = useToast()
 
@@ -12,8 +12,7 @@ const useBanks = (ID = 0) => {
     return await axios.get(`/api/dropdown/bank-account-title`, {
       params: {
         status: 1,
-        paginate: 0,
-        account_title_id: ID
+        paginate: 0
       }
     })
   }
@@ -23,7 +22,7 @@ const useBanks = (ID = 0) => {
     status,
     data,
     error
-  } = useQuery(["BANKS", ID], fetchBankList, {
+  } = useQuery(["BANKS"], fetchBankList, {
     refetchOnWindowFocus: false,
     select: (response) => response.data.result.banks,
     onError: (error) => {

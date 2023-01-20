@@ -49,6 +49,7 @@ import useCounterReceipts from '../../hooks/useCounterReceipts'
 import DocumentCounterReceiptFilter from './DocumentCounterReceiptFilter'
 import DocumentCounterReceiptCreatingActions from './DocumentCounterReceiptCreatingActions'
 import DocumentCounterReceiptReason from './DocumentCounterReceiptReason'
+import DocumentCounterReceiptTransaction from './DocumentCounterReceiptTransaction'
 
 
 const DocumentCounterReceiptCreating = () => {
@@ -69,7 +70,7 @@ const DocumentCounterReceiptCreating = () => {
   const [search, setSearch] = React.useState("")
   const [state, setState] = React.useState("pending")
 
-  const [reason, setReason] = React.useState({
+  const [reasonProps, setReason] = React.useState({
     open: false,
     data: null,
     process: null,
@@ -81,10 +82,29 @@ const DocumentCounterReceiptCreating = () => {
     }))
   })
 
-  const onUpdate = (data) => {
-    const { id } = data
+  const [viewProps, setView] = React.useState({
+    open: false,
+    transaction: null,
+    onBack: undefined,
+    onClose: () => setView(currentValue => ({
+      ...currentValue,
+      open: false
+    }))
+  })
 
-    navigate(`/counter-receipt/update-counter-receipt/${id}`)
+  const onView = (transaction) => {
+    setView(currentValue => ({
+      ...currentValue,
+      transaction,
+      open: true,
+      onBack: onView
+    }))
+  }
+
+  const onUpdate = (data) => {
+    const { counter_receipt_no } = data
+
+    navigate(`/counter-receipt/update-counter-receipt/${counter_receipt_no}`)
   }
 
   const onVoid = (data) => {
@@ -268,13 +288,14 @@ const DocumentCounterReceiptCreating = () => {
                     </TableCell>
 
                     <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body" align="center">
-                      <Chip label={item.status} size="small" />
+                      <Chip label={item.status} size="small" color={Boolean(item.state.match(/-return|-void/i)) ? `error` : `primary`} />
                     </TableCell>
 
                     <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body" align="center">
                       <DocumentCounterReceiptCreatingActions
                         data={item}
                         state={item.state}
+                        onView={onView}
                         onUpdate={onUpdate}
                         onVoid={onVoid}
                       />
@@ -309,7 +330,12 @@ const DocumentCounterReceiptCreating = () => {
           showLastButton
         />
 
-        <DocumentCounterReceiptReason {...reason} />
+        <DocumentCounterReceiptTransaction
+          {...viewProps}
+          state={state}
+        />
+
+        <DocumentCounterReceiptReason {...reasonProps} />
       </Paper>
     </Box>
   )

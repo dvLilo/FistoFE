@@ -6,14 +6,16 @@ import { useQuery } from 'react-query'
 
 import useToast from './useToast'
 
-const useCounterReceipts = (URL, STATE = "pending") => {
+const useCounterReceipts = (URL, STATUS = "pending") => {
 
   const toast = useToast()
 
   const [params, setParams] = React.useState({
-    state: STATE,
+    status: STATUS,
+    paginate: 1,
     page: 1,
     rows: 10,
+    state: null,
     search: null,
     from: null,
     to: null,
@@ -24,14 +26,16 @@ const useCounterReceipts = (URL, STATE = "pending") => {
   const fetchData = async () => {
     return await axios.get(URL, {
       params: {
-        state: params.state,
+        status: params.status,
+        paginate: params.paginate,
         page: params.page,
         rows: params.rows,
         search: params.search,
+        state: params.state,
         departments: params.departments ? JSON.stringify(params.departments) : params.departments,
         suppliers: params.suppliers ? JSON.stringify(params.suppliers) : params.suppliers,
-        transaction_from: params.from ? new Date(params.from).toISOString().slice(0, 10) : null,
-        transaction_to: params.to ? new Date(params.to).toISOString().slice(0, 10) : null
+        from: params.from ? new Date(params.from).toISOString().slice(0, 10) : null,
+        to: params.to ? new Date(params.to).toISOString().slice(0, 10) : null
       }
     })
   }
@@ -66,10 +70,33 @@ const useCounterReceipts = (URL, STATE = "pending") => {
     }))
   }
 
+  const generateData = (data) => {
+    const {
+      state,
+      from,
+      to,
+      suppliers,
+      departments
+    } = data
+
+    if (status === 'loading') return
+
+    setParams(currentValue => ({
+      ...currentValue,
+      paginate: 0,
+      page: null,
+      state,
+      from,
+      to,
+      suppliers,
+      departments
+    }))
+  }
+
   const changeStatus = (data) => setParams(currentValue => ({
     ...currentValue,
     page: 1,
-    state: data,
+    status: data,
     search: null
   }))
 
@@ -84,7 +111,7 @@ const useCounterReceipts = (URL, STATE = "pending") => {
   }))
 
   const { status, data, error, refetch: refetchData } = useQuery(
-    ["counter_receipts", params.search, params.state, params.page, params.rows, params.from, params.to, params.departments, params.suppliers],
+    ["counter_receipts", params.search, params.status, params.paginate, params.page, params.rows, params.from, params.to, params.departments, params.suppliers],
     fetchData,
     {
       retry: false,
@@ -103,7 +130,7 @@ const useCounterReceipts = (URL, STATE = "pending") => {
   )
 
   return {
-    status, data, error, refetchData, searchData, filterData, changeStatus, changePage, changeRows
+    status, data, error, refetchData, searchData, filterData, generateData, changeStatus, changePage, changeRows
   }
 }
 

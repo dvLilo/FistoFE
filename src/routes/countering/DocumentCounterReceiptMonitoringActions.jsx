@@ -95,7 +95,6 @@ const DocumentCounterReceiptMonitoringActions = (props) => {
           </MenuItem>}
 
         {
-          // Boolean(/process|unprocess/i.test(state)) &&
           state !== 'pending' &&
           <MenuItem
             className="FstoMenuItemAction-root"
@@ -110,7 +109,7 @@ const DocumentCounterReceiptMonitoringActions = (props) => {
           </MenuItem>}
 
         {
-          state === 'monitoring-receive' &&
+          Boolean(/receive$|unreturn$/gi.test(state)) &&
           <MenuItem
             className="FstoMenuItemAction-root"
             onClick={actionReturnHandler}

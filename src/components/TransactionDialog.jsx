@@ -113,7 +113,7 @@ const TransactionDialog = (props) => {
     <React.Fragment>
 
       {
-        status === `success` && Boolean(data.reason.id && data.reason.description && data.reason.remarks) && Boolean(data.transaction.state.match(/hold|return|void|request|receive-approver|receive-requestor|approve/i)) &&
+        status === `success` && Boolean(data.reason.id && data.reason.description) && Boolean(data.transaction.state.match(/hold|return|void|request|receive-approver|receive-requestor|approve/i)) &&
         <Alert
           className="FstoAlertTransactionDetails-root"
           severity={data.transaction.state === `void` ? "error" : "info"}
@@ -296,13 +296,17 @@ const TransactionDialog = (props) => {
           {
             status === `success` &&
             <List className="FstoListTransactionDetails-root" dense>
-              <ListItem className="FstoListItemTransactionDetails-root" dense>
-                <span>Date Received:</span>
-                <Stack direction="column">
-                  <strong>Dec. 25, 2022 12:00 AM <Chip label="Tagged" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
-                  <strong>Dec. 25, 2022 12:00 AM <Chip label="Released" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
-                </Stack>
-              </ListItem>
+              {
+                Boolean(data.tag) &&
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Date Received:</span>
+                  <Stack direction="column">
+                    <strong>{formatDates(data.tag.dates.received)} <Chip label="Tagged" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
+                    {
+                      Boolean(data.release) &&
+                      <strong>{formatDates(data.release.dates.received)} <Chip label="Released" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}
+                  </Stack>
+                </ListItem>}
 
               {
                 Boolean(data.tag) && Boolean(data.tag.no) &&
@@ -320,8 +324,7 @@ const TransactionDialog = (props) => {
                 Boolean(data.tag) && Boolean(data.tag.no) &&
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Date Tagged:</span>
-                  <strong>December 25, 2022 12:00 AM</strong>
-                  {/* <strong>{dates(data.tag.dates.tagged)}</strong> */}
+                  <strong>{formatDates(data.tag.dates.tagged)}</strong>
                 </ListItem>}
 
               <ListItem className="FstoListItemTransactionDetails-root" dense>
@@ -554,28 +557,11 @@ const TransactionDialog = (props) => {
               }
 
               {
-                Boolean(data.voucher) && Boolean(data.voucher.tax) && Boolean(data.voucher.tax.receipt_type === 'Official') &&
-                <React.Fragment>
-                  <ListItem className="FstoListItemTransactionDetails-root" dense>
-                    <span>Type of Receipt:</span>
-                    <strong>{data.voucher.tax.receipt_type}</strong>
-                  </ListItem>
-
-                  <ListItem className="FstoListItemTransactionDetails-root" dense>
-                    <span>Withholding Tax:</span>
-                    <strong>&#8369;{data.voucher.tax.witholding_tax?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
-                  </ListItem>
-
-                  <ListItem className="FstoListItemTransactionDetails-root" dense>
-                    <span>Percentage Tax:</span>
-                    <strong>{data.voucher.tax.percentage_tax?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}%</strong>
-                  </ListItem>
-
-                  <ListItem className="FstoListItemTransactionDetails-root" dense>
-                    <span>Net of Amount:</span>
-                    <strong>&#8369;{data.voucher.tax.net_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
-                  </ListItem>
-                </React.Fragment>
+                Boolean(data.voucher) && Boolean(data.voucher.receipt_type) &&
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Type of Receipt:</span>
+                  <strong>{data.voucher.receipt_type}</strong>
+                </ListItem>
               }
 
               <ListItem className="FstoListItemTransactionDetails-root" dense>
@@ -599,15 +585,23 @@ const TransactionDialog = (props) => {
               </Divider>
 
               <List className="FstoListTransactionDetails-root" dense>
-                <ListItem className="FstoListItemTransactionDetails-root" dense>
-                  <span>Date Received:</span>
-                  <Stack direction="column">
-                    <strong>Dec. 25, 2022 12:00 AM <Chip label="Vouchered" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
-                    <strong>Dec. 25, 2022 12:00 AM <Chip label="Approved" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
-                    <strong>Dec. 25, 2022 12:00 AM <Chip label="Transmitted" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
-                    <strong>Dec. 25, 2022 12:00 AM <Chip label="Filed" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
-                  </Stack>
-                </ListItem>
+                {
+                  Boolean(data.voucher) &&
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Date Received:</span>
+                    <Stack direction="column">
+                      <strong>{formatDates(data.voucher.dates.received)} <Chip label="Vouchered" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
+                      {
+                        Boolean(data.approve) &&
+                        <strong>{formatDates(data.approve.dates.received)} <Chip label="Approved" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}
+                      {
+                        Boolean(data.transmit) &&
+                        <strong>{formatDates(data.transmit.dates.received)} <Chip label="Transmitted" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}
+                      {
+                        Boolean(data.file) &&
+                        <strong>{formatDates(data.file.dates.received)} <Chip label="Filed" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}
+                    </Stack>
+                  </ListItem>}
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Voucher No.:</span>
@@ -619,34 +613,32 @@ const TransactionDialog = (props) => {
                   <strong>{moment(data.voucher.month).format("MMMM YYYY")}</strong>
                 </ListItem>
 
-                <ListItem className="FstoListItemTransactionDetails-root" dense>
-                  <span>Date Vouchered:</span>
-                  <strong>{formatDates(data.voucher.date)}</strong>
-                  {/* <strong>{formatDates(data.voucher.dates.vouchered)}</strong> */}
-                </ListItem>
+                {
+                  data.voucher && data.voucher.status === `voucher-voucher` &&
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Date Vouchered:</span>
+                    <strong>{formatDates(data.voucher.dates.vouchered)}</strong>
+                  </ListItem>}
 
                 {
                   data.approve && data.approve.status === `approve-approve` &&
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Date Approved:</span>
-                    <strong>Dec. 25, 2022 12:00 AM</strong>
-                    {/* <strong>{formatDates(data.approve.dates.approved)}</strong> */}
+                    <strong>{formatDates(data.approve.dates.approved)}</strong>
                   </ListItem>}
 
                 {
                   data.transmit && data.transmit.status === `transmit-transmit` &&
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Date Transmitted:</span>
-                    <strong>Dec. 25, 2022 12:00 AM</strong>
-                    {/* <strong>{formatDates(data.transmit.dates.transmitted)}</strong> */}
+                    <strong>{formatDates(data.transmit.dates.transmitted)}</strong>
                   </ListItem>}
 
                 {
                   data.file && data.file.status === `file-file` &&
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Date Filed:</span>
-                    <strong>{formatDates(data.file.date)}</strong>
-                    {/* <strong>{formatDates(data.file.dates.filed)}</strong> */}
+                    <strong>{formatDates(data.file.dates.filed)}</strong>
                   </ListItem>}
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
@@ -681,13 +673,17 @@ const TransactionDialog = (props) => {
               </Divider>
 
               <List className="FstoListTransactionDetails-root" dense>
-                <ListItem className="FstoListItemTransactionDetails-root" dense>
-                  <span>Date Received:</span>
-                  <Stack direction="column">
-                    <strong>Dec. 25, 2022 12:00 AM <Chip label="Created" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
-                    <strong>Dec. 25, 2022 12:00 AM <Chip label="Cleared" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
-                  </Stack>
-                </ListItem>
+                {
+                  Boolean(data.cheque) &&
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Date Received:</span>
+                    <Stack direction="column">
+                      <strong>{formatDates(data.cheque.dates.received)} <Chip label="Created" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
+                      {
+                        Boolean(data.clear) &&
+                        <strong>{formatDates(data.clear.dates.received)} <Chip label="Cleared" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}
+                    </Stack>
+                  </ListItem>}
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Bank Name:</span>
@@ -710,28 +706,24 @@ const TransactionDialog = (props) => {
                   </strong>
                 </ListItem>
 
-                <ListItem className="FstoListItemTransactionDetails-root" dense>
-                  <span>Date Created:</span>
-                  <strong>{formatDates(data.cheque.date)}</strong>
-                  {/* <strong>{formatDates(data.cheque.dates.created)}</strong> */}
-                </ListItem>
+                {
+                  data.cheque && data.cheque.status === `cheque-cheque` &&
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Date Created:</span>
+                    <strong>{formatDates(data.cheque.dates.created)}</strong>
+                  </ListItem>}
 
-                <ListItem className="FstoListItemTransactionDetails-root" dense>
-                  <span>Date Released:</span>
-                  <Stack direction="column">
-                    <strong>{formatDates(data.cheque.date)}  <Chip label="Internal" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
-                    {/* <strong>{formatDates(data.cheque.dates.released)}  <Chip label="Internal" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong> */}
-                    {
-                      data.release && data.release.status === `release-release` &&
-                      <strong>{formatDates(data.release.date)}  <Chip label="External" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}
-                    {/* <strong>{formatDates(data.release.dates.released)}  <Chip label="External" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong> */}
-                  </Stack>
-                </ListItem>
-
-                <ListItem className="FstoListItemTransactionDetails-root" dense>
-                  <span>Date Cleared:</span>
-                  <strong>Dec. 25, 2022 12:00 AM</strong>
-                </ListItem>
+                {
+                  data.cheque && data.cheque.status === `cheque-release` &&
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Date Released:</span>
+                    <Stack direction="column">
+                      <strong>{formatDates(data.cheque.dates.released)}  <Chip label="Internal" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
+                      {
+                        data.release && data.release.status === `release-release` &&
+                        <strong>{formatDates(data.release.dates.released)}  <Chip label="External" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}
+                    </Stack>
+                  </ListItem>}
 
                 {
                   data.clear && data.clear.status === `clear-clear` &&

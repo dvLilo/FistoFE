@@ -262,7 +262,7 @@ const DocumentChequingTransaction = (props) => {
       state,
       transaction,
       open: true,
-      onBack: onBack
+      onBack: onChequeManage
     }))
   }
 
@@ -325,12 +325,14 @@ const DocumentChequingTransaction = (props) => {
 
 
   const onChequeManage = () => {
+    onClose()
+
     setManageCheque(currentValue => ({
       ...currentValue,
       state,
       transaction,
       open: true,
-      onBack: onAccountTitleManage
+      onBack: onBack
     }))
   }
 
@@ -356,6 +358,14 @@ const DocumentChequingTransaction = (props) => {
   const onChequeInsert = (data) => {
     setChequeData(currentValue => ({
       ...currentValue,
+      accounts: [
+        ...currentValue.accounts, {
+          entry: "Credit",
+          account_title: data.bank.account_title_one,
+          amount: data.amount,
+          remarks: null
+        }
+      ],
       cheques: [
         ...currentValue.cheques,
         data
@@ -366,6 +376,18 @@ const DocumentChequingTransaction = (props) => {
   const onChequeUpdate = (data, index) => {
     setChequeData(currentValue => ({
       ...currentValue,
+      accounts: [
+        ...currentValue.accounts.filter((item) => item.entry.toLowerCase() === "debit"),
+        ...currentValue.accounts.filter((item) => item.entry.toLowerCase() === "credit").map((item, itemIndex) => {
+          if (itemIndex === index)
+            return {
+              ...item,
+              account_title: data.bank.account_title_one,
+              amount: data.amount
+            }
+          return item
+        })
+      ],
       cheques: [
         ...currentValue.cheques.map((item, itemIndex) => {
           if (itemIndex === index) return data
@@ -378,6 +400,12 @@ const DocumentChequingTransaction = (props) => {
   const onChequeRemove = (index) => {
     setChequeData(currentValue => ({
       ...currentValue,
+      accounts: [
+        ...currentValue.accounts.filter((item) => item.entry.toLowerCase() === "debit"),
+        ...currentValue.accounts.filter((item) => item.entry.toLowerCase() === "credit").filter((item, itemIndex) => {
+          return itemIndex !== index
+        })
+      ],
       cheques: [
         ...currentValue.cheques.filter((item, itemIndex) => {
           return itemIndex !== index
@@ -478,7 +506,7 @@ const DocumentChequingTransaction = (props) => {
               state === `cheque-receive` &&
               <Button
                 variant="contained"
-                onClick={onAccountTitleManage}
+                onClick={onChequeManage}
                 disableElevation
               > Create
               </Button>
@@ -561,6 +589,7 @@ const DocumentChequingTransaction = (props) => {
       <ChequeEntryDialog
         accounts={chequeData.accounts}
         cheques={chequeData.cheques}
+        onView={onAccountTitleManage}
         onClear={clearHandler}
         onSubmit={
           reversalData.reason.id && reversalData.reason.description

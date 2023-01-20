@@ -12,11 +12,13 @@ import {
   Autocomplete,
   Box,
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   Divider,
+  FormControlLabel,
   IconButton,
   Stack,
   Table,
@@ -34,9 +36,12 @@ import {
 } from '@mui/lab'
 
 import CloseIcon from '@mui/icons-material/Close'
+import DownloadIcon from '@mui/icons-material/Download';
 
+import useToast from '../../hooks/useToast'
 import useSuppliers from '../../hooks/useSuppliers'
 import useDepartments from '../../hooks/useDepartments'
+
 import DocumentCounterReceiptReceiver from './DocumentCounterReceiptReceiver'
 
 const DocumentCounterReceiptExport = (props) => {
@@ -45,6 +50,8 @@ const DocumentCounterReceiptExport = (props) => {
     open = false,
     onClose = () => { }
   } = props
+
+  const toast = useToast()
 
   const {
     status: SUPPLIER_STATUS,
@@ -56,10 +63,11 @@ const DocumentCounterReceiptExport = (props) => {
     data: DEPARTMENT_LIST = []
   } = useDepartments()
 
+  const [notice, setNotice] = React.useState(0)
   const [data, setData] = React.useState([])
 
   const [filter, setFilter] = React.useState({
-    status: null,
+    state: null,
     departments: [],
     suppliers: [],
     to: null,
@@ -101,72 +109,100 @@ const DocumentCounterReceiptExport = (props) => {
     try {
       response = await axios.get(`/api/counter-receipts`, {
         params: {
-          page: 1,
-          rows: 10000,
-
-          state: "monitoring-receive",
-          transaction_to: filter.to,
-          transaction_from: filter.from,
-          counter_receipt_status: filter.status,
-          department: JSON.stringify(filter.departments.map((item) => item.id)),
+          paginate: 0,
+          state: filter.state,
+          from: filter.from,
+          to: filter.to,
+          departments: JSON.stringify(filter.departments.map((item) => item.id)),
           suppliers: JSON.stringify(filter.suppliers.map((item) => item.id))
         }
       })
 
-      setData(response.data.result.data)
-      // console.log(response.data)
+      setData(response.data.result)
     } catch (error) {
+      if (error.request.status === 404)
+        return setData([])
 
+      toast({
+        open: true,
+        severity: "error",
+        title: "Error!",
+        message: `Something went wrong whilst trying to void this transaction. Please try again later.`
+      })
     }
   }
 
-  const exportCounterReceiptHandler = () => {
-    const excelHeader = {
-      header: [
-        "Counter Receipt No.",
-        "Date Transact",
-        "Receipt Type",
-        "Receipt No.",
-        "Amount",
-        "Supplier",
-        "Department",
-        "Receiver"
-      ]
-    }
-    const excelData = data.map((item) => {
-      return {
-        "Counter Receipt No.": item.counter_receipt_no,
-        "Date Transact": item.date_transaction,
-        "Receipt Type": item.receipt_type,
-        "Receipt No.": item.receipt_no,
-        "Amount": item.amount,
-        "Supplier": item.supplier,
-        "Department": item.department,
-        "Receiver": item.receiver
+  const exportCounterReceiptHandler = async () => {
+    let response
+    try {
+      response = await axios.post(`/api/counter-receipts/download`, {
+        with_memo: notice,
+        counter_receipts: data
+      })
+
+      if (response.status) {
+        const excelHeader = {
+          header: [
+            "Counter Receipt No.",
+            "Date Transact",
+            "Receipt Type",
+            "Receipt No.",
+            "Amount",
+            "Supplier",
+            "Department",
+            "Receiver"
+          ]
+        }
+        const excelData = data.map((item) => {
+          return {
+            "Counter Receipt No.": item.counter_receipt_no,
+            "Date Transact": item.date_transaction,
+            "Receipt Type": item.receipt_type,
+            "Receipt No.": item.receipt_no,
+            "Amount": item.amount,
+            "Supplier": item.supplier,
+            "Department": item.department,
+            "Receiver": item.receiver
+          }
+        })
+
+        const workbook = XLSX.utils.book_new()
+        const worksheet = XLSX.utils.json_to_sheet(excelData, excelHeader)
+
+        worksheet['!cols'] = [
+          { wpx: 140 },
+          { wpx: 105 },
+          { wpx: 100 },
+          { wpx: 120 },
+          { wpx: 90 },
+          { wpx: 300 },
+          { wpx: 300 },
+          { wpx: 300 }
+        ]
+
+        worksheet['A1'].alignment = {
+          vertical: 'center',
+          horizontal: 'center'
+        }
+
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Counter Receipt")
+        XLSX.writeFile(workbook, "Counter Receipt.xlsx")
       }
-    })
-
-    const workbook = XLSX.utils.book_new()
-    const worksheet = XLSX.utils.json_to_sheet(excelData, excelHeader)
-
-    worksheet['!cols'] = [
-      { wpx: 140 },
-      { wpx: 105 },
-      { wpx: 100 },
-      { wpx: 120 },
-      { wpx: 90 },
-      { wpx: 300 },
-      { wpx: 300 },
-      { wpx: 300 }
-    ]
-
-    worksheet['A1'].alignment = {
-      vertical: 'center',
-      horizontal: 'center'
+    } catch (error) {
+      toast({
+        open: true,
+        severity: "error",
+        title: "Error!",
+        message: `Something went wrong whilst trying to void this transaction. Please try again later.`
+      })
     }
+  }
 
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Counter Receipt")
-    XLSX.writeFile(workbook, "Counter Receipt.xlsx")
+  const closeHandler = () => {
+    setData([])
+    setNotice(false)
+
+    onClose()
   }
 
   return (
@@ -184,7 +220,7 @@ const DocumentCounterReceiptExport = (props) => {
       <Box className="FstoBoxExport-root">
         <DialogTitle className="FstoDialogExport-title">
           Counter Receipt Memo
-          <IconButton size="large" onClick={onClose}>
+          <IconButton size="large" onClick={closeHandler}>
             <CloseIcon />
           </IconButton>
         </DialogTitle>
@@ -194,7 +230,7 @@ const DocumentCounterReceiptExport = (props) => {
             <Autocomplete
               size="small"
               options={["Processed", "Unprocessed"]}
-              value={filter.status}
+              value={filter.state}
               renderInput={
                 (props) => <TextField {...props} label="Status" variant="outlined" />
               }
@@ -203,7 +239,7 @@ const DocumentCounterReceiptExport = (props) => {
               }
               onChange={(e, value) => setFilter(currentValue => ({
                 ...currentValue,
-                status: value
+                state: value
               }))}
               fullWidth
               disableClearable
@@ -392,7 +428,20 @@ const DocumentCounterReceiptExport = (props) => {
         </DialogContent>
 
         <DialogActions className="FstoDialogExport-actions">
-          <Button variant="contained" onClick={exportCounterReceiptHandler} disableElevation>Download</Button>
+          <FormControlLabel
+            label="Issued Memo"
+            checked={Boolean(notice)}
+            onChange={(e) => setNotice(e.target.checked ? 1 : 0)}
+            control={<Checkbox size="medium" />}
+          />
+
+          <Button
+            variant="contained"
+            startIcon={<DownloadIcon />}
+            onClick={exportCounterReceiptHandler}
+            disableElevation
+          > Download
+          </Button>
         </DialogActions>
       </Box>
     </Dialog>

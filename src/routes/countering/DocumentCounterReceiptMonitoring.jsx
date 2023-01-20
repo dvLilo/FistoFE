@@ -380,7 +380,7 @@ const DocumentCounterReceiptMonitoring = () => {
                       </TableCell>}
 
                     <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body" align="center">
-                      <Chip label={item.counter_receipt_status} size="small" />
+                      <Chip label={item.status} size="small" color={Boolean(item.state.match(/-return/i)) ? `error` : `primary`} />
                     </TableCell>
 
                     <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-body" align="center">
