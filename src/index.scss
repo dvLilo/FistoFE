@@ -1021,6 +1021,8 @@ body {
   }
 
   & .FstoDialogExport-content {
+    display: flex;
+    flex-direction: column;
     padding-top: 8px !important;
     padding-left: 24px;
     padding-right: 24px;

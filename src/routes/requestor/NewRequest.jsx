@@ -677,7 +677,6 @@ const NewRequest = () => {
 
       case 5: // Contractor's Billing
         return data.document.payment_type
-          && data.document.no
           && data.document.date
           && data.document.amount
           && data.document.company
@@ -2766,7 +2765,13 @@ const NewRequest = () => {
                   className="FstoSelectForm-root"
                   size="small"
                   filterOptions={filterOptions}
-                  options={SUPPLIER_LIST || []}
+                  options={
+                    SUPPLIER_LIST
+                      ? data.document.id === 8
+                        ? SUPPLIER_LIST.filter(row => row.name.match(/PCF.*/) ? row : null)
+                        : SUPPLIER_LIST
+                      : []
+                  }
                   value={data.document.supplier}
                   loading={
                     SUPPLIER_STATUS === 'loading'
@@ -3240,9 +3245,9 @@ const NewRequest = () => {
                           Boolean(data.document.utility.category) && data.document.utility.category.id === 4
                             ? (CREDIT_CARDS_LIST || [])
                             : data.document.supplier && data.document.utility.category && data.document.utility.location
-                              ? ACCOUNT_NUMBERS_LIST.filter(row => row.supplier.id === data.document.supplier.id && row.category.id === data.document.utility.category.id && row.location.id === data.document.utility.location.id)
+                              ? ACCOUNT_NUMBERS_LIST?.filter(row => row.supplier.id === data.document.supplier.id && row.category.id === data.document.utility.category.id && row.location.id === data.document.utility.location.id) || []
                               : data.document.supplier || data.document.utility.category || data.document.utility.location
-                                ? ACCOUNT_NUMBERS_LIST.filter(row => row.supplier.id === data.document.supplier?.id || row.category.id === data.document.utility.category?.id || row.location.id === data.document.utility.location?.id)
+                                ? ACCOUNT_NUMBERS_LIST?.filter(row => row.supplier.id === data.document.supplier?.id || row.category.id === data.document.utility.category?.id || row.location.id === data.document.utility.location?.id) || []
                                 : (ACCOUNT_NUMBERS_LIST || [])
                         }
                         value={data.document.utility.account_no}
@@ -3294,7 +3299,9 @@ const NewRequest = () => {
                         variant="outlined"
                         autoComplete="off"
                         size="small"
+                        type="number"
                         value={data.document.utility.consumption}
+                        onKeyDown={(e) => ["E", "e", ".", "+", "-"].includes(e.key) && e.preventDefault()}
                         onChange={(e) => setData({
                           ...data,
                           document: {

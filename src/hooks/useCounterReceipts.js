@@ -6,7 +6,7 @@ import { useQuery } from 'react-query'
 
 import useToast from './useToast'
 
-const useCounterReceipts = (URL, STATUS = "pending") => {
+const useCounterReceipts = (URL, STATUS = "pending", queryProps) => {
 
   const toast = useToast()
 
@@ -111,9 +111,10 @@ const useCounterReceipts = (URL, STATUS = "pending") => {
   }))
 
   const { status, data, error, refetch: refetchData } = useQuery(
-    ["counter_receipts", params.search, params.status, params.paginate, params.page, params.rows, params.from, params.to, params.departments, params.suppliers],
+    ["counter_receipts", params.search, params.status, params.state, params.paginate, params.page, params.rows, params.from, params.to, params.departments, params.suppliers],
     fetchData,
     {
+      ...queryProps,
       retry: false,
       refetchOnWindowFocus: false,
       select: (response) => response.data.result,

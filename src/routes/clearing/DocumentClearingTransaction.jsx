@@ -316,7 +316,10 @@ const DocumentClearingTransaction = (props) => {
       />
 
       <ChequeEntryDialog
+        accounts={clearData.accounts}
         cheques={data?.cheque?.cheques}
+        onView={onAccountTitleManage}
+        onClear={clearHandler}
         {...viewCheque}
       />
     </React.Fragment>

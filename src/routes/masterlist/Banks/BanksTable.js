@@ -147,11 +147,11 @@ const BanksTable = (props) => {
                   </TableCell>
 
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body" sx={{ textTransform: "capitalize" }}>
-                    {data.account_title_one?.title}
+                    {data.account_title_one?.name}
                   </TableCell>
 
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body" sx={{ textTransform: "capitalize" }}>
-                    {data.account_title_two?.title}
+                    {data.account_title_two?.name}
                   </TableCell>
 
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body">

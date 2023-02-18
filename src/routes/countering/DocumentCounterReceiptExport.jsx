@@ -27,7 +27,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField
+  TextField,
+  Typography
 } from '@mui/material'
 
 import {
@@ -38,9 +39,14 @@ import {
 import CloseIcon from '@mui/icons-material/Close'
 import DownloadIcon from '@mui/icons-material/Download';
 
+import EmptyImage from '../../assets/img/empty.svg'
+
+import Preloader from '../../components/Preloader'
+
 import useToast from '../../hooks/useToast'
 import useSuppliers from '../../hooks/useSuppliers'
 import useDepartments from '../../hooks/useDepartments'
+import useCounterReceipts from '../../hooks/useCounterReceipts'
 
 import DocumentCounterReceiptReceiver from './DocumentCounterReceiptReceiver'
 
@@ -50,6 +56,18 @@ const DocumentCounterReceiptExport = (props) => {
     open = false,
     onClose = () => { }
   } = props
+
+  const [enabled, setEnabled] = React.useState(false)
+
+  const {
+    status,
+    data: counterReceiptsData,
+    generateData
+  } = useCounterReceipts("/api/counter-receipts", null, {
+    enabled: enabled
+  })
+
+  console.log(status)
 
   const toast = useToast()
 
@@ -63,15 +81,15 @@ const DocumentCounterReceiptExport = (props) => {
     data: DEPARTMENT_LIST = []
   } = useDepartments()
 
-  const [notice, setNotice] = React.useState(0)
   const [data, setData] = React.useState([])
 
+  const [notice, setNotice] = React.useState(0)
   const [filter, setFilter] = React.useState({
-    state: null,
+    state: "Processed",
     departments: [],
     suppliers: [],
-    to: null,
-    from: null
+    to: moment().format("YYYY-MM-DD"),
+    from: moment().format("YYYY-MM-DD")
   })
 
   const submitReceiverHandler = (name, index) => {
@@ -104,32 +122,10 @@ const DocumentCounterReceiptExport = (props) => {
     })
   }
 
-  const generateCounterReceiptHandler = async () => {
-    let response
-    try {
-      response = await axios.get(`/api/counter-receipts`, {
-        params: {
-          paginate: 0,
-          state: filter.state,
-          from: filter.from,
-          to: filter.to,
-          departments: JSON.stringify(filter.departments.map((item) => item.id)),
-          suppliers: JSON.stringify(filter.suppliers.map((item) => item.id))
-        }
-      })
+  const generateCounterReceiptHandler = () => {
+    setEnabled(true)
 
-      setData(response.data.result)
-    } catch (error) {
-      if (error.request.status === 404)
-        return setData([])
-
-      toast({
-        open: true,
-        severity: "error",
-        title: "Error!",
-        message: `Something went wrong whilst trying to void this transaction. Please try again later.`
-      })
-    }
+    generateData(filter)
   }
 
   const exportCounterReceiptHandler = async () => {
@@ -204,6 +200,11 @@ const DocumentCounterReceiptExport = (props) => {
 
     onClose()
   }
+
+  React.useEffect(() => {
+    if (status === `success` && counterReceiptsData !== undefined) setData(counterReceiptsData)
+
+  }, [status, counterReceiptsData])
 
   return (
     <Dialog
@@ -342,6 +343,9 @@ const DocumentCounterReceiptExport = (props) => {
                 minWidth: 96
               }}
               onClick={generateCounterReceiptHandler}
+              disabled={
+                status === `loading`
+              }
               disableElevation
             >
               Generate
@@ -350,32 +354,53 @@ const DocumentCounterReceiptExport = (props) => {
 
           <Divider className="FstoDividerExport-root" />
 
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>COUNTER RECEIPT NO.</TableCell>
+          <TableContainer className="FstoTableContainer-root FstoTableContainerCounter-root">
+            <Table className="FstoTableCounter-root">
+              <TableHead className="FstoTableHeadCounter-root">
+                <TableRow className="FstoTableRowCounter-root">
+                  <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-head">
+                    COUNTER RECEIPT NO.
+                  </TableCell>
 
-                  <TableCell>DATE TRANSACT</TableCell>
+                  <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-head">
+                    DATE TRANSACT
+                  </TableCell>
 
-                  <TableCell>RECEIPT TYPE</TableCell>
+                  <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-head">
+                    RECEIPT TYPE
+                  </TableCell>
 
-                  <TableCell>RECEIPT NO.</TableCell>
+                  <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-head">
+                    RECEIPT NO.
+                  </TableCell>
 
-                  <TableCell align="right">AMOUNT</TableCell>
+                  <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-head" align="right">
+                    AMOUNT
+                  </TableCell>
 
-                  <TableCell>SUPPLIER</TableCell>
+                  <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-head">
+                    SUPPLIER
+                  </TableCell>
 
-                  <TableCell>DEPARTMENT</TableCell>
+                  <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-head">
+                    DEPARTMENT
+                  </TableCell>
 
-                  <TableCell>RECEIVER</TableCell>
+                  <TableCell className="FstoTableCellCounter-root FstoTableCellCounter-head">
+                    RECEIVER
+                  </TableCell>
                 </TableRow>
               </TableHead>
 
               <TableBody>
                 {
-                  data.map((item, index) => (
-                    <TableRow key={index}>
+                  status === 'loading'
+                  && <Preloader col={10} row={5} />}
+
+                {
+                  status === 'success'
+                  && data.map((item, index) => (
+                    <TableRow className="FstoTableRowCounter-root" key={index}>
                       <TableCell>
                         {item.counter_receipt_no}
                       </TableCell>
@@ -420,10 +445,20 @@ const DocumentCounterReceiptExport = (props) => {
                         />
                       </TableCell>
                     </TableRow>
-                  ))
-                }
+                  ))}
               </TableBody>
             </Table>
+
+            {
+              (status === 'error' || status === 'idle') &&
+              <React.Fragment>
+                <Divider variant="fullWidth" />
+
+                <Box className="FstoTableBox-root">
+                  <img alt="No Data" src={EmptyImage} />
+                  <Typography variant="body1">NO RECORDS FOUND</Typography>
+                </Box>
+              </React.Fragment>}
           </TableContainer>
         </DialogContent>
 

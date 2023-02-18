@@ -246,7 +246,12 @@ const NewUser = () => {
 
     let response
     try {
-      response = await axios.get(`http://localhost:5000/user`).then(JSON => JSON.data)
+      response = await axios.get(`http://rdfsedar.com/api/data/employees`, {
+        withCredentials: false,
+        headers: {
+          Authorization: `Bearer ${process.env.REACT_APP_SEDAR_KEY}`
+        }
+      }).then(JSON => JSON.data.data)
 
       setDropdown(currentValue => ({
         ...currentValue,
@@ -303,7 +308,7 @@ const NewUser = () => {
   const fetchDepartments = async () => {
     let response
     try {
-      response = await axios.get(`/api/admin/dropdown/department?all`)
+      response = await axios.get(`/api/admin/dropdown/organization?all`)
       const { departments } = response.data.result
 
       setDropdown(currentValue => ({
@@ -491,7 +496,7 @@ const NewUser = () => {
         department: value
       })
 
-      const department = dropdown.departments.filter((department) => department.name === value)
+      const department = dropdown.departments.filter((department) => department.name.toLowerCase() === value.toLowerCase())
       setUser(currentValue => ({
         ...currentValue,
         department
@@ -687,6 +692,7 @@ const NewUser = () => {
             size="small"
             options={dropdown.employees}
             value={userRaw}
+            loading={isFetching}
             filterOptions={filterOptions}
             renderInput={
               props =>
@@ -807,7 +813,7 @@ const NewUser = () => {
                     error.status &&
                     error.field === "department" &&
                     <React.Fragment>
-                      {error.message} <Link to="/masterlist/departments" state={{ department: user.department[0]?.name }}>Click here</Link> to register.
+                      {error.message} <Link to="/masterlist/organization-departments">Click here</Link> to sync with SEDAR.
                     </React.Fragment>
                   }
                   sx={{

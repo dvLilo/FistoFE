@@ -100,8 +100,14 @@ const BanksForm = (props) => {
         branch: data.branch,
         account_no: data.account_no,
         location: data.location,
-        account_title_1: data.account_title_1,
-        account_title_2: data.account_title_2
+        account_title_1: {
+          id: data.account_title_1.id,
+          title: data.account_title_1.name
+        },
+        account_title_2: {
+          id: data.account_title_2.id,
+          title: data.account_title_2.name
+        }
       })
     }
   }, [data])

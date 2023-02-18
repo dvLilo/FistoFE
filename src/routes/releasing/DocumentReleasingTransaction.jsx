@@ -268,8 +268,9 @@ const DocumentReleasingTransaction = (props) => {
       />
 
       <ChequeEntryDialog
+        accounts={data?.cheque?.accounts || data?.voucher?.accounts}
         cheques={data?.cheque.cheques}
-        onClear={clearHandler}
+        onView={onAccountTitleView}
         {...viewCheque}
       />
 

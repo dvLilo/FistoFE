@@ -50,7 +50,7 @@ const DocumentClearingActions = ({ data, state, onReceive, onManage, onView }) =
         disablePortal
       >
         {
-          state === `pending` &&
+          state === `pending-clear` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {

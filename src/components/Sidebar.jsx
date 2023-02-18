@@ -102,6 +102,7 @@ const Sidebar = () => {
 
               <AccordionDetails>
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/users">User Accounts</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/organization-departments">Organization Departments</RouterLink>
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/categories">Categories</RouterLink>
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/document-types">Document Types</RouterLink>
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/companies">Companies</RouterLink>

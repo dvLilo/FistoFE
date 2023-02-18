@@ -62,13 +62,13 @@ const DocumentClearing = () => {
     changeStatus,
     changePage,
     changeRows
-  } = useTransactions("/api/transactions")
+  } = useTransactions("/api/transactions", "pending-clear")
 
   const toast = useToast()
   const confirm = useConfirm()
 
   const [search, setSearch] = React.useState("")
-  const [state, setState] = React.useState("pending")
+  const [state, setState] = React.useState("pending-clear")
 
   const [manage, setManage] = React.useState({
     open: false,
@@ -153,7 +153,7 @@ const DocumentClearing = () => {
                 children: <span className="FstoTabsIndicator-root" />
               }}
             >
-              <Tab className="FstoTab-root" label="Pending" value="pending" disableRipple />
+              <Tab className="FstoTab-root" label="Pending" value="pending-clear" disableRipple />
               <Tab className="FstoTab-root" label="Received" value="clear-receive" disableRipple />
               <Tab className="FstoTab-root" label="Cleared" value="clear-clear" disableRipple />
             </Tabs>

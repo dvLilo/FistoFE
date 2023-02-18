@@ -6,34 +6,35 @@ import { useQuery } from 'react-query'
 
 import useToast from './useToast'
 
-const useGenerateCounterReceipts = (URL) => {
+const useGeneratedCounterReceipts = (URL, props) => {
 
   const toast = useToast()
 
   const [params, setParams] = React.useState({
-    state: 'moniroting-receive',
     paginate: 0,
-    from: null,
-    to: null,
-    suppliers: null,
-    departments: null
+    state: props.state,
+    from: props.from,
+    to: props.to,
+    suppliers: props.suppliers,
+    departments: props.departments
   })
 
   const fetchData = async () => {
     return await axios.get(URL, {
       params: {
-        state: params.state,
         paginate: params.paginate,
+        state: params.state,
         departments: params.departments ? JSON.stringify(params.departments) : params.departments,
         suppliers: params.suppliers ? JSON.stringify(params.suppliers) : params.suppliers,
-        transaction_from: params.from ? new Date(params.from).toISOString().slice(0, 10) : null,
-        transaction_to: params.to ? new Date(params.to).toISOString().slice(0, 10) : null
+        from: params.from ? new Date(params.from).toISOString().slice(0, 10) : null,
+        to: params.to ? new Date(params.to).toISOString().slice(0, 10) : null
       }
     })
   }
 
   const generateData = (data) => {
     const {
+      state,
       from,
       to,
       suppliers,
@@ -44,7 +45,7 @@ const useGenerateCounterReceipts = (URL) => {
 
     setParams(currentValue => ({
       ...currentValue,
-      page: 1,
+      state,
       from,
       to,
       suppliers,
@@ -53,7 +54,7 @@ const useGenerateCounterReceipts = (URL) => {
   }
 
   const { status, data, error, refetch: refetchData } = useQuery(
-    ["counter_receipts", params.state, params.page, params.rows, params.from, params.to, params.departments, params.suppliers],
+    ["counter_receipts", params.paginate, params.state, params.from, params.to, params.departments, params.suppliers],
     fetchData,
     {
       enabled: false,
@@ -72,8 +73,8 @@ const useGenerateCounterReceipts = (URL) => {
   )
 
   return {
-    status, data, error, refetchData, filterData: generateData
+    status, data, error, refetchData, generateData
   }
 }
 
-export default useGenerateCounterReceipts
+export default useGeneratedCounterReceipts

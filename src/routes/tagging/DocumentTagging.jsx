@@ -51,8 +51,8 @@ import EmptyImage from '../../assets/img/empty.svg'
 
 import ReasonDialog from '../../components/ReasonDialog'
 import TablePreloader from '../../components/TablePreloader'
+import FilterPopover from '../../components/FilterPopover'
 
-import DocumentTaggingFilter from './DocumentTaggingFilter'
 import DocumentTaggingActions from './DocumentTaggingActions'
 import DocumentTaggingTransaction from './DocumentTaggingTransaction'
 
@@ -306,7 +306,7 @@ const DocumentTagging = () => {
                 }}
               />
 
-              <DocumentTaggingFilter filterData={filterData} />
+              <FilterPopover onFilter={filterData} />
             </Stack>
           </Stack>
         </Stack>

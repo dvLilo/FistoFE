@@ -15,6 +15,7 @@ import './index.scss'
 axios.defaults.withCredentials = true
 // axios.defaults.baseURL = 'http://127.0.0.1:8000'
 axios.defaults.baseURL = 'http://10.10.13.17:8000'
+// axios.defaults.baseURL = 'https://backend.fisto.ml/public'
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token')
 axios.interceptors.response.use(

@@ -235,7 +235,7 @@ const AccountNumbersForm = (props) => {
             <TextField
               {...props}
               variant="outlined"
-              label="Location"
+              label="Utility Location"
               error={!Boolean(dropdown.locations.length) && !dropdown.isFetching}
               helperText={!Boolean(dropdown.locations.length) && !dropdown.isFetching && "No locations found."}
             />
@@ -277,7 +277,7 @@ const AccountNumbersForm = (props) => {
             <TextField
               {...props}
               variant="outlined"
-              label="Type"
+              label="Utility Type"
               error={!Boolean(dropdown.categories.length) && !dropdown.isFetching}
               helperText={!Boolean(dropdown.categories.length) && !dropdown.isFetching && "No categories found."}
             />

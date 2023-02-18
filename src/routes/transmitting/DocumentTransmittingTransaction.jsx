@@ -176,7 +176,9 @@ const DocumentTransmittingTransaction = (props) => {
       />
 
       <ChequeEntryDialog
+        accounts={data?.cheque?.accounts || data?.voucher?.accounts}
         cheques={data?.cheque?.cheques}
+        onView={onAccountTitleView}
         {...viewCheque}
       />
     </React.Fragment>
