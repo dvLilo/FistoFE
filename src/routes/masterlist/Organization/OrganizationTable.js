@@ -58,6 +58,15 @@ const OrganizationTable = (props) => {
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">
             <TableSortLabel
+              active={orderBy === `code`}
+              direction={orderBy === `code` ? order : `asc`}
+              onClick={() => onSort(`code`)}
+            > CODE
+            </TableSortLabel>
+          </TableCell>
+
+          <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">
+            <TableSortLabel
               active={orderBy === `name`}
               direction={orderBy === `name` ? order : `asc`}
               onClick={() => onSort(`name`)}
@@ -80,12 +89,16 @@ const OrganizationTable = (props) => {
       <TableBody className="FstoTableHeadMasterlist-root">
         {
           fetching
-            ? <Preloader row={5} col={4} />
+            ? <Preloader row={5} col={5} />
             : data
               ? data.sort(comparator(order, orderBy)).map((data, index) => (
                 <TableRow className="FstoTableRowMasterlist-root" key={index} hover>
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body" align="center" sx={{ padding: "16px !important" }}>
                     {data.id}
+                  </TableCell>
+
+                  <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body" sx={{ padding: "16px !important" }}>
+                    {data.code}
                   </TableCell>
 
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body" sx={{ padding: "16px !important" }}>
@@ -113,7 +126,7 @@ const OrganizationTable = (props) => {
               ))
               : (
                 <TableRow>
-                  <TableCell align="center" colSpan={4}>NO RECORDS FOUND</TableCell>
+                  <TableCell align="center" colSpan={5}>NO RECORDS FOUND</TableCell>
                 </TableRow>
               )
         }

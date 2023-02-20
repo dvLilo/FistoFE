@@ -75,9 +75,9 @@ const BanksTable = (props) => {
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">
             <TableSortLabel
-              active={orderBy === `branch`}
-              direction={orderBy === `branch` ? order : `asc`}
-              onClick={() => onSort(`branch`)}
+              active={orderBy === `name`}
+              direction={orderBy === `name` ? order : `asc`}
+              onClick={() => onSort(`name`)}
             > NAME
             </TableSortLabel>
           </TableCell>
@@ -139,7 +139,7 @@ const BanksTable = (props) => {
                   </TableCell>
 
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body">
-                    {data.branch}
+                    {data.name}
                   </TableCell>
 
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body">
