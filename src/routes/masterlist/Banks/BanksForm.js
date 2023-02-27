@@ -255,7 +255,7 @@ const BanksForm = (props) => {
 
       <TextField
         className="FstoTextfieldForm-root"
-        label="Branch Code"
+        label="Branch"
         variant="outlined"
         autoComplete="off"
         size="small"

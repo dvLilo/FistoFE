@@ -147,7 +147,7 @@ const Navbar = () => {
             lineHeight: 1
           }}
         >
-          {user?.last_name}, {user?.first_name} {user?.middle_name.charAt(0)}.
+          {user?.last_name}, {user?.first_name} {user?.middle_name?.charAt(0)}.
         </Typography>
 
         <Typography

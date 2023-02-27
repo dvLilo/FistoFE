@@ -375,7 +375,7 @@ const DocumentReversing = () => {
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
                       <Typography className="FstoTypography-root FstoTypography-requestor" variant="subtitle1">
-                        {item.users.first_name.toLowerCase()} {item.users.middle_name.toLowerCase()} {item.users.last_name.toLowerCase()}
+                        {item.users.first_name.toLowerCase()} {item.users.middle_name?.toLowerCase()} {item.users.last_name.toLowerCase()}
                       </Typography>
 
                       <Typography variant="subtitle2">

@@ -3245,9 +3245,9 @@ const NewRequest = () => {
                           Boolean(data.document.utility.category) && data.document.utility.category.id === 4
                             ? (CREDIT_CARDS_LIST || [])
                             : data.document.supplier && data.document.utility.category && data.document.utility.location
-                              ? ACCOUNT_NUMBERS_LIST?.filter(row => row.supplier.id === data.document.supplier.id && row.category.id === data.document.utility.category.id && row.location.id === data.document.utility.location.id) || []
+                              ? ACCOUNT_NUMBERS_LIST?.filter(row => row.supplier?.id === data.document.supplier?.id && row.category?.id === data.document.utility.category?.id && row.location?.id === data.document.utility.location?.id) || []
                               : data.document.supplier || data.document.utility.category || data.document.utility.location
-                                ? ACCOUNT_NUMBERS_LIST?.filter(row => row.supplier.id === data.document.supplier?.id || row.category.id === data.document.utility.category?.id || row.location.id === data.document.utility.location?.id) || []
+                                ? ACCOUNT_NUMBERS_LIST?.filter(row => row.supplier?.id === data.document.supplier?.id || row.category?.id === data.document.utility.category?.id || row.location?.id === data.document.utility.location?.id) || []
                                 : (ACCOUNT_NUMBERS_LIST || [])
                         }
                         value={data.document.utility.account_no}

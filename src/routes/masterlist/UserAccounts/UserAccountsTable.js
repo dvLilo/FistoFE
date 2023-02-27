@@ -121,7 +121,7 @@ const UserAccountsTable = (props) => {
                   </TableCell>
 
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body" sx={{ textTransform: "uppercase" }}>
-                    {data.last_name}, {data.first_name} {data.middle_name.charAt(0)}.
+                    {data.last_name}, {data.first_name} {data.middle_name?.charAt(0)}.
                   </TableCell>
 
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body" sx={{ textTransform: "capitalize" }}>

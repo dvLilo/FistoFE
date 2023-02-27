@@ -780,7 +780,7 @@ const NewUser = () => {
             variant="outlined"
             autoComplete="off"
             size="small"
-            value={user.middle_name.toLowerCase()}
+            value={user.middle_name?.toLowerCase()}
             onChange={(e) => setUser({
               ...user,
               middle_name: e.target.value
@@ -932,7 +932,6 @@ const NewUser = () => {
               !Boolean(user.id_no) ||
               !Boolean(user.last_name) ||
               !Boolean(user.first_name) ||
-              !Boolean(user.middle_name) ||
               !Boolean(user.department.length) ||
               !Boolean(user.position) ||
               !Boolean(user.username) ||

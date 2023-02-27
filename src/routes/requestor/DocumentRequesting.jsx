@@ -535,7 +535,7 @@ const DocumentRequesting = () => {
 
             //               <TableCell className="FstoTableCell-root FstoTableCell-body">
             //                 <Typography className="FstoTypography-root FstoTypography-requestor" variant="subtitle1">
-            //                   {data.users.first_name.toLowerCase()} {data.users.middle_name.toLowerCase()} {data.users.last_name.toLowerCase()}
+            //                   {data.users.first_name.toLowerCase()} {data.users.middle_name?.toLowerCase()} {data.users.last_name.toLowerCase()}
             //                 </Typography>
 
             //                 <Typography variant="subtitle2">

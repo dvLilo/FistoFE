@@ -190,7 +190,7 @@ const TransactionDialog = (props) => {
             <List className="FstoListTransactionDetails-root" dense>
               <ListItem className="FstoListItemTransactionDetails-root" dense>
                 <span>Name:</span>
-                <strong>{data.requestor.first_name.toLowerCase()} {data.requestor.middle_name.toLowerCase()} {data.requestor.last_name.toLowerCase()}</strong>
+                <strong>{data.requestor.first_name.toLowerCase()} {data.requestor.middle_name?.toLowerCase()} {data.requestor.last_name.toLowerCase()}</strong>
               </ListItem>
 
               <ListItem className="FstoListItemTransactionDetails-root" dense>

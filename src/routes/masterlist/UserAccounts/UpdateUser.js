@@ -796,7 +796,7 @@ const UpdateUser = () => {
             autoComplete="off"
             size="small"
             color="info"
-            value={user.middle_name.toLowerCase()}
+            value={user.middle_name?.toLowerCase()}
             InputProps={{
               readOnly: !update.middle_name
             }}
@@ -958,7 +958,6 @@ const UpdateUser = () => {
               !Boolean(user.id_no) ||
               !Boolean(user.last_name) ||
               !Boolean(user.first_name) ||
-              !Boolean(user.middle_name) ||
               !Boolean(user.department.length) ||
               !Boolean(user.position) ||
               !Boolean(user.username) ||

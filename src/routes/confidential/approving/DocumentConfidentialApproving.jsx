@@ -447,7 +447,7 @@ const DocumentConfidentialApproving = () => {
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
-                      <Typography variant="subtitle1" sx={{ textTransform: `capitalize` }}>{item.users.first_name.toLowerCase()} {item.users.middle_name.toLowerCase()} {item.users.last_name.toLowerCase()}</Typography>
+                      <Typography variant="subtitle1" sx={{ textTransform: `capitalize` }}>{item.users.first_name.toLowerCase()} {item.users.middle_name?.toLowerCase()} {item.users.last_name.toLowerCase()}</Typography>
                       <Typography variant="subtitle2">{item.users.department[0].name}</Typography>
                       <Typography variant="subtitle2">{item.users.position}</Typography>
                     </TableCell>
