@@ -649,7 +649,7 @@ const NewRequest = () => {
           && prmGroup.length
           && (
             (data.document.category.name.match(/rental/i) && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.gross_amount, 0)).toFixed(2) >= 0.00 && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.gross_amount, 0)).toFixed(2) < 1.00) ||
-            (data.document.category.name.match(/loans|leasing/i) && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.principal, 0)).toFixed(2) >= 0.00 && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.principal, 0)).toFixed(2) < 1.00)
+            (data.document.category.name.match(/loans|leasing/i) && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.net_of_amount, 0)).toFixed(2) >= 0.00 && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.net_of_amount, 0)).toFixed(2) < 1.00)
           )
           && (!error.status || !Boolean(error.data.document_no))
           && (!validate.status || !validate.data.includes('document_no'))
@@ -2520,8 +2520,8 @@ const NewRequest = () => {
                           Boolean(data.document.category.name.match(/loans|leasing/i)) &&
                           Boolean(data.document.amount)
                           && !(
-                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.principal, 0)).toFixed(2) >= 0.00 &&
-                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.principal, 0)).toFixed(2) < 1.00
+                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.net_of_amount, 0)).toFixed(2) >= 0.00 &&
+                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.net_of_amount, 0)).toFixed(2) < 1.00
                           )) ||
                         (
                           Boolean(debitGroup.length) &&
@@ -2556,10 +2556,10 @@ const NewRequest = () => {
                           Boolean(data.document.category.name.match(/loans|leasing/i)) &&
                           Boolean(data.document.amount)
                           && !(
-                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.principal, 0)).toFixed(2) >= 0.00 &&
-                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.principal, 0)).toFixed(2) < 1.00
+                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.net_of_amount, 0)).toFixed(2) >= 0.00 &&
+                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.net_of_amount, 0)).toFixed(2) < 1.00
                           )
-                          && "Document amount and principal amount is not equal.") ||
+                          && "Document amount and net of amount is not equal.") ||
                         (
                           Boolean(debitGroup.length) &&
                           Boolean(data.document.amount)
