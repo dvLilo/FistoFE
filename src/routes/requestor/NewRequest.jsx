@@ -117,11 +117,20 @@ const BATCH_LETTERS = [
 ]
 
 const PAYROLL_TYPES = [
-  "Regular",
+  "Billing",
   "Farm",
   "Paid Leave",
   "Farm Paid Leave",
-  "Cash Advance"
+  "Cash Advance",
+  "Common",
+  "Commision-Payroll",
+  "Commision-Paid Leave",
+  "Commision-Billing",
+  "Commision-SIL",
+  "Commision-Adjustment",
+  "Commision-Cash Advance",
+  "13th Month Pay",
+  "Birthday Bonus"
 ]
 
 const NumberField = React.forwardRef(function NumberField(props, ref) {
