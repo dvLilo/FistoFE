@@ -880,35 +880,6 @@ const NewRequest = () => {
     }))
   }
 
-  // const checkPettyCashFundNameHandler = async (name) => {
-  //   if (error.status && error.data.pcf_name) {
-  //     delete error.data.pcf_name
-  //     setError(currentValue => ({
-  //       ...currentValue,
-  //       data: error.data
-  //     }))
-  //   }
-
-  //   try {
-  //     await axios.post(`/api/transactions/validate-pcf-name`, {
-  //       pcf_name: name
-  //     })
-  //   }
-  //   catch (error) {
-  //     if (error.request.status === 422) {
-  //       const { errors } = error.response.data
-
-  //       setError(currentValue => ({
-  //         status: true,
-  //         data: {
-  //           ...currentValue.data,
-  //           pcf_name: errors["pcf_batch.name"]
-  //         }
-  //       }))
-  //     }
-  //   }
-  // }
-
   const checkPettyCashFundNameHandler = async () => {
     if (error.status && error.data.document_supplier && error.data.pcf_letter && error.data.pcf_date) {
       delete error.data.pcf_letter
