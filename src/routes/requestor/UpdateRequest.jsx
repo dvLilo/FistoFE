@@ -3373,7 +3373,7 @@ const UpdateRequest = () => {
                         size="small"
                         type="number"
                         value={data.document.utility.consumption}
-                        onKeyDown={(e) => ["E", "e", ".", "+", "-"].includes(e.key) && e.preventDefault()}
+                        onKeyDown={(e) => ["E", "e", "+", "-"].includes(e.key) && e.preventDefault()}
                         onChange={(e) => setData({
                           ...data,
                           document: {

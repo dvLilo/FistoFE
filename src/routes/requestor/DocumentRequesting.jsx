@@ -64,14 +64,14 @@ const DocumentRequesting = () => {
     changeStatus,
     changePage,
     changeRows
-  } = useTransactions("/api/transactions")
+  } = useTransactions("/api/transactions", "pending-request-requestor")
 
   const navigate = useNavigate()
 
   const toast = useToast()
 
   const [active, setActive] = React.useState(true)
-  const [state, setState] = React.useState("pending")
+  const [state, setState] = React.useState("pending-request-requestor")
   const [search, setSearch] = React.useState("")
   // const [density, setDensity] = React.useState("small")
 
@@ -368,7 +368,7 @@ const DocumentRequesting = () => {
                 children: <span className="FstoTabsIndicator-root" />
               }}
             >
-              <Tab className="FstoTab-root" label="Requested" value="pending" disableRipple />
+              <Tab className="FstoTab-root" label="Requested" value="pending-request-requestor" disableRipple />
               <Tab className="FstoTab-root" label="Voided" value="requestor-void" disableRipple />
             </Tabs>
 
