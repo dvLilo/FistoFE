@@ -301,6 +301,15 @@ const DocumentRequesting = () => {
 
         break
 
+      case "clear":
+        if (subprocess === 'receive')
+          return "Received by Treasury Associate for cheque clearing."
+
+        if (subprocess === 'clear')
+          return "Cleared cheque by Treasury Associate."
+
+        break
+
       default:
         return "Pending for tagging."
     }

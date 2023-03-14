@@ -62,7 +62,7 @@ const DocumentRequestingActions = (props) => {
         disablePortal
       >
         {
-          (state === `pending` || state === `requestor-void`)
+          (state === `pending-request-requestor` || state === `requestor-void`)
           &&
           <MenuItem dense
             sx={{ fontWeight: 500 }}
@@ -75,7 +75,7 @@ const DocumentRequestingActions = (props) => {
           </MenuItem>}
 
         {
-          (state === `pending`)
+          (state === `pending-request-requestor`)
           &&
           <MenuItem dense
             sx={{ fontWeight: 500 }}
@@ -83,13 +83,13 @@ const DocumentRequestingActions = (props) => {
               onUpdate(data)
               actionCloseHandler()
             }}
-            disabled={user?.id !== data.users_id || (data.document_id === 4 && data.payment_type.toLowerCase() === `partial` && !data.is_latest_transaction) || data.status.toLowerCase() !== `pending`}
+            disabled={user?.id !== data.users_id || (data.document_id === 4 && data.payment_type.toLowerCase() === `partial` && !data.is_latest_transaction) || data.status.toLowerCase() !== `pending-request-requestor`}
           >
             <UpdateIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Edit
           </MenuItem>}
 
         {
-          (state === `pending`)
+          (state === `pending-request-requestor`)
           &&
           <MenuItem dense
             sx={{ fontWeight: 500 }}
@@ -97,7 +97,7 @@ const DocumentRequestingActions = (props) => {
               onVoid(data)
               actionCloseHandler()
             }}
-            disabled={user?.id !== data.users_id || (data.document_id === 4 && data.payment_type.toLowerCase() === `partial` && !data.is_latest_transaction) || data.status.toLowerCase() !== `pending`}
+            disabled={user?.id !== data.users_id || (data.document_id === 4 && data.payment_type.toLowerCase() === `partial` && !data.is_latest_transaction) || data.status.toLowerCase() !== `pending-request-requestor`}
           >
             <VoidIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Void
           </MenuItem>}

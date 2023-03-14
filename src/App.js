@@ -92,6 +92,9 @@ import UpdateCounterReceipt from './routes/countering/UpdateCounterReceipt'
 // Receive Receipt
 import ReportReceiveReceipt from './routes/reports/receive-receipt/ReportReceiveReceipt'
 
+// Reports
+import Reports from './routes/reports/Reports'
+
 import NotFound from './exceptions/NotFound'
 import Sandbox from './Sandbox'
 
@@ -474,6 +477,10 @@ const App = () => {
 
             <Route element={<ProtectedRoute permission={4} />}>
               <Route index exact strict path="/reports/receive-receipt" element={<ReportReceiveReceipt />} />
+            </Route>
+
+            <Route element={<ProtectedRoute permission={1} />}>
+              <Route index exact strict path="/reports/requests" element={<Reports />} />
             </Route>
           </Routes>
         </Router>
