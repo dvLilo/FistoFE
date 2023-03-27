@@ -805,6 +805,11 @@ const TransactionDialog = (props) => {
                 </ListItem>
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Total DST:</span>
+                  <strong>&#8369;{data.autoDebit_group.reduce((a, b) => a + b.dst, 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                </ListItem>
+
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Total CWT:</span>
                   <strong>&#8369;{data.autoDebit_group.reduce((a, b) => a + b.cwt, 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
                 </ListItem>
@@ -830,6 +835,9 @@ const TransactionDialog = (props) => {
 
                         <span>Interest:</span>
                         <strong>&#8369;{item.interest_due.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+
+                        <span>DST:</span>
+                        <strong>&#8369;{item.dst.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
 
                         <span>CWT:</span>
                         <strong>&#8369;{item.cwt.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>

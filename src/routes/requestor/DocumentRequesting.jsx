@@ -696,6 +696,10 @@ const DocumentRequesting = () => {
                           <TableCell className="FstoTableData-root">
                             {data.document_type}
                             {
+                              Boolean(data.referrence_no) &&
+                              <Chip className="FstoChip-root FstoChip-latest" label={"ref#" + data.referrence_no} size="small" />
+                            }
+                            {
                               data.payment_type === 'Partial'
                               && <Chip className="FstoChip-root FstoChip-payment" label={data.payment_type} size="small" />
                             }

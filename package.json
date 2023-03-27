@@ -40,11 +40,11 @@
     "yup": "^0.32.11"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-scripts --openssl-legacy-provider start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "client": "react-scripts start",
+    "client": "react-scripts --openssl-legacy-provider start",
     "server": "npm start --prefix ../fisto-laravel",
     "others": "json-server --watch db.json --host localhost --port 5000 --routes routes.json",
     "all": "concurrently --kill-others \"react-scripts start\" \"npm start --prefix ../fisto-laravel\" \"json-server --watch db.json --port 5000\""

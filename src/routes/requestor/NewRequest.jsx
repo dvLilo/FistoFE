@@ -649,7 +649,7 @@ const NewRequest = () => {
           && prmGroup.length
           && (
             (data.document.category.name.match(/rental/i) && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.gross_amount, 0)).toFixed(2) >= 0.00 && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.gross_amount, 0)).toFixed(2) < 1.00) ||
-            (data.document.category.name.match(/loans|leasing/i) && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.principal, 0)).toFixed(2) >= 0.00 && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.principal, 0)).toFixed(2) < 1.00)
+            (data.document.category.name.match(/loans|leasing/i) && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.net_of_amount, 0)).toFixed(2) >= 0.00 && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.net_of_amount, 0)).toFixed(2) < 1.00)
           )
           && (!error.status || !Boolean(error.data.document_no))
           && (!validate.status || !validate.data.includes('document_no'))
@@ -763,8 +763,8 @@ const NewRequest = () => {
           && data.document.category
           && debitGroup.length
           && (
-            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)).toFixed(2) >= 0.00 &&
-            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)).toFixed(2) < 1.00
+            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)).toFixed(2) >= 0.00 &&
+            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)).toFixed(2) < 1.00
           )
           && (!error.status || !Boolean(error.data.document_no))
           && (!validate.status || !validate.data.includes('document_no'))
@@ -1514,7 +1514,8 @@ const NewRequest = () => {
           "outstanding_amount",
           "principal_amount",
           "interest_due",
-          "cwt"
+          "cwt",
+          "dst"
         ]
 
         const excelFile = response.target.result
@@ -1592,12 +1593,13 @@ const NewRequest = () => {
 
         // Validate amounts for outstanding, principal, interest due and cwt
         excelJson.map((item) => {
-          const { outstanding_amount, principal_amount, interest_due, cwt } = item
+          const { outstanding_amount, principal_amount, interest_due, dst, cwt } = item
 
           return {
             outstanding_amount,
             principal_amount,
             interest_due,
+            dst,
             cwt
           }
         }).forEach((item, itemIndex) => {
@@ -1629,6 +1631,7 @@ const NewRequest = () => {
         const excelTransformed = excelJson.map((item) => ({
           ...item,
           cwt: parseFloat(item.cwt.replace(/[,]/gi, '')),
+          dst: parseFloat(item.dst.replace(/[,]/gi, '')),
           interest_due: parseFloat(item.interest_due.replace(/[,]/gi, '')),
           interest_rate: parseFloat(item.interest_rate.replace(/[,]/gi, '')),
           principal_amount: parseFloat(item.principal_amount.replace(/[,]/gi, '')),
@@ -2549,15 +2552,15 @@ const NewRequest = () => {
                           Boolean(data.document.category.name.match(/loans|leasing/i)) &&
                           Boolean(data.document.amount)
                           && !(
-                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.principal, 0)).toFixed(2) >= 0.00 &&
-                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.principal, 0)).toFixed(2) < 1.00
+                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.net_of_amount, 0)).toFixed(2) >= 0.00 &&
+                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.net_of_amount, 0)).toFixed(2) < 1.00
                           )) ||
                         (
                           Boolean(debitGroup.length) &&
                           Boolean(data.document.amount)
                           && !(
-                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) < 1.00
+                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)) >= 0.00 &&
+                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)) < 1.00
                           ))
                       }
                       helperText={
@@ -2585,16 +2588,16 @@ const NewRequest = () => {
                           Boolean(data.document.category.name.match(/loans|leasing/i)) &&
                           Boolean(data.document.amount)
                           && !(
-                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.principal, 0)).toFixed(2) >= 0.00 &&
-                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.principal, 0)).toFixed(2) < 1.00
+                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.net_of_amount, 0)).toFixed(2) >= 0.00 &&
+                            Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.net_of_amount, 0)).toFixed(2) < 1.00
                           )
                           && "Document amount and principal amount is not equal.") ||
                         (
                           Boolean(debitGroup.length) &&
                           Boolean(data.document.amount)
                           && !(
-                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0)) < 1.00
+                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)) >= 0.00 &&
+                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)) < 1.00
                           )
                           && "Document amount and net of cwt amount is not equal.")
                       }
@@ -4070,7 +4073,7 @@ const NewRequest = () => {
                 </React.Fragment>
               )}
 
-            { // Table for Loans Import
+            { // Table for Leasing Import
               Boolean(prmGroup.length) && Boolean(data.document.category) && Boolean(data.document.category.name.match(/leasing/i)) &&
               (
                 <React.Fragment>
@@ -4226,11 +4229,10 @@ const NewRequest = () => {
                           <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Outstanding Amount</TableCell>
                           <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Principal Amount</TableCell>
                           <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>Interest Due</TableCell>
+                          <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>DST</TableCell>
                           <TableCell className="FstoTableCellImport-root" align="right">CWT</TableCell>
                         </TableRow>
                       </TableHead>
-
-
 
                       <TableBody className="FstoTableBodyImport-root" sx={{ borderBottom: '3px solid #e0e0e0' }}>
                         {
@@ -4286,6 +4288,16 @@ const NewRequest = () => {
                                   })}
                               </TableCell>
 
+                              <TableCell className="FstoTableCellImport-root" align="right" sx={{ borderRight: '1px solid #e0e0e0' }}>
+                                {
+                                  data.dst.toLocaleString('default', {
+                                    currency: 'PHP',
+                                    style: 'currency',
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                  })}
+                              </TableCell>
+
                               <TableCell className="FstoTableCellImport-root" align="right">
                                 {
                                   data.cwt.toLocaleString('default', {
@@ -4329,6 +4341,19 @@ const NewRequest = () => {
                   </Box>
 
                   <Box className="FstoBoxImport-variance">
+                    <Typography sx={{ fontSize: '1em' }}>Total DST Amount</Typography>
+                    <Typography variant="heading">
+                      {
+                        debitGroup.map((data) => data.dst).reduce((a, b) => a + b, 0).toLocaleString('default', {
+                          currency: 'PHP',
+                          style: 'currency',
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                    </Typography>
+                  </Box>
+
+                  <Box className="FstoBoxImport-variance">
                     <Typography sx={{ fontSize: '1em' }}>Total CWT</Typography>
                     <Typography variant="heading">
                       {
@@ -4345,7 +4370,7 @@ const NewRequest = () => {
                     <Typography sx={{ fontSize: '1em' }}>Total Net of CWT</Typography>
                     <Typography variant="heading">
                       {
-                        debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0).toLocaleString('default', {
+                        debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0).toLocaleString('default', {
                           currency: 'PHP',
                           style: 'currency',
                           minimumFractionDigits: 2,
