@@ -141,7 +141,7 @@ const SuppliersForm = (props) => {
         let response
         try {
           if (isUpdating)
-            response = await axios.put(`/api/admin/suppliers/${data.id}/`, {
+            response = await axios.put(`/api/admin/suppliers/${data.id}`, {
               code: supplier.code,
               name: supplier.name,
               terms: supplier.terms,

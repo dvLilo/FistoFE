@@ -69,7 +69,7 @@ const UtilityLocationsForm = (props) => {
         let response
         try {
           if (isUpdating)
-            response = await axios.put(`/api/admin/utility-location/${data.id}/`, {
+            response = await axios.put(`/api/admin/utility-location/${data.id}`, {
               location: utilityLocation.name
             })
           else

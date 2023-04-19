@@ -138,7 +138,7 @@ const CreditCardsForm = (props) => {
         let response
         try {
           if (isUpdating)
-            response = await axios.put(`/api/admin/credit-card/${data.id}/`, {
+            response = await axios.put(`/api/admin/credit-card/${data.id}`, {
               name: creditCard.name,
               account_no: creditCard.account_no,
               locations: creditCard.locations.map(loc => loc.id),

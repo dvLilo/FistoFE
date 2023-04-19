@@ -142,7 +142,7 @@ const AccountNumbersForm = (props) => {
         let response
         try {
           if (isUpdating)
-            response = await axios.put(`/api/admin/account-number/${data.id}/`, {
+            response = await axios.put(`/api/admin/account-number/${data.id}`, {
               account_no: accountNumber.number,
               location_id: accountNumber.location.id,
               category_id: accountNumber.category.id,

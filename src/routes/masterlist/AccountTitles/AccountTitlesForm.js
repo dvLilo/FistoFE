@@ -100,7 +100,7 @@ const AccountTitlesForm = (props) => {
         let response
         try {
           if (isUpdating)
-            response = await axios.put(`/api/admin/account-title/${data.id}/`, {
+            response = await axios.put(`/api/admin/account-title/${data.id}`, {
               code: accountTitle.code,
               title: accountTitle.title,
               category: accountTitle.category

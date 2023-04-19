@@ -143,7 +143,7 @@ const DepartmentsForm = (props) => {
         let response
         try {
           if (isUpdating)
-            response = await axios.put(`/api/admin/departments/${data.id}/`, {
+            response = await axios.put(`/api/admin/departments/${data.id}`, {
               code: department.code,
               department: department.department,
               company: department.company.id

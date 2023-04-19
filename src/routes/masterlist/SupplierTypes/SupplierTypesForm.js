@@ -72,7 +72,7 @@ const SupplierTypesForm = (props) => {
         let response
         try {
           if (isUpdating)
-            response = await axios.put(`/api/admin/supplier-types/${data.id}/`, {
+            response = await axios.put(`/api/admin/supplier-types/${data.id}`, {
               type: supplierType.type,
               transaction_days: supplierType.transaction
             })

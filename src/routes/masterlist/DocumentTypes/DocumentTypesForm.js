@@ -124,7 +124,7 @@ const DocumentTypesForm = (props) => {
         let response
         try {
           if (isUpdating)
-            response = await axios.put(`/api/admin/documents/${data.id}/`, {
+            response = await axios.put(`/api/admin/documents/${data.id}`, {
               type: document.type,
               description: document.description,
               categories: document.categories.map(cat => cat.id)

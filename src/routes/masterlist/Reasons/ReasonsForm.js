@@ -72,7 +72,7 @@ const ReasonsForm = (props) => {
         let response
         try {
           if (isUpdating)
-            response = await axios.put(`/api/admin/reasons/${data.id}/`, {
+            response = await axios.put(`/api/admin/reasons/${data.id}`, {
               reason: reason.reason,
               remarks: reason.remarks
             })

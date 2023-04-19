@@ -801,8 +801,8 @@ const UpdateRequest = () => {
           && data.document.category
           && debitGroup.length
           && (
-            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)) >= 0.00 &&
-            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)) < 1.00
+            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)).toFixed(2) >= 0.00 &&
+            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)).toFixed(2) < 1.00
           )
           && (!error.status || !Boolean(error.data.document_no))
           && (!validate.status || !validate.data.includes('document_no'))
@@ -2643,8 +2643,8 @@ const UpdateRequest = () => {
                           Boolean(debitGroup.length) &&
                           Boolean(data.document.amount)
                           && !(
-                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)) < 1.00
+                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)).toFixed(2) >= 0.00 &&
+                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)).toFixed(2) < 1.00
                           ))
                       }
                       helperText={
@@ -2680,8 +2680,8 @@ const UpdateRequest = () => {
                           Boolean(debitGroup.length) &&
                           Boolean(data.document.amount)
                           && !(
-                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)) >= 0.00 &&
-                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)) < 1.00
+                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)).toFixed(2) >= 0.00 &&
+                            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)).toFixed(2) < 1.00
                           )
                           && "Document amount and net of cwt amount is not equal.")
                       }
@@ -4449,7 +4449,7 @@ const UpdateRequest = () => {
                     <Typography sx={{ fontSize: '1em' }}>Total Net of CWT</Typography>
                     <Typography variant="heading">
                       {
-                        debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0).toLocaleString('default', {
+                        debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0).toLocaleString('default', {
                           currency: 'PHP',
                           style: 'currency',
                           minimumFractionDigits: 2,

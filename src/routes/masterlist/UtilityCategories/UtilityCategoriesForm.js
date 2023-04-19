@@ -69,7 +69,7 @@ const UtilityCategoriesForm = (props) => {
         let response
         try {
           if (isUpdating)
-            response = await axios.put(`/api/admin/utility-category/${data.id}/`, {
+            response = await axios.put(`/api/admin/utility-category/${data.id}`, {
               category: utilityCategory.name
             })
           else

@@ -68,7 +68,7 @@ const PayrollCategoriesForm = (props) => {
         let response
         try {
           if (isUpdating)
-            response = await axios.put(`/api/admin/payroll-category/${data.id}/`, {
+            response = await axios.put(`/api/admin/payroll-category/${data.id}`, {
               category: payrollCategory.category
             })
           else

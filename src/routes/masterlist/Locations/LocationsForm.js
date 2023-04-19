@@ -126,7 +126,7 @@ const LocationsForm = (props) => {
         let response
         try {
           if (isUpdating)
-            response = await axios.put(`/api/admin/locations/${data.id}/`, {
+            response = await axios.put(`/api/admin/locations/${data.id}`, {
               code: location.code,
               location: location.location,
               departments: location.departments.map(department => department.id)

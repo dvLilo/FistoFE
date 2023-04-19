@@ -72,7 +72,7 @@ const ReferencesForm = (props) => {
         let response
         try {
           if (isUpdating)
-            response = await axios.put(`/api/admin/referrences/${data.id}/`, {
+            response = await axios.put(`/api/admin/referrences/${data.id}`, {
               type: reference.type,
               description: reference.description
             })

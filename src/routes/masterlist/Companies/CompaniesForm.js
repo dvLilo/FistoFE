@@ -133,7 +133,7 @@ const CompaniesForm = (props) => {
         let response
         try {
           if (isUpdating)
-            response = await axios.put(`/api/admin/companies/${data.id}/`, {
+            response = await axios.put(`/api/admin/companies/${data.id}`, {
               code: company.code,
               company: company.company,
               associates: company.associates.map(assoc => assoc.id)

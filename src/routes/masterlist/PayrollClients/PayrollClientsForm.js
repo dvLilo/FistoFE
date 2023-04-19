@@ -68,7 +68,7 @@ const PayrollClientsForm = (props) => {
         let response
         try {
           if (isUpdating)
-            response = await axios.put(`/api/admin/payroll-client/${data.id}/`, {
+            response = await axios.put(`/api/admin/payroll-client/${data.id}`, {
               client: payrollClient.client
             })
           else

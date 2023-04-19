@@ -146,7 +146,7 @@ const BanksForm = (props) => {
         let response
         try {
           if (isUpdating)
-            response = await axios.put(`/api/admin/banks/${data.id}/`, {
+            response = await axios.put(`/api/admin/banks/${data.id}`, {
               code: bank.code,
               name: bank.name,
               branch: bank.branch,
