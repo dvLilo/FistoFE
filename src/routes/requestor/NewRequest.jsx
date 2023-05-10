@@ -2068,15 +2068,29 @@ const NewRequest = () => {
             isOptionEqualToValue={
               (option, value) => option.id === value.id
             }
-            onChange={(e, value) => setData({
-              ...data,
-              document: {
-                ...data.document,
-                id: value.id,
-                name: value.type,
-                payment_type: value.id === 4 ? null : "Full"
-              }
-            })}
+            // onChange={(e, value) => setData({
+            //   ...data,
+            //   document: {
+            //     ...data.document,
+            //     id: value.id,
+            //     name: value.type,
+            //     payment_type: value.id === 4 ? null : "Full"
+            //   }
+            // })}
+            onChange={(e, value) => {
+              console.log(value)
+
+              setData({
+                ...data,
+                document: {
+                  ...data.document,
+                  id: value.id,
+                  name: value.type,
+                  payment_type: value.id === 4 ? null : "Full",
+                  category: value.categories.length === 1 ? value.categories[0] : null
+                }
+              })
+            }}
             fullWidth
             disablePortal
             disableClearable

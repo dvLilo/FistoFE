@@ -62,7 +62,7 @@ const DocumentRequestingActions = (props) => {
         disablePortal
       >
         {
-          (state === `pending-request-requestor` || state === `requestor-void`)
+          (state === `pending` || state === `requestor-void`)
           &&
           <MenuItem dense
             sx={{ fontWeight: 500 }}
@@ -75,7 +75,7 @@ const DocumentRequestingActions = (props) => {
           </MenuItem>}
 
         {
-          (state === `pending-request-requestor`)
+          (state === `pending`)
           &&
           <MenuItem dense
             sx={{ fontWeight: 500 }}
@@ -89,7 +89,7 @@ const DocumentRequestingActions = (props) => {
           </MenuItem>}
 
         {
-          (state === `pending-request-requestor`)
+          (state === `pending`)
           &&
           <MenuItem dense
             sx={{ fontWeight: 500 }}
