@@ -12,6 +12,7 @@ export const VOUCHER = `voucher`
 export const APPROVAL = `approve`
 export const TRANSMIT = `transmit`
 export const CHEQUE = `cheque`
+export const AUDIT = `audit`
 export const RELEASE = `release`
 export const FILE = `file`
 export const CLEAR = `clear`

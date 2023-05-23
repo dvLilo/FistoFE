@@ -707,14 +707,15 @@ const UpdateRequest = () => {
           && data.document.reference.amount
           && data.po_group.length
           && (
-            data.document.payment_type === "Partial"
-              ? data.document.reference.amount <= data.po_group.reduce((a, b) => a + b.balance, 0).toFixed(2)
-              : data.document.reference.allowable
-                ? data.document.reference.allowable
+            data.document.reference.allowable
+            || (
+              data.document.payment_type === "Partial"
+                ? data.document.reference.amount <= data.po_group.reduce((a, b) => a + b.balance, 0).toFixed(2)
                 : (
                   Math.abs(data.document.reference.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) >= 0.00 &&
                   Math.abs(data.document.reference.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) < 1.00
                 )
+            )
           )
           && (!error.status || !Boolean(error.data.reference_no))
           && (!error.status || !Boolean(error.data.po_no))
@@ -3035,33 +3036,31 @@ const UpdateRequest = () => {
                         error={
                           Boolean(data.po_group.length) &&
                           Boolean(data.document.reference.amount)
-                          && (
-                            data.document.payment_type === "Partial"
-                              ? data.document.reference.amount > data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
-                              : !(
-                                data.document.reference.allowable
-                                  ? data.document.reference.allowable
-                                  : (
-                                    Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                                    Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
-                                  )
-                              )
+                          && !(
+                            data.document.reference.allowable
+                            || !(
+                              data.document.payment_type === "Partial"
+                                ? data.document.reference.amount > data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
+                                : (
+                                  Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
+                                  Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
+                                )
+                            )
                           )
                         }
                         helperText={
                           Boolean(data.po_group.length) &&
                           Boolean(data.document.reference.amount)
-                          && (
-                            data.document.payment_type === "Partial"
-                              ? data.document.reference.amount > data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
-                              : !(
-                                data.document.reference.allowable
-                                  ? data.document.reference.allowable
-                                  : (
-                                    Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
-                                    Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
-                                  )
-                              )
+                          && !(
+                            data.document.reference.allowable
+                            || !(
+                              data.document.payment_type === "Partial"
+                                ? data.document.reference.amount > data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
+                                : (
+                                  Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
+                                  Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
+                                )
+                            )
                           )
                           && "Reference amount and PO balance amount is not equal."
                         }
@@ -3084,32 +3083,28 @@ const UpdateRequest = () => {
                         fullWidth
                       />
 
-                      {
-                        (data.document.payment_type === "Full") &&
-                        (
-                          <FormControlLabel
-                            label="With allowable"
-                            checked={!!data.document.reference.allowable}
-                            value={data.document.reference.allowable}
-                            onChange={(e) => setData(currentValue => ({
-                              ...currentValue,
-                              document: {
-                                ...currentValue.document,
-                                reference: {
-                                  ...currentValue.document.reference,
-                                  allowable: e.target.checked ? 1 : 0
-                                }
-                              }
-                            }))}
-                            sx={{
-                              marginTop: '-1.25em'
-                            }}
-                            control={
-                              <Checkbox />
+                      <FormControlLabel
+                        label="With allowable"
+                        checked={!!data.document.reference.allowable}
+                        value={data.document.reference.allowable}
+                        onChange={(e) => setData(currentValue => ({
+                          ...currentValue,
+                          document: {
+                            ...currentValue.document,
+                            reference: {
+                              ...currentValue.document.reference,
+                              allowable: e.target.checked ? 1 : 0
                             }
-                            disableTypography
-                          />
-                        )}
+                          }
+                        }))}
+                        sx={{
+                          marginTop: '-1.25em'
+                        }}
+                        control={
+                          <Checkbox />
+                        }
+                        disableTypography
+                      />
                     </React.Fragment>
                   )
                 }
