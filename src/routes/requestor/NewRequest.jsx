@@ -1164,7 +1164,7 @@ const NewRequest = () => {
           })
         })
 
-        if (data.document.category.name.toLowerCase() === `rental` || data.document.category.name.toLowerCase() === `additional rental`) {
+        if (data.document.category.name.toLowerCase() === `rental` || data.document.category.name.toLowerCase() === `additional rental` || data.document.category.name.toLowerCase() === `lounge rental`) {
           const errors = []
           const header = ["period_covered", "gross_amount", "wht", "net_of_amount", "cheque_date"]
 
