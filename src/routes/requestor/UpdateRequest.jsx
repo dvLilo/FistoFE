@@ -3041,7 +3041,7 @@ const UpdateRequest = () => {
                             || !(
                               data.document.payment_type === "Partial"
                                 ? data.document.reference.amount > data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
-                                : (
+                                : !(
                                   Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
                                   Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
                                 )
@@ -3056,7 +3056,7 @@ const UpdateRequest = () => {
                             || !(
                               data.document.payment_type === "Partial"
                                 ? data.document.reference.amount > data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
-                                : (
+                                : !(
                                   Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) >= 0.00 &&
                                   Math.abs(data.document.reference.amount - data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)) < 1.00
                                 )
