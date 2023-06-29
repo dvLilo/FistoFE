@@ -3,7 +3,10 @@ import React from 'react'
 import axios from 'axios'
 
 import moment from 'moment'
-// import business from 'moment-business'
+
+import * as fs from 'file-saver'
+
+import { Workbook } from 'exceljs'
 
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -31,21 +34,19 @@ import {
 } from '@mui/material'
 
 import {
+  Download,
   Search,
   Close,
   Add,
-  // Error,
-  // AccessTime,
-  // DensitySmall,
-  // DensityMedium
 } from '@mui/icons-material'
+
+import { logo } from '../../assets/img/logo_s2'
 
 import EmptyImage from '../../assets/img/empty.svg'
 
 import useToast from '../../hooks/useToast'
 import useTransactions from '../../hooks/useTransactions'
 
-// import TablePreloader from '../../components/TablePreloader'
 import Preloader from '../../components/Preloader'
 
 import DocumentRequestingActions from './DocumentRequestingActions'
@@ -142,6 +143,92 @@ const DocumentRequesting = () => {
     data,
     open: true
   }))
+
+  const onExport = async (data) => {
+
+    const workbook = new Workbook()
+    const worksheet = workbook.addWorksheet("Fisto Report")
+
+    // add logo
+    const appLogo = workbook.addImage({
+      base64: logo,
+      extension: "png"
+    })
+    worksheet.mergeCells("A1:C4")
+    worksheet.addImage(appLogo, "A1:C4")
+
+    // add empty row
+    worksheet.addRow([])
+
+    // add header
+    const excelHeader = worksheet.addRow([
+      "Transaction No.",
+      "Date Transacted",
+      "Date Received",
+      "Date Transmitted",
+      "Supplier",
+      "PO No.",
+      "Reference No.",
+      "Description",
+      "Amount",
+      "Received By",
+      "Signature",
+      "Date Received"
+    ])
+    excelHeader.eachCell((cell) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "000000" }
+      }
+      cell.font = {
+        color: { argb: "FFFFFF" },
+        bold: true
+      }
+    })
+
+    worksheet.columns = [
+      { key: 'transaction_no' },
+      { key: 'date_requested' },
+      { key: 'date_received' },
+      { key: 'date_transmitted' },
+      { key: 'supplier_name' },
+      { key: 'po_no' },
+      { key: 'reference_no' },
+      { key: 'description' },
+      { key: 'amount' },
+      { key: 'received_by' },
+      { key: 'signature' },
+      { key: 'received_date' },
+    ]
+
+    // process data
+    const excelBody = data.data.map((item) => {
+      return {
+        transaction_no: item.transaction_id,
+        date_requested: item.date_requested,
+        supplier_name: item.supplier.name,
+        po_no: item.po_details.map((po) => po.po_no).join(" / "),
+        reference_no: item.document_no || item.reference_no,
+        amount: item.document_amount || item.referrence_amount,
+        description: item.remarks,
+        received_by: null,
+        signature: null,
+        date_transmitted: null,
+        date_received: null,
+        received_date: null
+      }
+    })
+    worksheet.addRows(excelBody)
+
+    await workbook.xlsx.writeBuffer().then((data) => {
+      const blob = new Blob([data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      });
+
+      fs.saveAs(blob, "Fisto Report.xlsx");
+    });
+  }
 
   const getStatusMessage = (state) => {
 
@@ -808,19 +895,31 @@ const DocumentRequesting = () => {
             </React.Fragment>}
         </TableContainer>
 
+        <Stack className="FstoStackPagination-root" direction="row" justifyContent="space-between" alignItems="center" gap={1}>
+          <Button
+            className="FstoButtonExport-root"
+            variant="contained"
+            startIcon={<Download />}
+            onClick={() => onExport(data)}
+            disabled={
+              status !== "success"
+            }
+            disableElevation
+          >Export</Button>
 
-        <TablePagination
-          className="FstoTablePagination-root"
-          component="div"
-          count={data ? data.total : 0}
-          page={data ? data.current_page - 1 : 0}
-          rowsPerPage={data ? data.per_page : 10}
-          onPageChange={(e, page) => changePage(page)}
-          onRowsPerPageChange={(e) => changeRows(e.target.value)}
-          rowsPerPageOptions={[10, 20, 50, 100]}
-          showFirstButton
-          showLastButton
-        />
+          <TablePagination
+            className="FstoTablePagination-root"
+            component="div"
+            count={data ? data.total : 0}
+            page={data ? data.current_page - 1 : 0}
+            rowsPerPage={data ? data.per_page : 10}
+            onPageChange={(e, page) => changePage(page)}
+            onRowsPerPageChange={(e) => changeRows(e.target.value)}
+            rowsPerPageOptions={[10, 20, 50, 100]}
+            showFirstButton
+            showLastButton
+          />
+        </Stack>
 
         <DocumentRequestingTransaction {...view} />
 

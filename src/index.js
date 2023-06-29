@@ -13,10 +13,9 @@ import App from './App'
 import './index.scss'
 
 axios.defaults.withCredentials = true
-axios.defaults.baseURL = 'http://127.0.0.1:8000'
-// axios.defaults.baseURL = 'http://10.10.10.8:8000'
-// axios.defaults.baseURL = 'http://10.10.2.76:8000' // Server IP
-// axios.defaults.baseURL = 'http://10.10.13.15:8000' // Backend IP
+// axios.defaults.baseURL = 'http://127.0.0.1:8000' // Home IP
+// axios.defaults.baseURL = 'http://10.10.10.8:8000' // Backend IP
+axios.defaults.baseURL = 'http://10.10.2.76:8000' // Server IP
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token')
 axios.interceptors.response.use(

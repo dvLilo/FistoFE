@@ -467,7 +467,7 @@ const NewRequest = () => {
     ) checkReferenceNumberHandler()
 
     // eslint-disable-next-line
-  }, [data.document.company])
+  }, [data.document.company, data.document.supplier])
 
   React.useEffect(() => { // PO Number Validation
     if ((data.document.id === 1 || data.document.id === 4 || data.document.id === 5)
@@ -858,6 +858,7 @@ const NewRequest = () => {
     try {
       await axios.post(`/api/transactions/validate-reference-no`, {
         company_id: data.document.company.id,
+        supplier_id: data.document.supplier.id,
         reference_no: data.document.reference.no
       })
     }
