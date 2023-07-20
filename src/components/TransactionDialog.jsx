@@ -520,6 +520,11 @@ const TransactionDialog = (props) => {
                 Boolean(data.document.payroll) &&
                 <React.Fragment>
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Control No.:</span>
+                    <strong>{data.document.payroll.control_no}</strong>
+                  </ListItem>
+
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Payroll Type:</span>
                     <strong>{data.document.payroll.type}</strong>
                   </ListItem>
