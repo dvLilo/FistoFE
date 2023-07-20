@@ -246,6 +246,7 @@ const NewRequest = () => {
       },
 
       payroll: {
+        control_no: "",
         type: null,
         category: null,
         clients: []
@@ -1165,7 +1166,17 @@ const NewRequest = () => {
           })
         })
 
-        if (data.document.category.name.toLowerCase() === `rental` || data.document.category.name.toLowerCase() === `additional rental` || data.document.category.name.toLowerCase() === `lounge rental`) {
+        if (
+          data.document.category.name.toLowerCase() === `rental` ||
+          data.document.category.name.toLowerCase() === `additional rental` ||
+          data.document.category.name.toLowerCase() === `lounge rental` ||
+          data.document.category.name.toLowerCase() === `cusa rental` ||
+          data.document.category.name.toLowerCase() === `dorm rental` ||
+          data.document.category.name.toLowerCase() === `stall a rental` ||
+          data.document.category.name.toLowerCase() === `stall b rental` ||
+          data.document.category.name.toLowerCase() === `stall c rental` ||
+          data.document.category.name.toLowerCase() === `stall d rental`
+        ) {
           const errors = []
           const header = ["period_covered", "gross_amount", "wht", "net_of_amount", "cheque_date"]
 
@@ -1367,7 +1378,11 @@ const NewRequest = () => {
           setPrmGroup(excelTransformed)
         }
 
-        if (data.document.category.name.toLowerCase() === `leasing`) {
+        if (
+          data.document.category.name.toLowerCase() === `leasing` ||
+          data.document.category.name.toLowerCase() === `official store leasing` ||
+          data.document.category.name.toLowerCase() === `unofficial store leasing`
+        ) {
           const errors = []
           const header = ["amortization", "interest", "cwt", "principal", "net_of_amount", "cheque_date"]
 
@@ -1929,6 +1944,7 @@ const NewRequest = () => {
         },
 
         payroll: {
+          control_no: "",
           type: null,
           category: null,
           clients: []
@@ -1989,12 +2005,14 @@ const NewRequest = () => {
                 pcf_date: errors["pcf_batch.date"],
                 pcf_letter: errors["pcf_batch.letter"],
 
+                payroll_no: errors["document.payroll.control_no"],
                 payroll_type: errors["document.payroll.type"],
                 payroll_clients: errors["document.payroll.clients"],
                 payroll_category: errors["document.payroll.category"],
 
                 utility_location: errors["document.utility.location.id"],
-                utility_category: errors["document.utility.category.id"]
+                utility_category: errors["document.utility.category.id"],
+                utility_soa: errors["document.utility.receipt_no"]
               }
             }))
 
@@ -3336,6 +3354,15 @@ const NewRequest = () => {
                         autoComplete="off"
                         size="small"
                         value={data.document.utility.receipt_no}
+                        error={
+                          error.status
+                          && Boolean(error.data.utility_soa)
+                        }
+                        helperText={
+                          error.status
+                          && error.data.utility_soa
+                          && error.data.utility_soa[0]
+                        }
                         onChange={(e) => setData({
                           ...data,
                           document: {
@@ -3358,6 +3385,38 @@ const NewRequest = () => {
                   (data.document.id === 7) &&
                   (
                     <React.Fragment>
+                      <TextField
+                        className="FstoTextfieldForm-root"
+                        label="Control Number"
+                        variant="outlined"
+                        autoComplete="off"
+                        size="small"
+                        value={data.document.payroll.control_no}
+                        error={
+                          error.status
+                          && Boolean(error.data.payroll_no)
+                        }
+                        helperText={
+                          error.status
+                          && error.data.payroll_no
+                          && error.data.payroll_no[0]
+                        }
+                        onChange={(e) => setData({
+                          ...data,
+                          document: {
+                            ...data.document,
+                            payroll: {
+                              ...data.document.payroll,
+                              control_no: e.target.value
+                            }
+                          }
+                        })}
+                        InputLabelProps={{
+                          className: "FstoLabelForm-root"
+                        }}
+                        fullWidth
+                      />
+
                       <Autocomplete
                         className="FstoSelectForm-root"
                         size="small"
