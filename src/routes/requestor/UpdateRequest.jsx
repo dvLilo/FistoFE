@@ -293,7 +293,7 @@ const UpdateRequest = () => {
           autoDebit_group
         } = response.data.result
 
-        const isBatch = po_group.every((item) => !item.is_add)
+        const isBatch = po_group.every((item) => !item.is_add && item.is_modifiable)
 
         const po_group_new = po_group.map((item) => {
           const data = {
@@ -2770,8 +2770,8 @@ const UpdateRequest = () => {
                       location: null
                     }
                   })}
-                  readOnly={
-                    data.document.id === 4 && data.transaction.is_latest_transaction === 0
+                  disabled={
+                    data.document.id === 4 && data.transaction?.is_latest_transaction === 0
                   }
                   fullWidth
                   disablePortal
@@ -2953,8 +2953,8 @@ const UpdateRequest = () => {
                       )
                     }
                   })}
-                  readOnly={
-                    data.document.id === 4 && data.transaction.is_latest_transaction === 0
+                  disabled={
+                    data.document.id === 4 && data.transaction?.is_latest_transaction === 0
                   }
                   fullWidth
                   disablePortal
@@ -3101,12 +3101,14 @@ const UpdateRequest = () => {
                           }
                         })}
                         InputProps={{
-                          inputComponent: NumberField,
-                          readOnly: data.document.id === 4 && data.transaction.is_latest_transaction === 0
+                          inputComponent: NumberField
                         }}
                         InputLabelProps={{
                           className: "FstoLabelForm-root"
                         }}
+                        disabled={
+                          data.document.id === 4 && data.transaction?.is_latest_transaction === 0
+                        }
                         fullWidth
                       />
 
@@ -3804,7 +3806,7 @@ const UpdateRequest = () => {
                 InputLabelProps={{
                   className: "FstoLabelForm-attachment"
                 }}
-                disabled={PO.batch || data.transaction.is_latest_transaction === 0}
+                disabled={PO.batch || data.transaction?.is_latest_transaction === 0}
               />
 
               <TextField
@@ -3828,7 +3830,7 @@ const UpdateRequest = () => {
                 InputLabelProps={{
                   className: "FstoLabelForm-attachment"
                 }}
-                disabled={PO.batch || data.transaction.is_latest_transaction === 0}
+                disabled={PO.batch || data.transaction?.is_latest_transaction === 0}
               />
 
               <Autocomplete
@@ -3896,39 +3898,39 @@ const UpdateRequest = () => {
                   <Box className="FstoPurchaseOrderBox-root">
                     {
                       data.po_group?.map(
-                        (data, index) =>
+                        (item, index) =>
                           <Box className="FstoPurchaseOrder-root" key={index}>
                             <Stack className="FstoPurchaseOrderStack-root" direction="row">
                               <Typography variant="subtitle2">P.O. Number</Typography>
-                              <Typography className="FstoPurchaseOrderTypography-root" variant="h6">{data.no}</Typography>
+                              <Typography className="FstoPurchaseOrderTypography-root" variant="h6">{item.no}</Typography>
                             </Stack>
 
                             <Stack className="FstoPurchaseOrderStack-root" direction="row">
                               <Typography variant="subtitle2">P.O. Amount</Typography>
-                              <Typography className="FstoPurchaseOrderTypography-root" variant="h6">&#8369;{data.amount.toLocaleString()}</Typography>
+                              <Typography className="FstoPurchaseOrderTypography-root" variant="h6">&#8369;{item.amount.toLocaleString()}</Typography>
                             </Stack>
 
                             <Stack className="FstoPurchaseOrderStack-root" direction="row">
                               <Typography variant="subtitle2">P.O. Balance</Typography>
-                              <Typography className="FstoPurchaseOrderTypography-root" variant="h6">&#8369;{data.balance.toLocaleString()}</Typography>
+                              <Typography className="FstoPurchaseOrderTypography-root" variant="h6">&#8369;{item.balance.toLocaleString()}</Typography>
                             </Stack>
 
                             <Stack className="FstoPurchaseOrderStack-root" direction="row">
                               <Typography variant="subtitle2">R.R. Number</Typography>
                               <Typography className="FstoPurchaseOrderTypography-root" variant="h6">
                                 {
-                                  data.rr_no.length
-                                    ? data.rr_no.join(", ")
+                                  item.rr_no.length
+                                    ? item.rr_no.join(", ")
                                     : <>&mdash;</>
                                 }
                               </Typography>
                             </Stack>
 
                             <Stack direction="row" spacing={1}>
-                              <IconButton onClick={() => updatePurchaseOrderHandler(index, data)}>
+                              <IconButton onClick={() => updatePurchaseOrderHandler(index, item)}>
                                 <Edit />
                               </IconButton>
-                              <IconButton onClick={() => removePurchaseOrderHandler(data)} disabled={PO.update}>
+                              <IconButton onClick={() => removePurchaseOrderHandler(item)} disabled={PO.update || data.transaction?.is_latest_transaction === 0}>
                                 <Delete />
                               </IconButton>
                             </Stack>
