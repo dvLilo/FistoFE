@@ -21,7 +21,7 @@ import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
 import ChequeEntryDialog from '../../components/ChequeEntryDialog'
 
-const DocumentAuditingTransaction = (props) => {
+const DocumentInspectingTransaction = (props) => {
 
   const {
     state,
@@ -50,9 +50,25 @@ const DocumentAuditingTransaction = (props) => {
     // eslint-disable-next-line
   }, [open])
 
-  const [auditData] = React.useState({
-    process: "audit",
-    subprocess: "audit"
+  React.useEffect(() => {
+    if (open && status === `success`) {
+      setInspectData(currentValue => ({
+        ...currentValue,
+        distributed_to: data.tag.distributed_to,
+        ...(
+          /approve-approve/i.test(state) && {
+            distributed_to: data.approve.distributed_to
+          }
+        )
+      }))
+    }
+
+    // eslint-disable-next-line
+  }, [open, data, status])
+
+  const [inspectData, setInspectData] = React.useState({
+    process: "inspect",
+    subprocess: "inspect"
   })
 
   const [viewAccountTitle, setViewAccountTitle] = React.useState({
@@ -89,7 +105,7 @@ const DocumentAuditingTransaction = (props) => {
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, auditData)
+          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, inspectData)
 
           const { message } = response.data
 
@@ -178,20 +194,20 @@ const DocumentAuditingTransaction = (props) => {
         </DialogContent>
 
         {
-          (state === `audit-receive` || state === `audit-audit` || state === `audit-hold`) &&
+          (state === `inspect-receive` || state === `inspect-inspect` || state === `inspect-hold`) &&
           <DialogActions className="FstoDialogTransaction-actions">
             {
-              state === `audit-receive` &&
+              (state === `inspect-receive` || state === `inspect-inspect`) &&
               <Button
                 variant="contained"
                 onClick={submitApproveHandler}
                 disableElevation
-              > Approve
+              > {state === `inspect-receive` ? "Approve" : "Save"}
               </Button>
             }
 
             {
-              state === `audit-hold` &&
+              state === `inspect-hold` &&
               <Button
                 variant="contained"
                 onClick={submitUnholdHandler}
@@ -201,7 +217,7 @@ const DocumentAuditingTransaction = (props) => {
             }
 
             {
-              state !== `audit-hold` &&
+              state !== `inspect-hold` &&
               <Button
                 variant="outlined"
                 color="error"
@@ -210,7 +226,6 @@ const DocumentAuditingTransaction = (props) => {
               > Hold
               </Button>
             }
-
 
             <Button
               variant="outlined"
@@ -238,4 +253,4 @@ const DocumentAuditingTransaction = (props) => {
   )
 }
 
-export default DocumentAuditingTransaction
+export default DocumentInspectingTransaction

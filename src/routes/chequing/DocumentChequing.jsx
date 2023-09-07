@@ -46,7 +46,7 @@ import {
   RETURN,
   UNRETURN,
   VOID,
-  RELEASE
+  // RELEASE
 } from '../../constants'
 
 import EmptyImage from '../../assets/img/empty.svg'
@@ -149,37 +149,37 @@ const DocumentChequing = () => {
     })
   }
 
-  const onRelease = (ID) => {
-    confirm({
-      open: true,
-      wait: true,
-      onConfirm: async () => {
-        let response
-        try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
-            process: CHEQUE,
-            subprocess: RELEASE
-          })
+  // const onRelease = (ID) => {
+  //   confirm({
+  //     open: true,
+  //     wait: true,
+  //     onConfirm: async () => {
+  //       let response
+  //       try {
+  //         response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
+  //           process: CHEQUE,
+  //           subprocess: RELEASE
+  //         })
 
-          const { message } = response.data
+  //         const { message } = response.data
 
-          refetchData()
-          toast({
-            message,
-            title: "Success!"
-          })
-        } catch (error) {
-          console.log("Fisto Error Status", error.request)
+  //         refetchData()
+  //         toast({
+  //           message,
+  //           title: "Success!"
+  //         })
+  //       } catch (error) {
+  //         console.log("Fisto Error Status", error.request)
 
-          toast({
-            severity: "error",
-            title: "Error!",
-            message: "Something went wrong whilst trying to receive transaction. Please try again later."
-          })
-        }
-      }
-    })
-  }
+  //         toast({
+  //           severity: "error",
+  //           title: "Error!",
+  //           message: "Something went wrong whilst trying to receive transaction. Please try again later."
+  //         })
+  //       }
+  //     }
+  //   })
+  // }
 
   const onHold = (data) => {
     setReason(currentValue => ({
@@ -301,7 +301,7 @@ const DocumentChequing = () => {
               <Tab className="FstoTab-root" label="Pending" value="pending" disableRipple />
               <Tab className="FstoTab-root" label="Received" value="cheque-receive" disableRipple />
               <Tab className="FstoTab-root" label="Created" value="cheque-cheque" disableRipple />
-              <Tab className="FstoTab-root" label="Released" value="cheque-release" disableRipple />
+              {/* <Tab className="FstoTab-root" label="Released" value="cheque-release" disableRipple /> */}
               <Tab className="FstoTab-root" label="Held" value="cheque-hold" disableRipple />
               <Tab className="FstoTab-root" label="Returned" value="cheque-return" disableRipple />
               <Tab className="FstoTab-root" label="Voided" value="cheque-void" disableRipple />
@@ -543,7 +543,7 @@ const DocumentChequing = () => {
           {...manage}
           state={state}
           refetchData={refetchData}
-          onRelease={onRelease}
+          // onRelease={onRelease}
           onHold={onHold}
           onUnhold={onUnhold}
           onReturn={onReturn}

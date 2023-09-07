@@ -20,17 +20,15 @@ import useReasons from '../hooks/useReasons'
 
 import '../assets/css/styles.reverse.scss'
 
-const ReverseDialog = (props) => {
-
-  const {
-    open = false,
-    reverse = null,
-    onSelect = () => { },
-    onChange = () => { },
-    onSubmit = () => { },
-    onClose = () => { },
-    onClear = () => { }
-  } = props
+const ReverseDialog = ({
+  open = false,
+  reverse = null,
+  onSelect = () => { },
+  onChange = () => { },
+  onSubmit = () => { },
+  onClose = () => { },
+  onClear = () => { }
+}) => {
 
   const {
     refetch: fetchReasons,

@@ -15,13 +15,11 @@ import {
 
 import ErrorIcon from '@mui/icons-material/Error'
 
-const ErrorDialog = (props) => {
-
-  const {
-    open,
-    data,
-    onClose
-  } = props
+const ErrorDialog = ({
+  open,
+  data,
+  onClose
+}) => {
 
   return (
     <Dialog

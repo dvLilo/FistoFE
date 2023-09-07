@@ -544,7 +544,7 @@ const UpdateRequest = () => {
     if (!ACCOUNT_NUMBERS_LIST) return
 
     if (data.document.supplier && data.document.utility.category && data.document.utility.location) {
-      const account_numbers = ACCOUNT_NUMBERS_LIST.filter(row => row.supplier.id === data.document.supplier.id && row.category.id === data.document.utility.category.id && row.location.id === data.document.utility.location.id)
+      const account_numbers = ACCOUNT_NUMBERS_LIST.filter(row => row.supplier?.id === data.document.supplier.id && row.category?.id === data.document.utility.category.id && row.location?.id === data.document.utility.location.id)
 
       if (account_numbers.length === 1)
         setData(currentValue => ({
@@ -650,8 +650,12 @@ const UpdateRequest = () => {
           && data.document.category
           && data.po_group.length
           && (
-            Math.abs(data.document.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) >= 0.00 &&
-            Math.abs(data.document.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) < 1.00
+            Boolean(data.document.payment_type.match(/full/i))
+              ? (
+                Math.abs(data.document.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) >= 0.00 &&
+                Math.abs(data.document.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) < 1.00
+              )
+              : data.document.amount <= data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
           )
           && (!error.status || !Boolean(error.data.document_no))
           && (!error.status || !Boolean(error.data.po_no))
@@ -1263,22 +1267,22 @@ const UpdateRequest = () => {
           })
 
           // Check if cheque date is less than 28 days or more than 31 days
-          excelJson.reduce((previousItem, currentItem, itemIndex) => {
-            const previousDate = new Date(previousItem.cheque_date)
-            const currentDate = new Date(currentItem.cheque_date)
+          // excelJson.reduce((previousItem, currentItem, itemIndex) => {
+          //   const previousDate = new Date(previousItem.cheque_date)
+          //   const currentDate = new Date(currentItem.cheque_date)
 
-            const differenceTime = Math.abs(currentDate - previousDate)
-            const differenceDays = Math.ceil(differenceTime / (1000 * 60 * 60 * 24))
+          //   const differenceTime = Math.abs(currentDate - previousDate)
+          //   const differenceDays = Math.ceil(differenceTime / (1000 * 60 * 60 * 24))
 
-            if (differenceDays < 27 || differenceDays > 32)
-              errors.push({
-                line: itemIndex + 2,
-                error_type: "invalid",
-                description: `Cheque date range is invalid.`
-              })
+          //   if (differenceDays < 27 || differenceDays > 32)
+          //     errors.push({
+          //       line: itemIndex + 2,
+          //       error_type: "invalid",
+          //       description: `Cheque date range is invalid.`
+          //     })
 
-            return currentItem
-          })
+          //   return currentItem
+          // })
 
           // Check if gross, wht and net of amount is valid
           excelJson.map((item) => {
@@ -1363,22 +1367,22 @@ const UpdateRequest = () => {
           })
 
           // Check if cheque date is less than 28 days or more than 31 days
-          excelJson.reduce((previousItem, currentItem, itemIndex) => {
-            const previousDate = new Date(previousItem.cheque_date)
-            const currentDate = new Date(currentItem.cheque_date)
+          // excelJson.reduce((previousItem, currentItem, itemIndex) => {
+          //   const previousDate = new Date(previousItem.cheque_date)
+          //   const currentDate = new Date(currentItem.cheque_date)
 
-            const differenceTime = Math.abs(currentDate - previousDate)
-            const differenceDays = Math.ceil(differenceTime / (1000 * 60 * 60 * 24))
+          //   const differenceTime = Math.abs(currentDate - previousDate)
+          //   const differenceDays = Math.ceil(differenceTime / (1000 * 60 * 60 * 24))
 
-            if (differenceDays < 27 || differenceDays > 32)
-              errors.push({
-                line: itemIndex + 2,
-                error_type: "invalid",
-                description: `Cheque date range is invalid.`
-              })
+          //   if (differenceDays < 27 || differenceDays > 32)
+          //     errors.push({
+          //       line: itemIndex + 2,
+          //       error_type: "invalid",
+          //       description: `Cheque date range is invalid.`
+          //     })
 
-            return currentItem
-          })
+          //   return currentItem
+          // })
 
           // Check if principal, interest, cwt and net of amount is valid
           excelJson.map((item) => {
@@ -1469,22 +1473,22 @@ const UpdateRequest = () => {
           })
 
           // Check if cheque date is less than 28 days or more than 31 days
-          excelJson.reduce((previousItem, currentItem, itemIndex) => {
-            const previousDate = new Date(previousItem.cheque_date)
-            const currentDate = new Date(currentItem.cheque_date)
+          // excelJson.reduce((previousItem, currentItem, itemIndex) => {
+          //   const previousDate = new Date(previousItem.cheque_date)
+          //   const currentDate = new Date(currentItem.cheque_date)
 
-            const differenceTime = Math.abs(currentDate - previousDate)
-            const differenceDays = Math.ceil(differenceTime / (1000 * 60 * 60 * 24))
+          //   const differenceTime = Math.abs(currentDate - previousDate)
+          //   const differenceDays = Math.ceil(differenceTime / (1000 * 60 * 60 * 24))
 
-            if (differenceDays < 27 || differenceDays > 32)
-              errors.push({
-                line: itemIndex + 2,
-                error_type: "invalid",
-                description: `Cheque date range is invalid.`
-              })
+          //   if (differenceDays < 27 || differenceDays > 32)
+          //     errors.push({
+          //       line: itemIndex + 2,
+          //       error_type: "invalid",
+          //       description: `Cheque date range is invalid.`
+          //     })
 
-            return currentItem
-          })
+          //   return currentItem
+          // })
 
           // Check if gross, wht and net of amount is valid
           excelJson.map((item) => {
@@ -2251,7 +2255,7 @@ const UpdateRequest = () => {
                   }
                   getOptionDisabled={
                     option => {
-                      if (data.document.id !== 4 && option.label === "Partial") return true
+                      if (data.document.id !== 1 && data.document.id !== 4 && option.label === "Partial") return true
                     }
                   }
                   isOptionEqualToValue={
@@ -2637,10 +2641,18 @@ const UpdateRequest = () => {
                       error={
                         (
                           Boolean(data.po_group.length) &&
-                          Boolean(data.document.amount)
+                          Boolean(data.document.amount) &&
+                          Boolean(data.document.payment_type.match(/full/i))
                           && !(
                             Math.abs(data.document.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) >= 0.00 &&
                             Math.abs(data.document.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) < 1.00
+                          )) ||
+                        (
+                          Boolean(data.po_group.length) &&
+                          Boolean(data.document.amount) &&
+                          Boolean(data.document.payment_type.match(/partial/i))
+                          && !(
+                            data.document.amount <= data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
                           )) ||
                         (
                           Boolean(prmGroup.length) &&
@@ -2671,10 +2683,19 @@ const UpdateRequest = () => {
                       helperText={
                         (
                           Boolean(data.po_group.length) &&
-                          Boolean(data.document.amount)
+                          Boolean(data.document.amount) &&
+                          Boolean(data.document.payment_type.match(/full/i))
                           && !(
                             Math.abs(data.document.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) >= 0.00 &&
                             Math.abs(data.document.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) < 1.00
+                          )
+                          && "Document amount and PO balance amount is not equal.") ||
+                        (
+                          Boolean(data.po_group.length) &&
+                          Boolean(data.document.amount) &&
+                          Boolean(data.document.payment_type.match(/partial/i))
+                          && !(
+                            data.document.amount <= data.po_group.map((po) => po.balance).reduce((a, b) => a + b, 0)
                           )
                           && "Document amount and PO balance amount is not equal.") ||
                         (
@@ -2719,6 +2740,9 @@ const UpdateRequest = () => {
                       InputLabelProps={{
                         className: "FstoLabelForm-root"
                       }}
+                      disabled={
+                        data.document.id === 1 && data.transaction?.is_latest_transaction === 0
+                      }
                       fullWidth
                     />
                   )}
@@ -2771,7 +2795,7 @@ const UpdateRequest = () => {
                     }
                   })}
                   disabled={
-                    data.document.id === 4 && data.transaction?.is_latest_transaction === 0
+                    ((data.document.id === 1 && data.document.payment_type === "Partial") || data.document.id === 4) && data.transaction?.is_latest_transaction === 0
                   }
                   fullWidth
                   disablePortal
@@ -2954,7 +2978,7 @@ const UpdateRequest = () => {
                     }
                   })}
                   disabled={
-                    data.document.id === 4 && data.transaction?.is_latest_transaction === 0
+                    ((data.document.id === 1 && data.document.payment_type === "Partial") || data.document.id === 4) && data.transaction?.is_latest_transaction === 0
                   }
                   fullWidth
                   disablePortal
@@ -3135,8 +3159,7 @@ const UpdateRequest = () => {
                         disableTypography
                       />
                     </React.Fragment>
-                  )
-                }
+                  )}
 
                 { // Category
                   (data.document.id === 1 || data.document.id === 2 || data.document.id === 3 || data.document.id === 4 || data.document.id === 5 || data.document.id === 9) &&
@@ -3487,7 +3510,7 @@ const UpdateRequest = () => {
                     <React.Fragment>
                       <TextField
                         className="FstoTextfieldForm-root"
-                        label="Control Number"
+                        label="Control Number (Optional)"
                         variant="outlined"
                         autoComplete="off"
                         size="small"

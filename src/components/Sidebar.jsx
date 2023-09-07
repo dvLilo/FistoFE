@@ -26,6 +26,7 @@ import {
   SettingsOutlined as MasterlistIcon,
   FeedOutlined as DocumentIcon,
   ConfirmationNumberOutlined as VoucherIcon,
+  PolicyOutlined as AuditIcon,
   LocalAtmOutlined as ChequeIcon,
   FactCheckOutlined as ApprovalIcon,
   SecurityOutlined as ConfidentialIcon,
@@ -126,27 +127,49 @@ const Sidebar = () => {
 
           { // Documents
             !!user &&
-            (user.permissions.includes(1) || user.permissions.includes(6) || user.permissions.includes(7) || user.permissions.includes(8) || user.permissions.includes(19) || user.permissions.includes(20) || user.permissions.includes(21) || user.permissions.includes(22)) &&
-            <Accordion defaultExpanded={/tagging|requestor/i.test(user.role)} elevation={0} square disableGutters>
+            user.permissions.some((item) => [1, 6, 7, 8, 19, 20, 21, 22, 23].includes(item)) &&
+            <Accordion defaultExpanded={/tagging|executive|requestor/i.test(user.role)} elevation={0} square disableGutters>
               <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
                 <DocumentIcon />
                 <Typography variant="sidebar">Documents</Typography>
               </AccordionSummary>
 
               <AccordionDetails>
-                {user.permissions.includes(1) && <RouterLink className="FstoSidebarLink-root" to="/request">Creation of Request</RouterLink>}
-                {user.permissions.includes(21) && <RouterLink className="FstoSidebarLink-root" to="/counter-receipt/creating">Creation of Counter Receipt</RouterLink>}
-                {user.permissions.includes(20) && <RouterLink className="FstoSidebarLink-root" to="/document/tagging">Tagging of Documents {/*<Chip className="FstoSidebarChip-root" color="primary" label="99+" size="small" />*/}</RouterLink>}
-                {user.permissions.includes(19) && <RouterLink className="FstoSidebarLink-root" to="/document/transmitting">Transmittal of Documents</RouterLink>}
-                {user.permissions.includes(22) && <RouterLink className="FstoSidebarLink-root" to="/counter-receipt/monitoring">Monitoring of Counter Receipt</RouterLink>}
-                <RouterLink className="FstoSidebarLink-root" to="/document/returned-documents">Returned Documents</RouterLink>
+                {user.permissions.includes(1)
+                  && <RouterLink className="FstoSidebarLink-root" to="/request">Creation of Request</RouterLink>
+                }
+
+                {user.permissions.includes(21)
+                  && <RouterLink className="FstoSidebarLink-root" to="/counter-receipt/creating">Creation of Counter Receipt</RouterLink>
+                }
+
+                {user.permissions.includes(20)
+                  && <RouterLink className="FstoSidebarLink-root" to="/document/tagging">Tagging of Documents {/*<Chip className="FstoSidebarChip-root" color="primary" label="99+" size="small" />*/}</RouterLink>
+                }
+
+                {user.permissions.includes(19)
+                  && <RouterLink className="FstoSidebarLink-root" to="/voucher/transmitting">Transmittal of Voucher</RouterLink>
+                }
+
+                {user.permissions.includes(23)
+                  && <RouterLink className="FstoSidebarLink-root" to="/cheque/transmitting">Transmittal of Cheque</RouterLink>
+                }
+
+                {user.permissions.includes(22)
+                  && <RouterLink className="FstoSidebarLink-root" to="/counter-receipt/monitoring">Monitoring of Counter Receipt</RouterLink>
+                }
+
+                {user.permissions.some((item) => [1, 6, 7, 8, 19, 20, 21, 22].includes(item))
+                  && <RouterLink className="FstoSidebarLink-root" to="/document/returned-documents">Returned Documents</RouterLink>
+                }
+
               </AccordionDetails>
             </Accordion>
           }
 
           { // Voucher
             !!user &&
-            (!!user.role.match(/ap associate|specialist/i) || (!!user.role.match(/tagging/i) && (user.permissions.includes(10) || user.permissions.includes(12)))) &&
+            user.permissions.some((item) => [10, 11, 12].includes(item)) &&
             <Accordion defaultExpanded={/associate|specialist/i.test(user.role)} elevation={0} square disableGutters>
               <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
                 <VoucherIcon />
@@ -169,9 +192,30 @@ const Sidebar = () => {
             </Accordion>
           }
 
+          { // Audit
+            !!user &&
+            !!user.role.match(/audit associate/i) &&
+            <Accordion defaultExpanded={/audit/i.test(user.role)} elevation={0} square disableGutters>
+              <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
+                <AuditIcon />
+                <Typography variant="sidebar">Audit</Typography>
+              </AccordionSummary>
+
+              <AccordionDetails>
+                {user.permissions.includes(3)
+                  && <RouterLink className="FstoSidebarLink-root" to="/audit/vouchering">Auditing of Voucher</RouterLink>
+                }
+
+                {user.permissions.includes(5)
+                  && <RouterLink className="FstoSidebarLink-root" to="/audit/chequing">Auditing of Cheque</RouterLink>
+                }
+              </AccordionDetails>
+            </Accordion>
+          }
+
           { // Cheque
             !!user &&
-            (!!user.role.match(/treasury/i) || (!!user.role.match(/tagging|associate|specialist/i) && user.permissions.includes(6))) &&
+            user.permissions.some((item) => [6, 7, 8, 9].includes(item)) &&
             <Accordion defaultExpanded={/treasury/i.test(user.role)} elevation={0} square disableGutters>
               <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
                 <ChequeIcon />
@@ -185,6 +229,10 @@ const Sidebar = () => {
 
                 {user.permissions.includes(9)
                   && <RouterLink className="FstoSidebarLink-root" to="/cheque/debiting">Creation of Debit Memo</RouterLink>
+                }
+
+                {user.permissions.includes(24)
+                  && <RouterLink className="FstoSidebarLink-root" to="/cheque/issuing">Releasing of Cheque</RouterLink>
                 }
 
                 {user.permissions.includes(6)

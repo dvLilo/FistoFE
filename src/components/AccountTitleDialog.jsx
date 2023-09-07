@@ -65,21 +65,19 @@ const NumberField = React.forwardRef(function NumberField(props, ref) {
   )
 })
 
-const AccountTitleDialog = (props) => {
-
-  const {
-    open = false,
-    state = null,
-    transaction = null,
-    accounts = [],
-    onInsert = () => { },
-    onUpdate = () => { },
-    onRemove = () => { },
-    onBack = () => { },
-    onClear = () => { },
-    onClose = () => { },
-    onSubmit = () => { }
-  } = props
+const AccountTitleDialog = ({
+  open = false,
+  state = null,
+  transaction = null,
+  accounts = [],
+  onInsert = () => { },
+  onUpdate = () => { },
+  onRemove = () => { },
+  onBack = () => { },
+  onClear = () => { },
+  onClose = () => { },
+  onSubmit = () => { }
+}) => {
 
   const {
     refetch: fetchAccountTitles,
@@ -134,7 +132,8 @@ const AccountTitleDialog = (props) => {
       index,
 
       ...item,
-      amount: item.amount.toString()
+      amount: item.amount.toString(),
+      remarks: item.remarks || ""
     })
   }
 
@@ -190,7 +189,7 @@ const AccountTitleDialog = (props) => {
 
       <DialogContent className="FstoDialogAccountTitle-content">
         {
-          Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|counter-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|audit-|debit-|executive-|counter-.*/)) &&
           <Box className="FstoBoxAccountTitle-root" sx={{ marginBottom: 5 }}>
             <Autocomplete
               className="FstoSelectForm-root"
@@ -235,7 +234,7 @@ const AccountTitleDialog = (props) => {
                 (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
               }
               getOptionLabel={
-                (option) => option.name
+                (option) => `${option.code} - ${option.name}`
               }
               // getOptionDisabled={
               //   (option) => accounts.some((item) => item.account_title.id === option.id)
@@ -309,7 +308,7 @@ const AccountTitleDialog = (props) => {
                     <TableCell className="FstoTabelCellAccountTitle-root" align="right">Debit</TableCell>
                     <TableCell>Credit</TableCell>
                     {
-                      Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|counter-.*/)) &&
+                      Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|audit-|debit-|executive-|counter-.*/)) &&
                       <TableCell align="right">Action</TableCell>
                     }
                   </TableRow>
@@ -343,7 +342,7 @@ const AccountTitleDialog = (props) => {
                         </TableCell>
 
                         {
-                          Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|counter-.*/)) &&
+                          Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|audit-|debit-|executive-|counter-.*/)) &&
                           <TableCell align="right" size="small">
                             <IconButton onClick={() => editAccountTitleHandler(item, index)} disabled={Boolean(state) && Boolean(state.match(/cheque-|clear-|return-.*/)) && Boolean(item.entry.match(/debit.*/i))}>
                               <EditIcon fontSize="small" />
@@ -418,7 +417,7 @@ const AccountTitleDialog = (props) => {
         </Button>
 
         {
-          Boolean(state) && !Boolean(state.match(/approve-|transmit-|cheque-|release-|file-|reverse-|pending-|counter-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/approve-|transmit-|cheque-|release-|file-|reverse-|pending-|audit-|debit-|executive-|counter-.*/)) &&
           <Button
             variant="contained"
             onClick={submitAccountTitleHandler}

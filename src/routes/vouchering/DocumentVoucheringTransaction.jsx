@@ -32,6 +32,10 @@ import useConfirm from '../../hooks/useConfirm'
 import useApprover from '../../hooks/useApprover'
 import useTransaction from '../../hooks/useTransaction'
 
+import {
+  VOUCHER
+} from '../../constants'
+
 import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
 import ChequeEntryDialog from '../../components/ChequeEntryDialog'
@@ -47,20 +51,18 @@ const RECEIPT_TYPE_LIST = [
   }
 ]
 
-const DocumentVoucheringTransaction = (props) => {
-
-  const {
-    state,
-    open = false,
-    transaction = null,
-    refetchData = () => { },
-    onHold = () => { },
-    onUnhold = () => { },
-    onReturn = () => { },
-    onVoid = () => { },
-    onBack = () => { },
-    onClose = () => { }
-  } = props
+const DocumentVoucheringTransaction = ({
+  state,
+  open = false,
+  transaction = null,
+  refetchData = () => { },
+  onHold = () => { },
+  onUnhold = () => { },
+  onReturn = () => { },
+  onVoid = () => { },
+  onBack = () => { },
+  onClose = () => { }
+}) => {
 
   const toast = useToast()
   const confirm = useConfirm()
@@ -112,12 +114,11 @@ const DocumentVoucheringTransaction = (props) => {
   }, [open, status, APPROVER_STATUS])
 
   React.useEffect(() => {
-    if (open && status === `success` && !Boolean(voucherData.receipt_type) && !Boolean(voucherData.voucher.no)) {
+    if (open && status === `success` && !Boolean(voucherData.receipt_type) && !Boolean(voucherData.voucher.month)) {
       setVoucherData(currentValue => ({
         ...currentValue,
         receipt_type: data.voucher?.receipt_type || "",
         voucher: {
-          no: data.voucher?.no || "",
           month: data.voucher?.month || null
         },
         accounts: data.voucher?.accounts,
@@ -131,22 +132,11 @@ const DocumentVoucheringTransaction = (props) => {
     // eslint-disable-next-line
   }, [open, data, status])
 
-  const [validate, setValidate] = React.useState({
-    status: false,
-    data: []
-  })
-
-  const [error, setError] = React.useState({
-    status: false,
-    data: []
-  })
-
   const [voucherData, setVoucherData] = React.useState({
-    process: "voucher",
-    subprocess: "voucher",
+    process: VOUCHER,
+    subprocess: VOUCHER,
     receipt_type: "",
     voucher: {
-      no: "",
       month: null,
     },
     approver: null,
@@ -180,17 +170,11 @@ const DocumentVoucheringTransaction = (props) => {
       ...currentValue,
       receipt_type: "",
       voucher: {
-        no: "",
         month: null,
       },
       approver: null,
       accounts: []
     }))
-
-    setError({
-      status: false,
-      data: []
-    })
   }
 
   const closeHandler = () => {
@@ -335,55 +319,6 @@ const DocumentVoucheringTransaction = (props) => {
     }))
   }
 
-
-  const checkVoucherHandler = async (e) => {
-    if (error.status && error.data.voucher_no) {
-      delete error.data.voucher_no
-      setError(currentValue => ({
-        ...currentValue,
-        data: error.data
-      }))
-    }
-
-    if (!voucherData.voucher.no) return
-
-    setValidate(currentValue => ({
-      status: true,
-      data: [
-        ...currentValue.data, 'voucher_no'
-      ]
-    }))
-
-    try {
-      await axios.post(`/api/transactions/flow/validate-voucher-no`, {
-        voucher_no: voucherData.voucher.no,
-        ...(
-          /voucher-voucher|return-return/i.test(state) && {
-            id: transaction?.id
-          }
-        )
-      })
-    }
-    catch (error) {
-      if (error.request.status === 422) {
-        const { errors } = error.response.data
-
-        setError(currentValue => ({
-          status: true,
-          data: {
-            ...currentValue.data,
-            voucher_no: errors["voucher.no"]
-          }
-        }))
-      }
-    }
-
-    setValidate(currentValue => ({
-      ...currentValue,
-      data: currentValue.data.filter((data) => data !== 'voucher_no')
-    }))
-  }
-
   return (
     <React.Fragment>
       <Dialog
@@ -453,44 +388,12 @@ const DocumentVoucheringTransaction = (props) => {
                         ...currentValue,
                         voucher: {
                           ...currentValue.voucher,
-                          // month: value
                           month: moment(value).format("YYYY-MM-DD")
                         }
                       }))}
                       showToolbar
                     />
                   </LocalizationProvider>
-
-                  <TextField
-                    className="FstoTextfieldForm-root"
-                    label="Voucher Number"
-                    variant="outlined"
-                    autoComplete="off"
-                    size="small"
-                    value={voucherData.voucher.no}
-                    error={
-                      error.status
-                      && Boolean(error.data.voucher_no)
-                    }
-                    helperText={
-                      (error.status
-                        && error.data.voucher_no
-                        && error.data.voucher_no[0])
-                      ||
-                      (validate.status
-                        && validate.data.includes('voucher_no')
-                        && "Please wait...")
-                    }
-                    onBlur={checkVoucherHandler}
-                    onChange={(e) => setVoucherData(currentValue => ({
-                      ...currentValue,
-                      voucher: {
-                        ...currentValue.voucher,
-                        no: e.target.value
-                      }
-                    }))}
-                    fullWidth
-                  />
 
                   <Divider variant="middle" sx={{ margin: "1.25em" }} />
 
@@ -543,11 +446,7 @@ const DocumentVoucheringTransaction = (props) => {
                 disabled={
                   !Boolean(voucherData.approver) ||
                   !Boolean(voucherData.receipt_type) ||
-                  !Boolean(voucherData.voucher.no) ||
-                  !Boolean(voucherData.voucher.month) ||
-
-                  (error.status && Boolean(error.data.voucher_no)) ||
-                  (validate.status && Boolean(validate.data.includes('voucher_no')))
+                  !Boolean(voucherData.voucher.month)
                 }
                 disableElevation
               > {state === `voucher-receive` ? "Approve" : "Save"}

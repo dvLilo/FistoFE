@@ -65,13 +65,13 @@ const DocumentReleasing = () => {
     changeStatus,
     changePage,
     changeRows
-  } = useTransactions("/api/transactions", "pending-cheque")
+  } = useTransactions("/api/transactions", "pending-release")
 
   const toast = useToast()
   const confirm = useConfirm()
 
   const [search, setSearch] = React.useState("")
-  const [state, setState] = React.useState("pending-cheque")
+  const [state, setState] = React.useState("pending-release")
 
   const [reason, setReason] = React.useState({
     open: false,
@@ -210,7 +210,7 @@ const DocumentReleasing = () => {
                 children: <span className="FstoTabsIndicator-root" />
               }}
             >
-              <Tab className="FstoTab-root" label="Pending" value="pending-cheque" disableRipple />
+              <Tab className="FstoTab-root" label="Pending" value="pending-release" disableRipple />
               <Tab className="FstoTab-root" label="Received" value="release-receive" disableRipple />
               <Tab className="FstoTab-root" label="Released" value="release-release" disableRipple />
               <Tab className="FstoTab-root" label="Returned" value="release-return" disableRipple />

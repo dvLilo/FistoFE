@@ -24,16 +24,14 @@ import useDistribute from '../hooks/useDistribute'
 
 import '../assets/css/styles.transfer.scss'
 
-const TransferDialog = (props) => {
-
-  const {
-    data,
-    process,
-    subprocess,
-    open = false,
-    onSuccess = () => { },
-    onClose = () => { }
-  } = props
+const TransferDialog = ({
+  data,
+  process,
+  subprocess,
+  open = false,
+  onSuccess = () => { },
+  onClose = () => { }
+}) => {
 
   const toast = useToast()
   const {

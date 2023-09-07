@@ -69,6 +69,14 @@ const Landing = () => {
       case 'ap specialist':
         return `/voucher/vouchering`
 
+      case 'audit associate':
+        if (permissions.includes(3))
+          return `/audit/vouchering`
+
+        if (permissions.includes(5))
+          return `/audit/chequing`
+        break
+
       case 'treasury associate':
         if (permissions.includes(7))
           return `/cheque/chequing`
@@ -76,6 +84,9 @@ const Landing = () => {
         if (permissions.includes(9))
           return `/cheque/debiting`
         break
+
+      case 'executive assistant':
+        return `/cheque/transmitting`
 
       case 'approver':
         return `/approval`

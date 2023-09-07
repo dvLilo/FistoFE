@@ -24,28 +24,55 @@ import ReportIcon from '@mui/icons-material/ReportOutlined'
 
 import '../assets/css/styles.transaction.scss'
 
-const TransactionDialog = (props) => {
-
-  const {
-    data,
-    status,
-    onAccountTitleView = () => { },
-    onChequeView = () => { }
-  } = props
+const TransactionDialog = ({
+  data,
+  status,
+  onAccountTitleView = () => { },
+  onChequeView = () => { }
+}) => {
 
   const user = useSelector((state) => state.user)
 
+  // const process = [
+  //   "Tagging of Document", // 0
+  //   "Creation of Voucher", // 1
+  //   "Approval of Voucher", // 2
+  //   "Transmittal of Document", // 3
+  //   // "Auditing of Voucher", // 4 (for PCF only)
+  //   "Creation of Cheque", // 4
+  //   "Auditing of Cheque", // 5
+  //   "Signing of Cheque", // 6
+  //   "Releasing of Cheque", // 7
+  //   "Filing of Voucher" // 8
+  // ]
+
   const process = [
-    "Tagging of Document",
-    "Creation of Voucher",
-    "Approval of Voucher",
-    "Transmittal of Document",
-    "Creation of Cheque",
-    "Releasing of Cheque",
-    "Filing of Voucher"
+    "Tagging of Document", // index 0
+    "Creation of Voucher", // index 1
+    "Approval of Voucher", // index 2
+    "Transmittal of Document", // index 3
+
+    ...(data?.document.id === 8 || data?.document.id === 9
+      ? [
+        "Auditing of Voucher" // index 4
+      ]
+      : []),
+
+    ...(data?.document.id !== 9
+      ? [
+        "Creation of Cheque",  // index 4 or 5
+        "Auditing of Cheque", // index 5 or 6
+        "Signing of Cheque",  // index 6 or 7
+        "Releasing of Cheque", // index 7 or 8
+      ]
+      : []),
+
+    "Filing of Voucher" // index 8 or 9
   ]
 
-  const activeStep = (state = "") => {
+  const activeStep = (data) => {
+    const { transaction: { status: state }, document: { id: type } } = data
+
     if (Boolean(state.match(/^tag/i)))
       return 0
 
@@ -58,14 +85,38 @@ const TransactionDialog = (props) => {
     if (Boolean(state.match(/^transmit/i)))
       return 3
 
-    if (Boolean(state.match(/^cheque/i)))
+    if (Boolean(state.match(/^inspect/i)))
       return 4
 
-    if (Boolean(state.match(/^release/i)))
+    if (Boolean(state.match(/^cheque/i)) && type !== 8)
+      return 4
+
+    if (Boolean(state.match(/^cheque/i)) && type === 8)
       return 5
 
-    if (Boolean(state.match(/^file/i)))
+    if (Boolean(state.match(/^audit/i)) && type !== 8)
+      return 5
+
+    if (Boolean(state.match(/^audit/i)) && type === 8)
       return 6
+
+    if (Boolean(state.match(/^executive/i)) && type !== 8)
+      return 6
+
+    if (Boolean(state.match(/^executive/i)) && type === 8)
+      return 7
+
+    if ((Boolean(state.match(/^release/i)) || Boolean(state.match(/^issue/i))) && type !== 8)
+      return 7
+
+    if ((Boolean(state.match(/^release/i)) || Boolean(state.match(/^issue/i))) && type === 8)
+      return 8
+
+    if ((Boolean(state.match(/^file/i)) || Boolean(state.match(/^debit/i))) && type !== 8)
+      return 8
+
+    if ((Boolean(state.match(/^file/i)) || Boolean(state.match(/^debit/i))) && type === 8)
+      return 9
 
     return -1
   }
@@ -132,16 +183,16 @@ const TransactionDialog = (props) => {
       {
         status === `success` && user && user.role.toLowerCase() === `requestor` &&
         <Box className="FstoBoxTransactionSteps-root">
-          <Stepper activeStep={activeStep(data.transaction.status)} alternativeLabel>
+          <Stepper activeStep={activeStep(data)} alternativeLabel>
             {
               process.map((item, index) => (
                 <Step
-                  {...(activeStep(data.transaction.status) === index && { completed: activeComplete(data.transaction.status) })}
+                  {...(activeStep(data) === index && { completed: activeComplete(data.transaction.status) })}
                   key={index}
                 >
                   <StepLabel
                     optional={
-                      activeStep(data.transaction.status) === index &&
+                      activeStep(data) === index &&
                       <Box sx={{ textAlign: 'center', marginTop: 1 }}>
                         <Chip label={activeStatus(data.transaction.state)} color="info" size="small" sx={{ textTransform: 'capitalize', paddingLeft: 0.5, paddingRight: 0.5, fontSize: '0.76em' }} />
                       </Box>
@@ -360,7 +411,7 @@ const TransactionDialog = (props) => {
                 data.document.from && data.document.to &&
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Coverage Date:</span>
-                  <strong>{formatDates(data.document.from)} - {formatDates(data.document.to)}</strong>
+                  <strong>{moment(data.document.from).format("MMM. DD, YYYY")} - {moment(data.document.to).format("MMM. DD, YYYY")}</strong>
                 </ListItem>}
 
               {
@@ -388,21 +439,21 @@ const TransactionDialog = (props) => {
                 data.document.prm_multiple_from && data.document.prm_multiple_to &&
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Period Covered:</span>
-                  <strong>{formatDates(data.document.prm_multiple_from)} - {formatDates(data.document.prm_multiple_to)}</strong>
+                  <strong>{moment(data.document.prm_multiple_from).format("MMM. DD, YYYY")} - {moment(data.document.prm_multiple_to).format("MMM. DD, YYYY")}</strong>
                 </ListItem>}
 
               {
                 data.document.release_date &&
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Release Date:</span>
-                  <strong>{formatDates(data.document.release_date)}</strong>
+                  <strong>{moment(data.document.release_date).format("MMM. DD, YYYY")}</strong>
                 </ListItem>}
 
               {
                 data.document.cheque_date &&
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Cheque Date:</span>
-                  <strong>{formatDates(data.document.cheque_date)}</strong>
+                  <strong>{moment(data.document.cheque_date).format("MMM. DD, YYYY")}</strong>
                 </ListItem>}
 
               {
@@ -519,10 +570,12 @@ const TransactionDialog = (props) => {
               {
                 Boolean(data.document.payroll) &&
                 <React.Fragment>
-                  <ListItem className="FstoListItemTransactionDetails-root" dense>
-                    <span>Control No.:</span>
-                    <strong>{data.document.payroll.control_no}</strong>
-                  </ListItem>
+                  {
+                    data.document.payroll.control_no &&
+                    <ListItem className="FstoListItemTransactionDetails-root" dense>
+                      <span>Control No.:</span>
+                      <strong>{data.document.payroll.control_no}</strong>
+                    </ListItem>}
 
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Payroll Type:</span>
@@ -603,8 +656,14 @@ const TransactionDialog = (props) => {
                         Boolean(data.transmit) &&
                         <strong>{formatDates(data.transmit.dates.received)} <Chip label="Transmitted" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}
                       {
+                        Boolean(data.inspect) &&
+                        <strong>{formatDates(data.inspect.dates.received)} <Chip label="Audited" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}
+                      {
                         Boolean(data.file) &&
                         <strong>{formatDates(data.file.dates.received)} <Chip label="Filed" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}
+                      {
+                        Boolean(data.debit) &&
+                        <strong>{formatDates(data.debit.dates.received)} <Chip label="Filed" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}
                     </Stack>
                   </ListItem>}
 
@@ -640,10 +699,24 @@ const TransactionDialog = (props) => {
                   </ListItem>}
 
                 {
+                  data.inspect && data.inspect.status === `inspect-inspect` &&
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Date Audited:</span>
+                    <strong>{formatDates(data.inspect.dates.inspected)}</strong>
+                  </ListItem>}
+
+                {
                   data.file && data.file.status === `file-file` &&
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Date Filed:</span>
                     <strong>{formatDates(data.file.dates.filed)}</strong>
+                  </ListItem>}
+
+                {
+                  data.debit && data.debit.status === `debit-file` &&
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Date Filed:</span>
+                    <strong>{formatDates(data.debit.dates.filed)}</strong>
                   </ListItem>}
 
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
@@ -685,6 +758,12 @@ const TransactionDialog = (props) => {
                     <Stack direction="column">
                       <strong>{formatDates(data.cheque.dates.received)} <Chip label="Created" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
                       {
+                        Boolean(data.audit) &&
+                        <strong>{formatDates(data.audit.dates.received)} <Chip label="Audited" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}
+                      {
+                        Boolean(data.executive) &&
+                        <strong>{formatDates(data.executive.dates.received)} <Chip label="Transmitted" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}
+                      {
                         Boolean(data.clear) &&
                         <strong>{formatDates(data.clear.dates.received)} <Chip label="Cleared" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}
                     </Stack>
@@ -719,11 +798,25 @@ const TransactionDialog = (props) => {
                   </ListItem>}
 
                 {
-                  data.cheque && data.cheque.status === `cheque-release` &&
+                  data.audit && data.audit.status === `audit-audit` &&
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Date Audited:</span>
+                    <strong>{formatDates(data.cheque.dates.audited)}</strong>
+                  </ListItem>}
+
+                {
+                  data.executive && data.executive.status === `executive-executive` &&
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Date Signed:</span>
+                    <strong>{formatDates(data.executive.dates.signed)}</strong>
+                  </ListItem>}
+
+                {
+                  data.issue && data.issue.status === `issue-issue` &&
                   <ListItem className="FstoListItemTransactionDetails-root" dense>
                     <span>Date Released:</span>
                     <Stack direction="column">
-                      <strong>{formatDates(data.cheque.dates.released)}  <Chip label="Internal" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
+                      <strong>{formatDates(data.issue.dates.issued)}  <Chip label="Internal" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
                       {
                         data.release && data.release.status === `release-release` &&
                         <strong>{formatDates(data.release.dates.released)}  <Chip label="External" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}

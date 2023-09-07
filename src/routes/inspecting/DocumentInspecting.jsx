@@ -39,13 +39,12 @@ import useConfirm from '../../hooks/useConfirm'
 import useTransactions from '../../hooks/useTransactions'
 
 import {
-  DEBIT,
+  INSPECT,
   RECEIVE,
   HOLD,
   UNHOLD,
   RETURN,
-  UNRETURN,
-  VOID
+  UNRETURN
 } from '../../constants'
 
 import EmptyImage from '../../assets/img/empty.svg'
@@ -54,10 +53,10 @@ import ReasonDialog from '../../components/ReasonDialog'
 import TablePreloader from '../../components/TablePreloader'
 import FilterPopover from '../../components/FilterPopover'
 
-import DocumentDebitingActions from './DocumentDebitingActions'
-import DocumentDebitingTransaction from './DocumentDebitingTransaction'
+import DocumentInspectingActions from './DocumentInspectingActions'
+import DocumentInspectingTransaction from './DocumentInspectingTransaction'
 
-const DocumentDebiting = () => {
+const DocumentInspecting = () => {
 
   const {
     status,
@@ -68,13 +67,13 @@ const DocumentDebiting = () => {
     changeStatus,
     changePage,
     changeRows
-  } = useTransactions("/api/transactions", "pending-debit")
+  } = useTransactions("/api/transactions", "pending-inspect")
 
   const toast = useToast()
   const confirm = useConfirm()
 
   const [search, setSearch] = React.useState("")
-  const [state, setState] = React.useState("pending-debit")
+  const [state, setState] = React.useState("pending-inspect")
 
   const [reason, setReason] = React.useState({
     open: false,
@@ -124,7 +123,7 @@ const DocumentDebiting = () => {
         let response
         try {
           response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
-            process: DEBIT,
+            process: INSPECT,
             subprocess: RECEIVE
           })
 
@@ -152,7 +151,7 @@ const DocumentDebiting = () => {
     setReason(currentValue => ({
       ...currentValue,
       open: true,
-      process: DEBIT,
+      process: INSPECT,
       subprocess: HOLD,
       data,
     }))
@@ -166,7 +165,7 @@ const DocumentDebiting = () => {
         let response
         try {
           response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
-            process: DEBIT,
+            process: INSPECT,
             subprocess: UNHOLD
           })
 
@@ -194,7 +193,7 @@ const DocumentDebiting = () => {
     setReason(currentValue => ({
       ...currentValue,
       open: true,
-      process: DEBIT,
+      process: INSPECT,
       subprocess: RETURN,
       data,
     }))
@@ -208,7 +207,7 @@ const DocumentDebiting = () => {
         let response
         try {
           response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
-            process: DEBIT,
+            process: INSPECT,
             subprocess: UNRETURN
           })
 
@@ -232,23 +231,13 @@ const DocumentDebiting = () => {
     })
   }
 
-  const onVoid = (data) => {
-    setReason(currentValue => ({
-      ...currentValue,
-      open: true,
-      process: DEBIT,
-      subprocess: VOID,
-      data,
-    }))
-  }
-
   return (
     <Box className="FstoBox-root">
       <Paper className="FstoPaperTable-root" elevation={1}>
         <Stack className="FstoStackToolbar-root" justifyContent="space-between" gap={2}>
           <Stack className="FstoStackToolbar-item" direction="row" justifyContent="center" gap={2}>
             <Typography variant="heading">
-              Filling of Debit Memo
+              Auditing of Voucher
             </Typography>
           </Stack>
 
@@ -265,12 +254,11 @@ const DocumentDebiting = () => {
                 children: <span className="FstoTabsIndicator-root" />
               }}
             >
-              <Tab className="FstoTab-root" label="Pending" value="pending-debit" disableRipple />
-              <Tab className="FstoTab-root" label="Received" value="debit-receive" disableRipple />
-              <Tab className="FstoTab-root" label="Filed" value="debit-file" disableRipple />
-              {/* <Tab className="FstoTab-root" label="Held" value="debit-hold" disableRipple /> */}
-              {/* <Tab className="FstoTab-root" label="Returned" value="debit-return" disableRipple /> */}
-              {/* <Tab className="FstoTab-root" label="Voided" value="debit-void" disableRipple /> */}
+              <Tab className="FstoTab-root" label="Pending" value="pending-inspect" disableRipple />
+              <Tab className="FstoTab-root" label="Received" value="inspect-receive" disableRipple />
+              <Tab className="FstoTab-root" label="Approved" value="inspect-inspect" disableRipple />
+              <Tab className="FstoTab-root" label="Held" value="inspect-hold" disableRipple />
+              <Tab className="FstoTab-root" label="Returned" value="inspect-return" disableRipple />
             </Tabs>
 
             <Stack direction="row" alignItems="center" justifyContent="center" gap={1}>
@@ -465,7 +453,7 @@ const DocumentDebiting = () => {
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                      <DocumentDebitingActions
+                      <DocumentInspectingActions
                         data={item}
                         state={state}
                         onReceive={onReceive}
@@ -505,14 +493,13 @@ const DocumentDebiting = () => {
           showLastButton
         />
 
-        <DocumentDebitingTransaction
+        <DocumentInspectingTransaction
           {...manage}
           state={state}
           refetchData={refetchData}
           onHold={onHold}
           onUnhold={onUnhold}
           onReturn={onReturn}
-          onVoid={onVoid}
         />
 
         <ReasonDialog {...reason} />
@@ -521,4 +508,4 @@ const DocumentDebiting = () => {
   )
 }
 
-export default DocumentDebiting
+export default DocumentInspecting

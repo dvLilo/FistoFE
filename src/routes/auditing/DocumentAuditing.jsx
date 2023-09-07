@@ -255,10 +255,10 @@ const DocumentAuditing = () => {
               }}
             >
               <Tab className="FstoTab-root" label="Pending" value="pending" disableRipple />
-              <Tab className="FstoTab-root" label="Received" value="approve-receive" disableRipple />
-              <Tab className="FstoTab-root" label="Approved" value="approve-approve" disableRipple />
-              <Tab className="FstoTab-root" label="Held" value="approve-hold" disableRipple />
-              <Tab className="FstoTab-root" label="Returned" value="approve-return" disableRipple />
+              <Tab className="FstoTab-root" label="Received" value="audit-receive" disableRipple />
+              <Tab className="FstoTab-root" label="Approved" value="audit-audit" disableRipple />
+              <Tab className="FstoTab-root" label="Held" value="audit-hold" disableRipple />
+              <Tab className="FstoTab-root" label="Returned" value="audit-return" disableRipple />
             </Tabs>
 
             <Stack direction="row" alignItems="center" justifyContent="center" gap={1}>

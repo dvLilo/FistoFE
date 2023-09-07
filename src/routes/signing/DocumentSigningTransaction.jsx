@@ -17,23 +17,17 @@ import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
 import useTransaction from '../../hooks/useTransaction'
 
-import {
-  DEBIT,
-  FILE
-} from '../../constants'
+import { EXECUTIVE } from "../../constants"
 
 import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
+import ChequeEntryDialog from '../../components/ChequeEntryDialog'
 
-const DocumentDebitingTransaction = ({
+const DocumentSigningTransaction = ({
   state,
   open = false,
   transaction = null,
   refetchData = () => { },
-  // onHold = () => { },
-  // onUnhold = () => { },
-  // onReturn = () => { },
-  // onVoid = () => { },
   onBack = () => { },
   onClose = () => { }
 }) => {
@@ -53,9 +47,9 @@ const DocumentDebitingTransaction = ({
     // eslint-disable-next-line
   }, [open])
 
-  const [fileData] = React.useState({
-    process: DEBIT,
-    subprocess: FILE
+  const [transmittalData] = React.useState({
+    process: EXECUTIVE,
+    subprocess: EXECUTIVE
   })
 
   const [viewAccountTitle, setViewAccountTitle] = React.useState({
@@ -66,6 +60,17 @@ const DocumentDebitingTransaction = ({
     onClose: () => setViewAccountTitle(currentValue => ({
       ...currentValue,
       open: false
+    }))
+  })
+
+  const [viewCheque, setViewCheque] = React.useState({
+    open: false,
+    state: null,
+    transaction: null,
+    onBack: undefined,
+    onClose: () => setViewCheque(currentValue => ({
+      ...currentValue,
+      open: false,
     }))
   })
 
@@ -81,7 +86,7 @@ const DocumentDebitingTransaction = ({
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, fileData)
+          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, transmittalData)
 
           const { message } = response.data
 
@@ -116,6 +121,18 @@ const DocumentDebitingTransaction = ({
     }))
   }
 
+  const onChequeView = () => {
+    onClose()
+
+    setViewCheque(currentValue => ({
+      ...currentValue,
+      state: "-release",
+      transaction,
+      open: true,
+      onBack: onBack
+    }))
+  }
+
   return (
     <React.Fragment>
       <Dialog
@@ -137,28 +154,35 @@ const DocumentDebitingTransaction = ({
         </DialogTitle>
 
         <DialogContent className="FstoDialogTransaction-content">
-          <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} />
+          <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
         </DialogContent>
 
         {
-          state === `debit-receive` &&
+          state === `executive-receive` &&
           <DialogActions className="FstoDialogTransaction-actions">
             <Button
               variant="contained"
               onClick={submitTransmitHandler}
               disableElevation
-            > File
+            > Transmit
             </Button>
           </DialogActions>
         }
       </Dialog>
 
       <AccountTitleDialog
-        accounts={data?.voucher?.accounts}
+        accounts={data?.cheque?.accounts || data?.voucher?.accounts}
         {...viewAccountTitle}
+      />
+
+      <ChequeEntryDialog
+        accounts={data?.cheque?.accounts || data?.voucher?.accounts}
+        cheques={data?.cheque?.cheques}
+        onView={onAccountTitleView}
+        {...viewCheque}
       />
     </React.Fragment>
   )
 }
 
-export default DocumentDebitingTransaction
+export default DocumentSigningTransaction

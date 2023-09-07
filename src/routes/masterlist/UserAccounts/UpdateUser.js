@@ -82,13 +82,9 @@ const UpdateUser = () => {
         id: 4,
         name: "Received Receipt Report"
       },
-      // {
-      //   id: 5,
-      //   name: "Edited Tag Approval"
-      // },
       {
         id: 6,
-        name: "Releasing of Cheque"
+        name: "Releasing of Cheque (External)"
       },
       {
         id: 10,
@@ -129,11 +125,23 @@ const UpdateUser = () => {
         name: "Matching of Voucher"
       }
     ],
+    audit: [
+      {
+        id: 3,
+        name: "Auditing of Voucher"
+      },
+      {
+        id: 5,
+        name: "Auditing of Cheque"
+      }
+    ],
+    executive: [
+      {
+        id: 23,
+        name: "Transmittal of Cheque"
+      }
+    ],
     approver: [
-      // {
-      //   id: 5,
-      //   name: "Reversal of Cheque"
-      // },
       {
         id: 17,
         name: "Approval of Voucher"
@@ -151,6 +159,10 @@ const UpdateUser = () => {
       {
         id: 9,
         name: "Creation of Debit Memo"
+      },
+      {
+        id: 24,
+        name: "Releasing of Cheque (Internal)"
       }
     ],
     confidential: [
@@ -205,14 +217,22 @@ const UpdateUser = () => {
       },
       {
         id: 5,
-        name: "Treasury Associate"
+        name: "Audit Associate"
       },
       {
         id: 6,
-        name: "Approver"
+        name: "Executive Assistant"
       },
       {
         id: 7,
+        name: "Treasury Associate"
+      },
+      {
+        id: 8,
+        name: "Approver"
+      },
+      {
+        id: 9,
         name: "Administrator"
       }
     ]
@@ -611,26 +631,40 @@ const UpdateUser = () => {
 
     let permissions = []
     switch (value.id) {
+      // Requestor
       case 1: permissions = [1]
         break
 
-      case 2: permissions = [6, 4, 20, 22]
+      // AP Tagging
+      case 2: permissions = [6, 20]
         break
 
-      case 3: permissions = [11, 12, 21]
+      // AP Associate
+      case 3: permissions = [11, 12, 19]
         break
 
-      case 4: permissions = [11, 12, 21]
+      // AP Specialist
+      case 4: permissions = [11, 12, 19]
         break
 
-      case 5: permissions = [7, 8]
+      // Audit Associate
+      case 5: permissions = [3, 5]
         break
 
-      case 6: permissions = [17]
+      // Executive Associate
+      case 6: permissions = [23]
+        break
+
+      // Treasury Associate
+      case 7: permissions = [7, 8]
+        break
+
+      // Approver
+      case 8: permissions = [17]
         break
 
       default:
-        permissions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]
+        permissions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
     }
 
     setUser({
@@ -994,7 +1028,7 @@ const UpdateUser = () => {
               <Typography variant="permission" sx={{ marginLeft: 4, marginBottom: 4, marginTop: 2 }}>Permissions</Typography>
 
               {
-                (user.role?.id === 1 || user.role?.id === 2 || user.role?.id === 3 || user.role?.id === 4 || user.role?.id === 6 || user.role?.id === 7) &&
+                (user.role.id === 1 || user.role.id === 2 || user.role.id === 3 || user.role.id === 4 || user.role.id === 5 || user.role.id === 6 || user.role.id === 7 || user.role.id === 9) &&
                 <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
                   <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Requestor</FormLabel>
                   <FormGroup row={true} sx={{ padding: '10px 35px' }}>
@@ -1015,7 +1049,7 @@ const UpdateUser = () => {
                 </FormControl>}
 
               {
-                (user.role?.id === 2 || user.role?.id === 3 || user.role?.id === 4 || user.role?.id === 7) &&
+                (user.role.id === 2 || user.role.id === 3 || user.role.id === 4 || user.role.id === 9) &&
                 <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
                   <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Accounts Payable</FormLabel>
                   <FormGroup row={true} sx={{ padding: '10px 35px' }}>
@@ -1037,12 +1071,12 @@ const UpdateUser = () => {
                 </FormControl>}
 
               {
-                (user.role?.id === 6 || user.role?.id === 7) &&
+                (user.role.id === 5) &&
                 <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
-                  <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Approver</FormLabel>
+                  <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Audit</FormLabel>
                   <FormGroup row={true} sx={{ padding: '10px 35px' }}>
                     {
-                      permissions.approver.map((perm, index) => (
+                      permissions.audit.map((perm, index) => (
                         <FormControlLabel
                           className="FstoCheckboxLabel-root"
                           key={index}
@@ -1059,7 +1093,29 @@ const UpdateUser = () => {
                 </FormControl>}
 
               {
-                (user.role?.id === 5 || user.role?.id === 7) &&
+                (user.role?.id === 6) &&
+                <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
+                  <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Executive</FormLabel>
+                  <FormGroup row={true} sx={{ padding: '10px 35px' }}>
+                    {
+                      permissions.executive.map((perm, index) => (
+                        <FormControlLabel
+                          className="FstoCheckboxLabel-root"
+                          key={index}
+                          label={perm.name}
+                          sx={{ width: '50%', margin: 0 }}
+                          control={
+                            <Checkbox size="small" sx={{ padding: '7px' }} value={perm.id} checked={user.permissions.includes(perm.id)} onChange={permissionsCheckboxHandler} />
+                          }
+                          disableTypography
+                        />
+                      ))
+                    }
+                  </FormGroup>
+                </FormControl>}
+
+              {
+                (user.role.id === 7 || user.role.id === 9) &&
                 <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
                   <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Treasury</FormLabel>
                   <FormGroup row={true} sx={{ padding: '10px 35px' }}>
@@ -1081,7 +1137,29 @@ const UpdateUser = () => {
                 </FormControl>}
 
               {
-                (user.role?.id === 6 || user.role?.id === 7) &&
+                (user.role.id === 8 || user.role.id === 9) &&
+                <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
+                  <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Approver</FormLabel>
+                  <FormGroup row={true} sx={{ padding: '10px 35px' }}>
+                    {
+                      permissions.approver.map((perm, index) => (
+                        <FormControlLabel
+                          className="FstoCheckboxLabel-root"
+                          key={index}
+                          label={perm.name}
+                          sx={{ width: '50%', margin: 0 }}
+                          control={
+                            <Checkbox size="small" sx={{ padding: '7px' }} value={perm.id} checked={user.permissions.includes(perm.id)} onChange={permissionsCheckboxHandler} />
+                          }
+                          disableTypography
+                        />
+                      ))
+                    }
+                  </FormGroup>
+                </FormControl>}
+
+              {
+                (user.role.id === 8 || user.role.id === 9) &&
                 <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
                   <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Confidential</FormLabel>
                   <FormGroup row={true} sx={{ padding: '10px 35px' }}>
@@ -1103,7 +1181,7 @@ const UpdateUser = () => {
                 </FormControl>}
 
               {
-                (user.role?.id === 7) &&
+                (user.role?.id === 9) &&
                 <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
                   <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Administrator</FormLabel>
                   <FormGroup row={true} sx={{ padding: '10px 35px' }}>

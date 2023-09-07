@@ -19,12 +19,10 @@ import ReportIcon from '@mui/icons-material/ReportOutlined'
 
 import '../assets/css/styles.transaction.scss'
 
-const CounterReceiptDialog = (props) => {
-
-  const {
-    data,
-    status,
-  } = props
+const CounterReceiptDialog = ({
+  data,
+  status,
+}) => {
 
   console.log("I'm from Counter Receipt dialog.")
   console.log(data)

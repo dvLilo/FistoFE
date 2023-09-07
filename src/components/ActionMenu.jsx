@@ -13,7 +13,11 @@ import {
   RestoreOutlined as Restore
 } from '@mui/icons-material'
 
-const ActionMenu = ({ data, onUpdateChange, onStatusChange }) => {
+const ActionMenu = ({
+  data,
+  onUpdateChange,
+  onStatusChange
+}) => {
 
   const [anchorEl, setAnchorEl] = React.useState(null)
 

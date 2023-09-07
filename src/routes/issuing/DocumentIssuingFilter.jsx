@@ -27,7 +27,7 @@ import DateAdapter from '@mui/lab/AdapterDateFns'
 
 import { createFilterOptions } from '@mui/material/Autocomplete'
 
-import useSuppliers from '../hooks/useSuppliers'
+import useSuppliers from '../../hooks/useSuppliers'
 
 const DOCUMENT_TYPES = [
   {
@@ -61,14 +61,10 @@ const DOCUMENT_TYPES = [
   {
     id: 8,
     type: "PCF"
-  },
-  {
-    id: 9,
-    type: "Auto Debit"
   }
 ]
 
-const FilterPopover = ({
+const DocumentIssuingFilter = ({
   onFilter = () => { }
 }) => {
 
@@ -101,8 +97,8 @@ const FilterPopover = ({
 
   const filterSubmitHandler = () => {
     onFilter({
-      from: filter.from,
-      to: filter.to,
+      cheque_from: filter.from,
+      cheque_to: filter.to,
       types: filter.types,
       suppliers: filter.suppliers.length ? filter.suppliers.map((item) => item.id) : null
     })
@@ -119,8 +115,8 @@ const FilterPopover = ({
     })
 
     onFilter({
-      from: null,
-      to: null,
+      cheque_from: null,
+      cheque_to: null,
       types: null,
       suppliers: null
     })
@@ -191,7 +187,7 @@ const FilterPopover = ({
 
         <Divider className="FstoDividerFilter-root" variant="middle" />
 
-        <Typography className="FstoTypographyFilter-root">Transaction Date:</Typography>
+        <Typography className="FstoTypographyFilter-root">Cheque Date:</Typography>
 
         <LocalizationProvider dateAdapter={DateAdapter}>
           <DatePicker
@@ -285,4 +281,4 @@ const FilterPopover = ({
   )
 }
 
-export default FilterPopover
+export default DocumentIssuingFilter

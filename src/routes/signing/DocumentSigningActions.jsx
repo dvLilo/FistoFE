@@ -10,17 +10,15 @@ import {
   MoreHoriz as MoreIcon,
   TaskOutlined as ReceiveIcon,
   VisibilityOutlined as ViewIcon,
-  DescriptionOutlined as ManageIcon,
-  ReplyOutlined as CancelIcon
+  DescriptionOutlined as ManageIcon
 } from '@mui/icons-material'
 
-const DocumentReleasingActions = ({
+const DocumentSigningActions = ({
   data,
   state,
   onReceive,
   onManage,
-  onView,
-  onCancel
+  onView
 }) => {
 
   const [anchor, setAnchor] = React.useState(null)
@@ -58,7 +56,7 @@ const DocumentReleasingActions = ({
         disablePortal
       >
         {
-          state === `pending-release` &&
+          state === `pending` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -71,7 +69,7 @@ const DocumentReleasingActions = ({
           </MenuItem>}
 
         {
-          (state === `release-receive`) &&
+          state === `executive-receive` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -84,7 +82,7 @@ const DocumentReleasingActions = ({
           </MenuItem>}
 
         {
-          (state === `release-release` || state === `release-return`) &&
+          state === `executive-executive` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -95,22 +93,8 @@ const DocumentReleasingActions = ({
           >
             <ViewIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> View
           </MenuItem>}
-
-        {
-          state === `release-return` &&
-          <MenuItem
-            sx={{ fontWeight: 500 }}
-            onClick={() => {
-              onCancel(data.id)
-              actionCloseHandler()
-            }}
-            dense
-          >
-            <CancelIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Cancel
-          </MenuItem>}
       </Menu>
     </React.Fragment>
   )
 }
-
-export default DocumentReleasingActions
+export default DocumentSigningActions

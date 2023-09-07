@@ -8,31 +8,25 @@ import {
 
 import {
   MoreHoriz as MoreIcon,
-  Visibility as ViewIcon,
-  Description as ManageIcon,
-  Edit as UpdateIcon,
-  RemoveCircle as VoidIcon
+  TaskOutlined as ReceiveIcon,
+  VisibilityOutlined as ViewIcon,
+  DescriptionOutlined as ManageIcon,
+  ReplyOutlined as CancelIcon
 } from '@mui/icons-material'
 
-import { useSelector } from 'react-redux'
-
-const DocumentReturningActions = (props) => {
-
-  const {
-    data,
-    state = "return-return",
-    onManage = () => { },
-    onUpdate = () => { },
-    onView = () => { },
-    onVoid = () => { }
-  } = props
-
-  const user = useSelector(state => state.user)
+const DocumentInspectingActions = ({
+  data,
+  state,
+  onReceive,
+  onManage,
+  onView,
+  onCancel
+}) => {
 
   const [anchor, setAnchor] = React.useState(null)
 
-  const actionOpenHandler = (e) => {
-    setAnchor(e.currentTarget)
+  const actionOpenHandler = (event) => {
+    setAnchor(event.currentTarget)
   }
 
   const actionCloseHandler = () => {
@@ -64,7 +58,20 @@ const DocumentReturningActions = (props) => {
         disablePortal
       >
         {
-          state === `return-return` && user?.role !== 'Requestor' &&
+          state === `pending-inspect` &&
+          <MenuItem
+            sx={{ fontWeight: 500 }}
+            onClick={() => {
+              onReceive(data.id)
+              actionCloseHandler()
+            }}
+            dense
+          >
+            <ReceiveIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Receive
+          </MenuItem>}
+
+        {
+          state === `inspect-receive` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -77,7 +84,7 @@ const DocumentReturningActions = (props) => {
           </MenuItem>}
 
         {
-          (state === `return-hold` || state === `return-void` || (state === `return-return` && user?.role === `Requestor`)) &&
+          (state === `inspect-inspect` || state === `inspect-hold` || state === `inspect-return` || state === `inspect-void`) &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -90,35 +97,20 @@ const DocumentReturningActions = (props) => {
           </MenuItem>}
 
         {
-          state === `return-return` && user?.role === `Requestor` &&
+          state === `inspect-return` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
-              onUpdate(data)
+              onCancel(data.id)
               actionCloseHandler()
             }}
-            disabled={user?.id !== data.users_id}
             dense
           >
-            <UpdateIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Edit
-          </MenuItem>}
-
-        {
-          state === `return-return` && user?.role === `Requestor` &&
-          <MenuItem
-            sx={{ fontWeight: 500 }}
-            onClick={() => {
-              onVoid(data)
-              actionCloseHandler()
-            }}
-            disabled={user?.id !== data.users_id || (data.document_id === 4 && data.payment_type.toLowerCase() === `partial` && !data.is_latest_transaction)}
-            dense
-          >
-            <VoidIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Void
+            <CancelIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Cancel
           </MenuItem>}
       </Menu>
     </React.Fragment>
   )
 }
 
-export default DocumentReturningActions
+export default DocumentInspectingActions

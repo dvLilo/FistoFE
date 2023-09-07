@@ -85,23 +85,21 @@ const NumberField = React.forwardRef(function NumberField(props, ref) {
   )
 })
 
-const ChequeEntryDialog = (props) => {
-
-  const {
-    open = false,
-    state = null,
-    transaction = null,
-    accounts = [],
-    cheques = [],
-    onInsert = () => { },
-    onUpdate = () => { },
-    onRemove = () => { },
-    onBack = () => { },
-    onClear = () => { },
-    onView = () => { },
-    onClose = () => { },
-    onSubmit = () => { }
-  } = props
+const ChequeEntryDialog = ({
+  open = false,
+  state = null,
+  transaction = null,
+  accounts = [],
+  cheques = [],
+  onInsert = () => { },
+  onUpdate = () => { },
+  onRemove = () => { },
+  onBack = () => { },
+  onClear = () => { },
+  onView = () => { },
+  onClose = () => { },
+  onSubmit = () => { }
+}) => {
 
   const {
     refetch: fetchBanks,
@@ -164,13 +162,17 @@ const ChequeEntryDialog = (props) => {
   }
 
   const editChequeHandler = (item, index) => {
-    setCQ({
-      update: true,
-      index,
+    if (BANKS_STATUS === "success") {
+      const bank = BANKS_LIST.find((bank) => bank.id === item.bank.id)
 
-      ...item,
-      amount: item.amount.toString()
-    })
+      setCQ({
+        update: true,
+        index,
+
+        ...item, bank,
+        amount: item.amount.toString()
+      })
+    }
   }
 
   const removeChequeHandler = (index) => {
@@ -298,6 +300,9 @@ const ChequeEntryDialog = (props) => {
               size="small"
               options={TYPE_LIST}
               value={TYPE_LIST.find((row) => row.name === CQ.type) || null}
+              disabled={
+                Boolean(state.match(/issue-.*/))
+              }
               renderInput={
                 (props) => <TextField {...props} label="Type" variant="outlined" />
               }
@@ -323,6 +328,9 @@ const ChequeEntryDialog = (props) => {
               size="small"
               options={BANKS_LIST || []}
               value={CQ.bank}
+              disabled={
+                Boolean(state.match(/issue-.*/))
+              }
               loading={
                 BANKS_STATUS === 'loading'
               }
@@ -354,6 +362,9 @@ const ChequeEntryDialog = (props) => {
               size="small"
               type="number"
               value={CQ.no}
+              disabled={
+                Boolean(state.match(/issue-.*/))
+              }
               error={
                 error.status
                 && Boolean(error.data.cheque_no)
@@ -397,6 +408,9 @@ const ChequeEntryDialog = (props) => {
               autoComplete="off"
               size="small"
               value={CQ.amount}
+              disabled={
+                Boolean(state.match(/issue-.*/))
+              }
               InputProps={{
                 inputComponent: NumberField
               }}

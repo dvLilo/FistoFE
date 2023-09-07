@@ -39,25 +39,26 @@ import useConfirm from '../../hooks/useConfirm'
 import useTransactions from '../../hooks/useTransactions'
 
 import {
-  DEBIT,
+  ISSUE,
   RECEIVE,
   HOLD,
   UNHOLD,
   RETURN,
-  UNRETURN,
-  VOID
+  // UNRETURN,
+  VOID,
+  // RELEASE
 } from '../../constants'
 
 import EmptyImage from '../../assets/img/empty.svg'
 
 import ReasonDialog from '../../components/ReasonDialog'
 import TablePreloader from '../../components/TablePreloader'
-import FilterPopover from '../../components/FilterPopover'
 
-import DocumentDebitingActions from './DocumentDebitingActions'
-import DocumentDebitingTransaction from './DocumentDebitingTransaction'
+import DocumentIssuingActions from './DocumentIssuingActions'
+import DocumentIssuingTransaction from './DocumentIssuingTransaction'
+import DocumentIssuingFilter from './DocumentIssuingFilter'
 
-const DocumentDebiting = () => {
+const DocumentIssuing = () => {
 
   const {
     status,
@@ -68,13 +69,13 @@ const DocumentDebiting = () => {
     changeStatus,
     changePage,
     changeRows
-  } = useTransactions("/api/transactions", "pending-debit")
+  } = useTransactions("/api/transactions", "pending-issue")
 
   const toast = useToast()
   const confirm = useConfirm()
 
   const [search, setSearch] = React.useState("")
-  const [state, setState] = React.useState("pending-debit")
+  const [state, setState] = React.useState("pending-issue")
 
   const [reason, setReason] = React.useState({
     open: false,
@@ -124,7 +125,7 @@ const DocumentDebiting = () => {
         let response
         try {
           response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
-            process: DEBIT,
+            process: ISSUE,
             subprocess: RECEIVE
           })
 
@@ -152,7 +153,7 @@ const DocumentDebiting = () => {
     setReason(currentValue => ({
       ...currentValue,
       open: true,
-      process: DEBIT,
+      process: ISSUE,
       subprocess: HOLD,
       data,
     }))
@@ -166,7 +167,7 @@ const DocumentDebiting = () => {
         let response
         try {
           response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
-            process: DEBIT,
+            process: ISSUE,
             subprocess: UNHOLD
           })
 
@@ -194,49 +195,17 @@ const DocumentDebiting = () => {
     setReason(currentValue => ({
       ...currentValue,
       open: true,
-      process: DEBIT,
+      process: ISSUE,
       subprocess: RETURN,
       data,
     }))
-  }
-
-  const onUnreturn = (ID) => {
-    confirm({
-      open: true,
-      wait: true,
-      onConfirm: async () => {
-        let response
-        try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
-            process: DEBIT,
-            subprocess: UNRETURN
-          })
-
-          const { message } = response.data
-
-          refetchData()
-          toast({
-            message,
-            title: "Success!"
-          })
-        } catch (error) {
-          console.log("Fisto Error Status", error.request)
-
-          toast({
-            severity: "error",
-            title: "Error!",
-            message: "Something went wrong whilst trying to cancel return transaction. Please try again later."
-          })
-        }
-      }
-    })
   }
 
   const onVoid = (data) => {
     setReason(currentValue => ({
       ...currentValue,
       open: true,
-      process: DEBIT,
+      process: ISSUE,
       subprocess: VOID,
       data,
     }))
@@ -248,7 +217,7 @@ const DocumentDebiting = () => {
         <Stack className="FstoStackToolbar-root" justifyContent="space-between" gap={2}>
           <Stack className="FstoStackToolbar-item" direction="row" justifyContent="center" gap={2}>
             <Typography variant="heading">
-              Filling of Debit Memo
+              Releasing of Cheque
             </Typography>
           </Stack>
 
@@ -265,12 +234,9 @@ const DocumentDebiting = () => {
                 children: <span className="FstoTabsIndicator-root" />
               }}
             >
-              <Tab className="FstoTab-root" label="Pending" value="pending-debit" disableRipple />
-              <Tab className="FstoTab-root" label="Received" value="debit-receive" disableRipple />
-              <Tab className="FstoTab-root" label="Filed" value="debit-file" disableRipple />
-              {/* <Tab className="FstoTab-root" label="Held" value="debit-hold" disableRipple /> */}
-              {/* <Tab className="FstoTab-root" label="Returned" value="debit-return" disableRipple /> */}
-              {/* <Tab className="FstoTab-root" label="Voided" value="debit-void" disableRipple /> */}
+              <Tab className="FstoTab-root" label="Pending" value="pending-issue" disableRipple />
+              <Tab className="FstoTab-root" label="Received" value="issue-receive" disableRipple />
+              <Tab className="FstoTab-root" label="Released" value="issue-issue" disableRipple />
             </Tabs>
 
             <Stack direction="row" alignItems="center" justifyContent="center" gap={1}>
@@ -308,7 +274,7 @@ const DocumentDebiting = () => {
                 }}
               />
 
-              <FilterPopover onFilter={filterData} />
+              <DocumentIssuingFilter onFilter={filterData} />
             </Stack>
           </Stack>
         </Stack>
@@ -465,11 +431,10 @@ const DocumentDebiting = () => {
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                      <DocumentDebitingActions
+                      <DocumentIssuingActions
                         data={item}
                         state={state}
                         onReceive={onReceive}
-                        onCancel={onUnreturn}
                         onManage={onManage}
                         onView={onView}
                       />
@@ -505,7 +470,7 @@ const DocumentDebiting = () => {
           showLastButton
         />
 
-        <DocumentDebitingTransaction
+        <DocumentIssuingTransaction
           {...manage}
           state={state}
           refetchData={refetchData}
@@ -519,6 +484,7 @@ const DocumentDebiting = () => {
       </Paper>
     </Box>
   )
+
 }
 
-export default DocumentDebiting
+export default DocumentIssuing

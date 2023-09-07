@@ -14,7 +14,14 @@ import {
   ReplyOutlined as CancelIcon
 } from '@mui/icons-material'
 
-const DocumentDebitingActions = ({ data, state, onReceive, onManage, onView, onCancel }) => {
+const DocumentDebitingActions = ({
+  data,
+  state,
+  onReceive,
+  onManage,
+  onView,
+  onCancel
+}) => {
 
   const [anchor, setAnchor] = React.useState(null)
 
@@ -51,7 +58,7 @@ const DocumentDebitingActions = ({ data, state, onReceive, onManage, onView, onC
         disablePortal
       >
         {
-          state === `pending` &&
+          state === `pending-debit` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -64,7 +71,7 @@ const DocumentDebitingActions = ({ data, state, onReceive, onManage, onView, onC
           </MenuItem>}
 
         {
-          (state === `cheque-receive` || state === `cheque-cheque`) &&
+          state === `debit-receive` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -77,7 +84,7 @@ const DocumentDebitingActions = ({ data, state, onReceive, onManage, onView, onC
           </MenuItem>}
 
         {
-          (state === `cheque-file` || state === `cheque-hold` || state === `cheque-return` || state === `cheque-void`) &&
+          (state === `debit-file` || state === `debit-hold` || state === `debit-return` || state === `debit-void`) &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -90,7 +97,7 @@ const DocumentDebitingActions = ({ data, state, onReceive, onManage, onView, onC
           </MenuItem>}
 
         {
-          state === `cheque-return` &&
+          state === `debit-return` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {

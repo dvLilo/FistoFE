@@ -24,16 +24,14 @@ import useReasons from '../hooks/useReasons'
 import '../assets/css/styles.reason.scss'
 
 
-const ReasonDialog = (props) => {
-
-  const {
-    data,
-    process,
-    subprocess,
-    open = false,
-    onSuccess = () => { },
-    onClose = () => { }
-  } = props
+const ReasonDialog = ({
+  data,
+  process,
+  subprocess,
+  open = false,
+  onSuccess = () => { },
+  onClose = () => { }
+}) => {
 
   const toast = useToast()
   const {

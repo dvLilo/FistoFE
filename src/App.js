@@ -55,11 +55,23 @@ import DocumentApproving from './routes/approving/DocumentApproving'
 // Transmitting
 import DocumentTransmitting from './routes/transmitting/DocumentTransmitting'
 
+// Inspecting
+import DocumentInspecting from "./routes/inspecting/DocumentInspecting"
+
 // Chequing
 import DocumentChequing from './routes/chequing/DocumentChequing'
 
 // Debiting
 import DocumentDebiting from './routes/debiting/DocumentDebiting'
+
+// Auditing
+import DocumentAuditing from "./routes/auditing/DocumentAuditing"
+
+// Signing
+import DocumentSigning from "./routes/signing/DocumentSigning"
+
+// Issuing
+import DocumentIssuing from "./routes/issuing/DocumentIssuing"
 
 // Releasing
 import DocumentReleasing from './routes/releasing/DocumentReleasing'
@@ -98,10 +110,10 @@ import Sandbox from './Sandbox'
 import FistoProvider from './contexts/FistoContext'
 import PasswordContextProvider from './contexts/PasswordContext'
 
-import { QueryClient, QueryClientProvider } from 'react-query'
-
 // Experimental Refactored Transction Request
 import TransactionRequest from './routes/requestor/TransactionRequest'
+
+import { QueryClient, QueryClientProvider } from 'react-query'
 
 // Create a client
 const queryClient = new QueryClient()
@@ -353,12 +365,6 @@ const App = () => {
               />
             </Route>
 
-            <Route exact path="/document/transmitting" element={<ProtectedRoute permission={19} />}>
-              <Route index exact strict
-                element={<DocumentTransmitting />}
-              />
-            </Route>
-
             <Route exact path="/voucher/vouchering" element={<ProtectedRoute permission={12} />}>
               <Route index exact strict
                 element={
@@ -366,6 +372,28 @@ const App = () => {
                     <DocumentVouchering />
                   </PasswordContextProvider>
                 }
+              />
+            </Route>
+
+            <Route exact path="/voucher/transmitting" element={<ProtectedRoute permission={19} />}>
+              <Route index exact strict
+                element={<DocumentTransmitting />}
+              />
+            </Route>
+
+            <Route exact path="/audit/vouchering" element={<ProtectedRoute permission={3} />}>
+              <Route index exact strict
+                element={
+                  <PasswordContextProvider>
+                    <DocumentInspecting />
+                  </PasswordContextProvider>
+                }
+              />
+            </Route>
+
+            <Route exact path="/audit/chequing" element={<ProtectedRoute permission={3} />}>
+              <Route index exact strict
+                element={<DocumentAuditing />}
               />
             </Route>
 
@@ -438,6 +466,22 @@ const App = () => {
                     <DocumentDebiting />
                   </PasswordContextProvider>
                 }
+              />
+            </Route>
+
+            <Route exact path="/cheque/transmitting" element={<ProtectedRoute permission={23} />}>
+              <Route index exact strict
+                element={
+                  <PasswordContextProvider>
+                    <DocumentSigning />
+                  </PasswordContextProvider>
+                }
+              />
+            </Route>
+
+            <Route exact path="/cheque/issuing" element={<ProtectedRoute permission={7} />}>
+              <Route index exact strict
+                element={<DocumentIssuing />}
               />
             </Route>
 
