@@ -143,7 +143,7 @@ const NewUser = () => {
       },
       {
         id: 9,
-        name: "Creation of Debit Memo"
+        name: "Filing of Debit Memo"
       },
       {
         id: 24,
