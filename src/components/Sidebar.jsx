@@ -227,16 +227,16 @@ const Sidebar = () => {
                   && <RouterLink className="FstoSidebarLink-root" to="/cheque/chequing">Creation of Cheque</RouterLink>
                 }
 
-                {user.permissions.includes(9)
-                  && <RouterLink className="FstoSidebarLink-root" to="/cheque/debiting">Creation of Debit Memo</RouterLink>
-                }
-
                 {user.permissions.includes(24)
                   && <RouterLink className="FstoSidebarLink-root" to="/cheque/issuing">Releasing of Cheque</RouterLink>
                 }
 
                 {user.permissions.includes(6)
                   && <RouterLink className="FstoSidebarLink-root" to="/cheque/releasing">Releasing of Cheque</RouterLink>
+                }
+
+                {user.permissions.includes(9)
+                  && <RouterLink className="FstoSidebarLink-root" to="/cheque/debiting">Filing of Debit Memo</RouterLink>
                 }
 
                 {user.permissions.includes(8)
