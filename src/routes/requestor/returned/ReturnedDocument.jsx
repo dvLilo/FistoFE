@@ -1,10 +1,6 @@
 import React from 'react'
 
-import axios from 'axios'
-
 import moment from 'moment'
-
-import { useSelector } from 'react-redux'
 
 import { useNavigate } from 'react-router-dom'
 
@@ -31,14 +27,11 @@ import {
 
 import {
   Search,
-  Close,
-  AccessTime
+  Close
 } from '@mui/icons-material'
 
 import statusColor from '../../../colors/statusColor'
 
-import useToast from '../../../hooks/useToast'
-import useConfirm from '../../../hooks/useConfirm'
 import useTransactions from '../../../hooks/useTransactions'
 
 import {
@@ -69,10 +62,6 @@ const ReturnedDocument = () => {
     changeRows
   } = useTransactions("/api/transactions", "return-request")
 
-  const user = useSelector(state => state.user)
-
-  const toast = useToast()
-  const confirm = useConfirm()
   const navigate = useNavigate()
 
   const [search, setSearch] = React.useState("")
