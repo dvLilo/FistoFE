@@ -52,7 +52,7 @@ const DocumentIssuingTransaction = ({
   }, [open])
 
   React.useEffect(() => {
-    if (open && (state === `issue-receive` || state === `issue-issue` || state === `return-return`) && status === `success`) {
+    if (open && (state === `issue-receive` || state === `issue-issue` || state === `return-release`) && status === `success`) {
       setChequeData(currentValue => ({
         ...currentValue,
         accounts: data.cheque.accounts,
@@ -352,7 +352,7 @@ const DocumentIssuingTransaction = ({
         </DialogContent>
 
         {
-          (state === `issue-receive` || state === `issue-issue` || state === `return-return` || state === `issue-hold`) &&
+          (state === `issue-receive` || state === `issue-issue` || state === `return-release` || state === `issue-hold`) &&
           <DialogActions className="FstoDialogTransaction-actions">
             {
               state === `issue-receive` &&

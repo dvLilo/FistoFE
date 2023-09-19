@@ -3,7 +3,7 @@ import React, { useEffect } from 'react'
 import moment from 'moment'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { RESET_PO } from '../../actions'
+import { RESET_PO } from '../../../actions'
 
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -41,11 +41,11 @@ import DateAdapter from '@mui/lab/AdapterMoment'
 import NumberFormat from 'react-number-format'
 
 // Hooks helper
-import useRequestor from '../../hooks/useRequestor'
-import useCompanies from '../../hooks/useCompanies'
-import useDepartments from '../../hooks/useDepartments'
-import useLocations from '../../hooks/useLocations'
-import useSuppliers from '../../hooks/useSuppliers'
+import useRequestor from '../../../hooks/useRequestor'
+import useCompanies from '../../../hooks/useCompanies'
+import useDepartments from '../../../hooks/useDepartments'
+import useLocations from '../../../hooks/useLocations'
+import useSuppliers from '../../../hooks/useSuppliers'
 import TransactionAttachment from './TransactionAttachment'
 
 const TransactionRequest = () => {

@@ -71,7 +71,7 @@ const DocumentChequingTransaction = (props) => {
       }))
     }
 
-    if (open && (state === `cheque-cheque` || state === `cheque-hold` || state === `cheque-return` || state === `cheque-void` || state === `return-return`) && status === `success`) {
+    if (open && (state === `cheque-cheque` || state === `cheque-hold` || state === `cheque-return` || state === `cheque-void` || state === `return-cheque`) && status === `success`) {
       setChequeData(currentValue => ({
         ...currentValue,
         accounts: data.cheque.accounts || data.voucher.accounts,
@@ -500,7 +500,7 @@ const DocumentChequingTransaction = (props) => {
         </DialogContent>
 
         {
-          (state === `cheque-receive` || state === `cheque-cheque` || state === `return-return` || state === `cheque-hold`) &&
+          (state === `cheque-receive` || state === `cheque-cheque` || state === `return-cheque` || state === `cheque-hold`) &&
           <DialogActions className="FstoDialogTransaction-actions">
             {
               state === `cheque-receive` &&
@@ -513,7 +513,7 @@ const DocumentChequingTransaction = (props) => {
             }
 
             {
-              (state === `cheque-cheque` || state === `return-return`) &&
+              (state === `cheque-cheque` || state === `return-cheque`) &&
               <React.Fragment>
                 {/*
                 <Button

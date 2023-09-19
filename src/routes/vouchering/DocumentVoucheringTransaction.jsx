@@ -343,7 +343,7 @@ const DocumentVoucheringTransaction = ({
           <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
 
           {
-            (state === `voucher-receive` || state === `voucher-voucher` || state === `return-return`) &&
+            (state === `voucher-receive` || state === `voucher-voucher` || state === `return-voucher`) &&
             <React.Fragment>
               <Divider className="FstoDividerTransaction-root" variant="middle" />
 
@@ -432,14 +432,14 @@ const DocumentVoucheringTransaction = ({
         </DialogContent>
 
         {
-          (state === `voucher-receive` || state === `voucher-voucher` || state === `voucher-hold` || state === `return-return`) &&
+          (state === `voucher-receive` || state === `voucher-voucher` || state === `voucher-hold` || state === `return-voucher`) &&
           <DialogActions className="FstoDialogTransaction-actions">
             {
-              (state === `voucher-receive` || state === `voucher-voucher` || state === `return-return`) &&
+              (state === `voucher-receive` || state === `voucher-voucher` || state === `return-voucher`) &&
               <Button
                 variant="contained"
                 onClick={
-                  state === `voucher-voucher` || state === `return-return`
+                  state === `voucher-voucher` || state === `return-voucher`
                     ? submitVoucherHandler
                     : onAccountTitleManage
                 }

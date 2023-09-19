@@ -246,9 +246,10 @@ const ChequeEntryDialog = ({
 
     try {
       await axios.post(`/api/transactions/flow/validate-cheque-no`, {
+        bank_id: CQ.bank.id,
         cheque_no: CQ.no,
         ...(
-          /cheque-cheque|cheque-receive|return-return/i.test(state) && {
+          /cheque-cheque|cheque-receive|return-cheque/i.test(state) && {
             id: transaction?.id
           }
         )
@@ -293,7 +294,7 @@ const ChequeEntryDialog = ({
 
       <DialogContent className="FstoDialogCheque-content">
         {
-          Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|return|release-|counter-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|return-tag|return-voucher|return-release|release-|counter-.*/)) &&
           <Box className="FstoBoxCheque-root">
             <Autocomplete
               className="FstoSelectForm-root"
@@ -472,7 +473,7 @@ const ChequeEntryDialog = ({
                     <TableCell className="FstoTabelCellCheque-root">Date</TableCell>
                     <TableCell>Amount</TableCell>
                     {
-                      Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|return|release-|counter-.*/)) &&
+                      Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|return-tag|return-voucher|return-release|release-|counter-.*/)) &&
                       <TableCell align="right">Action</TableCell>
                     }
                   </TableRow>
@@ -503,7 +504,7 @@ const ChequeEntryDialog = ({
                         </TableCell>
 
                         {
-                          Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|return|release-|counter-.*/)) &&
+                          Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|return-tag|return-voucher|return-release|release-|counter-.*/)) &&
                           <TableCell align="right" size="small">
                             <IconButton onClick={() => editChequeHandler(item, index)}>
                               <EditIcon fontSize="small" />
@@ -563,7 +564,7 @@ const ChequeEntryDialog = ({
         </Button>
 
         {
-          Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|return|release-|counter-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|return-tag|return-voucher|return-release|release-|counter-.*/)) &&
           <Button
             variant="contained"
             onClick={submitChequehandler}

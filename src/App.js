@@ -39,15 +39,18 @@ import Banks from './routes/masterlist/Banks/'
 import Reasons from './routes/masterlist/Reasons/'
 
 // Requestor
-import DocumentRequesting from './routes/requestor/DocumentRequesting'
 import NewRequest from './routes/requestor/NewRequest'
 import UpdateRequest from './routes/requestor/UpdateRequest'
+import DocumentRequesting from './routes/requestor/DocumentRequesting'
+import DocumentReturnedRequest from './routes/requestor/returned/ReturnedDocument'
 
 // Tagging
 import DocumentTagging from './routes/tagging/DocumentTagging'
+import DocumentReturnedTag from './routes/tagging/returned/ReturnedDocument'
 
 // Vouchering
 import DocumentVouchering from './routes/vouchering/DocumentVouchering'
+import DocumentReturnedVoucher from './routes/vouchering/returned/ReturnedDocument'
 
 // Approving
 import DocumentApproving from './routes/approving/DocumentApproving'
@@ -56,22 +59,24 @@ import DocumentApproving from './routes/approving/DocumentApproving'
 import DocumentTransmitting from './routes/transmitting/DocumentTransmitting'
 
 // Inspecting
-import DocumentInspecting from "./routes/inspecting/DocumentInspecting"
+import DocumentInspecting from './routes/inspecting/DocumentInspecting'
 
 // Chequing
 import DocumentChequing from './routes/chequing/DocumentChequing'
+import DocumentReturnedCheque from './routes/chequing/returned/ReturnedDocument'
 
 // Debiting
 import DocumentDebiting from './routes/debiting/DocumentDebiting'
 
 // Auditing
-import DocumentAuditing from "./routes/auditing/DocumentAuditing"
+import DocumentAuditing from './routes/auditing/DocumentAuditing'
 
 // Signing
-import DocumentSigning from "./routes/signing/DocumentSigning"
+import DocumentSigning from './routes/signing/DocumentSigning'
 
 // Issuing
-import DocumentIssuing from "./routes/issuing/DocumentIssuing"
+import DocumentIssuing from './routes/issuing/DocumentIssuing'
+import DocumentReturnedIssue from './routes/issuing/returned/ReturnedDocument'
 
 // Releasing
 import DocumentReleasing from './routes/releasing/DocumentReleasing'
@@ -84,9 +89,6 @@ import DocumentReversing from './routes/reversing/DocumentReversing'
 
 // Clearing
 import DocumentClearing from './routes/clearing/DocumentClearing'
-
-// Returning
-import DocumentReturning from './routes/returning/DocumentReturning'
 
 // Confidential
 import DocumentConfidentialVouchering from './routes/confidential/vouchering/DocumentConfidentialVouchering'
@@ -111,7 +113,7 @@ import FistoProvider from './contexts/FistoContext'
 import PasswordContextProvider from './contexts/PasswordContext'
 
 // Experimental Refactored Transction Request
-import TransactionRequest from './routes/requestor/TransactionRequest'
+import TransactionRequest from './routes/requestor/new/TransactionRequest'
 
 import { QueryClient, QueryClientProvider } from 'react-query'
 
@@ -346,13 +348,9 @@ const App = () => {
               <Route exact strict path="new-request" element={<NewRequest />} />
               <Route exact strict path="update-request/:id" element={<UpdateRequest />} />
 
-              <Route exact strict path="transaction-request" element={<TransactionRequest />} />
-            </Route>
+              <Route exact strict path="returned-requests" element={<DocumentReturnedRequest />} />
 
-            <Route exact path="/document/returned-documents" element={<ProtectedRoute />}>
-              <Route index exact strict
-                element={<DocumentReturning />}
-              />
+              <Route exact strict path="transaction-request" element={<TransactionRequest />} />
             </Route>
 
             <Route exact path="/document/tagging" element={<ProtectedRoute permission={20} />}>
@@ -362,6 +360,12 @@ const App = () => {
                     <DocumentTagging />
                   </PasswordContextProvider>
                 }
+              />
+            </Route>
+
+            <Route exact path="/document/returned-documents" element={<ProtectedRoute permission={20} />}>
+              <Route index exact strict
+                element={<DocumentReturnedTag />}
               />
             </Route>
 
@@ -378,6 +382,12 @@ const App = () => {
             <Route exact path="/voucher/transmitting" element={<ProtectedRoute permission={19} />}>
               <Route index exact strict
                 element={<DocumentTransmitting />}
+              />
+            </Route>
+
+            <Route exact path="/voucher/returned-vouchers" element={<ProtectedRoute permission={12} />}>
+              <Route index exact strict
+                element={<DocumentReturnedVoucher />}
               />
             </Route>
 
@@ -479,9 +489,15 @@ const App = () => {
               />
             </Route>
 
-            <Route exact path="/cheque/issuing" element={<ProtectedRoute permission={7} />}>
+            <Route exact path="/cheque/issuing" element={<ProtectedRoute permission={24} />}>
               <Route index exact strict
                 element={<DocumentIssuing />}
+              />
+            </Route>
+
+            <Route exact path="/cheque/returned-issues" element={<ProtectedRoute permission={24} />}>
+              <Route index exact strict
+                element={<DocumentReturnedIssue />}
               />
             </Route>
 
@@ -494,6 +510,12 @@ const App = () => {
             <Route exact path="/cheque/releasing" element={<ProtectedRoute permission={6} />}>
               <Route index exact strict
                 element={<DocumentReleasing />}
+              />
+            </Route>
+
+            <Route exact path="/cheque/returned-cheques" element={<ProtectedRoute permission={7} />}>
+              <Route index exact strict
+                element={<DocumentReturnedCheque />}
               />
             </Route>
 

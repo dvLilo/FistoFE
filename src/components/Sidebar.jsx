@@ -28,6 +28,7 @@ import {
   ConfirmationNumberOutlined as VoucherIcon,
   PolicyOutlined as AuditIcon,
   LocalAtmOutlined as ChequeIcon,
+  ReceiptOutlined as ReleaseIcon,
   FactCheckOutlined as ApprovalIcon,
   SecurityOutlined as ConfidentialIcon,
   AssessmentOutlined as ReportsIcon
@@ -127,7 +128,7 @@ const Sidebar = () => {
 
           { // Documents
             !!user &&
-            user.permissions.some((item) => [1, 6, 7, 8, 19, 20, 21, 22, 23].includes(item)) &&
+            user.permissions.some((item) => [1, 19, 20, 21, 22, 23].includes(item)) &&
             <Accordion defaultExpanded={/tagging|executive|requestor/i.test(user.role)} elevation={0} square disableGutters>
               <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
                 <DocumentIcon />
@@ -159,8 +160,13 @@ const Sidebar = () => {
                   && <RouterLink className="FstoSidebarLink-root" to="/counter-receipt/monitoring">Monitoring of Counter Receipt</RouterLink>
                 }
 
-                {user.permissions.some((item) => [1, 6, 7, 8, 19, 20, 21, 22].includes(item))
+
+                {user.permissions.includes(20)
                   && <RouterLink className="FstoSidebarLink-root" to="/document/returned-documents">Returned Documents</RouterLink>
+                }
+
+                {user.permissions.includes(1)
+                  && <RouterLink className="FstoSidebarLink-root" to="/request/returned-requests">Returned Requests</RouterLink>
                 }
 
               </AccordionDetails>
@@ -187,6 +193,10 @@ const Sidebar = () => {
 
                 {user.permissions.includes(10)
                   && <RouterLink className="FstoSidebarLink-root" to="/voucher/reversing">Reversal Request</RouterLink>
+                }
+
+                {user.permissions.includes(12)
+                  && <RouterLink className="FstoSidebarLink-root" to="/voucher/returned-vouchers">Returned Vouchers</RouterLink>
                 }
               </AccordionDetails>
             </Accordion>
@@ -215,7 +225,7 @@ const Sidebar = () => {
 
           { // Cheque
             !!user &&
-            user.permissions.some((item) => [6, 7, 8, 9].includes(item)) &&
+            user.permissions.some((item) => [7, 8, 9].includes(item)) &&
             <Accordion defaultExpanded={/treasury/i.test(user.role)} elevation={0} square disableGutters>
               <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
                 <ChequeIcon />
@@ -227,6 +237,31 @@ const Sidebar = () => {
                   && <RouterLink className="FstoSidebarLink-root" to="/cheque/chequing">Creation of Cheque</RouterLink>
                 }
 
+                {user.permissions.includes(9)
+                  && <RouterLink className="FstoSidebarLink-root" to="/cheque/debiting">Filing of Debit Memo</RouterLink>
+                }
+
+                {user.permissions.includes(8)
+                  && <RouterLink className="FstoSidebarLink-root" to="/cheque/clearing">Clearing of Cheque</RouterLink>
+                }
+
+                {user.permissions.includes(7)
+                  && <RouterLink className="FstoSidebarLink-root" to="/cheque/returned-cheques">Returned Cheques</RouterLink>
+                }
+              </AccordionDetails>
+            </Accordion>
+          }
+
+          { // Releasing
+            !!user &&
+            user.permissions.some((item) => [6, 24].includes(item)) &&
+            <Accordion defaultExpanded={/treasury/i.test(user.role)} elevation={0} square disableGutters>
+              <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
+                <ReleaseIcon />
+                <Typography variant="sidebar">Releasing</Typography>
+              </AccordionSummary>
+
+              <AccordionDetails>
                 {user.permissions.includes(24)
                   && <RouterLink className="FstoSidebarLink-root" to="/cheque/issuing">Releasing of Cheque</RouterLink>
                 }
@@ -235,12 +270,8 @@ const Sidebar = () => {
                   && <RouterLink className="FstoSidebarLink-root" to="/cheque/releasing">Releasing of Cheque</RouterLink>
                 }
 
-                {user.permissions.includes(9)
-                  && <RouterLink className="FstoSidebarLink-root" to="/cheque/debiting">Filing of Debit Memo</RouterLink>
-                }
-
-                {user.permissions.includes(8)
-                  && <RouterLink className="FstoSidebarLink-root" to="/cheque/clearing">Clearing of Cheque</RouterLink>
+                {user.permissions.includes(24)
+                  && <RouterLink className="FstoSidebarLink-root" to="/cheque/returned-issues">Returned Cheques</RouterLink>
                 }
               </AccordionDetails>
             </Accordion>

@@ -65,7 +65,7 @@ const DocumentTaggingTransaction = (props) => {
   }, [open])
 
   React.useEffect(() => {
-    if (open && (state === `tag-tag` || state === `return-return`) && status === `success`) {
+    if (open && (state === `tag-tag` || state === `return-tag`) && status === `success`) {
       setTagData(currentValue => ({
         ...currentValue,
         distributed_to: data.tag.distributed_to
@@ -230,7 +230,7 @@ const DocumentTaggingTransaction = (props) => {
           <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
 
           {
-            (state === `tag-receive` || state === `tag-tag` || state === `return-return`) &&
+            (state === `tag-receive` || state === `tag-tag` || state === `return-tag`) &&
             <React.Fragment>
               <Divider className="FstoDividerTransaction-root" variant="middle" />
 
@@ -270,10 +270,10 @@ const DocumentTaggingTransaction = (props) => {
         </DialogContent>
 
         {
-          (state === `tag-receive` || state === `tag-tag` || state === `tag-hold` || state === `return-return`) &&
+          (state === `tag-receive` || state === `tag-tag` || state === `tag-hold` || state === `return-tag`) &&
           <DialogActions className="FstoDialogTransaction-actions">
             {
-              (state === `tag-receive` || state === `tag-tag` || state === `return-return`) &&
+              (state === `tag-receive` || state === `tag-tag` || state === `return-tag`) &&
               <Button
                 variant="contained"
                 onClick={submitTagHandler}
@@ -318,6 +318,7 @@ const DocumentTaggingTransaction = (props) => {
               variant="outlined"
               color="error"
               onClick={submitVoidHandler}
+              disabled={(transaction?.document_id === 1 || transaction?.document_id === 4) && transaction?.payment_type.toLowerCase() === `partial` && !transaction?.is_latest_transaction}
               disableElevation
             > Void
             </Button>
