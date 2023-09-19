@@ -9,7 +9,6 @@ import {
 import {
   MoreHoriz as MoreIcon,
   Visibility as ViewIcon,
-  Description as ManageIcon,
   Edit as UpdateIcon,
   RemoveCircle as VoidIcon
 } from '@mui/icons-material'
@@ -19,7 +18,6 @@ import { useSelector } from 'react-redux'
 const ReturnedDocumentActions = ({
   data,
   state = "return-request",
-  onManage = () => { },
   onUpdate = () => { },
   onView = () => { },
   onVoid = () => { }
