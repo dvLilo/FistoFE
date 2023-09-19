@@ -69,7 +69,7 @@ const ReturnedDocumentActions = ({
           </MenuItem>}
 
         {
-          (state === `return-hold` || state === `return-void`) &&
+          (state === `hold-return` || state === `void-return`) &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
