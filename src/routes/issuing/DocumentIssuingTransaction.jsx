@@ -355,7 +355,7 @@ const DocumentIssuingTransaction = ({
           (state === `issue-receive` || state === `issue-issue` || state === `return-release` || state === `issue-hold`) &&
           <DialogActions className="FstoDialogTransaction-actions">
             {
-              state === `issue-receive` &&
+              (state === `issue-receive` || state === `return-release`) &&
               <Button
                 variant="contained"
                 onClick={onChequeManage}
