@@ -304,7 +304,7 @@ const ChequeEntryDialog = ({
               options={TYPE_LIST}
               value={TYPE_LIST.find((row) => row.name === CQ.type) || null}
               disabled={
-                Boolean(state.match(/issue-.*/))
+                Boolean(state.match(/issue-|return-.*/))
               }
               renderInput={
                 (props) => <TextField {...props} label="Type" variant="outlined" />
@@ -332,7 +332,7 @@ const ChequeEntryDialog = ({
               options={BANKS_LIST || []}
               value={CQ.bank}
               disabled={
-                Boolean(state.match(/issue-.*/))
+                Boolean(state.match(/issue-|return-.*/))
               }
               loading={
                 BANKS_STATUS === 'loading'
@@ -366,7 +366,7 @@ const ChequeEntryDialog = ({
               type="number"
               value={CQ.no}
               disabled={
-                Boolean(state.match(/issue-.*/))
+                Boolean(state.match(/issue-|return-.*/))
               }
               error={
                 error.status
@@ -412,7 +412,7 @@ const ChequeEntryDialog = ({
               size="small"
               value={CQ.amount}
               disabled={
-                Boolean(state.match(/issue-.*/))
+                Boolean(state.match(/issue-|return-.*/))
               }
               InputProps={{
                 inputComponent: NumberField
@@ -511,7 +511,7 @@ const ChequeEntryDialog = ({
                             <IconButton onClick={() => editChequeHandler(item, index)}>
                               <EditIcon fontSize="small" />
                             </IconButton>
-                            <IconButton onClick={() => removeChequeHandler(index)}>
+                            <IconButton disabled={Boolean(state.match(/issue-|return-.*/))} onClick={() => removeChequeHandler(index)}>
                               <DeleteIcon fontSize="small" />
                             </IconButton>
                           </TableCell>
