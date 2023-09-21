@@ -189,7 +189,7 @@ const DocumentIssuingTransaction = ({
       open: true,
       onBack: onBack,
 
-      ...(Boolean(state.match(/-receive|-hold|cheque-return|-void.*/)) && {
+      ...(Boolean(state.match(/-receive|-hold|-return|-void.*/)) && {
         state: "transmit-",
         accounts: Boolean(data.cheque.accounts.length)
           ? data.cheque.accounts
@@ -259,7 +259,7 @@ const DocumentIssuingTransaction = ({
       open: true,
       onBack: onBack,
 
-      ...(Boolean(state.match(/-receive|-hold|cheque-return|-void.*/)) && {
+      ...(Boolean(state.match(/-receive|-hold|-return|-void|return-release.*/)) && {
         state: "release-"
       }),
       ...(Boolean(state.match(/-release.*/)) && {

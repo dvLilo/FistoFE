@@ -101,6 +101,8 @@ const ChequeEntryDialog = ({
   onSubmit = () => { }
 }) => {
 
+  console.log(state)
+
   const {
     refetch: fetchBanks,
     status: BANKS_STATUS,
@@ -294,7 +296,7 @@ const ChequeEntryDialog = ({
 
       <DialogContent className="FstoDialogCheque-content">
         {
-          Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|return-tag|return-voucher|return-release|release-|counter-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/file|reverse|clear|return-tag|return-voucher|release-|counter-.*/)) &&
           <Box className="FstoBoxCheque-root">
             <Autocomplete
               className="FstoSelectForm-root"
@@ -473,7 +475,7 @@ const ChequeEntryDialog = ({
                     <TableCell className="FstoTabelCellCheque-root">Date</TableCell>
                     <TableCell>Amount</TableCell>
                     {
-                      Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|return-tag|return-voucher|return-release|release-|counter-.*/)) &&
+                      Boolean(state) && !Boolean(state.match(/file|reverse|clear|return-tag|return-voucher|release-|counter-.*/)) &&
                       <TableCell align="right">Action</TableCell>
                     }
                   </TableRow>
@@ -504,7 +506,7 @@ const ChequeEntryDialog = ({
                         </TableCell>
 
                         {
-                          Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|return-tag|return-voucher|return-release|release-|counter-.*/)) &&
+                          Boolean(state) && !Boolean(state.match(/file|reverse|clear|return-tag|return-voucher|release-|counter-.*/)) &&
                           <TableCell align="right" size="small">
                             <IconButton onClick={() => editChequeHandler(item, index)}>
                               <EditIcon fontSize="small" />
@@ -564,7 +566,7 @@ const ChequeEntryDialog = ({
         </Button>
 
         {
-          Boolean(state) && !Boolean(state.match(/-release|file|reverse|clear|return-tag|return-voucher|return-release|release-|counter-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/file|reverse|clear|return-tag|return-voucher|release-|counter-.*/)) &&
           <Button
             variant="contained"
             onClick={submitChequehandler}
