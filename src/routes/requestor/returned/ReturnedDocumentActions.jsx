@@ -88,7 +88,7 @@ const ReturnedDocumentActions = ({
             onVoid(data)
             actionCloseHandler()
           }}
-          disabled={user?.id !== data.users_id || (data.document_id === 4 && data.payment_type.toLowerCase() === `partial` && !data.is_latest_transaction)}
+          disabled={user?.id !== data.users_id || ((data.document_id === 1 || data.document_id === 4) && data.payment_type.toLowerCase() === `partial` && !data.is_latest_transaction)}
           dense
         >
           <VoidIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Void
