@@ -50,14 +50,10 @@ const TYPE_LIST = [
   },
   {
     id: 2,
-    name: "Debit Memo"
-  },
-  {
-    id: 3,
     name: "Telegraphic"
   },
   {
-    id: 4,
+    id: 3,
     name: "Managers Cheque"
   }
 ]
@@ -314,6 +310,9 @@ const ChequeEntryDialog = ({
               }
               getOptionLabel={
                 (option) => option.name
+              }
+              getOptionDisabled={
+                (option) => option.id !== 1
               }
               isOptionEqualToValue={
                 (option, value) => option.id === value.id
