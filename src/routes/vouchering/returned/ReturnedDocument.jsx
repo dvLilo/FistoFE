@@ -142,7 +142,7 @@ const ReturnedDocument = () => {
         <Stack className="FstoStackToolbar-root" justifyContent="space-between" gap={2}>
           <Stack className="FstoStackToolbar-item" direction="row" justifyContent="center" gap={2}>
             <Typography variant="heading">
-              Returned Documents
+              Returned/Held Vouchers
             </Typography>
           </Stack>
 

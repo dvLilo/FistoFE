@@ -162,7 +162,7 @@ const Sidebar = () => {
 
 
                 {user.permissions.includes(20)
-                  && <RouterLink className="FstoSidebarLink-root" to="/document/returned-documents">Returned Documents</RouterLink>
+                  && <RouterLink className="FstoSidebarLink-root" to="/document/returned-documents">Returned/Held Documents</RouterLink>
                 }
 
                 {user.permissions.includes(1)
@@ -196,7 +196,7 @@ const Sidebar = () => {
                 }
 
                 {user.permissions.includes(12)
-                  && <RouterLink className="FstoSidebarLink-root" to="/voucher/returned-vouchers">Returned Vouchers</RouterLink>
+                  && <RouterLink className="FstoSidebarLink-root" to="/voucher/returned-vouchers">Returned/Held Vouchers</RouterLink>
                 }
               </AccordionDetails>
             </Accordion>
@@ -246,7 +246,7 @@ const Sidebar = () => {
                 }
 
                 {user.permissions.includes(7)
-                  && <RouterLink className="FstoSidebarLink-root" to="/cheque/returned-cheques">Returned Cheques</RouterLink>
+                  && <RouterLink className="FstoSidebarLink-root" to="/cheque/returned-cheques">Returned/Held Cheques</RouterLink>
                 }
               </AccordionDetails>
             </Accordion>
@@ -271,7 +271,7 @@ const Sidebar = () => {
                 }
 
                 {user.permissions.includes(24)
-                  && <RouterLink className="FstoSidebarLink-root" to="/cheque/returned-issues">Returned Cheques</RouterLink>
+                  && <RouterLink className="FstoSidebarLink-root" to="/cheque/returned-issues">Returned/Held Cheques</RouterLink>
                 }
               </AccordionDetails>
             </Accordion>
