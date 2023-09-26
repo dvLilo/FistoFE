@@ -65,17 +65,6 @@ import useUtilityLocations from '../../hooks/useUtilityLocations'
 
 import ErrorDialog from '../../components/ErrorDialog'
 
-const REQUEST_TYPES = [
-  {
-    id: 1,
-    label: "Regular"
-  },
-  {
-    id: 2,
-    label: "Confidential"
-  }
-]
-
 const PAYMENT_TYPES = [
   {
     id: 1,
@@ -202,7 +191,6 @@ const NewRequest = () => {
     document: {
       id: null,
       name: "",
-      request_type: "",
       payment_type: "Full",
       no: "",
       capex_no: "",
@@ -250,6 +238,10 @@ const NewRequest = () => {
         type: null,
         category: null,
         clients: []
+      },
+
+      debit_memo: {
+        attachment: true
       },
 
       remarks: ""
@@ -584,6 +576,14 @@ const NewRequest = () => {
     // eslint-disable-next-line
   }, [data.document.category])
 
+  // Clear Auto Debit Import
+  React.useEffect(() => {
+    if (data.document.id === 9 && !data.document.debit_memo.attachment)
+      setDebitGroup([])
+
+    // eslint-disable-next-line
+  }, [data.document.debit_memo.attachment])
+
 
   React.useEffect(() => {
     const unload = (e) => {
@@ -767,10 +767,13 @@ const NewRequest = () => {
           && data.document.location
           && data.document.supplier
           && data.document.category
-          && debitGroup.length
           && (
-            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)).toFixed(2) >= 0.00 &&
-            Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)).toFixed(2) < 1.00
+            data.document.debit_memo.attachment
+              ? debitGroup.length && (
+                Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)).toFixed(2) >= 0.00 &&
+                Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)).toFixed(2) < 1.00
+              )
+              : true
           )
           && (!error.status || !Boolean(error.data.document_no))
           && (!validate.status || !validate.data.includes('document_no'))
@@ -886,35 +889,6 @@ const NewRequest = () => {
       data: currentValue.data.filter((data) => data !== 'reference_no')
     }))
   }
-
-  // const checkPettyCashFundNameHandler = async (name) => {
-  //   if (error.status && error.data.pcf_name) {
-  //     delete error.data.pcf_name
-  //     setError(currentValue => ({
-  //       ...currentValue,
-  //       data: error.data
-  //     }))
-  //   }
-
-  //   try {
-  //     await axios.post(`/api/transactions/validate-pcf-name`, {
-  //       pcf_name: name
-  //     })
-  //   }
-  //   catch (error) {
-  //     if (error.request.status === 422) {
-  //       const { errors } = error.response.data
-
-  //       setError(currentValue => ({
-  //         status: true,
-  //         data: {
-  //           ...currentValue.data,
-  //           pcf_name: errors["pcf_batch.name"]
-  //         }
-  //       }))
-  //     }
-  //   }
-  // }
 
   const checkPettyCashFundNameHandler = async () => {
     if (error.status && error.data.document_supplier && error.data.pcf_letter && error.data.pcf_date) {
@@ -1954,6 +1928,10 @@ const NewRequest = () => {
           clients: []
         },
 
+        debit_memo: {
+          attachment: true
+        },
+
         remarks: ""
       },
 
@@ -2112,42 +2090,29 @@ const NewRequest = () => {
             data.document.id &&
             (
               <React.Fragment>
-                { // Request Types
-                  (data.document.id === `confi`) &&
+                { // With attachment
+                  (data.document.id === 9) &&
                   (
-                    <Autocomplete
-                      className="FstoSelectForm-root"
-                      size="small"
-                      options={REQUEST_TYPES}
-                      value={REQUEST_TYPES.find(row => row.label === data.document.request_type) || null}
-                      renderInput={
-                        props =>
-                          <TextField
-                            {...props}
-                            variant="outlined"
-                            label="Request Type"
-                          />
-                      }
-                      PaperComponent={
-                        props =>
-                          <Paper
-                            {...props}
-                            sx={{ textTransform: 'capitalize' }}
-                          />
-                      }
-                      isOptionEqualToValue={
-                        (option, value) => option.label === value.label
-                      }
-                      onChange={(e, value) => setData({
-                        ...data,
+                    <FormControlLabel
+                      className="FstoCheckboxForm-root"
+                      label="With attachment"
+                      checked={data.document.debit_memo.attachment}
+                      onChange={(e) => setData(currentValue => ({
+                        ...currentValue,
                         document: {
-                          ...data.document,
-                          request_type: value.label
+                          ...currentValue.document,
+                          debit_memo: {
+                            attachment: e.target.checked
+                          }
                         }
-                      })}
-                      fullWidth
-                      disablePortal
-                      disableClearable
+                      }))}
+                      sx={{
+                        marginTop: '-1.25em'
+                      }}
+                      control={
+                        <Checkbox />
+                      }
+                      disableTypography
                     />
                   )}
 
@@ -2195,67 +2160,6 @@ const NewRequest = () => {
                   (data.document.id === 8) &&
                   (
                     <React.Fragment>
-                      {/*
-                      <Autocomplete
-                        className="FstoSelectForm-root"
-                        size="small"
-                        filterOptions={filterOptions}
-                        options={PETTYCASHFUND_LIST}
-                        value={PETTYCASHFUND_LIST.find(row => row.name === data.document.pcf_batch.name) || null}
-                        renderInput={
-                          props =>
-                            <TextField
-                              {...props}
-                              variant="outlined"
-                              label="Batch Name"
-                              error={
-                                error.status
-                                && Boolean(error.data.pcf_name)
-                              }
-                              helperText={
-                                error.status
-                                && error.data.pcf_name
-                                && error.data.pcf_name[0]
-                              }
-                            />
-                        }
-                        PaperComponent={
-                          props =>
-                            <Paper
-                              {...props}
-                              sx={{ textTransform: 'capitalize' }}
-                            />
-                        }
-                        getOptionLabel={
-                          option => option.name
-                        }
-                        isOptionEqualToValue={
-                          (option, value) => option.name === value.name
-                        }
-                        onChange={(e, value) => {
-                          setData({
-                            ...data,
-                            document: {
-                              ...data.document,
-                              date: new Date(value.date_created).toISOString().slice(0, 10),
-                              payment_type: "Full",
-                              amount: value.amount,
-                              pcf_batch: {
-                                name: value.name,
-                                letter: value.letter,
-                                date: value.date
-                              },
-                              supplier: SUPPLIER_LIST.find(row => row.name.replace(/\s|-/g, '').toLowerCase() === value.branch.replace(/\s|-/g, '').toLowerCase()) || null
-                            }
-                          })
-                          checkPettyCashFundNameHandler(value.name)
-                        }}
-                        fullWidth
-                        disablePortal
-                        disableClearable
-                      />
-                      */}
-
                       <Autocomplete
                         className="FstoSelectForm-root"
                         size="small"
@@ -2591,7 +2495,8 @@ const NewRequest = () => {
                           )) ||
                         (
                           Boolean(debitGroup.length) &&
-                          Boolean(data.document.amount)
+                          Boolean(data.document.amount) &&
+                          Boolean(data.document.debit_memo.attachment)
                           && !(
                             Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)) >= 0.00 &&
                             Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)) < 1.00
@@ -2637,7 +2542,8 @@ const NewRequest = () => {
                           && "Document amount and principal amount is not equal.") ||
                         (
                           Boolean(debitGroup.length) &&
-                          Boolean(data.document.amount)
+                          Boolean(data.document.amount) &&
+                          Boolean(data.document.debit_memo.attachment)
                           && !(
                             Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)) >= 0.00 &&
                             Math.abs(data.document.amount - debitGroup.reduce((a, b) => ((b.principal_amount + b.interest_due + b.dst) - b.cwt) + a, 0)) < 1.00
@@ -4275,7 +4181,7 @@ const NewRequest = () => {
       }
 
       {
-        (data.document.id === 9) &&
+        (data.document.id === 9 && data.document.debit_memo.attachment) &&
         (
           <Paper className="FstoPaperImport-root" elevation={1}>
             <Stack direction="row" spacing={2}>

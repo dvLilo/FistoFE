@@ -97,8 +97,6 @@ const ChequeEntryDialog = ({
   onSubmit = () => { }
 }) => {
 
-  console.log(state)
-
   const {
     refetch: fetchBanks,
     status: BANKS_STATUS,
