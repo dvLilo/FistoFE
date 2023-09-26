@@ -1153,7 +1153,10 @@ const NewRequest = () => {
           data.document.category.name.toLowerCase() === `stall a rental` ||
           data.document.category.name.toLowerCase() === `stall b rental` ||
           data.document.category.name.toLowerCase() === `stall c rental` ||
-          data.document.category.name.toLowerCase() === `stall d rental`
+          data.document.category.name.toLowerCase() === `stall d rental` ||
+          data.document.category.name.toLowerCase() === `official store rental` ||
+          data.document.category.name.toLowerCase() === `unofficial store rental` ||
+          data.document.category.name.toLowerCase() === `corporate special program - education`
         ) {
           const errors = []
           const header = ["period_covered", "gross_amount", "wht", "net_of_amount", "cheque_date"]
@@ -3858,7 +3861,7 @@ const NewRequest = () => {
             </Stack>
 
             { // Table for Rental Import
-              Boolean(prmGroup.length) && Boolean(data.document.category) && Boolean(data.document.category.name.match(/rental/i)) &&
+              Boolean(prmGroup.length) && Boolean(data.document.category) && Boolean(data.document.category.name.match(/rental|education/i)) &&
               (
                 <React.Fragment>
                   <TableContainer className="FstoTableContainerImport-root">
