@@ -886,7 +886,7 @@ const TransactionDialog = ({
           </React.Fragment>}
 
         { // Attachment
-          status === `success` && data.document.id === 9 &&
+          status === `success` && data.document.id === 9 && Boolean(data.autoDebit_group.length) &&
           <React.Fragment>
             <Box className="FstoBoxTransactionDetails-content">
               <Typography variant="h6" sx={{ fontWeight: 700 }}>Attachment</Typography>

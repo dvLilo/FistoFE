@@ -649,7 +649,7 @@ const NewRequest = () => {
           && data.document.supplier
           && data.document.category
           && (
-            data.document.category.name.match(/rental/i) || (data.document.category.name.match(/loans|leasing/i) && data.document.release_date && data.document.batch_no)
+            data.document.category.name.match(/rental|education/i) || (data.document.category.name.match(/loans|leasing/i) && data.document.release_date && data.document.batch_no)
           )
           && prmGroup.length
           && (
