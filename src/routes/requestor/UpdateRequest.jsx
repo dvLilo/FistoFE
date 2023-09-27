@@ -321,7 +321,7 @@ const UpdateRequest = () => {
             },
 
             debit_memo: {
-              attachment: Boolean(autoDebit_group)
+              attachment: Boolean(autoDebit_group.length)
             }
           },
           po_group: po_group_new
