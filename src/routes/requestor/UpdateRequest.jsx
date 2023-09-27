@@ -695,7 +695,7 @@ const UpdateRequest = () => {
           )
           && prmGroup.length
           && (
-            (data.document.category.name.match(/rental/i) && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.gross_amount, 0)).toFixed(2) >= 0.00 && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.gross_amount, 0)).toFixed(2) < 1.00) ||
+            (data.document.category.name.match(/rental|education/i) && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.gross_amount, 0)).toFixed(2) >= 0.00 && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.gross_amount, 0)).toFixed(2) < 1.00) ||
             (data.document.category.name.match(/loans|leasing/i) && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.net_of_amount, 0)).toFixed(2) >= 0.00 && Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.net_of_amount, 0)).toFixed(2) < 1.00)
           )
           && (!error.status || !Boolean(error.data.document_no))
@@ -2567,7 +2567,7 @@ const UpdateRequest = () => {
                         (
                           Boolean(prmGroup.length) &&
                           Boolean(data.document.category) &&
-                          Boolean(data.document.category.name.match(/rental/i)) &&
+                          Boolean(data.document.category.name.match(/rental|education/i)) &&
                           Boolean(data.document.amount)
                           && !(
                             Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.gross_amount, 0)).toFixed(2) >= 0.00 &&
@@ -2612,7 +2612,7 @@ const UpdateRequest = () => {
                         (
                           Boolean(prmGroup.length) &&
                           Boolean(data.document.category) &&
-                          Boolean(data.document.category.name.match(/rental/i)) &&
+                          Boolean(data.document.category.name.match(/rental|education/i)) &&
                           Boolean(data.document.amount)
                           && !(
                             Math.abs(data.document.amount - prmGroup.reduce((a, b) => a + b.gross_amount, 0)).toFixed(2) >= 0.00 &&

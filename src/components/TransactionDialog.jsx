@@ -886,67 +886,77 @@ const TransactionDialog = ({
           </React.Fragment>}
 
         { // Attachment
-          status === `success` && data.document.id === 9 && Boolean(data.autoDebit_group.length) &&
+          status === `success` && data.document.id === 9 &&
           <React.Fragment>
             <Box className="FstoBoxTransactionDetails-content">
               <Typography variant="h6" sx={{ fontWeight: 700 }}>Attachment</Typography>
 
-              <List dense>
-                <ListItem className="FstoListItemTransactionDetails-root" dense>
-                  <span>Total Principal:</span>
-                  <strong>&#8369;{data.autoDebit_group.reduce((a, b) => a + b.principal_amount, 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
-                </ListItem>
+              {
+                status === `success` && Boolean(data.autoDebit_group.length) &&
+                <List dense>
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Total Principal:</span>
+                    <strong>&#8369;{data.autoDebit_group.reduce((a, b) => a + b.principal_amount, 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                  </ListItem>
 
-                <ListItem className="FstoListItemTransactionDetails-root" dense>
-                  <span>Total Interest:</span>
-                  <strong>&#8369;{data.autoDebit_group.reduce((a, b) => a + b.interest_due, 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
-                </ListItem>
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Total Interest:</span>
+                    <strong>&#8369;{data.autoDebit_group.reduce((a, b) => a + b.interest_due, 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                  </ListItem>
 
-                <ListItem className="FstoListItemTransactionDetails-root" dense>
-                  <span>Total DST:</span>
-                  <strong>&#8369;{data.autoDebit_group.reduce((a, b) => a + b.dst, 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
-                </ListItem>
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Total DST:</span>
+                    <strong>&#8369;{data.autoDebit_group.reduce((a, b) => a + b.dst, 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                  </ListItem>
 
-                <ListItem className="FstoListItemTransactionDetails-root" dense>
-                  <span>Total CWT:</span>
-                  <strong>&#8369;{data.autoDebit_group.reduce((a, b) => a + b.cwt, 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
-                </ListItem>
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Total CWT:</span>
+                    <strong>&#8369;{data.autoDebit_group.reduce((a, b) => a + b.cwt, 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                  </ListItem>
 
-                <ListItem className="FstoListItemTransactionDetails-root" dense>
-                  <span>Total Net of CWT:</span>
-                  <strong>&#8369;{data.autoDebit_group.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
-                </ListItem>
-              </List>
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Total Net of CWT:</span>
+                    <strong>&#8369;{data.autoDebit_group.reduce((a, b) => ((b.principal_amount + b.interest_due) - b.cwt) + a, 0).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                  </ListItem>
+                </List>}
+
+              {
+                status === `success` && !Boolean(data.autoDebit_group.length) &&
+                <Typography sx={{ marginLeft: 2, marginTop: 1, marginBottom: 1 }}>
+                  No attachement.
+                </Typography>}
 
               <Divider variant="middle" />
 
-              <List dense sx={{ marginTop: 3 }}>
-                {
-                  data.autoDebit_group.map((item, index) => {
-                    return (
-                      <ListItem className="FstoListItemTransactionDetails-root FstoListItemTransactionDetails-alt" key={index} dense divider>
-                        <span>PN No.:</span>
-                        <strong>{item.pn_no}</strong>
+              {
+                status === `success` && Boolean(data.autoDebit_group.length) &&
+                <List dense sx={{ marginTop: 3 }}>
+                  {
+                    data.autoDebit_group.map((item, index) => {
+                      return (
+                        <ListItem className="FstoListItemTransactionDetails-root FstoListItemTransactionDetails-alt" key={index} dense divider>
+                          <span>PN No.:</span>
+                          <strong>{item.pn_no}</strong>
 
-                        <span>Principal Amount:</span>
-                        <strong>&#8369;{item.principal_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                          <span>Principal Amount:</span>
+                          <strong>&#8369;{item.principal_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
 
-                        <span>Interest:</span>
-                        <strong>&#8369;{item.interest_due.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                          <span>Interest:</span>
+                          <strong>&#8369;{item.interest_due.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
 
-                        <span>DST:</span>
-                        <strong>&#8369;{item.dst.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                          <span>DST:</span>
+                          <strong>&#8369;{item.dst.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
 
-                        <span>CWT:</span>
-                        <strong>&#8369;{item.cwt.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                          <span>CWT:</span>
+                          <strong>&#8369;{item.cwt.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
 
-                        <span>Net of Amount:</span>
-                        <strong>&#8369;{((item.principal_amount + item.interest_due) - item.cwt).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
-                      </ListItem>
-                    )
-                  })
-                }
-              </List>
+                          <span>Net of Amount:</span>
+                          <strong>&#8369;{((item.principal_amount + item.interest_due) - item.cwt).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                        </ListItem>
+                      )
+                    })
+                  }
+                </List>}
             </Box>
           </React.Fragment>}
 
