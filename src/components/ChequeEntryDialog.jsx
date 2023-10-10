@@ -363,7 +363,7 @@ const ChequeEntryDialog = ({
               type="number"
               value={CQ.no}
               disabled={
-                Boolean(state.match(/issue-|return-.*/))
+                Boolean(state.match(/issue-.*/))
               }
               error={
                 error.status
