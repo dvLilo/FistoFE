@@ -189,7 +189,7 @@ const AccountTitleDialog = ({
 
       <DialogContent className="FstoDialogAccountTitle-content">
         {
-          Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|audit-|debit-|executive-|counter-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|audit-|executive-|counter-.*/)) &&
           <Box className="FstoBoxAccountTitle-root" sx={{ marginBottom: 5 }}>
             <Autocomplete
               className="FstoSelectForm-root"
@@ -206,7 +206,7 @@ const AccountTitleDialog = ({
                 (option) => option.name
               }
               getOptionDisabled={
-                (option) => Boolean(state) && Boolean(state.match(/cheque-|clear-|return-.*/)) && option.name.toLowerCase() === `debit`
+                (option) => Boolean(state) && Boolean(state.match(/cheque-|clear-|debit-|return-.*/)) && option.name.toLowerCase() === `debit`
               }
               isOptionEqualToValue={
                 (option, value) => option.id === value.id
@@ -308,7 +308,7 @@ const AccountTitleDialog = ({
                     <TableCell className="FstoTabelCellAccountTitle-root" align="right">Debit</TableCell>
                     <TableCell>Credit</TableCell>
                     {
-                      Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|audit-|debit-|executive-|counter-.*/)) &&
+                      Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|audit-|executive-|counter-.*/)) &&
                       <TableCell align="right">Action</TableCell>
                     }
                   </TableRow>
@@ -342,12 +342,12 @@ const AccountTitleDialog = ({
                         </TableCell>
 
                         {
-                          Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|audit-|debit-|executive-|counter-.*/)) &&
+                          Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|audit-|executive-|counter-.*/)) &&
                           <TableCell align="right" size="small">
-                            <IconButton onClick={() => editAccountTitleHandler(item, index)} disabled={Boolean(state) && Boolean(state.match(/cheque-|clear-|return-.*/)) && Boolean(item.entry.match(/debit.*/i))}>
+                            <IconButton onClick={() => editAccountTitleHandler(item, index)} disabled={Boolean(state) && Boolean(state.match(/cheque-|clear-|debit-|return-.*/)) && Boolean(item.entry.match(/debit.*/i))}>
                               <EditIcon fontSize="small" />
                             </IconButton>
-                            <IconButton onClick={() => removeAccountTitleHandler(index)} disabled={Boolean(state) && Boolean(state.match(/cheque-|clear-|return-.*/)) && Boolean(item.entry.match(/debit.*/i))}>
+                            <IconButton onClick={() => removeAccountTitleHandler(index)} disabled={Boolean(state) && Boolean(state.match(/cheque-|clear-|debit-|return-.*/)) && Boolean(item.entry.match(/debit.*/i))}>
                               <DeleteIcon fontSize="small" />
                             </IconButton>
                           </TableCell>
@@ -417,7 +417,7 @@ const AccountTitleDialog = ({
         </Button>
 
         {
-          Boolean(state) && !Boolean(state.match(/approve-|transmit-|cheque-|release-|file-|reverse-|pending-|audit-|debit-|executive-|counter-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/approve-|transmit-|cheque-|release-|file-|reverse-|pending-|audit-|executive-|counter-.*/)) &&
           <Button
             variant="contained"
             onClick={submitAccountTitleHandler}
