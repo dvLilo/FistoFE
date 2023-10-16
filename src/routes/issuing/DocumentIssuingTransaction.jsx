@@ -17,7 +17,7 @@ import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
 import useTransaction from '../../hooks/useTransaction'
 
-import { ISSUE } from "../../constants"
+import { ISSUE } from '../../constants'
 
 import TransactionDialog from '../../components/TransactionDialog'
 import ChequeEntryDialog from '../../components/ChequeEntryDialog'

@@ -17,13 +17,13 @@ import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
 import useTransaction from '../../hooks/useTransaction'
 
-import { AUDIT } from '../../constants'
+import { GAS } from '../../constants'
 
 import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
 import ChequeEntryDialog from '../../components/ChequeEntryDialog'
 
-const DocumentAuditingTransaction = (props) => {
+const DocumentTransferringTransaction = (props) => {
 
   const {
     state,
@@ -52,9 +52,9 @@ const DocumentAuditingTransaction = (props) => {
     // eslint-disable-next-line
   }, [open])
 
-  const [auditData] = React.useState({
-    process: AUDIT,
-    subprocess: AUDIT
+  const [transferData] = React.useState({
+    process: GAS,
+    subprocess: GAS
   })
 
   const [viewAccountTitle, setViewAccountTitle] = React.useState({
@@ -91,7 +91,7 @@ const DocumentAuditingTransaction = (props) => {
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, auditData)
+          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, transferData)
 
           const { message } = response.data
 
@@ -107,7 +107,7 @@ const DocumentAuditingTransaction = (props) => {
           toast({
             severity: "error",
             title: "Error!",
-            message: "Something went wrong whilst trying to save the approval details. Please try again."
+            message: "Something went wrong whilst trying to save the transmittal details. Please try again."
           })
         }
       }
@@ -180,10 +180,10 @@ const DocumentAuditingTransaction = (props) => {
         </DialogContent>
 
         {
-          (state === `audit-receive` || state === `audit-audit` || state === `audit-hold`) &&
+          (state === `gas-receive` || state === `gas-gas` || state === `gas-hold`) &&
           <DialogActions className="FstoDialogTransaction-actions">
             {
-              state === `audit-receive` &&
+              state === `gas-receive` &&
               <Button
                 variant="contained"
                 onClick={submitApproveHandler}
@@ -193,7 +193,7 @@ const DocumentAuditingTransaction = (props) => {
             }
 
             {
-              state === `audit-hold` &&
+              state === `gas-hold` &&
               <Button
                 variant="contained"
                 onClick={submitUnholdHandler}
@@ -203,7 +203,7 @@ const DocumentAuditingTransaction = (props) => {
             }
 
             {
-              state !== `audit-hold` &&
+              state !== `gas-hold` &&
               <Button
                 variant="outlined"
                 color="error"
@@ -240,4 +240,4 @@ const DocumentAuditingTransaction = (props) => {
   )
 }
 
-export default DocumentAuditingTransaction
+export default DocumentTransferringTransaction

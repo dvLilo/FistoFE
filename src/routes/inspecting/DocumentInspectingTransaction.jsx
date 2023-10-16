@@ -17,6 +17,8 @@ import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
 import useTransaction from '../../hooks/useTransaction'
 
+import { INSPECT } from '../../constants'
+
 import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
 import ChequeEntryDialog from '../../components/ChequeEntryDialog'
@@ -67,8 +69,8 @@ const DocumentInspectingTransaction = (props) => {
   }, [open, data, status])
 
   const [inspectData, setInspectData] = React.useState({
-    process: "inspect",
-    subprocess: "inspect"
+    process: INSPECT,
+    subprocess: INSPECT
   })
 
   const [viewAccountTitle, setViewAccountTitle] = React.useState({

@@ -14,7 +14,7 @@ import {
   ReplyOutlined as CancelIcon
 } from '@mui/icons-material'
 
-const DocumentAuditingActions = ({
+const DocumentTransferringActions = ({
   data,
   state,
   onReceive,
@@ -71,7 +71,7 @@ const DocumentAuditingActions = ({
           </MenuItem>}
 
         {
-          state === `audit-receive` &&
+          state === `gas-receive` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -84,7 +84,7 @@ const DocumentAuditingActions = ({
           </MenuItem>}
 
         {
-          (state === `audit-audit` || state === `audit-hold` || state === `audit-return` || state === `audit-void`) &&
+          (state === `gas-gas` || state === `gas-hold` || state === `gas-return`) &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -97,7 +97,7 @@ const DocumentAuditingActions = ({
           </MenuItem>}
 
         {
-          state === `audit-return` &&
+          state === `gas-return` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
@@ -113,4 +113,4 @@ const DocumentAuditingActions = ({
   )
 }
 
-export default DocumentAuditingActions
+export default DocumentTransferringActions

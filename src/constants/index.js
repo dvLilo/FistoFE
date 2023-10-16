@@ -8,6 +8,7 @@ export const TREASURY = `Treasury Associate`
 
 // transaction flow process
 export const TAG = `tag`
+export const GAS = `gas`
 export const VOUCHER = `voucher`
 export const APPROVAL = `approve`
 export const INSPECT = `inspect`
