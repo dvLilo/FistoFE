@@ -40,17 +40,6 @@ import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
 import ChequeEntryDialog from '../../components/ChequeEntryDialog'
 
-const RECEIPT_TYPE_LIST = [
-  {
-    id: 1,
-    name: "Official"
-  },
-  {
-    id: 2,
-    name: "Unofficial"
-  }
-]
-
 const DocumentVoucheringTransaction = ({
   state,
   open = false,
@@ -114,10 +103,9 @@ const DocumentVoucheringTransaction = ({
   }, [open, status, APPROVER_STATUS])
 
   React.useEffect(() => {
-    if (open && status === `success` && !Boolean(voucherData.receipt_type) && !Boolean(voucherData.voucher.month)) {
+    if (open && status === `success` && !Boolean(voucherData.voucher.month)) {
       setVoucherData(currentValue => ({
         ...currentValue,
-        receipt_type: data.voucher?.receipt_type || "",
         voucher: {
           month: data.voucher?.month || null
         },
@@ -135,7 +123,6 @@ const DocumentVoucheringTransaction = ({
   const [voucherData, setVoucherData] = React.useState({
     process: VOUCHER,
     subprocess: VOUCHER,
-    receipt_type: "",
     voucher: {
       month: null,
     },
@@ -168,7 +155,6 @@ const DocumentVoucheringTransaction = ({
   const clearHandler = () => {
     setVoucherData(currentValue => ({
       ...currentValue,
-      receipt_type: "",
       voucher: {
         month: null,
       },
@@ -349,34 +335,6 @@ const DocumentVoucheringTransaction = ({
 
               <Box className="FstoBoxTransactionForm-root">
                 <Box className="FstoBoxTransactionForm-content">
-                  <Autocomplete
-                    className="FstoSelectForm-root"
-                    size="small"
-                    options={RECEIPT_TYPE_LIST}
-                    value={RECEIPT_TYPE_LIST.find((row) => row.name === voucherData.receipt_type) || null}
-                    renderInput={
-                      (props) => <TextField {...props} label="Type of Receipt" variant="outlined" />
-                    }
-                    PaperComponent={
-                      (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
-                    }
-                    getOptionLabel={
-                      (option) => option.name
-                    }
-                    isOptionEqualToValue={
-                      (option, value) => option.id === value.id
-                    }
-                    onChange={(e, value) => setVoucherData(currentValue => ({
-                      ...currentValue,
-                      receipt_type: value.name
-                    }))}
-                    fullWidth
-                    disablePortal
-                    disableClearable
-                  />
-
-                  <Divider variant="middle" sx={{ margin: "1.25em" }} />
-
                   <LocalizationProvider dateAdapter={DateAdapter}>
                     <DatePicker
                       views={['month', 'year']}
@@ -445,7 +403,6 @@ const DocumentVoucheringTransaction = ({
                 }
                 disabled={
                   !Boolean(voucherData.approver) ||
-                  !Boolean(voucherData.receipt_type) ||
                   !Boolean(voucherData.voucher.month)
                 }
                 disableElevation
