@@ -27,6 +27,17 @@ import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
 import ChequeEntryDialog from '../../components/ChequeEntryDialog'
 
+const RECEIPT_TYPE_LIST = [
+  {
+    id: 1,
+    name: "Official"
+  },
+  {
+    id: 2,
+    name: "Unofficial"
+  }
+]
+
 const DocumentTaggingTransaction = (props) => {
 
   const {
@@ -68,6 +79,7 @@ const DocumentTaggingTransaction = (props) => {
     if (open && (state === `tag-tag` || state === `return-tag`) && status === `success`) {
       setTagData(currentValue => ({
         ...currentValue,
+        receipt_type: data.tag.receipt_type,
         distributed_to: data.tag.distributed_to
       }))
     }
@@ -89,6 +101,7 @@ const DocumentTaggingTransaction = (props) => {
   const [tagData, setTagData] = React.useState({
     process: "tag",
     subprocess: "tag",
+    receipt_type: "",
     distributed_to: null
   })
 
@@ -117,6 +130,7 @@ const DocumentTaggingTransaction = (props) => {
   const clearHandler = () => {
     setTagData(currentValue => ({
       ...currentValue,
+      receipt_type: "",
       distributed_to: null
     }))
   }
@@ -236,6 +250,34 @@ const DocumentTaggingTransaction = (props) => {
 
               <Box className="FstoBoxTransactionForm-root">
                 <Box className="FstoBoxTransactionForm-content">
+                  <Autocomplete
+                    className="FstoSelectForm-root"
+                    size="small"
+                    options={RECEIPT_TYPE_LIST}
+                    value={RECEIPT_TYPE_LIST.find((row) => row.name === tagData.receipt_type) || null}
+                    renderInput={
+                      (props) => <TextField {...props} label="Type of Receipt" variant="outlined" />
+                    }
+                    PaperComponent={
+                      (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
+                    }
+                    getOptionLabel={
+                      (option) => option.name
+                    }
+                    isOptionEqualToValue={
+                      (option, value) => option.id === value.id
+                    }
+                    onChange={(e, value) => setTagData(currentValue => ({
+                      ...currentValue,
+                      receipt_type: value.name
+                    }))}
+                    fullWidth
+                    disablePortal
+                    disableClearable
+                  />
+
+                  <Divider variant="middle" sx={{ margin: "1.25em" }} />
+
                   <Autocomplete
                     className="FstoSelectForm-root"
                     size="small"
