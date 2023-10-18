@@ -895,6 +895,62 @@ body {
 }
 
 
+.FstoDialogChartAccount-root {
+
+  & .FstoDialogChartAccount-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  & .FstoDialogChartAccount-content {
+    overflow: initial;
+  }
+
+  & .FstoDialogChartAccount-actions {
+    padding: 2em;
+  }
+
+  & .FstoPaperChartAccount-root {
+    max-width: 1100px;
+    min-height: 75vh;
+  }
+
+  & .FstoBoxChartAccount-root {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    padding-bottom: 30px;
+  }
+
+  & .FstoBoxChartAccount-root:first-of-type {
+    border-bottom: 3px solid #707070;
+  }
+
+  & .FstoSelectForm-root {
+    flex-grow: 1;
+    margin-bottom: 0;
+  }
+
+  & .FstoSelectForm-root:first-of-type {
+    flex-grow: 0;
+    flex-basis: 126px;
+  }
+
+  & .FstoButtonForm-root {
+    margin: 0;
+  }
+
+  & .FstoTableBodyChartAccount-root {
+    border-bottom: 3px solid rgba(224, 224, 224, 1);
+  }
+
+  & .FstoTableRowChartAccount-root {
+    height: 46px;
+  }
+
+}
+
 
 .FstoDialogAccountTitle-root {
 

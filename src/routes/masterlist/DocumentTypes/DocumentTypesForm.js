@@ -11,6 +11,10 @@ import {
 
 import { LoadingButton } from '@mui/lab'
 
+import { AccountBalanceWallet } from '@mui/icons-material'
+
+import DocumentTypesDialog from './DocumentTypesDialog'
+
 const DocumentTypesForm = (props) => {
 
   const {
@@ -23,6 +27,8 @@ const DocumentTypesForm = (props) => {
   const [isSaving, setIsSaving] = React.useState(false)
 
   const [isUpdating, setIsUpdating] = React.useState(false)
+
+  const [isOpen, setIsOpen] = React.useState(false)
 
   const [error, setError] = React.useState({
     status: false,
@@ -39,7 +45,8 @@ const DocumentTypesForm = (props) => {
   const [document, setDocument] = React.useState({
     type: "",
     description: "",
-    categories: []
+    categories: [],
+    accounts: []
   })
 
   React.useEffect(() => {
@@ -48,7 +55,8 @@ const DocumentTypesForm = (props) => {
       setDocument({
         type: data.type,
         description: data.description,
-        categories: data.categories
+        categories: data.categories,
+        accounts: []
       })
     }
   }, [data])
@@ -127,13 +135,27 @@ const DocumentTypesForm = (props) => {
             response = await axios.put(`/api/admin/documents/${data.id}`, {
               type: document.type,
               description: document.description,
-              categories: document.categories.map(cat => cat.id)
+              categories: document.categories.map(cat => cat.id),
+              accounts: document.accounts.map(act => ({
+                entry: act.entry,
+                account_title_id: act.account_title.id,
+                company_id: act.company.id,
+                department_id: act.department.id,
+                location_id: act.location.id,
+              }))
             })
           else
             response = await axios.post(`/api/admin/documents`, {
               type: document.type,
               description: document.description,
-              categories: document.categories.map(cat => cat.id)
+              categories: document.categories.map(cat => cat.id),
+              accounts: document.accounts.map(act => ({
+                entry: act.entry,
+                account_title_id: act.account_title.id,
+                company_id: act.company.id,
+                department_id: act.department.id,
+                location_id: act.location.id,
+              }))
             })
 
           toast({
@@ -177,6 +199,39 @@ const DocumentTypesForm = (props) => {
         setIsSaving(false)
       }
     })
+  }
+
+
+  const accountCloseHandler = () => {
+    setIsOpen(false)
+  }
+
+  const accountInsertHandler = (data) => {
+    setDocument((currentValue) => ({
+      ...currentValue,
+      accounts: [
+        ...currentValue.accounts,
+        data
+      ]
+    }))
+  }
+
+  const accountUpdateHandler = (data, index) => {
+    setDocument((currentValue) => ({
+      ...currentValue,
+      accounts: currentValue.accounts.map((item, i) => {
+        if (i === index) return data
+
+        return item
+      })
+    }))
+  }
+
+  const accountRemoveHandler = (index) => {
+    setDocument((currentValue) => ({
+      ...currentValue,
+      accounts: currentValue.accounts.filter((_, i) => i !== index)
+    }))
   }
 
   return (
@@ -264,6 +319,22 @@ const DocumentTypesForm = (props) => {
         disableCloseOnSelect
       />
 
+      <Button
+        variant="contained"
+        color="info"
+        startIcon={<AccountBalanceWallet />}
+        disabled={
+          !Boolean(document.type.trim()) ||
+          !Boolean(document.description.trim()) ||
+          !Boolean(document.categories.length)
+        }
+        onClick={() => setIsOpen(true)}
+        fullWidth
+        disableElevation
+      >
+        Setup COA
+      </Button>
+
       <LoadingButton
         className="FstoButtonForm-root"
         type="submit"
@@ -298,6 +369,16 @@ const DocumentTypesForm = (props) => {
             : "Clear"
         }
       </Button>
+
+
+      <DocumentTypesDialog
+        open={isOpen}
+        accounts={document.accounts}
+        onInsert={accountInsertHandler}
+        onUpdate={accountUpdateHandler}
+        onRemove={accountRemoveHandler}
+        onClose={accountCloseHandler}
+      />
     </form>
   )
 }
