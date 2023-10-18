@@ -309,6 +309,10 @@ body {
     border-right: 1px solid rgba(224, 224, 224);
   }
 
+  & .FstoCheckbox-root {
+    padding: 0;
+  }
+
   & .FstoTypography-transaction {
     display: flex;
     align-items: center;
@@ -961,6 +965,9 @@ body {
   }
 
   & .FstoDialogAccountTitle-content {
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
     overflow: initial;
   }
 
@@ -969,34 +976,21 @@ body {
   }
 
   & .FstoPaperAccountTitle-root {
-    max-width: 1100px;
+    max-width: 1200px;
     min-height: 75vh;
   }
 
   & .FstoBoxAccountTitle-root {
     display: flex;
-    flex-direction: row;
-    gap: 1em;
-    padding-bottom: 30px;
+    flex-direction: column;
   }
 
-  & .FstoBoxAccountTitle-root:first-of-type {
-    border-bottom: 3px solid #707070;
+  & .FstoBoxAccountTitle-root.FstoBoxAccountTitle-form {
+    flex-basis: 300px;
   }
 
-  & .FstoSelectForm-root {
-    flex-grow: 1;
-    margin-bottom: 0;
-  }
-
-  & .FstoSelectForm-root:first-of-type {
-    flex-grow: 0;
-    flex-basis: 210px;
-  }
-
-  & .FstoTextfieldForm-root {
-    flex: 1;
-    margin-bottom: 0;
+  & .FstoButtonForm-root {
+    margin-top: auto;
   }
 
   & .FstoTableBodyAccountTitle-root {

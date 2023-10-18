@@ -7,7 +7,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
   IconButton,
   Paper,
   TextField,
@@ -29,18 +28,12 @@ import EditIcon from '@mui/icons-material/Edit'
 import CloseIcon from '@mui/icons-material/Close'
 import DeleteIcon from '@mui/icons-material/Delete'
 
-import useAccountTitles from '../hooks/useAccountTitles'
+import useAccountTitleCOA from '../hooks/useAccountTitleCOA'
+import useCompanyCOA from '../hooks/useCompanyCOA'
+import useDepartmentCOA from '../hooks/useDepartmentCOA'
+import useLocationCOA from '../hooks/useLocationCOA'
 
-const ENTRY_LIST = [
-  {
-    id: 1,
-    name: "Debit"
-  },
-  {
-    id: 2,
-    name: "Credit"
-  }
-]
+const ENTRY_LIST = ["Debit", "Credit"]
 
 const NumberField = React.forwardRef(function NumberField(props, ref) {
   const { onChange, ...rest } = props
@@ -79,26 +72,38 @@ const AccountTitleDialog = ({
   onSubmit = () => { }
 }) => {
 
-  const {
-    refetch: fetchAccountTitles,
-    data: ACCOUNT_TITLE_LIST,
-    status: ACCOUNT_TITLE_STATUS
-  } = useAccountTitles()
-
-  React.useEffect(() => {
-    if (open && !ACCOUNT_TITLE_LIST) fetchAccountTitles()
-    // eslint-disable-next-line
-  }, [open])
-
   const [AT, setAT] = React.useState({
     update: false,
     index: null,
 
     entry: null,
     account_title: null,
+    company: null,
+    department: null,
+    location: null,
     amount: "",
     remarks: ""
   })
+
+  const {
+    data: ACCOUNT_TITLE_LIST,
+    status: ACCOUNT_TITLE_STATUS
+  } = useAccountTitleCOA({ enabled: open })
+
+  const {
+    data: COMPANY_LIST,
+    status: COMPANY_STATUS
+  } = useCompanyCOA({ enabled: open })
+
+  const {
+    data: DEPARTMENT_LIST,
+    status: DEPARTMENT_STATUS
+  } = useDepartmentCOA({ enabled: !!AT.company?.id, company: AT.company?.id })
+
+  const {
+    data: LOCATION_LIST,
+    status: LOCATION_STATUS
+  } = useLocationCOA({ enabled: !!AT.department?.id, department: AT.department?.id })
 
   React.useEffect(() => {
     if (!open) clearAccountTitleHandler()
@@ -112,7 +117,11 @@ const AccountTitleDialog = ({
         entry: AT.entry,
         amount: parseFloat(AT.amount),
         remarks: AT.remarks,
-        account_title: AT.account_title
+
+        account_title: AT.account_title,
+        company: AT.company,
+        department: AT.department,
+        location: AT.location
       })
 
     if (!!AT.update)
@@ -120,7 +129,11 @@ const AccountTitleDialog = ({
         entry: AT.entry,
         amount: parseFloat(AT.amount),
         remarks: AT.remarks,
-        account_title: AT.account_title
+
+        account_title: AT.account_title,
+        company: AT.company,
+        department: AT.department,
+        location: AT.location
       }, AT.index)
 
     clearAccountTitleHandler()
@@ -159,6 +172,9 @@ const AccountTitleDialog = ({
 
       entry: null,
       account_title: null,
+      company: null,
+      department: null,
+      location: null,
       amount: "",
       remarks: ""
     })
@@ -190,30 +206,27 @@ const AccountTitleDialog = ({
       <DialogContent className="FstoDialogAccountTitle-content">
         {
           Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|audit-|executive-|issue-|counter-.*/)) &&
-          <Box className="FstoBoxAccountTitle-root" sx={{ marginBottom: 5 }}>
+          <Box className="FstoBoxAccountTitle-root FstoBoxAccountTitle-form">
             <Autocomplete
               className="FstoSelectForm-root"
               size="small"
               options={ENTRY_LIST}
-              value={ENTRY_LIST.find((row) => row.name === AT.entry) || null}
+              value={AT.entry}
               renderInput={
                 (props) => <TextField {...props} label="Entry" variant="outlined" />
               }
               PaperComponent={
                 (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
               }
-              getOptionLabel={
-                (option) => option.name
-              }
               getOptionDisabled={
                 (option) => Boolean(state) && Boolean(state.match(/cheque-|clear-|debit-|return-.*/)) && option.name.toLowerCase() === `debit`
               }
               isOptionEqualToValue={
-                (option, value) => option.id === value.id
+                (option, value) => option === value
               }
               onChange={(e, value) => setAT(currentValue => ({
                 ...currentValue,
-                entry: value.name
+                entry: value
               }))}
               disablePortal
               disableClearable
@@ -250,6 +263,96 @@ const AccountTitleDialog = ({
               disableClearable
             />
 
+            <Autocomplete
+              className="FstoSelectForm-root"
+              size="small"
+              options={COMPANY_LIST}
+              value={AT.company}
+              loading={
+                COMPANY_STATUS === 'loading'
+              }
+              renderInput={
+                (props) => <TextField {...props} label="Company" variant="outlined" />
+              }
+              componentsProps={{
+                paper: {
+                  sx: { textTransform: 'capitalize' }
+                }
+              }}
+              getOptionLabel={
+                (option) => `${option.code} - ${option.name}`
+              }
+              isOptionEqualToValue={
+                (option, value) => option.id === value.id
+              }
+              onChange={(e, value) => setAT(currentValue => ({
+                ...currentValue,
+                company: value
+              }))}
+              disablePortal
+              disableClearable
+            />
+
+            <Autocomplete
+              className="FstoSelectForm-root"
+              size="small"
+              options={DEPARTMENT_LIST}
+              value={AT.department}
+              loading={
+                DEPARTMENT_STATUS === 'loading'
+              }
+              renderInput={
+                (props) => <TextField {...props} label="Department" variant="outlined" />
+              }
+              componentsProps={{
+                paper: {
+                  sx: { textTransform: 'capitalize' }
+                }
+              }}
+              getOptionLabel={
+                (option) => `${option.code} - ${option.name}`
+              }
+              isOptionEqualToValue={
+                (option, value) => option.id === value.id
+              }
+              onChange={(e, value) => setAT(currentValue => ({
+                ...currentValue,
+                department: value
+              }))}
+              disablePortal
+              disableClearable
+            />
+
+            <Autocomplete
+              className="FstoSelectForm-root"
+              size="small"
+              options={LOCATION_LIST}
+              value={AT.location}
+              loading={
+                LOCATION_STATUS === 'loading'
+              }
+              renderInput={
+                (props) => <TextField {...props} label="Location" variant="outlined" />
+              }
+              componentsProps={{
+                paper: {
+                  sx: { textTransform: 'capitalize' }
+                }
+              }}
+              getOptionLabel={
+                (option) => `${option.code} - ${option.name}`
+              }
+              isOptionEqualToValue={
+                (option, value) => option.id === value.id
+              }
+              onChange={(e, value) => setAT(currentValue => ({
+                ...currentValue,
+                location: value
+              }))}
+              disablePortal
+              disableClearable
+            />
+
             <TextField
               className="FstoTextfieldForm-root"
               label="Amount"
@@ -280,7 +383,7 @@ const AccountTitleDialog = ({
             />
 
             <Button
-              className=""
+              className="FstoButtonForm-root"
               variant="contained"
               startIcon={
                 AT.update ? <EditIcon /> : <AddIcon />
@@ -297,32 +400,35 @@ const AccountTitleDialog = ({
           </Box>
         }
 
-        {
-          Boolean(accounts.length) &&
-          <React.Fragment>
-            <TableContainer sx={{ marginBottom: 5 }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Account Title</TableCell>
-                    <TableCell className="FstoTabelCellAccountTitle-root" align="right">Debit</TableCell>
-                    <TableCell>Credit</TableCell>
-                    {
-                      Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|audit-|executive-|issue-|counter-.*/)) &&
-                      <TableCell align="right">Action</TableCell>
-                    }
-                  </TableRow>
-                </TableHead>
+        <Stack direction="column" flex={1}>
+          <TableContainer sx={{ marginBottom: 5 }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Chart Of Account</TableCell>
+                  <TableCell className="FstoTabelCellAccountTitle-root" align="right">Debit</TableCell>
+                  <TableCell>Credit</TableCell>
+                  {
+                    Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|audit-|executive-|issue-|counter-.*/)) &&
+                    <TableCell align="right">Action</TableCell>
+                  }
+                </TableRow>
+              </TableHead>
 
+              {
+                Boolean(accounts.length) &&
                 <TableBody className="FstoTableBodyAccountTitle-root">
                   {
                     accounts.map((item, index) => (
                       <TableRow className="FstoTableRowAccountTitle-root" key={index}>
                         <TableCell size="small">
-                          <strong>{item.account_title.name}</strong>
-                          {
-                            item.remarks && <React.Fragment><br /><i>{item.remarks}</i></React.Fragment>
-                          }
+                          <Stack direction="column">
+                            <strong>{item.account_title.name}</strong>
+                            <em>{item.company.name}</em>
+                            <em>{item.department.name}</em>
+                            <em>{item.location.name}</em>
+                            <em>{item.remarks}</em>
+                          </Stack>
                         </TableCell>
 
                         <TableCell className="FstoTabelCellAccountTitle-root" align="right" size="small">
@@ -353,86 +459,92 @@ const AccountTitleDialog = ({
                           </TableCell>
                         }
                       </TableRow>
-                    ))
-                  }
+                    ))}
                 </TableBody>
-              </Table>
-            </TableContainer>
+              }
 
+              {
+                !Boolean(accounts.length) &&
+                <TableBody className="FstoTableBodyAccountTitle-root">
+                  <TableRow>
+                    <TableCell align="center" colSpan={4}>
+                      <Typography variant="body2" sx={{ paddingTop: 2, paddingBottom: 2 }}>NO DATA FOUND</Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              }
+            </Table>
+          </TableContainer>
+
+          <Stack className="FstoStackAccountTitle-root" direction="row">
+            <Typography variant="body1" sx={{ flex: 1 }}>Total Debit Amount</Typography>
+            <Typography variant="h6">
+              &#8369;{accounts.filter((item) => item.entry === `Debit`).reduce((a, b) => a + b.amount, 0).toLocaleString()}
+            </Typography>
+          </Stack>
+
+          <Stack className="FstoStackAccountTitle-root" direction="row">
+            <Typography variant="body1" sx={{ flex: 1 }}>Total Credit Amount</Typography>
+            <Typography variant="h6">
+              &#8369;{accounts.filter((item) => item.entry === `Credit`).reduce((a, b) => a + b.amount, 0).toLocaleString()}
+            </Typography>
+          </Stack>
+
+          <Divider variant="middle" sx={{ marginY: 2 }} />
+
+          <Stack className="FstoStackAccountTitle-root" direction="row">
+            <Typography variant="body1" sx={{ flex: 1 }}>Variance</Typography>
+            <Typography variant="h6">
+              &#8369;
+              {((accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0)) - (accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0))).toLocaleString()}
+            </Typography>
+          </Stack>
+
+          {
+            accounts.some((item) => item.entry === `Debit`) &&
+            accounts.some((item) => item.entry === `Credit`) &&
+            accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) !== accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0) &&
+            <Stack className="FstoStackAccountTitle-root" direction="row" justifyContent="flex-end">
+              <Typography variant="caption" color="error">Total debit and credit amount are not equal.</Typography>
+            </Stack>}
+
+          {
+            accounts.some((item) => item.entry === `Debit`) &&
+            accounts.some((item) => item.entry === `Credit`) &&
+            accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0) &&
+            (accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) !== (transaction?.document_amount || transaction?.referrence_amount) || accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0) !== (transaction?.document_amount || transaction?.referrence_amount)) &&
+            <Stack className="FstoStackAccountTitle-root" direction="row" justifyContent="flex-end">
+              <Typography variant="caption" color="error">Total debit, credit and document amount are not equal.</Typography>
+            </Stack>}
+
+          <Stack direction="row-reverse" gap={1} marginTop="auto">
             {
-              accounts.some((item) => item.entry === `Credit`) &&
-              <Stack className="FstoStackAccountTitle-root" direction="row">
-                <Typography variant="body1" sx={{ flex: 1 }}>Total Credit Amount</Typography>
-                <Typography variant="h6">
-                  &#8369;{accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0).toLocaleString()}
-                </Typography>
-              </Stack>}
-            {
-              accounts.some((item) => item.entry === `Debit`) &&
-              <Stack className="FstoStackAccountTitle-root" direction="row">
-                <Typography variant="body1" sx={{ flex: 1 }}>Total Debit Amount</Typography>
-                <Typography variant="h6">
-                  &#8369;{accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0).toLocaleString()}
-                </Typography>
-              </Stack>}
+              Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|audit-|executive-|issue-|counter-.*/)) &&
+              <Button
+                variant="contained"
+                onClick={submitAccountTitleHandler}
+                disabled={
+                  !Boolean(accounts.length) ||
+                  !accounts.some((item) => item.entry.toLowerCase() === `debit`) ||
+                  !accounts.some((item) => item.entry.toLowerCase() === `credit`) ||
+                  !(accounts.filter((item) => item.entry.toLowerCase() === `debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === (transaction?.document_amount || transaction?.referrence_amount)) ||
+                  !(accounts.filter((item) => item.entry.toLowerCase() === `credit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === (transaction?.document_amount || transaction?.referrence_amount)) ||
+                  !(accounts.filter((item) => item.entry.toLowerCase() === `debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === accounts.filter((item) => item.entry.toLowerCase() === `credit`).map((item) => item.amount).reduce((a, b) => a + b, 0))
+                }
+                disableElevation
+              > {state.match(/receive.*/) ? "Submit" : "Save"}
+              </Button>}
 
-            <Divider variant="middle" sx={{ marginY: 2 }} />
-
-            <Stack className="FstoStackAccountTitle-root" direction="row">
-              <Typography variant="body1" sx={{ flex: 1 }}>Variance</Typography>
-              <Typography variant="h6">
-                &#8369;
-                {((accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0)) - (accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0))).toLocaleString()}
-              </Typography>
-            </Stack>
-
-            {
-              accounts.some((item) => item.entry === `Debit`) &&
-              accounts.some((item) => item.entry === `Credit`) &&
-              accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) !== accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0) &&
-              <Stack className="FstoStackAccountTitle-root" direction="row" justifyContent="flex-end">
-                <Typography variant="caption" color="error">Total debit and credit amount are not equal.</Typography>
-              </Stack>}
-
-            {
-              accounts.some((item) => item.entry === `Debit`) &&
-              accounts.some((item) => item.entry === `Credit`) &&
-              accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0) &&
-              (accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) !== (transaction?.document_amount || transaction?.referrence_amount) || accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0) !== (transaction?.document_amount || transaction?.referrence_amount)) &&
-              <Stack className="FstoStackAccountTitle-root" direction="row" justifyContent="flex-end">
-                <Typography variant="caption" color="error">Total debit, credit and document amount are not equal.</Typography>
-              </Stack>}
-
-          </React.Fragment>
-        }
+            <Button
+              variant="outlined"
+              color="info"
+              onClick={backAccountTitleHandler}
+              disableElevation
+            > Back
+            </Button>
+          </Stack>
+        </Stack>
       </DialogContent>
-
-      <DialogActions className="FstoDialogAccountTitle-actions">
-        <Button
-          variant="outlined"
-          color="info"
-          onClick={backAccountTitleHandler}
-          disableElevation
-        > Back
-        </Button>
-
-        {
-          Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|audit-|executive-|issue-|counter-.*/)) &&
-          <Button
-            variant="contained"
-            onClick={submitAccountTitleHandler}
-            disabled={
-              !Boolean(accounts.length) ||
-              !accounts.some((item) => item.entry.toLowerCase() === `debit`) ||
-              !accounts.some((item) => item.entry.toLowerCase() === `credit`) ||
-              !(accounts.filter((item) => item.entry.toLowerCase() === `debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === (transaction?.document_amount || transaction?.referrence_amount)) ||
-              !(accounts.filter((item) => item.entry.toLowerCase() === `credit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === (transaction?.document_amount || transaction?.referrence_amount)) ||
-              !(accounts.filter((item) => item.entry.toLowerCase() === `debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === accounts.filter((item) => item.entry.toLowerCase() === `credit`).map((item) => item.amount).reduce((a, b) => a + b, 0))
-            }
-            disableElevation
-          > {state.match(/receive.*/) ? "Submit" : "Save"}
-          </Button>}
-      </DialogActions>
     </Dialog >
   )
 }

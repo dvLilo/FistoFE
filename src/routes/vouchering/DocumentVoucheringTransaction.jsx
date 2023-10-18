@@ -406,7 +406,7 @@ const DocumentVoucheringTransaction = ({
                   !Boolean(voucherData.voucher.month)
                 }
                 disableElevation
-              > {state === `voucher-receive` ? "Approve" : "Save"}
+              > {state === `voucher-receive` ? "Create" : "Save"}
               </Button>
             }
 
