@@ -98,7 +98,7 @@ const BusinessUnitsTable = (props) => {
       <TableBody className="FstoTableHeadMasterlist-root">
         {
           fetching
-            ? <Preloader row={5} col={7} />
+            ? <Preloader row={5} col={8} />
             : data
               ? data.sort(comparator(order, orderBy)).map((data, index) => (
                 <TableRow className="FstoTableRowMasterlist-root" key={index} hover>
@@ -151,7 +151,7 @@ const BusinessUnitsTable = (props) => {
               ))
               : (
                 <TableRow>
-                  <TableCell align="center" colSpan={7}>NO RECORDS FOUND</TableCell>
+                  <TableCell align="center" colSpan={8}>NO RECORDS FOUND</TableCell>
                 </TableRow>
               )
         }

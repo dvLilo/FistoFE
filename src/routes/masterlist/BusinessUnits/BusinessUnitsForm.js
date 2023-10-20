@@ -91,47 +91,47 @@ const BusinessUnitsForm = (props) => {
 
         console.log("Fisto Error Details: ", error.request)
       }
-    })()
+    })();
 
-      (async () => {
+    (async () => {
+      setDropdown(currentValue => ({
+        ...currentValue,
+        isFetching: true
+      }))
+
+      let response
+      try {
+        response = await axios.get(`/api/admin/dropdown/company`)
+
+        const {
+          companies
+        } = response.data.result
+
         setDropdown(currentValue => ({
           ...currentValue,
-          isFetching: true
+          isFetching: false,
+          companies
+        }))
+      }
+      catch (error) {
+        if (error.request.status !== 404) {
+          toast({
+            show: true,
+            title: "Error",
+            message: "Something went wrong whilst fetching companies dropdown list.",
+            severity: "error"
+          })
+        }
+
+        setDropdown(currentValue => ({
+          ...currentValue,
+          isFetching: false,
+          associates: []
         }))
 
-        let response
-        try {
-          response = await axios.get(`/api/admin/dropdown/company`)
-
-          const {
-            companies
-          } = response.data.result
-
-          setDropdown(currentValue => ({
-            ...currentValue,
-            isFetching: false,
-            companies
-          }))
-        }
-        catch (error) {
-          if (error.request.status !== 404) {
-            toast({
-              show: true,
-              title: "Error",
-              message: "Something went wrong whilst fetching companies dropdown list.",
-              severity: "error"
-            })
-          }
-
-          setDropdown(currentValue => ({
-            ...currentValue,
-            isFetching: false,
-            associates: []
-          }))
-
-          console.log("Fisto Error Details: ", error.request)
-        }
-      })()
+        console.log("Fisto Error Details: ", error.request)
+      }
+    })()
     // eslint-disable-next-line
   }, [])
 
@@ -160,6 +160,7 @@ const BusinessUnitsForm = (props) => {
     setBusinessUnit({
       code: "",
       name: "",
+      company: null,
       associates: []
     })
   }

@@ -117,12 +117,8 @@ const UpdateUser = () => {
     ],
     GAS: [
       {
-        id: 3,
-        name: "Identifying of Receipt"
-      },
-      {
-        id: 11,
-        name: "Matching of Voucher"
+        id: 25,
+        name: "Transmittal of Official Receipt"
       }
     ],
     audit: [
@@ -218,6 +214,10 @@ const UpdateUser = () => {
       {
         id: 5,
         name: "Audit Associate"
+      },
+      {
+        id: 10,
+        name: "GAS Associate"
       },
       {
         id: 6,
@@ -651,6 +651,10 @@ const UpdateUser = () => {
       case 5: permissions = [3, 5]
         break
 
+      // GAS Associate
+      case 10: permissions = [25]
+        break
+
       // Executive Associate
       case 6: permissions = [23]
         break
@@ -664,7 +668,7 @@ const UpdateUser = () => {
         break
 
       default:
-        permissions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+        permissions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
     }
 
     setUser({
@@ -1028,7 +1032,7 @@ const UpdateUser = () => {
               <Typography variant="permission" sx={{ marginLeft: 4, marginBottom: 4, marginTop: 2 }}>Permissions</Typography>
 
               {
-                (user.role.id === 1 || user.role.id === 2 || user.role.id === 3 || user.role.id === 4 || user.role.id === 5 || user.role.id === 6 || user.role.id === 7 || user.role.id === 9) &&
+                (user.role.id === 1 || user.role.id === 2 || user.role.id === 3 || user.role.id === 4 || user.role.id === 5 || user.role.id === 6 || user.role.id === 7 || user.role.id === 9 || user.role.id === 10) &&
                 <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
                   <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>Requestor</FormLabel>
                   <FormGroup row={true} sx={{ padding: '10px 35px' }}>
@@ -1055,6 +1059,28 @@ const UpdateUser = () => {
                   <FormGroup row={true} sx={{ padding: '10px 35px' }}>
                     {
                       permissions.AP.map((perm, index) => (
+                        <FormControlLabel
+                          className="FstoCheckboxLabel-root"
+                          key={index}
+                          label={perm.name}
+                          sx={{ width: '50%', margin: 0 }}
+                          control={
+                            <Checkbox size="small" sx={{ padding: '7px' }} value={perm.id} checked={user.permissions.includes(perm.id)} onChange={permissionsCheckboxHandler} />
+                          }
+                          disableTypography
+                        />
+                      ))
+                    }
+                  </FormGroup>
+                </FormControl>}
+
+              {
+                (user.role.id === 10) &&
+                <FormControl component="fieldset" variant="standard" sx={{ marginX: 4, marginBottom: 4, border: '2px solid #dee2e6', borderRadius: '5px' }}>
+                  <FormLabel component="legend" sx={{ background: '#eee', marginLeft: 2, paddingLeft: 3, paddingRight: 3, borderRadius: '5px', color: '#000', fontWeight: 500 }}>GAS</FormLabel>
+                  <FormGroup row={true} sx={{ padding: '10px 35px' }}>
+                    {
+                      permissions.GAS.map((perm, index) => (
                         <FormControlLabel
                           className="FstoCheckboxLabel-root"
                           key={index}

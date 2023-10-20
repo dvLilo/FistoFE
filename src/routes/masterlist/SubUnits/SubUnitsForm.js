@@ -89,11 +89,8 @@ const SubUnitsForm = (props) => {
       setIsUpdating(true)
       setSubUnit({
         code: data.code,
-        name: data.sub_unit,
-        department: {
-          id: data.department.id,
-          department: data.department.name
-        }
+        name: data.subunit,
+        department: data.department
       })
     }
   }, [data])
@@ -131,13 +128,13 @@ const SubUnitsForm = (props) => {
           if (isUpdating)
             response = await axios.put(`/api/admin/sub-units/${data.id}`, {
               code: subUnit.code,
-              sub_unit: subUnit.name,
+              subunit: subUnit.name,
               department_id: subUnit.department.id
             })
           else
             response = await axios.post(`/api/admin/sub-units`, {
               code: subUnit.code,
-              sub_unit: subUnit.name,
+              subunit: subUnit.name,
               department_id: subUnit.department.id
             })
 
@@ -258,7 +255,7 @@ const SubUnitsForm = (props) => {
             />
         }
         getOptionLabel={
-          option => option.department
+          option => option.name
         }
         isOptionEqualToValue={
           (option, value) => option.id === value.id

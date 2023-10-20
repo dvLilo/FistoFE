@@ -271,11 +271,12 @@ const DocumentTagging = () => {
         try {
           response = await axios.post(`api/transactions/flow/receive`, {
             process: TAG,
-            transaction: selected
+            transactions: selected
           })
 
           const { message } = response.data
 
+          setSelected([])
           refetchData()
           toast({
             message,
@@ -437,7 +438,7 @@ const DocumentTagging = () => {
                     {
                       state === 'pending' && status === 'success' &&
                       <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                        <Checkbox className="FstoCheckbox-root" onChange={onCheck} value={item.id} selected={selected.includes(item.id)} />
+                        <Checkbox className="FstoCheckbox-root" onChange={onCheck} value={item.id} checked={selected.includes(item.id)} />
                       </TableCell>}
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">

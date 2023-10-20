@@ -108,7 +108,9 @@ const Sidebar = () => {
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/categories">Categories</RouterLink>
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/document-types">Document Types</RouterLink>
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/companies">Companies</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/business-unit">Business Unit</RouterLink>
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/departments">Departments</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/sub-unit">Sub Unit</RouterLink>
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/locations">Locations</RouterLink>
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/references">References</RouterLink>
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/supplier-types">Urgency Types</RouterLink>
@@ -128,8 +130,8 @@ const Sidebar = () => {
 
           { // Documents
             !!user &&
-            user.permissions.some((item) => [1, 19, 20, 21, 22, 23].includes(item)) &&
-            <Accordion defaultExpanded={/tagging|executive|requestor/i.test(user.role)} elevation={0} square disableGutters>
+            user.permissions.some((item) => [1, 19, 20, 21, 22, 23, 25].includes(item)) &&
+            <Accordion defaultExpanded={/tagging|gas|executive|requestor/i.test(user.role)} elevation={0} square disableGutters>
               <AccordionSummary expandIcon={<ExpandIcon htmlColor="white" />}>
                 <DocumentIcon />
                 <Typography variant="sidebar">Documents</Typography>
@@ -146,6 +148,10 @@ const Sidebar = () => {
 
                 {user.permissions.includes(20)
                   && <RouterLink className="FstoSidebarLink-root" to="/document/tagging">Tagging of Documents {/*<Chip className="FstoSidebarChip-root" color="primary" label="99+" size="small" />*/}</RouterLink>
+                }
+
+                {user.permissions.includes(25)
+                  && <RouterLink className="FstoSidebarLink-root" to="/document/transmitting">Transmittal Of Official Receipt</RouterLink>
                 }
 
                 {user.permissions.includes(19)

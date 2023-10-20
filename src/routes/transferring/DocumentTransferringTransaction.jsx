@@ -188,7 +188,7 @@ const DocumentTransferringTransaction = (props) => {
                 variant="contained"
                 onClick={submitApproveHandler}
                 disableElevation
-              > Approve
+              > Transmit
               </Button>
             }
 

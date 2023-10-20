@@ -65,6 +65,9 @@ const Landing = () => {
       case 'ap tagging':
         return `/document/tagging`
 
+      case 'gas associate':
+        return `/document/transmitting`
+
       case 'ap associate':
       case 'ap specialist':
         return `/voucher/vouchering`

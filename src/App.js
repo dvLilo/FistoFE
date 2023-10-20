@@ -21,8 +21,10 @@ import UpdateUser from './routes/masterlist/UserAccounts/UpdateUser'
 import ChangePassword from './routes/masterlist/ChangePassword'
 import Organization from './routes/masterlist/Organization/Organization'
 import Companies from './routes/masterlist/Companies/'
+import BusinessUnit from './routes/masterlist/BusinessUnits/'
 import DocumentTypes from './routes/masterlist/DocumentTypes/'
 import Departments from './routes/masterlist/Departments/'
+import SubUnit from './routes/masterlist/SubUnits/'
 import Locations from './routes/masterlist/Locations/'
 import Categories from './routes/masterlist/Categories/'
 import References from './routes/masterlist/References/'
@@ -47,6 +49,8 @@ import DocumentReturnedRequest from './routes/requestor/returned/ReturnedDocumen
 // Tagging
 import DocumentTagging from './routes/tagging/DocumentTagging'
 import DocumentReturnedTag from './routes/tagging/returned/ReturnedDocument'
+
+import DocumentTransferring from './routes/transferring/DocumentTransferring'
 
 // Vouchering
 import DocumentVouchering from './routes/vouchering/DocumentVouchering'
@@ -321,7 +325,9 @@ const App = () => {
               <Route exact strict path="categories" element={<Categories />} />
               <Route exact strict path="document-types" element={<DocumentTypes />} />
               <Route exact strict path="companies" element={<Companies />} />
+              <Route exact strict path="business-unit" element={<BusinessUnit />} />
               <Route exact strict path="departments" element={<Departments />} />
+              <Route exact strict path="sub-unit" element={<SubUnit />} />
               <Route exact strict path="locations" element={<Locations />} />
               <Route exact strict path="references" element={<References />} />
               <Route exact strict path="supplier-types" element={<SupplierTypes />} />
@@ -360,6 +366,12 @@ const App = () => {
                     <DocumentTagging />
                   </PasswordContextProvider>
                 }
+              />
+            </Route>
+
+            <Route exact path="/document/transmitting" element={<ProtectedRoute permission={25} />}>
+              <Route index exact strict
+                element={<DocumentTransferring />}
               />
             </Route>
 
