@@ -107,6 +107,7 @@ const Sidebar = () => {
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/organization-departments">Organization Departments</RouterLink>
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/categories">Categories</RouterLink>
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/document-types">Document Types</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/voucher-codes">Voucher Codes</RouterLink>
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/companies">Companies</RouterLink>
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/business-unit">Business Unit</RouterLink>
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/departments">Departments</RouterLink>

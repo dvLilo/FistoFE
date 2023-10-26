@@ -14,11 +14,11 @@ import {
 import Toast from '../../../components/Toast'
 import Confirm from '../../../components/Confirm'
 
-import DepartmentsForm from './DepartmentsForm'
-import DepartmentsTable from './DepartmentsTable'
-import DepartmentsToolbar from './DepartmentsToolbar'
+import VoucherCodesForm from './VoucherCodesForm'
+import VoucherCodesToolbar from './VoucherCodesToolbar'
+import VoucherCodesTable from './VoucherCodesTable'
 
-const Departments = () => {
+const VoucherCodes = () => {
 
   const {
     fetching,
@@ -30,9 +30,7 @@ const Departments = () => {
     statusChange,
     pageChange,
     rowChange
-  } = useFistoHook("/api/admin/departments")
-
-  const [update, setUpdate] = React.useState(null)
+  } = useFistoHook("/api/admin/voucher-codes")
 
   const [toast, setToast] = React.useState({
     show: false,
@@ -45,6 +43,8 @@ const Departments = () => {
     loading: false,
     onConfirm: () => { }
   })
+
+  const [update, setUpdate] = React.useState(null)
 
   const dataStatusHandler = (data) => {
     const { id, deleted_at } = data
@@ -61,7 +61,7 @@ const Departments = () => {
 
         let response
         try {
-          response = await axios.patch(`/api/admin/departments/${id}`, {
+          response = await axios.patch(`/api/admin/voucher-codes/${id}`, {
             status: Boolean(deleted_at) ? 0 : 1
           })
 
@@ -85,13 +85,10 @@ const Departments = () => {
   }
 
   const dataUpdateHandler = (data) => {
-    const { id, code, department, company, voucher_code } = data
+    const { id, code } = data
     setUpdate({
       id,
-      code,
-      department,
-      company,
-      voucher_code
+      code
     })
     window.scrollTo(0, 0)
   }
@@ -99,7 +96,7 @@ const Departments = () => {
   return (
     <Box className="FstoBox-root">
       <Paper className="FstoPaperForm-root" elevation={1}>
-        <DepartmentsForm
+        <VoucherCodesForm
           data={update}
           refetchData={refetchData}
           toast={setToast}
@@ -109,10 +106,8 @@ const Departments = () => {
 
       <Paper className="FstoPaperTable-root" elevation={1}>
         <Box className="FstoBoxToolbar-root">
-          <DepartmentsToolbar
+          <VoucherCodesToolbar
             fetching={fetching}
-            toast={setToast}
-            refetchData={refetchData}
             searchData={searchData}
             searchClear={searchClear}
             statusChange={statusChange}
@@ -120,7 +115,7 @@ const Departments = () => {
         </Box>
 
         <TableContainer className="FstoTableContainerMasterlist-root">
-          <DepartmentsTable
+          <VoucherCodesTable
             fetching={fetching}
             data={data}
             onStatusChange={dataStatusHandler}
@@ -169,4 +164,4 @@ const Departments = () => {
   )
 }
 
-export default Departments
+export default VoucherCodes

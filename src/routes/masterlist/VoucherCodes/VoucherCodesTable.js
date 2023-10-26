@@ -12,7 +12,7 @@ import {
 import ActionMenu from '../../../components/ActionMenu'
 import Preloader from '../../../components/Preloader'
 
-const DepartmentsTable = (props) => {
+const VoucherCodesTable = (props) => {
 
   const {
     fetching,
@@ -23,32 +23,27 @@ const DepartmentsTable = (props) => {
 
   const [order, setOrder] = React.useState('desc')
   const [orderBy, setOrderBy] = React.useState('updated_at')
-  const [orderKey, setOrderKey] = React.useState(null)
 
-  const descendingComparator = (a, b, orderBy, orderKey) => {
-    if (orderKey) {
-      if (b[orderBy][orderKey] < a[orderBy][orderKey]) return -1
-      if (b[orderBy][orderKey] > a[orderBy][orderKey]) return 1
+  const descendingComparator = (a, b, orderBy) => {
+    if (b[orderBy] < a[orderBy]) {
+      return -1;
     }
-    else {
-      if (b[orderBy] < a[orderBy]) return -1
-      if (b[orderBy] > a[orderBy]) return 1
+    if (b[orderBy] > a[orderBy]) {
+      return 1;
     }
-
     return 0;
   }
 
-  const comparator = (order, orderBy, orderKey) => {
+  const comparator = (order, orderBy) => {
     return order === 'desc'
-      ? (a, b) => descendingComparator(a, b, orderBy, orderKey)
-      : (a, b) => -descendingComparator(a, b, orderBy, orderKey)
+      ? (a, b) => descendingComparator(a, b, orderBy)
+      : (a, b) => -descendingComparator(a, b, orderBy)
   }
 
-  const onSort = (property, key = null) => {
+  const onSort = (property) => {
     const isAsc = orderBy === property && order === 'asc'
     setOrder(isAsc ? 'desc' : 'asc')
     setOrderBy(property)
-    setOrderKey(key)
   }
 
   return (
@@ -73,33 +68,6 @@ const DepartmentsTable = (props) => {
             </TableSortLabel>
           </TableCell>
 
-          <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">
-            <TableSortLabel
-              active={orderBy === `department`}
-              direction={orderBy === `department` ? order : `asc`}
-              onClick={() => onSort(`department`)}
-            > DEPARTMENT
-            </TableSortLabel>
-          </TableCell>
-
-          <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">
-            <TableSortLabel
-              active={orderBy === `company`}
-              direction={orderBy === `company` ? order : `asc`}
-              onClick={() => onSort(`company`, `name`)}
-            > COMPANY
-            </TableSortLabel>
-          </TableCell>
-
-          <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">
-            <TableSortLabel
-              active={orderBy === `voucher_code`}
-              direction={orderBy === `voucher_code` ? order : `asc`}
-              onClick={() => onSort(`voucher_code`, `code`)}
-            > VOUCHER CODE
-            </TableSortLabel>
-          </TableCell>
-
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">STATUS</TableCell>
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">
@@ -117,28 +85,16 @@ const DepartmentsTable = (props) => {
       <TableBody className="FstoTableHeadMasterlist-root">
         {
           fetching
-            ? <Preloader row={5} col={8} />
+            ? <Preloader row={5} col={5} />
             : data
-              ? data.sort(comparator(order, orderBy, orderKey)).map((data, index) => (
+              ? data.sort(comparator(order, orderBy)).map((data, index) => (
                 <TableRow className="FstoTableRowMasterlist-root" key={index} hover>
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body" align="center">
                     {data.id}
                   </TableCell>
 
-                  <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body">
+                  <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body" sx={{ textTransform: "capitalize" }}>
                     {data.code}
-                  </TableCell>
-
-                  <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body">
-                    {data.department}
-                  </TableCell>
-
-                  <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body">
-                    {data.company?.name}
-                  </TableCell>
-
-                  <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body">
-                    {data.voucher_code?.code}
                   </TableCell>
 
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body">
@@ -170,7 +126,7 @@ const DepartmentsTable = (props) => {
               ))
               : (
                 <TableRow>
-                  <TableCell align="center" colSpan={7}>NO RECORDS FOUND</TableCell>
+                  <TableCell align="center" colSpan={5}>NO RECORDS FOUND</TableCell>
                 </TableRow>
               )
         }
@@ -179,4 +135,4 @@ const DepartmentsTable = (props) => {
   )
 }
 
-export default DepartmentsTable
+export default VoucherCodesTable

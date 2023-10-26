@@ -20,6 +20,7 @@ import NewUser from './routes/masterlist/UserAccounts/NewUser'
 import UpdateUser from './routes/masterlist/UserAccounts/UpdateUser'
 import ChangePassword from './routes/masterlist/ChangePassword'
 import Organization from './routes/masterlist/Organization/Organization'
+import VoucherCodes from './routes/masterlist/VoucherCodes/'
 import Companies from './routes/masterlist/Companies/'
 import BusinessUnit from './routes/masterlist/BusinessUnits/'
 import DocumentTypes from './routes/masterlist/DocumentTypes/'
@@ -324,6 +325,7 @@ const App = () => {
               <Route exact strict path="organization-departments" element={<Organization />} />
               <Route exact strict path="categories" element={<Categories />} />
               <Route exact strict path="document-types" element={<DocumentTypes />} />
+              <Route exact strict path="voucher-codes" element={<VoucherCodes />} />
               <Route exact strict path="companies" element={<Companies />} />
               <Route exact strict path="business-unit" element={<BusinessUnit />} />
               <Route exact strict path="departments" element={<Departments />} />

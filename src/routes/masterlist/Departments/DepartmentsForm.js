@@ -37,14 +37,16 @@ const DepartmentsForm = (props) => {
   // Dropdown Array
   const [dropdown, setDropdown] = React.useState({
     isFetching: false,
-    companies: []
+    companies: [],
+    vouchers: []
   })
 
   // Form Data State
   const [department, setDepartment] = React.useState({
     code: "",
     department: "",
-    company: null
+    company: null,
+    voucher: null
   })
 
   React.useEffect(() => {
@@ -73,6 +75,7 @@ const DepartmentsForm = (props) => {
         } = response.data.result
 
         setDropdown(currentValue => ({
+          ...currentValue,
           isFetching: false,
           companies
         }))
@@ -88,8 +91,52 @@ const DepartmentsForm = (props) => {
         }
 
         setDropdown(currentValue => ({
+          ...currentValue,
           isFetching: false,
           companies: []
+        }))
+
+        console.log("Fisto Error Details: ", error.request)
+      }
+    })()
+    // eslint-disable-next-line
+  }, [])
+
+  React.useEffect(() => {
+    (async () => {
+      setDropdown(currentValue => ({
+        ...currentValue,
+        isFetching: true
+      }))
+
+      let response
+      try {
+        response = await axios.get(`/api/admin/dropdown/voucher-code`)
+
+        const {
+          voucher_codes
+        } = response.data.result
+
+        setDropdown(currentValue => ({
+          ...currentValue,
+          isFetching: false,
+          vouchers: voucher_codes
+        }))
+      }
+      catch (error) {
+        if (error.request.status !== 404) {
+          toast({
+            show: true,
+            title: "Error",
+            message: "Something went wrong whilst fetching voucher codes dropdown list.",
+            severity: "error"
+          })
+        }
+
+        setDropdown(currentValue => ({
+          ...currentValue,
+          isFetching: false,
+          vouchers: []
         }))
 
         console.log("Fisto Error Details: ", error.request)
@@ -107,7 +154,8 @@ const DepartmentsForm = (props) => {
         company: {
           id: data.company.id,
           company: data.company.name
-        }
+        },
+        voucher: data.voucher_code
       })
     }
   }, [data])
@@ -122,7 +170,8 @@ const DepartmentsForm = (props) => {
     setDepartment({
       code: "",
       department: "",
-      company: null
+      company: null,
+      voucher: null,
     })
   }
 
@@ -146,13 +195,15 @@ const DepartmentsForm = (props) => {
             response = await axios.put(`/api/admin/departments/${data.id}`, {
               code: department.code,
               department: department.department,
-              company: department.company.id
+              company: department.company.id,
+              voucher_code_id: department.voucher.id
             })
           else
             response = await axios.post(`/api/admin/departments`, {
               code: department.code,
               department: department.department,
-              company: department.company.id
+              company: department.company.id,
+              voucher_code_id: department.voucher.id
             })
 
           toast({
@@ -290,6 +341,47 @@ const DepartmentsForm = (props) => {
         disableClearable
       />
 
+      <Autocomplete
+        className="FstoSelectForm-root"
+        size="small"
+        options={dropdown.vouchers}
+        value={department.voucher}
+        renderInput={
+          props =>
+            <TextField
+              {...props}
+              variant="outlined"
+              label="Voucher Code"
+              error={!Boolean(dropdown.vouchers.length) && !dropdown.isFetching}
+              helperText={!Boolean(dropdown.vouchers.length) && !dropdown.isFetching && "No voucher codes found."}
+            />
+        }
+        PaperComponent={
+          props =>
+            <Paper
+              {...props}
+              sx={{ textTransform: 'capitalize' }}
+            />
+        }
+        getOptionLabel={
+          option => option.code
+        }
+        isOptionEqualToValue={
+          (option, value) => option.id === value.id
+        }
+        onChange={
+          (e, value) => {
+            setDepartment({
+              ...department,
+              voucher: value
+            })
+          }
+        }
+        fullWidth
+        disablePortal
+        disableClearable
+      />
+
       <LoadingButton
         className="FstoButtonForm-root"
         type="submit"
@@ -300,7 +392,8 @@ const DepartmentsForm = (props) => {
         disabled={
           !Boolean(department.code.trim()) ||
           !Boolean(department.department.trim()) ||
-          !Boolean(department.company)
+          !Boolean(department.company) ||
+          !Boolean(department.voucher)
         }
         disableElevation
       >
