@@ -2,8 +2,11 @@ import React, { useEffect } from 'react'
 
 import moment from 'moment'
 
-import { useDispatch, useSelector } from 'react-redux'
-import { RESET_PO } from '../../../actions'
+// import {
+//   useDispatch,
+//   useSelector
+// } from 'react-redux'
+// import { RESET_PO } from '../../../actions'
 
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -50,7 +53,8 @@ import TransactionAttachment from './TransactionAttachment'
 
 const TransactionRequest = () => {
 
-  const attachment = useSelector((state) => state.po)
+  // const attachment = useSelector((state) => state.po)
+  const attachment = []
 
   const {
     watch,
@@ -84,7 +88,7 @@ const TransactionRequest = () => {
   // console.log(watch())
   console.log(watch("attachment"))
 
-  const dispatch = useDispatch()
+  // const dispatch = useDispatch()
 
   const {
     status: REQUESTOR_STATUS,
@@ -120,7 +124,7 @@ const TransactionRequest = () => {
   useEffect(() => {
     return () => {
       console.log("Clearing PO...")
-      dispatch(RESET_PO())
+      // dispatch(RESET_PO())
     }
 
     // eslint-disable-next-line

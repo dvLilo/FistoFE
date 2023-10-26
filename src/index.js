@@ -4,9 +4,8 @@ import ReactDOM from 'react-dom'
 import axios from 'axios'
 
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
+import { store } from './app/store'
 
-import reducers from './reducers'
 
 import App from './App'
 
@@ -41,11 +40,6 @@ axios.interceptors.response.use(
 
     return Promise.reject(error)
   }
-)
-
-const store = createStore(
-  reducers,
-  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 )
 
 ReactDOM.render(

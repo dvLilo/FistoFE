@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react'
 
-import { useDispatch, useSelector } from 'react-redux'
-import { ADD_PO, UPDATE_PO } from '../../../actions'
+// import {
+//   useDispatch,
+//   useSelector
+// } from 'react-redux'
+// import { ADD_PO, UPDATE_PO } from '../../../actions'
 
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -36,7 +39,7 @@ import NumberFormat from 'react-number-format'
 
 const TransactionAttachment = () => {
 
-  const dispatch = useDispatch()
+  // const dispatch = useDispatch()
 
   const {
     // watch,
@@ -56,7 +59,8 @@ const TransactionAttachment = () => {
     }
   })
 
-  const po = useSelector((state) => state.po)
+  // const po = useSelector((state) => state.po)
+  const po = []
 
   // eslint-disable-next-line
   const [update, setUpdate] = useState({
@@ -75,8 +79,8 @@ const TransactionAttachment = () => {
   const submitTransactionHandler = (data) => {
     // console.log(data)
 
-    if (!update.status) dispatch(ADD_PO(data))
-    else dispatch(UPDATE_PO(update.index, data))
+    // if (!update.status) dispatch(ADD_PO(data))
+    // else dispatch(UPDATE_PO(update.index, data))
 
     setUpdate((currentValue) => ({
       ...currentValue,

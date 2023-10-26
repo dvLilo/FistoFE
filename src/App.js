@@ -127,7 +127,7 @@ const queryClient = new QueryClient()
 
 const App = () => {
 
-  const colorScheme = useSelector(state => state.color)
+  const colorScheme = useSelector(state => state.theme)
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
 
   React.useEffect(() => {

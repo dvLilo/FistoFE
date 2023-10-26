@@ -5,7 +5,9 @@ import CryptoJS from 'crypto-js'
 import { useNavigate } from 'react-router-dom'
 
 import { useSelector, useDispatch } from 'react-redux'
-import { SET_AUTH, SET_USER } from './actions'
+
+import { authenticate } from './features/auth/auth.slice'
+import { setUserDetails } from './features/users/users.slice'
 
 import FistoLogo from './assets/img/logo_s.png'
 import './assets/css/styles.login.scss'
@@ -108,8 +110,8 @@ const Landing = () => {
       response = await axios.post(`/api/login`, credential)
       const { token, ...user } = response.data.result
 
-      dispatch(SET_AUTH())
-      dispatch(SET_USER(user))
+      dispatch(authenticate())
+      dispatch(setUserDetails(user))
 
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
 

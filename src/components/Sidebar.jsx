@@ -3,7 +3,7 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 
 import { useSelector, useDispatch } from 'react-redux'
-import { TOGGLE_SIDEBAR, HIDE_SIDEBAR } from '../actions'
+import { hideSidebar, toggleSidebar } from '../features/sidebar/sidebar.slice'
 
 import {
   Box,
@@ -41,16 +41,16 @@ import FistoLogo from '../assets/img/logo_s.png'
 const Sidebar = () => {
   const user = useSelector(state => state.user)
   const open = useSelector(state => state.sidebar)
-  const color = useSelector(state => state.color)
+  const color = useSelector(state => state.theme)
 
   const dispatch = useDispatch()
 
   const hideSidebarHandler = () => {
-    dispatch(HIDE_SIDEBAR())
+    dispatch(hideSidebar())
   }
 
   const toggleSidebarHandler = () => {
-    dispatch(TOGGLE_SIDEBAR())
+    dispatch(toggleSidebar())
   }
 
   const RouterLink = ({ children, ...rest }) => {

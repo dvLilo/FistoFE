@@ -3,12 +3,12 @@ import React from 'react'
 import axios from 'axios'
 
 import { useSelector, useDispatch } from 'react-redux'
-import {
-  TOGGLE_SIDEBAR,
-  SET_COLOR,
-  SET_AUTH,
-  SET_USER
-} from '../actions'
+
+import { unauthenticate } from '../features/auth/auth.slice'
+import { clearUserDetails } from '../features/users/users.slice'
+
+import { setTheme } from '../features/theme/theme.slice'
+import { toggleSidebar } from '../features/sidebar/sidebar.slice'
 
 import {
   useNavigate,
@@ -45,7 +45,7 @@ const Navbar = () => {
   const dispatch = useDispatch()
 
   const user = useSelector((state) => state.user)
-  const color = useSelector((state) => state.color)
+  const color = useSelector((state) => state.theme)
 
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
 
@@ -56,7 +56,7 @@ const Navbar = () => {
     setAnchorEl(null)
   }
   const toggleSidebarHandler = () => {
-    dispatch(TOGGLE_SIDEBAR())
+    dispatch(toggleSidebar())
   }
   const logoutHandler = async () => {
     try {
@@ -65,8 +65,8 @@ const Navbar = () => {
       window.localStorage.removeItem("token")
       window.localStorage.removeItem("user")
 
-      dispatch(SET_AUTH())
-      dispatch(SET_USER())
+      dispatch(unauthenticate())
+      dispatch(clearUserDetails())
 
       navigate("/", {
         replace: true
@@ -80,25 +80,25 @@ const Navbar = () => {
     if (color === "system") {
       if (prefersDarkMode) {
         window.localStorage.setItem("color", "light")
-        dispatch(SET_COLOR("light"))
+        dispatch(setTheme("light"))
       }
       else {
         window.localStorage.setItem("color", "dark")
-        dispatch(SET_COLOR("dark"))
+        dispatch(setTheme("dark"))
       }
     }
     else if (color === "dark") {
       window.localStorage.setItem("color", "light")
-      dispatch(SET_COLOR("light"))
+      dispatch(setTheme("light"))
     }
     else {
       window.localStorage.setItem("color", "dark")
-      dispatch(SET_COLOR("dark"))
+      dispatch(setTheme("dark"))
     }
   }
   const systemColorHandler = () => {
     window.localStorage.setItem("color", "system")
-    dispatch(SET_COLOR("system"))
+    dispatch(setTheme("system"))
   }
 
   return (
