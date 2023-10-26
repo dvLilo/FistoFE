@@ -56,7 +56,7 @@ const DocumentTypesForm = (props) => {
         type: data.type,
         description: data.description,
         categories: data.categories,
-        accounts: []
+        accounts: data.accounts
       })
     }
   }, [data])
@@ -136,7 +136,7 @@ const DocumentTypesForm = (props) => {
               type: document.type,
               description: document.description,
               categories: document.categories.map(cat => cat.id),
-              accounts: document.accounts.map(act => ({
+              account: document.accounts.map(act => ({
                 entry: act.entry,
                 account_title_id: act.account_title.id,
                 company_id: act.company.id,
@@ -149,7 +149,7 @@ const DocumentTypesForm = (props) => {
               type: document.type,
               description: document.description,
               categories: document.categories.map(cat => cat.id),
-              accounts: document.accounts.map(act => ({
+              account: document.accounts.map(act => ({
                 entry: act.entry,
                 account_title_id: act.account_title.id,
                 company_id: act.company.id,

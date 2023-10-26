@@ -9,6 +9,7 @@ import Navbar from './Navbar'
 import Sidebar from './Sidebar'
 
 import FistoProvider from '../contexts/FistoContext'
+import ConfirmProvider from '../contexts/ConfirmContext'
 
 const Layouts = () => {
   return (
@@ -17,7 +18,9 @@ const Layouts = () => {
       <Box className="fsto">
         <Navbar />
         <FistoProvider>
-          <Outlet />
+          <ConfirmProvider>
+            <Outlet />
+          </ConfirmProvider>
         </FistoProvider>
       </Box>
     </React.Fragment>

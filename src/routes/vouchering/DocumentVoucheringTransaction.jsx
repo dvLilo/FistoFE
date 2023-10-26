@@ -39,6 +39,7 @@ import {
 import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
 import ChequeEntryDialog from '../../components/ChequeEntryDialog'
+import PrintDialog from '../../components/PrintDialog'
 
 const DocumentVoucheringTransaction = ({
   state,
@@ -147,6 +148,17 @@ const DocumentVoucheringTransaction = ({
     transaction: null,
     onBack: undefined,
     onClose: () => setViewCheque(currentValue => ({
+      ...currentValue,
+      open: false,
+    }))
+  })
+
+  const [viewPrint, setViewPrint] = React.useState({
+    open: false,
+    state: null,
+    transaction: null,
+    onBack: undefined,
+    onClose: () => setViewPrint(currentValue => ({
       ...currentValue,
       open: false,
     }))
@@ -305,6 +317,19 @@ const DocumentVoucheringTransaction = ({
     }))
   }
 
+
+  const onPrintView = () => {
+    onClose()
+
+    setViewPrint(currentValue => ({
+      ...currentValue,
+      state,
+      transaction,
+      open: true,
+      onBack: onBack
+    }))
+  }
+
   return (
     <React.Fragment>
       <Dialog
@@ -326,7 +351,7 @@ const DocumentVoucheringTransaction = ({
         </DialogTitle>
 
         <DialogContent className="FstoDialogTransaction-content">
-          <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
+          <TransactionDialog data={data} status={status} onPrintView={onPrintView} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
 
           {
             (state === `voucher-receive` || state === `voucher-voucher` || state === `return-voucher`) &&
@@ -465,6 +490,11 @@ const DocumentVoucheringTransaction = ({
         cheques={data?.cheque?.cheques}
         onView={onAccountTitleView}
         {...viewCheque}
+      />
+
+      <PrintDialog
+        data={data}
+        {...viewPrint}
       />
     </React.Fragment>
   )

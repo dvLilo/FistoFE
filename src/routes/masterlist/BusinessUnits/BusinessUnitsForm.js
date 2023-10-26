@@ -26,11 +26,7 @@ const BusinessUnitsForm = (props) => {
 
   const [isUpdating, setIsUpdating] = React.useState(false)
 
-  const [error, setError] = React.useState({
-    status: false,
-    field: "",
-    message: ""
-  })
+  const [error, setError] = React.useState(null)
 
   // Dropdown Array
   const [dropdown, setDropdown] = React.useState({
@@ -152,11 +148,7 @@ const BusinessUnitsForm = (props) => {
 
   const formClearHandler = () => {
     setIsUpdating(false)
-    setError({
-      status: false,
-      field: null,
-      message: null
-    })
+    setError(null)
     setBusinessUnit({
       code: "",
       name: "",
@@ -207,12 +199,8 @@ const BusinessUnitsForm = (props) => {
         }
         catch (error) {
           switch (error.request.status) {
-            case 409:
-              setError({
-                status: true,
-                field: error.response.data.result.error_field,
-                message: error.response.data.message
-              })
+            case 422:
+              setError(error.response?.data?.errors)
               break
 
             case 304:
@@ -249,13 +237,8 @@ const BusinessUnitsForm = (props) => {
         autoComplete="off"
         size="small"
         value={businessUnit.code}
-        helperText={error.status && error.field === "code" && error.message}
-        error={error.status && error.field === "code"}
-        onBlur={() => setError({
-          status: false,
-          field: "",
-          message: ""
-        })}
+        helperText={error?.code && error?.code?.at(0)}
+        error={!!error?.code}
         onChange={(e) => setBusinessUnit((currentValue) => ({
           ...currentValue,
           code: e.target.value
@@ -273,13 +256,8 @@ const BusinessUnitsForm = (props) => {
         autoComplete="off"
         size="small"
         value={businessUnit.name}
-        helperText={error.status && error.field === "name" && error.message}
-        error={error.status && error.field === "name"}
-        onBlur={() => setError({
-          status: false,
-          field: "",
-          message: ""
-        })}
+        helperText={error?.business_unit && error?.business_unit?.at(0)}
+        error={!!error?.business_unit}
         onChange={(e) => setBusinessUnit((currentValue) => ({
           ...currentValue,
           name: e.target.value

@@ -1,0 +1,37 @@
+.FstoDialogPrint-root {
+
+  & .FstoTypographyPrint-root {
+    margin-top: 16px;
+    margin-bottom: 16px;
+    font-weight: 700;
+  }
+
+  & .FstoListItemPrint-root {
+    align-items: baseline;
+
+    padding-top: 0;
+    padding-bottom: 0;
+
+    &>span {
+      flex: 1;
+    }
+
+    &>strong {
+      flex: 2;
+    }
+  }
+
+  & .FstoTableContainerPrint-root {
+    margin-top: 24px;
+    margin-bottom: 24px;
+  }
+
+  & .FstoTableCellPrint-root {
+    border: 1px solid rgba(0, 0, 0, 0.54);
+  }
+
+  & .FstoTableCellPrint-head {
+    background-color: rgba(0, 0, 0, 0.16);
+    padding: 8px 8px;
+  }
+}

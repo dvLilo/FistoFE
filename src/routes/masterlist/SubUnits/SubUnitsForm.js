@@ -24,11 +24,7 @@ const SubUnitsForm = (props) => {
 
   const [isUpdating, setIsUpdating] = React.useState(false)
 
-  const [error, setError] = React.useState({
-    status: false,
-    field: "",
-    message: ""
-  })
+  const [error, setError] = React.useState(null)
 
   // Dropdown Array
   const [dropdown, setDropdown] = React.useState({
@@ -89,7 +85,7 @@ const SubUnitsForm = (props) => {
       setIsUpdating(true)
       setSubUnit({
         code: data.code,
-        name: data.subunit,
+        name: data.sub_unit,
         department: data.department
       })
     }
@@ -97,11 +93,7 @@ const SubUnitsForm = (props) => {
 
   const formClearHandler = () => {
     setIsUpdating(false)
-    setError({
-      status: false,
-      field: null,
-      message: null
-    })
+    setError(null)
     setSubUnit({
       code: "",
       name: "",
@@ -128,13 +120,13 @@ const SubUnitsForm = (props) => {
           if (isUpdating)
             response = await axios.put(`/api/admin/sub-units/${data.id}`, {
               code: subUnit.code,
-              subunit: subUnit.name,
+              sub_unit: subUnit.name,
               department_id: subUnit.department.id
             })
           else
             response = await axios.post(`/api/admin/sub-units`, {
               code: subUnit.code,
-              subunit: subUnit.name,
+              sub_unit: subUnit.name,
               department_id: subUnit.department.id
             })
 
@@ -148,13 +140,10 @@ const SubUnitsForm = (props) => {
           refetchData() // refresh the table data
         }
         catch (error) {
+          console.log(error.response)
           switch (error.request.status) {
-            case 409:
-              setError({
-                status: true,
-                field: error.response.data.result.error_field,
-                message: error.response.data.message
-              })
+            case 422:
+              setError(error.response?.data?.errors)
               break
 
             case 304:
@@ -191,13 +180,8 @@ const SubUnitsForm = (props) => {
         autoComplete="off"
         size="small"
         value={subUnit.code}
-        helperText={error.status && error.field === "code" && error.message}
-        error={error.status && error.field === "code"}
-        onBlur={() => setError({
-          status: false,
-          field: "",
-          message: ""
-        })}
+        helperText={error?.code && error?.code?.at(0)}
+        error={!!error?.code}
         onChange={(e) => setSubUnit((currentValue) => ({
           ...currentValue,
           code: e.target.value
@@ -215,13 +199,8 @@ const SubUnitsForm = (props) => {
         autoComplete="off"
         size="small"
         value={subUnit.name}
-        helperText={error.status && error.field === "sub_unit" && error.message}
-        error={error.status && error.field === "sub_unit"}
-        onBlur={() => setError({
-          status: false,
-          field: "",
-          message: ""
-        })}
+        helperText={error?.sub_unit && error?.sub_unit?.at(0)}
+        error={!!error?.sub_unit}
         onChange={(e) => setSubUnit((currentValue) => ({
           ...currentValue,
           name: e.target.value

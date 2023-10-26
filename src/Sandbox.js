@@ -668,293 +668,47 @@
 
 
 
-// import React from 'react'
-
-// import ReactDOM from 'react-dom'
-
-// import * as Mui from '@mui/material'
-
-// import { LoadingButton } from '@mui/lab'
-
-// const Sandbox = () => {
-
-//   const [loading, setLoading] = React.useState(true)
-
-//   return ReactDOM.createPortal(
-//     <React.Fragment>
-//       <Mui.Typography variant="h2" align="center">Hello world</Mui.Typography>
-//       <Mui.Box sx={{ display: `flex`, flexDirection: `column`, alignItems: `center`, paddingTop: `3em` }}>
-
-//         <Mui.Button variant="outlined" size="large" startIcon={loading && <Mui.CircularProgress color="inherit" size={16} thickness={4} />} disabled={loading} disableElevation>Hello world.</Mui.Button>
-
-//         <Mui.Divider variant="middle" sx={{ marginY: 3 }} flexItem />
-
-//         <LoadingButton
-//           variant="contained"
-//           size="large"
-//           startIcon={<span style={{ backgroundColor: "#00000000", display: "block", width: "16px", height: "16px" }} />}
-//           // endIcon={<span style={{ backgroundColor: "#00000000", display: "block", width: "16px", height: "16px" }} />}
-//           loadingPosition="start"
-//           loading={loading}
-//           sx={{
-//             paddingLeft: 2,
-//             paddingRight: 4
-//           }}
-//           disableElevation
-//         >
-//           Hello again.
-//         </LoadingButton>
-
-//         <Mui.Switch
-//           onChange={(e) => setLoading(e.target.checked)}
-//           defaultChecked
-//         />
-
-//       </Mui.Box>
-//     </React.Fragment>,
-//     document.getElementById("sandbox")
-//   )
-// }
-
-// export default Sandbox
-
-
-
-
-
-
-
 import React from 'react'
 
 import ReactDOM from 'react-dom'
 
 import * as Mui from '@mui/material'
 
-import { motion } from 'framer-motion'
-
-const container = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2
-    }
-  }
-};
-
-const row = {
-  hidden: {
-    opacity: 0,
-    translateX: 30
-  },
-  show: {
-    opacity: 1,
-    translateX: 0,
-    transition: {
-      duration: 0.5
-    }
-  }
-};
+import { LoadingButton } from '@mui/lab'
 
 const Sandbox = () => {
 
-  const [key, setKey] = React.useState(6 + Math.random())
-
+  const [loading, setLoading] = React.useState(true)
 
   return ReactDOM.createPortal(
     <React.Fragment>
       <Mui.Typography variant="h2" align="center">Hello world</Mui.Typography>
-      <Mui.Box sx={{ display: `flex`, flexDirection: `column`, alignItems: `center`, padding: `3em 15em`, overflow: `hidden` }}>
+      <Mui.Box sx={{ display: `flex`, flexDirection: `column`, alignItems: `center`, paddingTop: `3em` }}>
 
-        <Mui.Button variant="contained" onClick={() => setKey(Math.random())}>Generate Key</Mui.Button>
+        <Mui.Button variant="outlined" size="large" startIcon={loading && <Mui.CircularProgress color="inherit" size={16} thickness={4} />} disabled={loading} disableElevation>Yes</Mui.Button>
 
-        <Mui.TableContainer className="FstoTableContainer-root" component={motion.div} variants={container} initial="hidden" animate="show" key={key} sx={{ overflow: `hidden` }}>
-          <Mui.Table className="FstoTable-root" size="small">
-            <Mui.TableHead className="FstoTableHead-root">
-              <Mui.TableRow className="FstoTableRow-root">
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-head">
-                  TRANSCTION
-                </Mui.TableCell>
+        <Mui.Divider variant="middle" sx={{ marginY: 3 }} flexItem />
 
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-head">
-                  REQUESTOR
-                </Mui.TableCell>
+        <LoadingButton
+          variant="contained"
+          size="large"
+          startIcon={<span style={{ backgroundColor: "#00000000", display: "block", width: "16px", height: "16px" }} />}
+          // endIcon={<span style={{ backgroundColor: "#00000000", display: "block", width: "16px", height: "16px" }} />}
+          loadingPosition="start"
+          loading={loading}
+          sx={{
+            paddingLeft: 2,
+            paddingRight: 4
+          }}
+          disableElevation
+        >
+          Yes
+        </LoadingButton>
 
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-head">
-                  CHARGING
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-head">
-                  AMOUNT DETAILS
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-head">
-                  PO DETAILS
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-head">
-                  STATUS
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-head">
-                  ACTIONS
-                </Mui.TableCell>
-              </Mui.TableRow>
-            </Mui.TableHead>
-
-            <Mui.TableBody className="FstoTableBody-root">
-              <Mui.TableRow className="FstoTableRow-root" component={motion.tr} variants={row} key={1} hover>
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  Ut enim ad minim.
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  Quis nostrud exercitation ullamco laboris nisi ut.
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  P50,000.00
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  &mdash;
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  Pending
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  &bull;&bull;&bull;
-                </Mui.TableCell>
-              </Mui.TableRow>
-
-              <Mui.TableRow className="FstoTableRow-root" component={motion.tr} variants={row} key={2} hover>
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  Ut enim ad minim.
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  Quis nostrud exercitation ullamco laboris nisi ut.
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  P50,000.00
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  &mdash;
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  Pending
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  &bull;&bull;&bull;
-                </Mui.TableCell>
-              </Mui.TableRow>
-
-              <Mui.TableRow className="FstoTableRow-root" component={motion.tr} variants={row} key={3} hover>
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  Ut enim ad minim.
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  Quis nostrud exercitation ullamco laboris nisi ut.
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  P50,000.00
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  &mdash;
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  Pending
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  &bull;&bull;&bull;
-                </Mui.TableCell>
-              </Mui.TableRow>
-
-              <Mui.TableRow className="FstoTableRow-root" component={motion.tr} variants={row} key={4} hover>
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  Ut enim ad minim.
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  Quis nostrud exercitation ullamco laboris nisi ut.
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  P50,000.00
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  &mdash;
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  Pending
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  &bull;&bull;&bull;
-                </Mui.TableCell>
-              </Mui.TableRow>
-
-              <Mui.TableRow className="FstoTableRow-root" component={motion.tr} variants={row} key={5} hover>
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  Ut enim ad minim.
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  Quis nostrud exercitation ullamco laboris nisi ut.
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  P50,000.00
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  &mdash;
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  Pending
-                </Mui.TableCell>
-
-                <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
-                  &bull;&bull;&bull;
-                </Mui.TableCell>
-              </Mui.TableRow>
-            </Mui.TableBody>
-          </Mui.Table>
-        </Mui.TableContainer>
+        <Mui.Switch
+          onChange={(e) => setLoading(e.target.checked)}
+          defaultChecked
+        />
 
       </Mui.Box>
     </React.Fragment>,
@@ -963,3 +717,249 @@ const Sandbox = () => {
 }
 
 export default Sandbox
+
+
+
+
+
+
+
+// import React from 'react'
+
+// import ReactDOM from 'react-dom'
+
+// import * as Mui from '@mui/material'
+
+// import { motion } from 'framer-motion'
+
+// const container = {
+//   hidden: { opacity: 0 },
+//   show: {
+//     opacity: 1,
+//     transition: {
+//       staggerChildren: 0.2
+//     }
+//   }
+// };
+
+// const row = {
+//   hidden: {
+//     opacity: 0,
+//     translateX: 30
+//   },
+//   show: {
+//     opacity: 1,
+//     translateX: 0,
+//     transition: {
+//       duration: 0.5
+//     }
+//   }
+// };
+
+// const Sandbox = () => {
+
+//   const [key, setKey] = React.useState(6 + Math.random())
+
+
+//   return ReactDOM.createPortal(
+//     <React.Fragment>
+//       <Mui.Typography variant="h2" align="center">Hello world</Mui.Typography>
+//       <Mui.Box sx={{ display: `flex`, flexDirection: `column`, alignItems: `center`, padding: `3em 15em`, overflow: `hidden` }}>
+
+//         <Mui.Button variant="contained" onClick={() => setKey(Math.random())}>Generate Key</Mui.Button>
+
+//         <Mui.TableContainer className="FstoTableContainer-root" component={motion.div} variants={container} initial="hidden" animate="show" key={key} sx={{ overflow: `hidden` }}>
+//           <Mui.Table className="FstoTable-root" size="small">
+//             <Mui.TableHead className="FstoTableHead-root">
+//               <Mui.TableRow className="FstoTableRow-root">
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-head">
+//                   TRANSCTION
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-head">
+//                   REQUESTOR
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-head">
+//                   CHARGING
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-head">
+//                   AMOUNT DETAILS
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-head">
+//                   PO DETAILS
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-head">
+//                   STATUS
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-head">
+//                   ACTIONS
+//                 </Mui.TableCell>
+//               </Mui.TableRow>
+//             </Mui.TableHead>
+
+//             <Mui.TableBody className="FstoTableBody-root">
+//               <Mui.TableRow className="FstoTableRow-root" component={motion.tr} variants={row} key={1} hover>
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   Ut enim ad minim.
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   Quis nostrud exercitation ullamco laboris nisi ut.
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   P50,000.00
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   &mdash;
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   Pending
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   &bull;&bull;&bull;
+//                 </Mui.TableCell>
+//               </Mui.TableRow>
+
+//               <Mui.TableRow className="FstoTableRow-root" component={motion.tr} variants={row} key={2} hover>
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   Ut enim ad minim.
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   Quis nostrud exercitation ullamco laboris nisi ut.
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   P50,000.00
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   &mdash;
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   Pending
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   &bull;&bull;&bull;
+//                 </Mui.TableCell>
+//               </Mui.TableRow>
+
+//               <Mui.TableRow className="FstoTableRow-root" component={motion.tr} variants={row} key={3} hover>
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   Ut enim ad minim.
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   Quis nostrud exercitation ullamco laboris nisi ut.
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   P50,000.00
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   &mdash;
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   Pending
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   &bull;&bull;&bull;
+//                 </Mui.TableCell>
+//               </Mui.TableRow>
+
+//               <Mui.TableRow className="FstoTableRow-root" component={motion.tr} variants={row} key={4} hover>
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   Ut enim ad minim.
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   Quis nostrud exercitation ullamco laboris nisi ut.
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   P50,000.00
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   &mdash;
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   Pending
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   &bull;&bull;&bull;
+//                 </Mui.TableCell>
+//               </Mui.TableRow>
+
+//               <Mui.TableRow className="FstoTableRow-root" component={motion.tr} variants={row} key={5} hover>
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   Ut enim ad minim.
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   Quis nostrud exercitation ullamco laboris nisi ut.
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   P50,000.00
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   &mdash;
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   Pending
+//                 </Mui.TableCell>
+
+//                 <Mui.TableCell className="FstoTableCell-root FstoTableCell-body">
+//                   &bull;&bull;&bull;
+//                 </Mui.TableCell>
+//               </Mui.TableRow>
+//             </Mui.TableBody>
+//           </Mui.Table>
+//         </Mui.TableContainer>
+
+//       </Mui.Box>
+//     </React.Fragment>,
+//     document.getElementById("sandbox")
+//   )
+// }
+
+// export default Sandbox

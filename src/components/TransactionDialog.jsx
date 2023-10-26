@@ -10,6 +10,7 @@ import {
   Box,
   Chip,
   Divider,
+  IconButton,
   List,
   ListItem,
   Skeleton,
@@ -20,6 +21,7 @@ import {
   Typography
 } from '@mui/material'
 
+import PrintIcon from '@mui/icons-material/Print'
 import ReportIcon from '@mui/icons-material/ReportOutlined'
 
 import '../assets/css/styles.transaction.scss'
@@ -28,7 +30,8 @@ const TransactionDialog = ({
   data,
   status,
   onAccountTitleView = () => { },
-  onChequeView = () => { }
+  onChequeView = () => { },
+  onPrintView = () => { }
 }) => {
 
   const user = useSelector((state) => state.user)
@@ -249,6 +252,7 @@ const TransactionDialog = ({
                 <strong>{data.requestor.department}</strong>
               </ListItem>
 
+              {/*
               <ListItem className="FstoListItemTransactionDetails-root" dense>
                 <span>Position:</span>
                 <strong>{data.requestor.position}</strong>
@@ -258,6 +262,7 @@ const TransactionDialog = ({
                 <span>Role:</span>
                 <strong>{data.requestor.role}</strong>
               </ListItem>
+              */}
             </List>}
 
 
@@ -615,10 +620,10 @@ const TransactionDialog = ({
               }
 
               {
-                Boolean(data.voucher) && Boolean(data.voucher.receipt_type) &&
+                Boolean(data.tag) && Boolean(data.tag.receipt_type) &&
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Type of Receipt:</span>
-                  <strong>{data.voucher.receipt_type}</strong>
+                  <strong>{data.tag.receipt_type}</strong>
                 </ListItem>
               }
 
@@ -639,7 +644,19 @@ const TransactionDialog = ({
             Boolean(data?.voucher) && Boolean(data.voucher.no) && Boolean(data.voucher.month) &&
             <React.Fragment>
               <Divider className="FstoDividerTransactionDetails-root" textAlign="left">
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>Voucher</Typography>
+                <Stack direction="row" alignItems="center" gap={1}>
+                  {
+                    data.voucher.accounts?.every((item) => !item.is_default) &&
+                    <ReportIcon color="error" fontSize="large" />}
+
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>Voucher</Typography>
+
+                  {
+                    (user?.role.toLowerCase() === `ap associate` || user?.role.toLowerCase() === `ap specialist`) &&
+                    <IconButton onClick={onPrintView}>
+                      <PrintIcon />
+                    </IconButton>}
+                </Stack>
               </Divider>
 
               <List className="FstoListTransactionDetails-root" dense>

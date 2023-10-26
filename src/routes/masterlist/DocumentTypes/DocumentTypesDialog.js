@@ -203,7 +203,7 @@ const DocumentTypesDialog = ({
               ...currentValue,
               account_title: value
             }))}
-            disablePortal
+            // disablePortal
             disableClearable
           />
 
@@ -236,7 +236,7 @@ const DocumentTypesDialog = ({
               ...currentValue,
               company: value
             }))}
-            disablePortal
+            // disablePortal
             disableClearable
           />
 
@@ -269,7 +269,7 @@ const DocumentTypesDialog = ({
               ...currentValue,
               department: value
             }))}
-            disablePortal
+            // disablePortal
             disableClearable
           />
 
@@ -289,7 +289,7 @@ const DocumentTypesDialog = ({
                 sx: { textTransform: 'capitalize' }
               },
               popper: {
-                placement: 'bottom-start'
+                placement: "bottom"
               }
             }}
             getOptionLabel={
@@ -302,7 +302,7 @@ const DocumentTypesDialog = ({
               ...currentValue,
               location: value
             }))}
-            disablePortal
+            // disablePortal
             disableClearable
           />
 

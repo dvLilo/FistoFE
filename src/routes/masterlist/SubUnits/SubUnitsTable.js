@@ -75,9 +75,9 @@ const SubUnitsTable = (props) => {
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">
             <TableSortLabel
-              active={orderBy === `subunit`}
-              direction={orderBy === `subunit` ? order : `asc`}
-              onClick={() => onSort(`subunit`)}
+              active={orderBy === `sub_unit`}
+              direction={orderBy === `sub_unit` ? order : `asc`}
+              onClick={() => onSort(`sub_unit`)}
             > SUBUNIT
             </TableSortLabel>
           </TableCell>
@@ -121,7 +121,7 @@ const SubUnitsTable = (props) => {
                   </TableCell>
 
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body">
-                    {data.subunit}
+                    {data.sub_unit}
                   </TableCell>
 
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body">

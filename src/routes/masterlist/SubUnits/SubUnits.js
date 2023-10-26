@@ -85,11 +85,11 @@ const SubUnits = () => {
   }
 
   const dataUpdateHandler = (data) => {
-    const { id, code, subunit, department } = data
+    const { id, code, sub_unit, department } = data
     setUpdate({
       id,
       code,
-      subunit,
+      sub_unit,
       department
     })
     window.scrollTo(0, 0)

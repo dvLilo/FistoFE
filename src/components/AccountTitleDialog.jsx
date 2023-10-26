@@ -28,10 +28,10 @@ import EditIcon from '@mui/icons-material/Edit'
 import CloseIcon from '@mui/icons-material/Close'
 import DeleteIcon from '@mui/icons-material/Delete'
 
-import useAccountTitleCOA from '../hooks/useAccountTitleCOA'
 import useCompanyCOA from '../hooks/useCompanyCOA'
 import useDepartmentCOA from '../hooks/useDepartmentCOA'
 import useLocationCOA from '../hooks/useLocationCOA'
+import useAccountEntryCOA from '../hooks/useAccountEntryCOA'
 
 const ENTRY_LIST = ["Debit", "Credit"]
 
@@ -86,11 +86,6 @@ const AccountTitleDialog = ({
   })
 
   const {
-    data: ACCOUNT_TITLE_LIST,
-    status: ACCOUNT_TITLE_STATUS
-  } = useAccountTitleCOA({ enabled: open })
-
-  const {
     data: COMPANY_LIST,
     status: COMPANY_STATUS
   } = useCompanyCOA({ enabled: open })
@@ -105,18 +100,27 @@ const AccountTitleDialog = ({
     status: LOCATION_STATUS
   } = useLocationCOA({ enabled: !!AT.department?.id, department: AT.department?.id })
 
+  const {
+    data: ACCOUNT_ENTRY_LIST,
+    status: ACCOUNT_ENTRY_STATUS
+  } = useAccountEntryCOA({ enabled: open, document: transaction?.document_id })
+
   React.useEffect(() => {
     if (!open) clearAccountTitleHandler()
+
     // eslint-disable-next-line
   }, [open])
 
 
   const addAccountTitleHandler = () => {
+    const isDefault = ACCOUNT_ENTRY_LIST.filter((item) => item.account_title.id === AT.account_title.id).every((item) => item.company.id === AT.company.id && item.department.id === AT.department.id && item.location.id === AT.location.id)
+
     if (!AT.update)
       onInsert({
         entry: AT.entry,
         amount: parseFloat(AT.amount),
         remarks: AT.remarks,
+        is_default: isDefault,
 
         account_title: AT.account_title,
         company: AT.company,
@@ -124,11 +128,13 @@ const AccountTitleDialog = ({
         location: AT.location
       })
 
+
     if (!!AT.update)
       onUpdate({
         entry: AT.entry,
         amount: parseFloat(AT.amount),
         remarks: AT.remarks,
+        is_default: isDefault,
 
         account_title: AT.account_title,
         company: AT.company,
@@ -226,7 +232,11 @@ const AccountTitleDialog = ({
               }
               onChange={(e, value) => setAT(currentValue => ({
                 ...currentValue,
-                entry: value
+                entry: value,
+                account_title: null,
+                company: null,
+                department: null,
+                location: null
               }))}
               disablePortal
               disableClearable
@@ -235,10 +245,10 @@ const AccountTitleDialog = ({
             <Autocomplete
               className="FstoSelectForm-root"
               size="small"
-              options={ACCOUNT_TITLE_LIST || []}
+              options={ACCOUNT_ENTRY_LIST.filter((item) => item.entry.toLowerCase() === AT.entry?.toLowerCase()).map((item) => item.account_title) || []}
               value={AT.account_title}
               loading={
-                ACCOUNT_TITLE_STATUS === 'loading'
+                ACCOUNT_ENTRY_STATUS === 'loading'
               }
               renderInput={
                 (props) => <TextField {...props} label="Account Title" variant="outlined" />
@@ -249,16 +259,24 @@ const AccountTitleDialog = ({
               getOptionLabel={
                 (option) => `${option.code} - ${option.name}`
               }
-              // getOptionDisabled={
-              //   (option) => accounts.some((item) => item.account_title.id === option.id)
-              // }
+              getOptionDisabled={
+                (option) => accounts.some((item) => item.account_title.id === option.id)
+              }
               isOptionEqualToValue={
                 (option, value) => option.id === value.id
               }
-              onChange={(e, value) => setAT(currentValue => ({
-                ...currentValue,
-                account_title: value
-              }))}
+              onChange={(e, value) => setAT(currentValue => {
+
+                const { company, department, location } = ACCOUNT_ENTRY_LIST.find((item) => item.account_title.id === value.id)
+
+                return {
+                  ...currentValue,
+                  account_title: value,
+                  company: company,
+                  department: department,
+                  location: location,
+                }
+              })}
               disablePortal
               disableClearable
             />
