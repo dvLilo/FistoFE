@@ -12,20 +12,16 @@
     "@mui/lab": "^5.0.0-alpha.59",
     "@mui/material": "^5.8.7",
     "@mui/styles": "^5.2.3",
-    "@mui/x-data-grid": "^5.2.1",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
     "axios": "^0.24.0",
     "crypto-js": "^4.1.1",
     "date-fns": "^2.28.0",
-    "eslint-plugin-react": "^7.28.0",
     "exceljs": "^4.3.0",
     "file-saver": "^2.0.5",
     "framer-motion": "^4.1.17",
-    "json-server": "^0.17.0",
     "moment": "^2.29.3",
-    "moment-business": "^3.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-hook-form": "^7.27.1",
@@ -43,14 +39,10 @@
     "yup": "^0.32.11"
   },
   "scripts": {
-    "start": "set PORT=88 && react-scripts --openssl-legacy-provider start",
+    "start": "react-scripts --openssl-legacy-provider start",
     "build": "react-scripts --openssl-legacy-provider build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "client": "react-scripts --openssl-legacy-provider start",
-    "server": "npm start --prefix ../fisto-laravel",
-    "others": "json-server --watch db.json --host localhost --port 5000 --routes routes.json",
-    "all": "concurrently --kill-others \"react-scripts start\" \"npm start --prefix ../fisto-laravel\" \"json-server --watch db.json --port 5000\""
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -69,10 +61,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "concurrently": "^7.0.0",
-    "eslint": "^7.32.0",
-    "eslint-plugin-react-hooks": "^4.3.0"
   }
 }
