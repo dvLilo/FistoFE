@@ -48,9 +48,7 @@ const ConfirmProvider = ({ children }) => {
 
   const handleClose = useCallback(() => {
     setResolveRejectCallback([]);
-
-    handleLoading()
-  }, [handleLoading])
+  }, [])
 
   const handleCancel = useCallback(() => {
     if (reject) {
@@ -59,8 +57,9 @@ const ConfirmProvider = ({ children }) => {
         isCancelled: true,
         result: null
       })
-      return handleClose()
     }
+
+    handleClose()
   }, [reject, handleClose])
 
   const handleConfirm = useCallback(() => {
@@ -77,7 +76,10 @@ const ConfirmProvider = ({ children }) => {
           isCancelled: false,
           error: error
         }))
-        .finally(() => handleClose())
+        .finally(() => {
+          handleLoading()
+          handleClose()
+        })
     }
     else if (resolve) {
       resolve({

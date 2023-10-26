@@ -41,6 +41,9 @@ import statusColor from '../../colors/statusColor'
 import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
 import useTransactions from '../../hooks/useTransactions'
+// import useConfirmation from '../../hooks/useConfirmation'
+
+// import { useMutateTransactionMutation } from '../../features/transactions/transactions.api'
 
 import {
   TAG,
@@ -74,8 +77,12 @@ const DocumentTagging = () => {
     changeRows
   } = useTransactions("/api/transactions")
 
+  // const [mutateTransaction] = useMutateTransactionMutation()
+
   const toast = useToast()
   const confirm = useConfirm()
+
+  // const confirmation = useConfirmation()
 
   const [anchor, setAnchor] = React.useState(null)
 
@@ -135,6 +142,12 @@ const DocumentTagging = () => {
         }
       }
     })
+
+    // confirmation({
+    //   title: "Confirmation",
+    //   description: "Are you sure you want to receive this transaction?",
+    //   callback: () => mutateTransaction({ id: ID, process: TAG, subprocess: RECEIVE, }).unwrap()
+    // }).then((result) => console.log("Response: ", result)).catch((error) => console.log("Error: ", error))
   }
 
   const onManage = (transaction) => {
