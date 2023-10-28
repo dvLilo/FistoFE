@@ -41,9 +41,6 @@ import statusColor from '../../colors/statusColor'
 import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
 import useTransactions from '../../hooks/useTransactions'
-// import useConfirmation from '../../hooks/useConfirmation'
-
-// import { useMutateTransactionMutation } from '../../features/transactions/transactions.api'
 
 import {
   TAG,
@@ -77,12 +74,8 @@ const DocumentTagging = () => {
     changeRows
   } = useTransactions("/api/transactions")
 
-  // const [mutateTransaction] = useMutateTransactionMutation()
-
   const toast = useToast()
   const confirm = useConfirm()
-
-  // const confirmation = useConfirmation()
 
   const [anchor, setAnchor] = React.useState(null)
 
@@ -142,12 +135,6 @@ const DocumentTagging = () => {
         }
       }
     })
-
-    // confirmation({
-    //   title: "Confirmation",
-    //   description: "Are you sure you want to receive this transaction?",
-    //   callback: () => mutateTransaction({ id: ID, process: TAG, subprocess: RECEIVE, }).unwrap()
-    // }).then((result) => console.log("Response: ", result)).catch((error) => console.log("Error: ", error))
   }
 
   const onManage = (transaction) => {
@@ -463,6 +450,10 @@ const DocumentTagging = () => {
                         }
                         &nbsp;&mdash;&nbsp;
                         {item.document_type}
+                        {
+                          item.receipt_type?.toLowerCase() === `official` &&
+                          <Chip className="FstoChip-root FstoChip-latest" label={item.receipt_type} size="small" color="primary" />
+                        }
                         {
                           item.document_id === 4 && item.payment_type.toLowerCase() === `partial` &&
                           <Chip className="FstoChip-root FstoChip-payment" label={item.payment_type} size="small" />

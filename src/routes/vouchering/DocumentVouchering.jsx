@@ -477,6 +477,10 @@ const DocumentVouchering = () => {
                       <Typography className="FstoTypography-root FstoTypography-transaction" variant="button">
                         TAG#{item.tag_no}&nbsp;&mdash;&nbsp;{item.document_type}
                         {
+                          item.receipt_type.toLowerCase() === `official` &&
+                          <Chip className="FstoChip-root FstoChip-latest" label={item.receipt_type} size="small" color="primary" />
+                        }
+                        {
                           item.document_id === 4 && item.payment_type.toLowerCase() === `partial` &&
                           <Chip className="FstoChip-root FstoChip-payment" label={item.payment_type} size="small" />
                         }
