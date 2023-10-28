@@ -23,7 +23,7 @@ const CategoriesForm = (props) => {
 
   // Form Data State
   const [category, setCategory] = React.useState({
-    code: ""
+    name: ""
   })
 
   const [error, setError] = React.useState({
@@ -35,7 +35,7 @@ const CategoriesForm = (props) => {
     if (data) {
       setIsUpdating(true)
       setCategory({
-        code: data.name
+        name: data.name
       })
     }
   }, [data])
@@ -47,7 +47,7 @@ const CategoriesForm = (props) => {
       message: null
     })
     setCategory({
-      code: ""
+      name: ""
     })
   }
 
@@ -135,7 +135,7 @@ const CategoriesForm = (props) => {
           message: ""
         })}
         onChange={(e) => setCategory({
-          code: e.target.value
+          name: e.target.value
         })}
         InputLabelProps={{
           className: "FstoLabelForm-root"
