@@ -36,6 +36,7 @@ import UtilityLocations from './routes/masterlist/UtilityLocations/'
 import AccountNumbers from './routes/masterlist/AccountNumbers/'
 import CreditCards from './routes/masterlist/CreditCards/'
 import AccountTitles from './routes/masterlist/AccountTitles/'
+import TransactionTypes from './routes/masterlist/TransactionTypes'
 import PayrollClients from './routes/masterlist/PayrollClients/'
 import PayrollCategories from './routes/masterlist/PayrollCategories/'
 import Banks from './routes/masterlist/Banks/'
@@ -340,6 +341,7 @@ const App = () => {
               <Route exact strict path="account-numbers" element={<AccountNumbers />} />
               <Route exact strict path="credit-cards" element={<CreditCards />} />
               <Route exact strict path="account-titles" element={<AccountTitles />} />
+              <Route exact strict path="transaction-types" element={<TransactionTypes />} />
               <Route exact strict path="payroll-clients" element={<PayrollClients />} />
               <Route exact strict path="payroll-categories" element={<PayrollCategories />} />
               <Route exact strict path="banks" element={<Banks />} />

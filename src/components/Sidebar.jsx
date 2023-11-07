@@ -121,6 +121,7 @@ const Sidebar = () => {
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/account-numbers">Utility Account</RouterLink>
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/credit-cards">Credit Card</RouterLink>
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/account-titles">Account Titles</RouterLink>
+                <RouterLink className="FstoSidebarLink-root" to="/masterlist/transaction-types">Transaction Types</RouterLink>
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/payroll-clients">Payroll Clients</RouterLink>
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/payroll-categories">Payroll Categories</RouterLink>
                 <RouterLink className="FstoSidebarLink-root" to="/masterlist/banks">Banks</RouterLink>
