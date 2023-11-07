@@ -156,24 +156,6 @@ const PrintDialog = ({
                 }}
                 dense
               >
-                <span>Batch Name:</span>
-                <strong>&mdash;</strong>
-              </ListItem>
-
-              <ListItem
-                sx={{
-                  paddingTop: 0,
-                  paddingBottom: 0,
-                  alignItems: "baseline",
-                  "& span": {
-                    flex: 1
-                  },
-                  "& strong": {
-                    flex: 2
-                  }
-                }}
-                dense
-              >
                 <span>Operating Unit:</span>
                 <strong>{data?.voucher?.accounts?.at(0)?.company?.name}</strong>
               </ListItem>
@@ -251,7 +233,7 @@ const PrintDialog = ({
                 dense
               >
                 <span>GL Date:</span>
-                <strong>&mdash;</strong>
+                <strong>{moment(data?.voucher?.dates?.vouchered).format("MMM. DD, YYYY")}</strong>
               </ListItem>
 
               <ListItem
@@ -433,24 +415,6 @@ const PrintDialog = ({
               >
                 <span>Prepared by:</span>
                 <strong style={{ textIndent: 16, borderBottom: "1px solid" }}>{data?.tag?.distributed_to?.name}</strong>
-              </ListItem>
-
-              <ListItem
-                sx={{
-                  paddingTop: 0,
-                  paddingBottom: 0,
-                  alignItems: "baseline",
-                  "& span": {
-                    flex: 1
-                  },
-                  "& strong": {
-                    flex: 2
-                  }
-                }}
-                dense
-              >
-                <span>Checked by:</span>
-                <strong style={{ borderBottom: "1px solid" }}>&nbsp;</strong>
               </ListItem>
 
               <ListItem
