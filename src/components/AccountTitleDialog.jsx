@@ -305,7 +305,9 @@ const AccountTitleDialog = ({
               }
               onChange={(e, value) => setAT(currentValue => ({
                 ...currentValue,
-                company: value
+                company: value,
+                department: null,
+                location: null
               }))}
               disablePortal
               disableClearable
@@ -335,7 +337,8 @@ const AccountTitleDialog = ({
               }
               onChange={(e, value) => setAT(currentValue => ({
                 ...currentValue,
-                department: value
+                department: value,
+                location: null
               }))}
               disablePortal
               disableClearable
@@ -410,6 +413,9 @@ const AccountTitleDialog = ({
               disabled={
                 !Boolean(AT.entry) ||
                 !Boolean(AT.account_title) ||
+                !Boolean(AT.company) ||
+                !Boolean(AT.department) ||
+                !Boolean(AT.location) ||
                 !Boolean(AT.amount)
               }
               disableElevation
