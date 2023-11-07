@@ -5,6 +5,7 @@ import authReducer from '../features/auth/auth.slice'
 import themeReducer from '../features/theme/theme.slice'
 import sidebarReducer from '../features/sidebar/sidebar.slice'
 import userReducer from '../features/users/users.slice'
+import dialogReducer from '../features/dialog/dialog.slice'
 
 import { transactionApi } from "../features/transactions/transactions.api"
 
@@ -14,6 +15,8 @@ export const store = configureStore({
     theme: themeReducer,
     sidebar: sidebarReducer,
     user: userReducer,
+
+    dialog: dialogReducer,
 
     [transactionApi.reducerPath]: transactionApi.reducer
   },
