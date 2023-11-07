@@ -610,6 +610,7 @@ const NewRequest = () => {
           && data.document.location
           && data.document.supplier
           && data.document.category
+          && data.document.remarks
           && data.po_group.length
           && (
             Boolean(data.document.payment_type.match(/full/i))
@@ -635,6 +636,7 @@ const NewRequest = () => {
           && data.document.location
           && data.document.supplier
           && data.document.category
+          && data.document.remarks
           && (!error.status || !Boolean(error.data.document_no))
           && (!validate.status || !validate.data.includes('document_no'))
           ? false : true
@@ -648,6 +650,7 @@ const NewRequest = () => {
           && data.document.location
           && data.document.supplier
           && data.document.category
+          && data.document.remarks
           && (
             data.document.category.name.match(/rental|education/i) || (data.document.category.name.match(/loans|leasing/i) && data.document.release_date && data.document.batch_no)
           )
@@ -668,6 +671,7 @@ const NewRequest = () => {
           && data.document.location
           && data.document.supplier
           && data.document.category
+          && data.document.remarks
           && data.document.reference.id
           && data.document.reference.type
           && data.document.reference.no
@@ -700,6 +704,7 @@ const NewRequest = () => {
           && data.document.supplier
           && data.document.category
           && data.document.capex_no
+          && data.document.remarks
           && data.po_group.length
           && (
             Math.abs(data.document.amount - data.po_group.reduce((a, b) => a + b.balance, 0)).toFixed(2) >= 0.00 &&
@@ -725,6 +730,7 @@ const NewRequest = () => {
           && data.document.utility.account_no
           && data.document.utility.consumption
           && data.document.utility.receipt_no
+          && data.document.remarks
           ? false : true
 
       case 7: // Payroll
@@ -739,6 +745,7 @@ const NewRequest = () => {
           && data.document.payroll.clients.length
           && data.document.payroll.category
           && data.document.payroll.type
+          && data.document.remarks
           ? false : true
 
       case 8: // PCF - Petty Cash Fund
@@ -752,6 +759,7 @@ const NewRequest = () => {
           && data.document.pcf_batch.name
           && data.document.pcf_batch.letter
           && data.document.pcf_batch.date
+          && data.document.remarks
           && (!error.status || !Boolean(error.data.pcf_letter))
           && (!error.status || !Boolean(error.data.pcf_date))
           && (!error.status || !Boolean(error.data.document_company))
@@ -767,6 +775,7 @@ const NewRequest = () => {
           && data.document.location
           && data.document.supplier
           && data.document.category
+          && data.document.remarks
           && (
             data.document.debit_memo.attachment
               ? debitGroup.length && (
@@ -3544,7 +3553,7 @@ const NewRequest = () => {
 
                 <TextField
                   className="FstoTextfieldForm-root"
-                  label="Remarks (Optional)"
+                  label="Description"
                   variant="outlined"
                   autoComplete="off"
                   size="small"
