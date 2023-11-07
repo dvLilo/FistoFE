@@ -419,41 +419,6 @@
 
 
 
-
-
-
-
-// import React from 'react'
-
-// import ReactDOM from 'react-dom'
-
-// import * as Mui from '@mui/material'
-
-// import { ReasonContext } from './contexts/ReasonContext'
-
-// const Sandbox = () => {
-
-//   const { reason } = React.useContext(ReasonContext)
-
-//   return ReactDOM.createPortal(
-//     <React.Fragment>
-//       <Mui.Typography variant="h1" align="center">Hello world</Mui.Typography>
-//       <Mui.Box sx={{ display: `flex`, justifyContent: `center`, paddingTop: `3em` }}>
-//         <Mui.Button variant="outlined" onClick={reason}>Reason!</Mui.Button>
-//       </Mui.Box>
-//     </React.Fragment>,
-//     document.getElementById("sandbox")
-//   )
-// }
-
-// export default 
-
-
-
-
-
-
-
 // import React from 'react'
 
 // import ReactDOM from 'react-dom'
@@ -676,16 +641,34 @@ import * as Mui from '@mui/material'
 
 import { LoadingButton } from '@mui/lab'
 
+import useReason from './hooks/useReason'
+
 const Sandbox = () => {
 
   const [loading, setLoading] = React.useState(true)
+
+  const reason = useReason()
+
+  // const showReason = () => reason({
+  //   title: "Confirmation",
+  //   description: "Are you sure you want to return this transaction?",
+  //   callback: async (reason) => { console.log(reason); return reason }
+  // }).then((result) => console.log(result)).catch((error) => console.log(error))
+
+  const showReason = () => reason({
+    title: "Confirmation",
+    description: "Are you sure you want to return this transaction?",
+    callback: async (reason) => console.log(reason)
+  })
+    .then((result) => console.log(result))
+    .catch((error) => console.log(error))
 
   return ReactDOM.createPortal(
     <React.Fragment>
       <Mui.Typography variant="h2" align="center">Hello world</Mui.Typography>
       <Mui.Box sx={{ display: `flex`, flexDirection: `column`, alignItems: `center`, paddingTop: `3em` }}>
 
-        <Mui.Button variant="outlined" size="large" startIcon={loading && <Mui.CircularProgress color="inherit" size={16} thickness={4} />} disabled={loading} disableElevation>Yes</Mui.Button>
+        <Mui.Button variant="outlined" size="large" onClick={showReason} startIcon={loading && <Mui.CircularProgress color="inherit" size={16} thickness={4} />} disabled={loading} disableElevation>Yes</Mui.Button>
 
         <Mui.Divider variant="middle" sx={{ marginY: 3 }} flexItem />
 

@@ -97,12 +97,12 @@ const ConfirmProvider = ({ children }) => {
         {children}
       </ConfirmContext.Provider>
 
-      <Dialog open={resolveRejectCallback.length === 3}>
+      <Dialog open={resolveRejectCallback.length === 3} maxWidth="xs">
         <DialogTitle>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Typography variant="h6">{options.title}</Typography>
+            <Typography variant="h6" fontWeight={700}>{options.title}</Typography>
 
-            <IconButton disabled={isLoading} onClick={handleCancel} size="small">
+            <IconButton disabled={isLoading} onClick={handleCancel} size="large">
               <Close />
             </IconButton>
           </Stack>

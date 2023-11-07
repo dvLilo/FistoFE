@@ -1,175 +1,152 @@
-import React from 'react'
-
-// import axios from 'axios'
+import React, { Fragment, createContext, useCallback, useState } from 'react'
 
 import {
-  Box,
-  TextField,
-  IconButton,
   Button,
-  Autocomplete,
+  CircularProgress,
   Dialog,
-  DialogTitle,
+  DialogActions,
   DialogContent,
-  DialogActions
+  DialogTitle,
+  IconButton,
+  Stack,
+  TextField,
+  Typography
 } from '@mui/material'
 
-import { LoadingButton } from '@mui/lab'
+import {
+  Close,
+  WarningAmberRounded
+} from '@mui/icons-material'
 
-import CloseIcon from '@mui/icons-material/CloseRounded'
-import WarningIcon from '@mui/icons-material/WarningAmberRounded'
+import useDisclosure from '../hooks/useDisclosure'
 
-import '../assets/css/styles.reason.scss'
+export const ReasonContext = createContext()
 
-// import useToast from '../hooks/useToast'
-// import useReasons from '../hooks/useReasons'
+const ReasonProvider = ({ children }) => {
 
-export const ReasonContext = React.createContext()
+  const { open: isLoading, onToggle: handleLoading } = useDisclosure(false)
 
-const ReasonContextProvider = ({ children }) => {
+  const [value, setValue] = useState("")
 
-  // const toast = useToast()
-
-  const [dialog, setDialog] = React.useState({
-    open: false,
-    loading: false,
-    onConfirm: undefined
+  const [options, setOptions] = useState({
+    title: "Confirmation",
+    description: "Are you sure you want to void this transaction? Please note that you cannot undo this action."
   })
 
-  const [data, setData] = React.useState({
-    process: null,
-    subprocess: null,
-    reason: null
-  })
+  const [resolveRejectCallback, setResolveRejectCallback] = useState([])
+  const [resolve, reject, callback] = resolveRejectCallback
 
-  const onCloseDialog = () => {
-    setDialog(currentValue => ({
-      ...currentValue,
-      open: false,
-      loading: false,
-      onConfirm: undefined
-    }))
-  }
+  const reason = useCallback((params = {}) => {
+    const { callback, ...options } = params
 
-  const reason = (props) => {
-    const {
-      open = true,
-      process = null,
-      subprocess = null,
-      onConfirm = undefined
-    } = props
+    return new Promise((resolve, reject) => {
+      setOptions((currentValue) => ({
+        ...currentValue,
+        ...options
+      }))
 
-    setDialog(currentValue => ({
-      ...currentValue,
-      open,
-      onConfirm
-    }))
+      setResolveRejectCallback([resolve, reject, callback])
+    })
+  }, [])
 
-    setData(currentValue => ({
-      ...currentValue,
-      process,
-      subprocess
-    }))
-  }
+  const handleClose = useCallback(() => {
+    setResolveRejectCallback([]);
+  }, [])
+
+  const handleCancel = useCallback(() => {
+    if (reject) {
+      reject({
+        isConfirmed: false,
+        isCancelled: true,
+        result: null
+      })
+    }
+
+    handleClose()
+  }, [reject, handleClose])
+
+  const handleConfirm = useCallback(() => {
+    if (callback) {
+      handleLoading()
+      callback(value)
+        .then((result) => resolve({
+          isConfirmed: true,
+          isCancelled: false,
+          result: result
+        }))
+        .catch((error) => reject({
+          isConfirmed: true,
+          isCancelled: false,
+          error: error
+        }))
+        .finally(() => {
+          handleLoading()
+          handleClose()
+        })
+    }
+    else if (resolve) {
+      resolve({
+        isConfirmed: true,
+        isCancelled: false,
+        result: null
+      })
+      handleClose()
+    }
+  }, [value, resolve, reject, callback, handleClose, handleLoading])
 
   return (
-    <ReasonContext.Provider value={{ reason }}>
-      {/* App content here */}
-      {children}
+    <Fragment>
+      <ReasonContext.Provider value={{ reason }}>
+        {children}
+      </ReasonContext.Provider>
 
-      <Dialog
-        className="FstoDialogReason-root"
-        open={dialog.open}
-        PaperProps={{
-          className: "FstoPaperReason-root"
-        }}
-        fullWidth
-      >
-        <DialogTitle className="FstoDialogTitleReason-root">
-          Confirmation
-          <IconButton onClick={onCloseDialog}>
-            <CloseIcon fontSize="small" />
-          </IconButton>
+      <Dialog open={resolveRejectCallback.length === 3} maxWidth="xs">
+        <DialogTitle>
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Typography variant="h6" fontWeight={700}>{options.title}</Typography>
+
+            <IconButton disabled={isLoading} onClick={handleCancel} size="large">
+              <Close />
+            </IconButton>
+          </Stack>
         </DialogTitle>
 
-        <DialogContent className="FstoDialogContentReason-root">
-          <Box className="FstoDialogContentReason-box">
-            <WarningIcon className="FstoDialogContentReason-icon" />
-            Are you sure you want to *SUBPROCESS* this transaction?
-          </Box>
+        <DialogContent>
+          <Stack direction="row" alignItems="center" gap={2} marginBottom={2}>
+            <WarningAmberRounded sx={{ fontSize: 54 }} />
 
-          <form className="FstoDialogContentReason-form" >
-            <Autocomplete
-              className="FstoDialogContentReason-option"
-              size="small"
-              options={[]}
-              value={data.reason}
-              loading={false}
-              renderInput={
-                (props) => <TextField {...props} variant="outlined" label="Select Reason" />
-              }
-              getOptionLabel={
-                (option) => option.description
-              }
-              isOptionEqualToValue={
-                (option, value) => option.id === value.id
-              }
-              onChange={(e, value) => setData(currentValue => ({
-                ...currentValue,
-                reason: {
-                  ...currentValue.reason,
-                  id: value.id,
-                  description: value.description
-                }
-              }))}
-              fullWidth
-              disableClearable
-            />
+            <Typography variant="body1">{options.description}</Typography>
+          </Stack>
 
-            <TextField
-              className="FstoDialogContentReason-input"
-              variant="outlined"
-              autoComplete="off"
-              size="small"
-              label="Remarks (Optional)"
-              rows={3}
-              value={data.reason.remarks}
-              onChange={(e) => setData(currentValue => ({
-                ...currentValue,
-                reason: {
-                  ...currentValue.reason,
-                  remarks: e.target.value
-                }
-              }))}
-              fullWidth
-              multiline
-            />
-          </form>
+          <TextField
+            label="Write reason"
+            value={value}
+            rows={2}
+            onChange={(e) => setValue(e.target.value)}
+            fullWidth
+            multiline
+          />
         </DialogContent>
 
-        <DialogActions className="FstoDialogActionsReason-root">
-          <Button
-            className="FstoDialogActionsReason-button"
-            variant="text"
-            onClick={onCloseDialog}
-          > No
-          </Button>
+        <DialogActions>
+          <Button disabled={isLoading} onClick={handleCancel}>No</Button>
 
-          <LoadingButton
-            className="FstoDialogActionsReason-button"
+          <Button
             variant="contained"
-            loadingPosition="start"
-            loading={dialog.loading}
-            startIcon={<></>}
-            onClick={dialog.onConfirm}
-            disabled={false}
+            startIcon={
+              isLoading
+              && <CircularProgress color="inherit" size={16} thickness={4} />
+            }
+            disabled={isLoading || !value}
+            onClick={handleConfirm}
             disableElevation
-          > Yes
-          </LoadingButton>
+          >
+            Yes
+          </Button>
         </DialogActions>
       </Dialog>
-    </ReasonContext.Provider>
+    </Fragment>
   )
 }
 
-export default ReasonContextProvider
+export default ReasonProvider

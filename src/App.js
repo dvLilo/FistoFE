@@ -115,6 +115,7 @@ import NotFound from './exceptions/NotFound'
 import Sandbox from './Sandbox'
 
 import FistoProvider from './contexts/FistoContext'
+import ReasonProvider from './contexts/ReasonContext'
 import PasswordContextProvider from './contexts/PasswordContext'
 
 // Experimental Refactored Transction Request
@@ -303,7 +304,7 @@ const App = () => {
           <Routes>
             <Route exact strict path="*" element={<NotFound />} />
 
-            <Route exact path="/sandbox" element={<FistoProvider><Sandbox /></FistoProvider>} />
+            <Route exact path="/sandbox" element={<FistoProvider><ReasonProvider><Sandbox /></ReasonProvider></FistoProvider>} />
 
             <Route exact path="/" element={<Landing />} />
 

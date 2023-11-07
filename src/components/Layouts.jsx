@@ -10,6 +10,7 @@ import Sidebar from './Sidebar'
 
 import FistoProvider from '../contexts/FistoContext'
 import ConfirmProvider from '../contexts/ConfirmContext'
+import ReasonProvider from '../contexts/ReasonContext'
 
 const Layouts = () => {
   return (
@@ -19,7 +20,9 @@ const Layouts = () => {
         <Navbar />
         <FistoProvider>
           <ConfirmProvider>
-            <Outlet />
+            <ReasonProvider>
+              <Outlet />
+            </ReasonProvider>
           </ConfirmProvider>
         </FistoProvider>
       </Box>
