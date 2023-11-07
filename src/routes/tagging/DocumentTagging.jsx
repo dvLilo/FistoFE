@@ -33,7 +33,9 @@ import {
   Close,
   AccessTime,
   MoreHoriz,
-  TaskOutlined
+  TaskOutlined,
+  AccountBalanceWalletOutlined,
+  DescriptionOutlined
 } from '@mui/icons-material'
 
 import statusColor from '../../colors/statusColor'
@@ -295,6 +297,10 @@ const DocumentTagging = () => {
     })
   }
 
+  const onTagAll = () => {
+
+  }
+
   return (
     <Box className="FstoBox-root">
       <Paper className="FstoPaperTable-root" elevation={1}>
@@ -373,13 +379,14 @@ const DocumentTagging = () => {
             <TableHead className="FstoTableHead-root">
               <TableRow className="FstoTableRow-root">
                 {
-                  state === 'pending' && status === 'success' &&
+                  !!state.match(/pending|receive/gi) && status === 'success' &&
                   <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">
                     <IconButton onClick={(e) => setAnchor(e.currentTarget)} disabled={!selected.length}>
                       <MoreHoriz />
                     </IconButton>
 
                     <Menu
+                      className="FstoTableMenu-root"
                       open={!!anchor}
                       elevation={2}
                       anchorEl={anchor}
@@ -397,16 +404,31 @@ const DocumentTagging = () => {
                       onClose={() => setAnchor(null)}
                       disablePortal
                     >
-                      <MenuItem
-                        sx={{ fontWeight: 500 }}
-                        onClick={() => {
-                          setAnchor(null)
-                          onReceiveAll()
-                        }}
-                        dense
-                      >
-                        <TaskOutlined sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Receive
-                      </MenuItem>
+                      {
+                        state === 'pending' &&
+                        <MenuItem
+                          sx={{ fontWeight: 500 }}
+                          onClick={() => {
+                            setAnchor(null)
+                            onReceiveAll()
+                          }}
+                          dense
+                        >
+                          <TaskOutlined sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Receive
+                        </MenuItem>}
+
+                      {
+                        state === 'tag-receive' &&
+                        <MenuItem
+                          sx={{ fontWeight: 500 }}
+                          onClick={() => {
+                            setAnchor(null)
+                            onTagAll()
+                          }}
+                          dense
+                        >
+                          <DescriptionOutlined sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Manage
+                        </MenuItem>}
                     </Menu>
                   </TableCell>}
 
@@ -436,7 +458,7 @@ const DocumentTagging = () => {
                 && data.data.map((item, index) => (
                   <TableRow className="FstoTableRow-root" key={index} selected={selected.includes(item.id)} hover>
                     {
-                      state === 'pending' && status === 'success' &&
+                      !!state.match(/pending|receive/gi) && status === 'success' &&
                       <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
                         <Checkbox className="FstoCheckbox-root" onChange={onCheck} value={item.id} checked={selected.includes(item.id)} />
                       </TableCell>}
@@ -490,7 +512,17 @@ const DocumentTagging = () => {
 
                       <Typography className="FstoTypography-root FstoTypography-dates" variant="caption">
                         <AccessTime sx={{ fontSize: `1.3em` }} />
-                        {moment(item.date_requested).format("MMMM DD, YYYY — hh:mm A")}
+                        {moment(item.date_requested).format("MMM. DD, YYYY, hh:mm A")}
+
+                        {
+                          Boolean(item.cheque_date) && (
+                            <React.Fragment>
+                              <AccountBalanceWalletOutlined sx={{ fontSize: `1.3em` }} />
+                              {moment(item.cheque_date).format("MMM. DD, YYYY")}
+                            </React.Fragment>
+                          )
+                        }
+
                       </Typography>
                     </TableCell>
 

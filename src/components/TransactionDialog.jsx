@@ -36,90 +36,188 @@ const TransactionDialog = ({
 
   const user = useSelector((state) => state.user)
 
-  // const process = [
-  //   "Tagging of Document", // 0
-  //   "Creation of Voucher", // 1
-  //   "Approval of Voucher", // 2
-  //   "Transmittal of Document", // 3
-  //   // "Auditing of Voucher", // 4 (for PCF only)
-  //   "Creation of Cheque", // 4
-  //   "Auditing of Cheque", // 5
-  //   "Signing of Cheque", // 6
-  //   "Releasing of Cheque", // 7
-  //   "Filing of Voucher" // 8
-  // ]
-
   const process = [
-    "Tagging of Document", // index 0
-    "Creation of Voucher", // index 1
-    "Approval of Voucher", // index 2
-    "Transmittal of Document", // index 3
+    "Tagging of Document",
+
+    ...(data?.tag?.receipt_type === "Official"
+      ? [
+        "Transmittal of Official Receipt"
+      ]
+      : []
+    ),
+
+    "Creation of Voucher",
+    "Approval of Voucher",
+    "Transmittal of Document",
 
     ...(data?.document.id === 8 || data?.document.id === 9
       ? [
-        "Auditing of Voucher" // index 4
+        "Auditing of Voucher"
       ]
-      : []),
+      : []
+    ),
 
     ...(data?.document.id !== 9
       ? [
-        "Creation of Cheque",  // index 4 or 5
-        "Auditing of Cheque", // index 5 or 6
-        "Signing of Cheque",  // index 6 or 7
-        "Releasing of Cheque", // index 7 or 8
+        "Creation of Cheque",
+        "Auditing of Cheque",
+        "Signing of Cheque",
+        "Releasing of Cheque",
       ]
-      : []),
+      : []
+    ),
 
-    "Filing of Voucher" // index 8 or 9
+    "Filing of Voucher"
   ]
 
+  // const activeStep = (data) => {
+  //   const { transaction: { status: state }, document: { id: type } } = data
+
+  //   if (Boolean(state.match(/^tag/i)))
+  //     return 0
+
+  //   if (Boolean(state.match(/^voucher/i)))
+  //     return 1
+
+  //   if (Boolean(state.match(/^approve/i)))
+  //     return 2
+
+  //   if (Boolean(state.match(/^transmit/i)))
+  //     return 3
+
+  //   if (Boolean(state.match(/^inspect/i)))
+  //     return 4
+
+  //   if (Boolean(state.match(/^cheque/i)) && type !== 8)
+  //     return 4
+
+  //   if (Boolean(state.match(/^cheque/i)) && type === 8)
+  //     return 5
+
+  //   if (Boolean(state.match(/^audit/i)) && type !== 8)
+  //     return 5
+
+  //   if (Boolean(state.match(/^audit/i)) && type === 8)
+  //     return 6
+
+  //   if (Boolean(state.match(/^executive/i)) && type !== 8)
+  //     return 6
+
+  //   if (Boolean(state.match(/^executive/i)) && type === 8)
+  //     return 7
+
+  //   if ((Boolean(state.match(/^release/i)) || Boolean(state.match(/^issue/i))) && type !== 8)
+  //     return 7
+
+  //   if ((Boolean(state.match(/^release/i)) || Boolean(state.match(/^issue/i))) && type === 8)
+  //     return 8
+
+  //   if ((Boolean(state.match(/^file/i)) || Boolean(state.match(/^debit/i))) && type !== 8)
+  //     return 8
+
+  //   if ((Boolean(state.match(/^file/i)) || Boolean(state.match(/^debit/i))) && type === 8)
+  //     return 9
+
+  //   return -1
+  // }
+
   const activeStep = (data) => {
-    const { transaction: { status: state }, document: { id: type } } = data
+    const { transaction: { status: state }, document: { id: type }, tag } = data
+
+    if (tag && tag.receipt_type === "Unofficial") {
+      if (Boolean(state.match(/^tag/i)))
+        return 0
+
+      if (Boolean(state.match(/^voucher/i)))
+        return 1
+
+      if (Boolean(state.match(/^approve/i)))
+        return 2
+
+      if (Boolean(state.match(/^transmit/i)))
+        return 3
+
+      if (Boolean(state.match(/^inspect/i)))
+        return 4
+
+      if (Boolean(state.match(/^cheque/i)) && type !== 8)
+        return 4
+
+      if (Boolean(state.match(/^cheque/i)) && type === 8)
+        return 5
+
+      if (Boolean(state.match(/^audit/i)) && type !== 8)
+        return 5
+
+      if (Boolean(state.match(/^audit/i)) && type === 8)
+        return 6
+
+      if (Boolean(state.match(/^executive/i)) && type !== 8)
+        return 6
+
+      if (Boolean(state.match(/^executive/i)) && type === 8)
+        return 7
+
+      if ((Boolean(state.match(/^release/i)) || Boolean(state.match(/^issue/i))) && type !== 8)
+        return 7
+
+      if ((Boolean(state.match(/^release/i)) || Boolean(state.match(/^issue/i))) && type === 8)
+        return 8
+
+      if ((Boolean(state.match(/^file/i)) || Boolean(state.match(/^debit/i))) && type !== 8)
+        return 8
+
+      if ((Boolean(state.match(/^file/i)) || Boolean(state.match(/^debit/i))) && type === 8)
+        return 9
+    }
 
     if (Boolean(state.match(/^tag/i)))
       return 0
 
-    if (Boolean(state.match(/^voucher/i)))
+    if (Boolean(state.match(/^gas/i)))
       return 1
 
-    if (Boolean(state.match(/^approve/i)))
+    if (Boolean(state.match(/^voucher/i)))
       return 2
 
-    if (Boolean(state.match(/^transmit/i)))
+    if (Boolean(state.match(/^approve/i)))
       return 3
 
-    if (Boolean(state.match(/^inspect/i)))
+    if (Boolean(state.match(/^transmit/i)))
       return 4
+
+    if (Boolean(state.match(/^inspect/i)))
+      return 5
 
     if (Boolean(state.match(/^cheque/i)) && type !== 8)
-      return 4
+      return 5
 
     if (Boolean(state.match(/^cheque/i)) && type === 8)
-      return 5
+      return 6
 
     if (Boolean(state.match(/^audit/i)) && type !== 8)
-      return 5
+      return 6
 
     if (Boolean(state.match(/^audit/i)) && type === 8)
-      return 6
+      return 7
 
     if (Boolean(state.match(/^executive/i)) && type !== 8)
-      return 6
+      return 7
 
     if (Boolean(state.match(/^executive/i)) && type === 8)
-      return 7
+      return 8
 
     if ((Boolean(state.match(/^release/i)) || Boolean(state.match(/^issue/i))) && type !== 8)
-      return 7
+      return 8
 
     if ((Boolean(state.match(/^release/i)) || Boolean(state.match(/^issue/i))) && type === 8)
-      return 8
+      return 9
 
     if ((Boolean(state.match(/^file/i)) || Boolean(state.match(/^debit/i))) && type !== 8)
-      return 8
+      return 9
 
     if ((Boolean(state.match(/^file/i)) || Boolean(state.match(/^debit/i))) && type === 8)
-      return 9
+      return 10
 
     return -1
   }
@@ -646,7 +744,7 @@ const TransactionDialog = ({
               <Divider className="FstoDividerTransactionDetails-root" textAlign="left">
                 <Stack direction="row" alignItems="center" gap={1}>
                   {
-                    data.voucher.accounts?.every((item) => !item.is_default) &&
+                    data.voucher.accounts?.some((item) => !item.is_default) &&
                     <ReportIcon color="error" fontSize="large" />}
 
                   <Typography variant="h6" sx={{ fontWeight: 700 }}>Voucher</Typography>

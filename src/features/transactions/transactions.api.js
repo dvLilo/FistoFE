@@ -2,18 +2,6 @@ import queryString from 'query-string'
 
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
-// import {
-//   RECEIVE,
-
-//   HOLD,
-//   UNHOLD,
-
-//   RETURN,
-//   UNRETURN,
-
-//   VOID
-// } from '../../constants'
-
 export const transactionApi = createApi({
   reducerPath: "transactionApi",
   tagTypes: ["Transactions"],
@@ -33,7 +21,7 @@ export const transactionApi = createApi({
     }
   }),
   endpoints: (builder) => ({
-    getTransactions: builder.query({
+    fetchTransactions: builder.query({
       query: (params) => ({
         url: "/api/transactions",
         method: "GET",
@@ -42,97 +30,37 @@ export const transactionApi = createApi({
       transformResponse: (response) => response.result,
       providesTags: ["Transactions"]
     }),
+    viewTransaction: builder.query({
+      query: (id) => ({
+        url: "/api/transactions/" + id,
+        method: "GET",
+      }),
+      transformResponse: (response) => response.result
+    }),
+    receiveTransactions: builder.mutation({
+      query: (body) => ({
+        url: "/api/transactions/flow/receive",
+        method: "POST",
+        body: body
+      }),
+      invalidatesTags: (_, error) => error ? [] : ["Transactions"]
+    }),
     mutateTransaction: builder.mutation({
       query: ({ id, ...body }) => ({
         url: "/api/transactions/flow/update-transaction/" + id,
         method: "POST",
         body: body
       }),
-      invalidatesTags: ["Transactions"]
+      invalidatesTags: (_, error) => error ? [] : ["Transactions"]
     }),
-
-    // receiveTransaction: builder.mutation({
-    //   query: ({ id, process }) => ({
-    //     url: "/api/transactions/flow/update-transaction/" + id,
-    //     method: "POST",
-    //     body: {
-    //       process: process,
-    //       subprocess: RECEIVE
-    //     }
-    //   }),
-    //   invalidatesTags: ["Transactions"]
-    // }),
-    // unholdTransaction: builder.mutation({
-    //   query: ({ id, process }) => ({
-    //     url: "/api/transactions/flow/update-transaction/" + id,
-    //     method: "POST",
-    //     body: {
-    //       process: process,
-    //       subprocess: UNHOLD
-    //     }
-    //   }),
-    //   invalidatesTags: ["Transactions"]
-    // }),
-    // unreturnTransaction: builder.mutation({
-    //   query: ({ id, process }) => ({
-    //     url: "/api/transactions/flow/update-transaction/" + id,
-    //     method: "POST",
-    //     body: {
-    //       process: process,
-    //       subprocess: UNRETURN
-    //     }
-    //   }),
-    //   invalidatesTags: ["Transactions"]
-    // }),
-
-    // holdTransaction: builder.mutation({
-    //   query: ({ id, ...body }) => ({
-    //     url: "/api/transactions/flow/update-transaction/" + id,
-    //     method: "POST",
-    //     body: {
-    //       ...body,
-    //       subprocess: HOLD
-    //     }
-    //   }),
-    //   invalidatesTags: ["Transactions"]
-    // }),
-    // returnTransaction: builder.mutation({
-    //   query: ({ id, ...body }) => ({
-    //     url: "/api/transactions/flow/update-transaction/" + id,
-    //     method: "POST",
-    //     body: {
-    //       ...body,
-    //       subprocess: RETURN
-    //     }
-    //   }),
-    //   invalidatesTags: ["Transactions"]
-    // }),
-    // voidTransaction: builder.mutation({
-    //   query: ({ id, ...body }) => ({
-    //     url: "/api/transactions/flow/update-transaction/" + id,
-    //     method: "POST",
-    //     body: {
-    //       ...body,
-    //       subprocess: VOID
-    //     }
-    //   }),
-    //   invalidatesTags: ["Transactions"]
-    // })
   })
 })
 
 export const {
-  useGetTransactionsQuery,
+  useFetchTransactionsQuery,
+  useViewTransactionQuery,
+
+  useReceiveTransactionsMutation,
 
   useMutateTransactionMutation,
-
-  // useReceiveTransactionMutation,
-
-  // useHoldTransactionMutation,
-  // useUnholdTransactionMutation,
-
-  // useReturnTransactionMutation,
-  // useUnreturnTransactionMutation,
-
-  // useVoidTransactionMutation
 } = transactionApi
