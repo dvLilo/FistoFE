@@ -19,6 +19,7 @@ export const DEBIT = `debit`
 export const EXECUTIVE = `executive`
 export const ISSUE = `issue`
 export const RELEASE = `release`
+export const DISCHARGE = `discharge`
 export const FILE = `file`
 export const CLEAR = `clear`
 export const COUNTER = `counter`
