@@ -103,7 +103,7 @@ const AccountTitleDialog = ({
   const {
     data: ACCOUNT_ENTRY_LIST,
     status: ACCOUNT_ENTRY_STATUS
-  } = useAccountEntryCOA({ enabled: open, document: transaction?.document_id })
+  } = useAccountEntryCOA({ enabled: !!transaction?.transaction_type_id, type: transaction?.transaction_type_id })
 
   React.useEffect(() => {
     if (!open) clearAccountTitleHandler()
@@ -218,6 +218,7 @@ const AccountTitleDialog = ({
               size="small"
               options={ENTRY_LIST}
               value={AT.entry}
+              disabled={Boolean(state) && Boolean(state.match(/cheque-|clear-|debit-|return-.*/))}
               renderInput={
                 (props) => <TextField {...props} label="Entry" variant="outlined" />
               }
@@ -225,19 +226,37 @@ const AccountTitleDialog = ({
                 (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
               }
               getOptionDisabled={
-                (option) => Boolean(state) && Boolean(state.match(/cheque-|clear-|debit-|return-.*/)) && option.name.toLowerCase() === `debit`
+                (option) => !accounts.some((item) => item.entry.toLowerCase() === `debit`) && option.toLowerCase() === `credit`
               }
               isOptionEqualToValue={
                 (option, value) => option === value
               }
-              onChange={(e, value) => setAT(currentValue => ({
-                ...currentValue,
-                entry: value,
-                account_title: null,
-                company: null,
-                department: null,
-                location: null
-              }))}
+              onChange={(_, value) => {
+                const isMultipleSelection = ACCOUNT_ENTRY_LIST.filter((item) => item.entry.toLowerCase() === value.toLowerCase()).length > 1
+
+                if (isMultipleSelection) {
+                  setAT(currentValue => ({
+                    ...currentValue,
+                    entry: value,
+                    account_title: null,
+                    company: null,
+                    department: null,
+                    location: null
+                  }))
+                }
+                else {
+                  const account = ACCOUNT_ENTRY_LIST.find((item) => item.entry.toLowerCase() === value.toLowerCase())
+
+                  setAT(currentValue => ({
+                    ...currentValue,
+                    entry: value,
+                    account_title: account.account_title,
+                    company: account.company,
+                    department: account.department,
+                    location: account.location
+                  }))
+                }
+              }}
               disablePortal
               disableClearable
             />
@@ -247,6 +266,7 @@ const AccountTitleDialog = ({
               size="small"
               options={ACCOUNT_ENTRY_LIST.filter((item) => item.entry.toLowerCase() === AT.entry?.toLowerCase()).map((item) => item.account_title) || []}
               value={AT.account_title}
+              disabled={Boolean(state) && Boolean(state.match(/cheque-|clear-|debit-|return-.*/))}
               loading={
                 ACCOUNT_ENTRY_STATUS === 'loading'
               }
