@@ -1,0 +1,35 @@
+.FstoDialogTagging-root {
+
+
+  & .FstoDialogTagging-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  & .FstoDialogTagging-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  & .FstoIconTagging-root {
+    margin-left: 16px;
+    margin-right: 16px;
+    font-size: 48px;
+  }
+
+  & .FstoDividerTagging-root {
+    margin-top: 32px;
+    margin-bottom: 32px;
+  }
+
+  & .FstoBoxTagging-root {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  & .FstoAutocompleteTagging-root {
+    margin-bottom: 10px;
+  }
+}
