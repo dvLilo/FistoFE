@@ -5,14 +5,14 @@ import { useQuery } from 'react-query'
 import useToast from './useToast'
 
 const useAccountEntryCOA = ({
-  document,
+  type,
   enabled = true,
 }) => {
 
   const toast = useToast()
 
   const fetchAccoutTitleList = async () => {
-    return await axios.get(`/api/dropdown/account-title/${document}`)
+    return await axios.get(`/api/dropdown/account-title/${type}`)
   }
 
   const {
