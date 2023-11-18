@@ -8,7 +8,6 @@ import {
 
 import {
   MoreHoriz as MoreIcon,
-  TaskOutlined as ReceiveIcon,
   VisibilityOutlined as ViewIcon,
   DescriptionOutlined as ManageIcon
 } from '@mui/icons-material'
@@ -16,7 +15,6 @@ import {
 const DocumentIssuingActions = ({
   data,
   state,
-  onReceive,
   onManage,
   onView
 }) => {
@@ -57,19 +55,6 @@ const DocumentIssuingActions = ({
       >
         {
           state === `pending-issue` &&
-          <MenuItem
-            sx={{ fontWeight: 500 }}
-            onClick={() => {
-              onReceive(data.id)
-              actionCloseHandler()
-            }}
-            dense
-          >
-            <ReceiveIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Receive
-          </MenuItem>}
-
-        {
-          state === `issue-receive` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {

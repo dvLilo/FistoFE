@@ -97,17 +97,6 @@ const DocumentChequingFilter = (props) => {
     setAnchor(null)
   }
 
-  const filterSubmitHandler = () => {
-    onFilter({
-      cheque_from: filter.from,
-      cheque_to: filter.to,
-      types: filter.types,
-      suppliers: filter.suppliers.length ? filter.suppliers.map((item) => item.id) : null
-    })
-
-    filterCloseHandler()
-  }
-
   const filterClearHandler = () => {
     setFilter({
       from: null,
@@ -122,6 +111,17 @@ const DocumentChequingFilter = (props) => {
       types: null,
       suppliers: null
     })
+  }
+
+  const filterSubmitHandler = () => {
+    onFilter({
+      cheque_from: filter.from,
+      cheque_to: filter.to,
+      types: filter.types,
+      suppliers: filter.suppliers.length ? filter.suppliers.map((item) => item.id) : null
+    })
+
+    filterCloseHandler()
   }
 
   const filterCheckHandler = (e) => {

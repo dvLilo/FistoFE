@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 
 import axios from 'axios'
 
@@ -28,15 +28,14 @@ import {
 
 import {
   Search,
-  Close,
-  AccessTime
+  Close
 } from '@mui/icons-material'
 
 import statusColor from '../../colors/statusColor'
 
 import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
-import useTransactions from '../../hooks/useTransactions'
+import useCheques from '../../hooks/useCheques'
 
 import {
   EXECUTIVE,
@@ -45,7 +44,6 @@ import {
 
 import EmptyImage from '../../assets/img/empty.svg'
 
-import TransferDialog from '../../components/TransferDialog'
 import TablePreloader from '../../components/TablePreloader'
 import FilterPopover from '../../components/FilterPopover'
 
@@ -63,24 +61,13 @@ const DocumentSigning = () => {
     changeStatus,
     changePage,
     changeRows
-  } = useTransactions("/api/transactions")
+  } = useCheques("/api/cheques", "pending-executive")
 
   const toast = useToast()
   const confirm = useConfirm()
 
   const [search, setSearch] = React.useState("")
-  const [state, setState] = React.useState("pending")
-
-  const [transfer, setTransfer] = React.useState({
-    open: false,
-    data: null,
-    process: null,
-    subprocess: null,
-    onClose: () => setTransfer(currentValue => ({
-      ...currentValue,
-      open: false
-    }))
-  })
+  const [state, setState] = React.useState("pending-executive")
 
   const [manage, setManage] = React.useState({
     open: false,
@@ -165,7 +152,7 @@ const DocumentSigning = () => {
                 children: <span className="FstoTabsIndicator-root" />
               }}
             >
-              <Tab className="FstoTab-root" label="Pending" value="pending" disableRipple />
+              <Tab className="FstoTab-root" label="Pending" value="pending-executive" disableRipple />
               <Tab className="FstoTab-root" label="Received" value="executive-receive" disableRipple />
               <Tab className="FstoTab-root" label="Transmitted" value="executive-executive" disableRipple />
             </Tabs>
@@ -215,11 +202,11 @@ const DocumentSigning = () => {
             <TableHead className="FstoTableHead-root">
               <TableRow className="FstoTableRow-root">
                 <TableCell className="FstoTableCell-root FstoTableCell-head">
-                  <TableSortLabel active={false}>TRANSACTION</TableSortLabel>
+                  <TableSortLabel active={false}>VOUCHER DETAILS</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableCell-root FstoTableCell-head">
-                  <TableSortLabel active={false}>REQUESTOR</TableSortLabel>
+                  <TableSortLabel active={false}>CHEQUE DETAILS</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableCell-root FstoTableCell-head">
@@ -228,10 +215,6 @@ const DocumentSigning = () => {
 
                 <TableCell className="FstoTableCell-root FstoTableCell-head">
                   <TableSortLabel active={false}>AMOUNT DETAILS</TableSortLabel>
-                </TableCell>
-
-                <TableCell className="FstoTableCell-root FstoTableCell-head">
-                  <TableSortLabel active={false}>PO DETAILS</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">STATUS</TableCell>
@@ -250,65 +233,77 @@ const DocumentSigning = () => {
                 && data.data.map((item, index) => (
                   <TableRow className="FstoTableRow-root" key={index} hover>
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
-                      <Typography className="FstoTypography-root FstoTypography-transaction" variant="button">
-                        TAG#{item.tag_no}&nbsp;&mdash;&nbsp;{item.document_type}
-                        {
-                          item.document_id === 4 && item.payment_type.toLowerCase() === `partial` &&
-                          <Chip className="FstoChip-root FstoChip-payment" label={item.payment_type} size="small" />
-                        }
-                        {
-                          Boolean(item.is_latest_transaction) &&
-                          <Chip className="FstoChip-root FstoChip-latest" label="Latest" size="small" color="primary" />
-                        }
-                        {
-                          item.supplier.supplier_type.id === 1 &&
-                          <Chip className="FstoChip-root FstoChip-priority" label={item.supplier.supplier_type.name} size="small" color="secondary" />
-                        }
+                      <Typography className="FstoTypography-root FstoTypography-transaction" variant="button" gap={1}>
+                        <span>TAG#{item.tag_no}</span>
+
+                        &mdash;
+
+                        <span>{item.voucher.no}</span>
+
+                        &mdash;
+
+                        <span>
+                          {item.document.name}
+                          {
+                            item.supplier.type.toUpperCase() === "RUSH" &&
+                            <Chip className="FstoChip-root FstoChip-priority" label={item.supplier.type} size="small" color="secondary" />
+                          }
+                        </span>
                       </Typography>
 
-                      <Typography className="FstoTypography-root FstoTypography-supplier" variant="caption">
-                        {item.supplier.name}
+                      <Typography className="FstoTypography-root FstoTypography-dates" variant="caption">
+                        Voucher Month: {moment(item.date_requested).format("MMMM YYYY")}
                       </Typography>
 
                       <Typography className="FstoTypography-root FstoTypography-remarks" variant="h6">
+                        {item.supplier.name}
+                      </Typography>
+
+                      <Typography className="FstoTypography-root FstoTypography-supplier" variant="caption" sx={{ textTransform: "unset!important" }}>
                         {
                           item.remarks
                             ? item.remarks
-                            : <React.Fragment>&mdash;</React.Fragment>
+                            : <Fragment>&mdash;</Fragment>
                         }
                       </Typography>
 
                       <Typography className="FstoTypography-root FstoTypography-dates" variant="caption">
-                        <AccessTime sx={{ fontSize: `1.3em` }} />
                         {moment(item.date_requested).format("MMMM DD, YYYY — hh:mm A")}
                       </Typography>
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
-                      <Typography className="FstoTypography-root FstoTypography-requestor" variant="subtitle1">
-                        {item.users.first_name.toLowerCase()} {item.users.middle_name?.toLowerCase()} {item.users.last_name.toLowerCase()}
+                      <Stack direction="row" alignItems="center">
+                        <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
+                          {item.cheques.at(0).bank.name}
+                        </Typography>
+
+                        {
+                          item.cheques.length > 1 &&
+                          <Chip className="FstoChip-root FstoChip-priority" label={`+${item.cheques.length - 1} more`} size="small" />
+                        }
+                      </Stack>
+
+                      <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
+                        {item.cheques.at(0).no}
                       </Typography>
 
-                      <Typography variant="subtitle2">
-                        {item.users.department[0].name}
-                      </Typography>
-
-                      <Typography variant="subtitle2">
-                        {item.users.position}
+                      <Typography className="FstoTypography-root FstoTypography-amount" variant="h6">
+                        &#8369;{item.cheques.at(0).amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
                       </Typography>
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
                       <Typography variant="subtitle1">
-                        {item.company}
+                        {item.company.name}
                       </Typography>
 
                       <Typography variant="subtitle2">
-                        {item.department}
+                        {item.department.name}
                       </Typography>
 
                       <Typography variant="subtitle2">
-                        {item.location}
+                        {item.location.name}
                       </Typography>
                     </TableCell>
 
@@ -323,30 +318,6 @@ const DocumentSigning = () => {
                         {item.document_id !== 4 && item.document_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
                         {item.document_id === 4 && item.referrence_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
                       </Typography>
-                    </TableCell>
-
-                    <TableCell className="FstoTableCell-root FstoTableCell-body">
-                      {
-                        Boolean(item.po_details.length) &&
-                        <React.Fragment>
-                          <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
-                            {item.po_details[0].po_no.toUpperCase()}
-                            {item.po_details.length > 1 && <React.Fragment>&nbsp;&bull;&bull;&bull;</React.Fragment>}
-                          </Typography>
-
-                          <Typography className="FstoTypography-root FstoTypography-amount" variant="h6">
-                            &#8369;
-                            {item.po_details[0].po_total_amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
-                          </Typography>
-                        </React.Fragment>
-                      }
-
-                      {
-                        !Boolean(item.po_details.length) &&
-                        <React.Fragment>
-                          &mdash;
-                        </React.Fragment>
-                      }
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
@@ -405,11 +376,6 @@ const DocumentSigning = () => {
           {...manage}
           state={state}
           refetchData={refetchData}
-        />
-
-        <TransferDialog
-          {...transfer}
-          onSuccess={refetchData}
         />
       </Paper>
     </Box>
