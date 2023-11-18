@@ -292,15 +292,14 @@ const DocumentConfidentialVoucheringTransaction = (props) => {
   // } = useTransaction(transaction?.id)
 
   const {
-    refetch: fetchApprover,
     data: APPROVER_LIST,
     status: APPROVER_STATUS
-  } = useApprover()
+  } = useApprover({
+    enabled: open
+  })
 
   React.useEffect(() => {
     // if (open) fetchTransaction()
-
-    if (open && !APPROVER_LIST) fetchApprover()
     // eslint-disable-next-line
   }, [open])
 
