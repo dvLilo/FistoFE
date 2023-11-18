@@ -62,6 +62,9 @@ import FilterPopover from '../../components/FilterPopover'
 
 import DocumentTaggingActions from './DocumentTaggingActions'
 import DocumentTaggingTransaction from './DocumentTaggingTransaction'
+import DocumentTaggingDialog from "./DocumentTaggingDialog"
+
+import '../../assets/css/styles.tagging.scss'
 
 const DocumentTagging = () => {
 
@@ -102,6 +105,16 @@ const DocumentTagging = () => {
     transaction: null,
     onBack: undefined,
     onClose: () => setManage(currentValue => ({
+      ...currentValue,
+      open: false
+    }))
+  })
+
+  const [multiTag, setMultiTag] = React.useState({
+    open: false,
+    data: null,
+    process: null,
+    onClose: () => setMultiTag(currentValue => ({
       ...currentValue,
       open: false
     }))
@@ -264,7 +277,7 @@ const DocumentTagging = () => {
     ]))
   }
 
-  const onReceiveAll = () => {
+  const onReceiveAll = (data) => {
     confirm({
       open: true,
       wait: true,
@@ -273,7 +286,7 @@ const DocumentTagging = () => {
         try {
           response = await axios.post(`api/transactions/flow/receive`, {
             process: TAG,
-            transactions: selected
+            transactions: data
           })
 
           const { message } = response.data
@@ -297,8 +310,13 @@ const DocumentTagging = () => {
     })
   }
 
-  const onTagAll = () => {
-
+  const onTagAll = (data) => {
+    setMultiTag(currentValue => ({
+      ...currentValue,
+      open: true,
+      process: TAG,
+      data,
+    }))
   }
 
   return (
@@ -410,7 +428,7 @@ const DocumentTagging = () => {
                           sx={{ fontWeight: 500 }}
                           onClick={() => {
                             setAnchor(null)
-                            onReceiveAll()
+                            onReceiveAll(selected)
                           }}
                           dense
                         >
@@ -423,7 +441,7 @@ const DocumentTagging = () => {
                           sx={{ fontWeight: 500 }}
                           onClick={() => {
                             setAnchor(null)
-                            onTagAll()
+                            onTagAll(selected)
                           }}
                           dense
                         >
@@ -460,7 +478,21 @@ const DocumentTagging = () => {
                     {
                       !!state.match(/pending|receive/gi) && status === 'success' &&
                       <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                        <Checkbox className="FstoCheckbox-root" onChange={onCheck} value={item.id} checked={selected.includes(item.id)} />
+                        <Checkbox
+                          className="FstoCheckbox-root"
+                          value={item.id}
+                          onChange={onCheck}
+                          checked={selected.includes(item.id)}
+                        // disabled={
+                        //   !!state.match(/receive/gi) &&
+                        //   !!selected.length &&
+                        //   !selected.every((selectedItem) => {
+                        //     const selectedCompany = data.data.find((dataItem) => dataItem.id === selectedItem)
+
+                        //     return selectedCompany.company_id === item.company_id
+                        //   })
+                        // }
+                        />
                       </TableCell>}
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
@@ -637,6 +669,8 @@ const DocumentTagging = () => {
           showFirstButton
           showLastButton
         />
+
+        <DocumentTaggingDialog onSuccess={refetchData} {...multiTag} />
 
         <DocumentTaggingTransaction state={state} refetchData={refetchData} onHold={onHold} onUnhold={onUnhold} onReturn={onReturn} onVoid={onVoid} {...manage} />
 
