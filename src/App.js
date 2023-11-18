@@ -52,6 +52,7 @@ import DocumentReturnedRequest from './routes/requestor/returned/ReturnedDocumen
 import DocumentTagging from './routes/tagging/DocumentTagging'
 import DocumentReturnedTag from './routes/tagging/returned/ReturnedDocument'
 
+// GAS (Transmitting)
 import DocumentTransferring from './routes/transferring/DocumentTransferring'
 
 // Vouchering
@@ -86,6 +87,9 @@ import DocumentReturnedIssue from './routes/issuing/returned/ReturnedDocument'
 
 // Releasing
 import DocumentReleasing from './routes/releasing/DocumentReleasing'
+
+// GAS (Transmitting)
+import DocumentDistributing from './routes/distributing/DocumentDistributing'
 
 // Filing
 import DocumentFiling from './routes/filing/DocumentFiling'
@@ -377,6 +381,12 @@ const App = () => {
             <Route exact path="/document/transmitting" element={<ProtectedRoute permission={25} />}>
               <Route index exact strict
                 element={<DocumentTransferring />}
+              />
+            </Route>
+
+            <Route exact path="/document/filing" element={<ProtectedRoute permission={26} />}>
+              <Route index exact strict
+                element={<DocumentDistributing />}
               />
             </Route>
 
