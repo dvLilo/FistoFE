@@ -168,6 +168,10 @@ const Sidebar = () => {
                   && <RouterLink className="FstoSidebarLink-root" to="/counter-receipt/monitoring">Monitoring of Counter Receipt</RouterLink>
                 }
 
+                {user.permissions.includes(26)
+                  && <RouterLink className="FstoSidebarLink-root" to="/document/filing">Filing Of Official Receipt</RouterLink>
+                }
+
 
                 {user.permissions.includes(20)
                   && <RouterLink className="FstoSidebarLink-root" to="/document/returned-documents">Returned/Held Documents</RouterLink>
