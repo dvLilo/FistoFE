@@ -148,7 +148,7 @@ const DocumentAuditingTransaction = (props) => {
 
     setViewCheque(currentValue => ({
       ...currentValue,
-      state: "-release",
+      state,
       transaction,
       open: true,
       onBack: onBack

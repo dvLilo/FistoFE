@@ -227,7 +227,7 @@ const ChequeEntryDialog = ({
       ]
     }))
 
-    const check = cheques.some((item) => item.no === CQ.no)
+    const check = cheques.some((item) => item.no === CQ.no && item.bank.id === CQ.bank.id)
     if (check && !CQ.update) {
       setError(currentValue => ({
         status: true,
@@ -290,7 +290,7 @@ const ChequeEntryDialog = ({
 
       <DialogContent className="FstoDialogCheque-content">
         {
-          Boolean(state) && !Boolean(state.match(/file|reverse|clear|return-tag|return-voucher|release-|counter-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/file|reverse|clear|return-tag|return-voucher|audit-|release-|counter-.*/)) &&
           <Box className="FstoBoxCheque-root">
             <Autocomplete
               className="FstoSelectForm-root"
@@ -298,7 +298,7 @@ const ChequeEntryDialog = ({
               options={TYPE_LIST}
               value={TYPE_LIST.find((row) => row.name === CQ.type) || null}
               disabled={
-                Boolean(state.match(/issue-|return-.*/))
+                Boolean(state.match(/^issue|^return/gi))
               }
               renderInput={
                 (props) => <TextField {...props} label="Type" variant="outlined" />
@@ -329,7 +329,7 @@ const ChequeEntryDialog = ({
               options={BANKS_LIST || []}
               value={CQ.bank}
               disabled={
-                Boolean(state.match(/issue-|return-.*/))
+                Boolean(state.match(/^issue|^return/gi))
               }
               loading={
                 BANKS_STATUS === 'loading'
@@ -363,7 +363,7 @@ const ChequeEntryDialog = ({
               type="number"
               value={CQ.no}
               disabled={
-                Boolean(state.match(/issue-.*/))
+                Boolean(state.match(/^issue/gi))
               }
               error={
                 error.status
@@ -389,12 +389,14 @@ const ChequeEntryDialog = ({
             <LocalizationProvider dateAdapter={DateAdapter}>
               <DatePicker
                 value={CQ.date}
+                disabled={
+                  Boolean(state.match(/^cheque/gi))
+                }
                 renderInput={
                   (props) => <TextField {...props} className="FstoTextfieldForm-root" label="Date" variant="outlined" size="small" onKeyPress={(e) => e.preventDefault()} />
                 }
                 onChange={(value) => setCQ(currentValue => ({
                   ...currentValue,
-                  // date: new Date(value).toISOString()
                   date: moment(value).format("YYYY-MM-DD")
                 }))}
                 showToolbar
@@ -409,7 +411,7 @@ const ChequeEntryDialog = ({
               size="small"
               value={CQ.amount}
               disabled={
-                Boolean(state.match(/issue-|return-.*/))
+                Boolean(state.match(/^issue|^return/gi))
               }
               InputProps={{
                 inputComponent: NumberField
@@ -430,7 +432,6 @@ const ChequeEntryDialog = ({
                 !Boolean(CQ.no) ||
                 !Boolean(CQ.type) ||
                 !Boolean(CQ.bank) ||
-                !Boolean(CQ.date) ||
                 !Boolean(CQ.amount) ||
                 (error.status && Boolean(error.data.cheque_no)) ||
                 (validate.status && Boolean(validate.data.includes('cheque_no')))
@@ -472,7 +473,7 @@ const ChequeEntryDialog = ({
                     <TableCell className="FstoTabelCellCheque-root">Date</TableCell>
                     <TableCell>Amount</TableCell>
                     {
-                      Boolean(state) && !Boolean(state.match(/file|reverse|clear|return-tag|return-voucher|release-|counter-.*/)) &&
+                      Boolean(state) && !Boolean(state.match(/file|reverse|clear|return-tag|return-voucher|audit-|release-|counter-.*/)) &&
                       <TableCell align="right">Action</TableCell>
                     }
                   </TableRow>
@@ -495,7 +496,11 @@ const ChequeEntryDialog = ({
                         </TableCell>
 
                         <TableCell className="FstoTabelCellCheque-root" size="small">
-                          {moment(item.date).format("MM/DD/YYYY")}
+                          {
+                            item.date
+                              ? moment(item.date).format("MM/DD/YYYY")
+                              : <>&mdash;</>
+                          }
                         </TableCell>
 
                         <TableCell size="small">
@@ -503,7 +508,7 @@ const ChequeEntryDialog = ({
                         </TableCell>
 
                         {
-                          Boolean(state) && !Boolean(state.match(/file|reverse|clear|return-tag|return-voucher|release-|counter-.*/)) &&
+                          Boolean(state) && !Boolean(state.match(/file|reverse|clear|return-tag|return-voucher|audit-|release-|counter-.*/)) &&
                           <TableCell align="right" size="small">
                             <IconButton onClick={() => editChequeHandler(item, index)}>
                               <EditIcon fontSize="small" />
@@ -545,7 +550,7 @@ const ChequeEntryDialog = ({
 
             {
               Boolean(cheques.length) &&
-              cheques.map((item) => item.amount).reduce((a, b) => a + b, 0) !== (transaction?.document_amount || transaction?.referrence_amount) &&
+              cheques.reduce((a, b) => a + b.amount, 0) !== (transaction?.document_amount || transaction?.referrence_amount) &&
               <Stack className="FstoStackAccountTitle-root" direction="row" justifyContent="flex-end">
                 <Typography variant="caption" color="error">Total cheque and document amount are not equal.</Typography>
               </Stack>}
@@ -563,7 +568,7 @@ const ChequeEntryDialog = ({
         </Button>
 
         {
-          Boolean(state) && !Boolean(state.match(/file|reverse|clear|return-tag|return-voucher|release-|counter-.*/)) &&
+          Boolean(state) && !Boolean(state.match(/file|reverse|clear|return-tag|return-voucher|audit-|release-|counter-.*/)) &&
           <Button
             variant="contained"
             onClick={submitChequehandler}
@@ -575,9 +580,11 @@ const ChequeEntryDialog = ({
               !(accounts.filter((item) => item.entry.toLowerCase() === `debit`).reduce((a, b) => a + b.amount, 0) === (transaction?.document_amount || transaction?.referrence_amount)) ||
               !(accounts.filter((item) => item.entry.toLowerCase() === `credit`).reduce((a, b) => a + b.amount, 0) === (transaction?.document_amount || transaction?.referrence_amount)) ||
               !(cheques.reduce((a, b) => a + b.amount, 0) === (transaction?.document_amount || transaction?.referrence_amount))
+
+              || (state?.match(/^issue/gi) && cheques.some((item) => item.date === null))
             }
             disableElevation
-          > {state?.match(/receive.*/) ? "Submit" : "Save"}
+          > {state?.match(/receive$/gi) ? "Submit" : "Save"}
           </Button>
         }
       </DialogActions>
