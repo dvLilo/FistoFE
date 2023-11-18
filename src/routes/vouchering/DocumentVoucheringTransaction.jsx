@@ -1,5 +1,7 @@
 import React from 'react'
 
+import NumberFormat from 'react-number-format'
+
 import axios from 'axios'
 
 import moment from 'moment'
@@ -31,6 +33,7 @@ import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
 import useApprover from '../../hooks/useApprover'
 import useTransaction from '../../hooks/useTransaction'
+import useTransactionTypes from '../../hooks/useTransactionTypes'
 
 import {
   VOUCHER
@@ -40,6 +43,29 @@ import TransactionDialog from '../../components/TransactionDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
 import ChequeEntryDialog from '../../components/ChequeEntryDialog'
 import PrintDialog from '../../components/PrintDialog'
+
+const NumberField = React.forwardRef(function NumberField(props, ref) {
+  const { onChange, ...rest } = props
+
+  return (
+    <NumberFormat
+      {...rest}
+      getInputRef={ref}
+      onValueChange={(values) => {
+        onChange({
+          target: {
+            name: props.name,
+            value: values.value,
+          }
+        })
+      }}
+      prefix="₱"
+      allowNegative={false}
+      thousandSeparator
+      isNumericString
+    />
+  )
+})
 
 const DocumentVoucheringTransaction = ({
   state,
@@ -64,15 +90,21 @@ const DocumentVoucheringTransaction = ({
   } = useTransaction(transaction?.id)
 
   const {
-    refetch: fetchApprover,
     data: APPROVER_LIST,
     status: APPROVER_STATUS
-  } = useApprover()
+  } = useApprover({
+    enabled: open
+  })
+
+  const {
+    data: TRANSACTION_TYPE_LIST,
+    status: TRANSACTION_TYPE_STATUS
+  } = useTransactionTypes({
+    enabled: open
+  })
 
   React.useEffect(() => {
     if (open) fetchTransaction()
-
-    if (open && !APPROVER_LIST) fetchApprover()
     // eslint-disable-next-line
   }, [open])
 
@@ -108,9 +140,11 @@ const DocumentVoucheringTransaction = ({
       setVoucherData(currentValue => ({
         ...currentValue,
         voucher: {
-          month: data.voucher?.month || null
+          month: data.voucher?.month
         },
         accounts: data.voucher?.accounts,
+        transaction_type: data.voucher?.transaction_type,
+        input_tax: data.voucher?.input_tax,
 
         ...(Boolean(data.voucher?.approver) && {
           approver: data.voucher?.approver
@@ -128,6 +162,8 @@ const DocumentVoucheringTransaction = ({
       month: null,
     },
     approver: null,
+    transaction_type: null,
+    input_tax: "",
     accounts: []
   })
 
@@ -136,9 +172,10 @@ const DocumentVoucheringTransaction = ({
     state: null,
     transaction: null,
     onBack: undefined,
-    onClose: () => setManageAccountTitle(currentValue => ({
+    onClose: () => setManageAccountTitle((currentValue) => ({
       ...currentValue,
-      open: false
+      open: false,
+      transaction: null
     }))
   })
 
@@ -147,7 +184,7 @@ const DocumentVoucheringTransaction = ({
     state: null,
     transaction: null,
     onBack: undefined,
-    onClose: () => setViewCheque(currentValue => ({
+    onClose: () => setViewCheque((currentValue) => ({
       ...currentValue,
       open: false,
     }))
@@ -158,7 +195,7 @@ const DocumentVoucheringTransaction = ({
     state: null,
     transaction: null,
     onBack: undefined,
-    onClose: () => setViewPrint(currentValue => ({
+    onClose: () => setViewPrint((currentValue) => ({
       ...currentValue,
       open: false,
     }))
@@ -168,9 +205,11 @@ const DocumentVoucheringTransaction = ({
     setVoucherData(currentValue => ({
       ...currentValue,
       voucher: {
-        month: null,
+        month: null
       },
       approver: null,
+      transaction_type: null,
+      input_tax: "",
       accounts: []
     }))
   }
@@ -247,25 +286,36 @@ const DocumentVoucheringTransaction = ({
   const onAccountTitleManage = () => {
     onClose()
 
-    setManageAccountTitle(currentValue => ({
+    setManageAccountTitle((currentValue) => ({
       ...currentValue,
       state,
-      transaction,
+
       open: true,
-      onBack: onBack
+      onBack: onBack,
+      transaction: {
+        ...transaction,
+
+        transaction_type_id: voucherData.transaction_type?.id
+      }
     }))
   }
 
   const onAccountTitleView = () => {
     onClose()
 
-    setManageAccountTitle(currentValue => ({
+    setManageAccountTitle((currentValue) => ({
       ...currentValue,
       state,
-      transaction,
+
       open: true,
       onBack: onBack,
-      ...(Boolean(state.match(/-receive|-hold|-return|-void.*/)) && {
+      transaction: {
+        ...transaction,
+
+        transaction_type_id: voucherData.transaction_type?.id
+      },
+
+      ...(!!state.match(/-receive|-hold|-return|-void/) && {
         state: "transmit-"
       })
     }))
@@ -360,6 +410,24 @@ const DocumentVoucheringTransaction = ({
 
               <Box className="FstoBoxTransactionForm-root">
                 <Box className="FstoBoxTransactionForm-content">
+                  <TextField
+                    className="FstoTextfieldForm-root"
+                    label="Input Tax"
+                    variant="outlined"
+                    size="small"
+                    value={voucherData.input_tax}
+                    InputProps={{
+                      inputComponent: NumberField
+                    }}
+                    onChange={(e) => setVoucherData((currentValue) => ({
+                      ...currentValue,
+                      input_tax: e.target.value
+                    }))}
+                    fullWidth
+                  />
+
+                  <Divider variant="middle" sx={{ marginBottom: "1.25em" }} />
+
                   <LocalizationProvider dateAdapter={DateAdapter}>
                     <DatePicker
                       views={['month', 'year']}
@@ -378,7 +446,36 @@ const DocumentVoucheringTransaction = ({
                     />
                   </LocalizationProvider>
 
-                  <Divider variant="middle" sx={{ margin: "1.25em" }} />
+                  <Autocomplete
+                    className="FstoSelectForm-root"
+                    size="small"
+                    options={TRANSACTION_TYPE_LIST || []}
+                    value={voucherData.transaction_type}
+                    loading={
+                      TRANSACTION_TYPE_STATUS === 'loading'
+                    }
+                    renderInput={
+                      (props) => <TextField {...props} label="Transaction Type" variant="outlined" />
+                    }
+                    PaperComponent={
+                      (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
+                    }
+                    getOptionLabel={
+                      (option) => option.name
+                    }
+                    isOptionEqualToValue={
+                      (option, value) => option.id === value.id
+                    }
+                    onChange={(e, value) => setVoucherData((currentValue) => ({
+                      ...currentValue,
+                      transaction_type: value
+                    }))}
+                    fullWidth
+                    disablePortal
+                    disableClearable
+                  />
+
+                  <Divider variant="middle" sx={{ marginBottom: "1.25em" }} />
 
                   <Autocomplete
                     className="FstoSelectForm-root"
@@ -400,7 +497,7 @@ const DocumentVoucheringTransaction = ({
                     isOptionEqualToValue={
                       (option, value) => option.id === value.id
                     }
-                    onChange={(e, value) => setVoucherData(currentValue => ({
+                    onChange={(e, value) => setVoucherData((currentValue) => ({
                       ...currentValue,
                       approver: value
                     }))}
@@ -428,6 +525,7 @@ const DocumentVoucheringTransaction = ({
                 }
                 disabled={
                   !Boolean(voucherData.approver) ||
+                  !Boolean(voucherData.transaction_type) ||
                   !Boolean(voucherData.voucher.month)
                 }
                 disableElevation

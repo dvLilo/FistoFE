@@ -4,14 +4,14 @@ import { useQuery } from 'react-query'
 
 import useToast from './useToast'
 
-const useApprover = ({
+const useTransactionTypes = ({
   enabled = true
 }) => {
 
   const toast = useToast()
 
-  const fetchApproverList = async () => {
-    return await axios.get(`/api/dropdown/approver`)
+  const fetchTransactionTypes = async () => {
+    return await axios.get(`/api/dropdown/transaction-types`)
   }
 
   const {
@@ -25,10 +25,10 @@ const useApprover = ({
 
     data = [],
     error
-  } = useQuery("APPROVER", fetchApproverList, {
+  } = useQuery("TRANSACTION_TYPES", fetchTransactionTypes, {
     enabled: enabled,
     refetchOnWindowFocus: false,
-    select: (response) => response.data.result.approvers,
+    select: (response) => response.data.result.transaction_types,
     onError: (error) => {
       if (error.request.status !== 404)
         toast({
@@ -54,4 +54,4 @@ const useApprover = ({
   }
 }
 
-export default useApprover
+export default useTransactionTypes
