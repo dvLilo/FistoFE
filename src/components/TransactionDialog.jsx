@@ -411,7 +411,7 @@ const TransactionDialog = ({
 
 
           <Divider className="FstoDividerTransactionDetails-root" textAlign="left">
-            <Typography variant="h6" sx={{ display: "inline-block", fontWeight: 700 }}>Transaction</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 700 }}>Transaction</Typography>
           </Divider>
 
           {
@@ -457,6 +457,9 @@ const TransactionDialog = ({
                   <Stack direction="column">
                     <strong>{formatDates(data.tag.dates.received)} <Chip label="Tagged" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>
                     {
+                      Boolean(data.gas) &&
+                      <strong>{formatDates(data.gas.dates.received)} <Chip label="Transmitted" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}
+                    {
                       Boolean(data.release) &&
                       <strong>{formatDates(data.release.dates.received)} <Chip label="Released" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}
                   </Stack>
@@ -478,6 +481,13 @@ const TransactionDialog = ({
                 Boolean(data.tag) && Boolean(data.tag.no) &&
                 <ListItem className="FstoListItemTransactionDetails-root" dense>
                   <span>Date Tagged:</span>
+                  <strong>{formatDates(data.tag.dates.tagged)}</strong>
+                </ListItem>}
+
+              {
+                Boolean(data.gas) && Boolean(data.gas.dates.gas) &&
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Date Transmitted:</span>
                   <strong>{formatDates(data.tag.dates.tagged)}</strong>
                 </ListItem>}
 
@@ -725,6 +735,14 @@ const TransactionDialog = ({
                 </ListItem>
               }
 
+              {
+                Boolean(data.voucher) && Boolean(data.voucher.input_tax) &&
+                <ListItem className="FstoListItemTransactionDetails-root" dense>
+                  <span>Input Tax:</span>
+                  <strong>&#8369;{data.voucher.input_tax.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}</strong>
+                </ListItem>
+              }
+
               <ListItem className="FstoListItemTransactionDetails-root" dense>
                 <span>Remarks:</span>
                 {
@@ -744,16 +762,19 @@ const TransactionDialog = ({
               <Divider className="FstoDividerTransactionDetails-root" textAlign="left">
                 <Stack direction="row" alignItems="center" gap={1}>
                   {
+                    user?.role.match(/(AP ASSOCIATE|AP SPECIALIST|APPROVER)/gi) &&
                     data.voucher.accounts?.some((item) => !item.is_default) &&
-                    <ReportIcon color="error" fontSize="large" />}
+                    <ReportIcon color="error" fontSize="large" />
+                  }
 
                   <Typography variant="h6" sx={{ fontWeight: 700 }}>Voucher</Typography>
 
                   {
-                    (user?.role.toLowerCase() === `ap associate` || user?.role.toLowerCase() === `ap specialist`) &&
+                    user?.role.match(/(AP ASSOCIATE|AP SPECIALIST)/gi) &&
                     <IconButton onClick={onPrintView}>
                       <PrintIcon />
-                    </IconButton>}
+                    </IconButton>
+                  }
                 </Stack>
               </Divider>
 
