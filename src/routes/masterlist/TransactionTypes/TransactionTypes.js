@@ -85,10 +85,10 @@ const TransactionTypes = () => {
   }
 
   const dataUpdateHandler = (data) => {
-    const { id, name, accounts } = data
+    const { id, transaction_type, accounts } = data
     setUpdate({
       id,
-      name,
+      transaction_type,
       accounts
     })
     window.scrollTo(0, 0)

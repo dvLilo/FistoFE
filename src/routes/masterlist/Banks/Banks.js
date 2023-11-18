@@ -85,7 +85,29 @@ const Banks = () => {
   }
 
   const dataUpdateHandler = (data) => {
-    const { id, code, name, branch, account_no, location, account_title_one, account_title_two } = data
+    const {
+      id,
+      code,
+      name,
+      branch,
+      account_no,
+      location,
+
+      account_title_one,
+      company_one,
+      business_unit_one,
+      department_one,
+      sub_unit_one,
+      location_one,
+
+      account_title_two,
+      company_two,
+      business_unit_two,
+      department_two,
+      sub_unit_two,
+      location_two
+    } = data
+
     setUpdate({
       id,
       code,
@@ -93,8 +115,20 @@ const Banks = () => {
       branch,
       account_no,
       location,
+
       account_title_1: account_title_one,
-      account_title_2: account_title_two
+      company_1: company_one,
+      business_unit_1: business_unit_one,
+      department_1: department_one,
+      sub_unit_1: sub_unit_one,
+      location_1: location_one,
+
+      account_title_2: account_title_two,
+      company_2: company_two,
+      business_unit_2: business_unit_two,
+      department_2: department_two,
+      sub_unit_2: sub_unit_two,
+      location_2: location_two
     })
     window.scrollTo(0, 0)
   }

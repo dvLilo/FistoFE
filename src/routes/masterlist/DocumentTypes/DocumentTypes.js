@@ -85,13 +85,12 @@ const DocumentTypes = () => {
   }
 
   const dataUpdateHandler = (data) => {
-    const { id, type, description, categories, accounts } = data
+    const { id, type, description, categories } = data
     setUpdate({
       id,
       type,
       description,
-      categories,
-      accounts
+      categories
     })
     window.scrollTo(0, 0)
   }

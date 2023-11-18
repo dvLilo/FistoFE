@@ -94,7 +94,7 @@ const TransactionTypesTable = (props) => {
                   </TableCell>
 
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body" sx={{ textTransform: "capitalize" }}>
-                    {data.name}
+                    {data.transaction_type}
                   </TableCell>
 
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body">

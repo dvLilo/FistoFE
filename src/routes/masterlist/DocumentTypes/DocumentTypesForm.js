@@ -11,10 +11,6 @@ import {
 
 import { LoadingButton } from '@mui/lab'
 
-import { AccountBalanceWallet } from '@mui/icons-material'
-
-import DocumentTypesDialog from './DocumentTypesDialog'
-
 const DocumentTypesForm = (props) => {
 
   const {
@@ -27,8 +23,6 @@ const DocumentTypesForm = (props) => {
   const [isSaving, setIsSaving] = React.useState(false)
 
   const [isUpdating, setIsUpdating] = React.useState(false)
-
-  const [isOpen, setIsOpen] = React.useState(false)
 
   const [error, setError] = React.useState({
     status: false,
@@ -45,8 +39,7 @@ const DocumentTypesForm = (props) => {
   const [document, setDocument] = React.useState({
     type: "",
     description: "",
-    categories: [],
-    accounts: []
+    categories: []
   })
 
   React.useEffect(() => {
@@ -55,8 +48,7 @@ const DocumentTypesForm = (props) => {
       setDocument({
         type: data.type,
         description: data.description,
-        categories: data.categories,
-        accounts: data.accounts
+        categories: data.categories
       })
     }
   }, [data])
@@ -201,39 +193,6 @@ const DocumentTypesForm = (props) => {
     })
   }
 
-
-  const accountCloseHandler = () => {
-    setIsOpen(false)
-  }
-
-  const accountInsertHandler = (data) => {
-    setDocument((currentValue) => ({
-      ...currentValue,
-      accounts: [
-        ...currentValue.accounts,
-        data
-      ]
-    }))
-  }
-
-  const accountUpdateHandler = (data, index) => {
-    setDocument((currentValue) => ({
-      ...currentValue,
-      accounts: currentValue.accounts.map((item, i) => {
-        if (i === index) return data
-
-        return item
-      })
-    }))
-  }
-
-  const accountRemoveHandler = (index) => {
-    setDocument((currentValue) => ({
-      ...currentValue,
-      accounts: currentValue.accounts.filter((_, i) => i !== index)
-    }))
-  }
-
   return (
     <form onSubmit={formSubmitHandler}>
       <TextField
@@ -319,22 +278,6 @@ const DocumentTypesForm = (props) => {
         disableCloseOnSelect
       />
 
-      <Button
-        variant="contained"
-        color="info"
-        startIcon={<AccountBalanceWallet />}
-        disabled={
-          !Boolean(document.type.trim()) ||
-          !Boolean(document.description.trim()) ||
-          !Boolean(document.categories.length)
-        }
-        onClick={() => setIsOpen(true)}
-        fullWidth
-        disableElevation
-      >
-        Setup COA
-      </Button>
-
       <LoadingButton
         className="FstoButtonForm-root"
         type="submit"
@@ -369,16 +312,6 @@ const DocumentTypesForm = (props) => {
             : "Clear"
         }
       </Button>
-
-
-      <DocumentTypesDialog
-        open={isOpen}
-        accounts={document.accounts}
-        onInsert={accountInsertHandler}
-        onUpdate={accountUpdateHandler}
-        onRemove={accountRemoveHandler}
-        onClose={accountCloseHandler}
-      />
     </form>
   )
 }

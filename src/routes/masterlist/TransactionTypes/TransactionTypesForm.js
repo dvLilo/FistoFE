@@ -41,7 +41,7 @@ const TransactionTypesForm = (props) => {
     if (data) {
       setIsUpdating(true)
       setTransactionType({
-        name: data.name,
+        name: data.transaction_type,
         accounts: data.accounts
       })
     }
@@ -77,13 +77,29 @@ const TransactionTypesForm = (props) => {
         try {
           if (isUpdating)
             response = await axios.put(`/api/admin/transaction-types/${data.id}`, {
-              name: transactionType.name,
-              accounts: transactionType.accounts,
+              transaction_type: transactionType.name,
+              account: transactionType.accounts.map((item) => ({
+                entry: item.entry,
+                account_title_id: item.account_title.id,
+                company_id: item.company.id,
+                business_unit_id: null,
+                department_id: item.department.id,
+                sub_unit_id: null,
+                location_id: item.location.id
+              })),
             })
           else
             response = await axios.post(`/api/admin/transaction-types`, {
-              name: transactionType.name,
-              accounts: transactionType.accounts,
+              transaction_type: transactionType.name,
+              account: transactionType.accounts.map((item) => ({
+                entry: item.entry,
+                account_title_id: item.account_title.id,
+                company_id: item.company.id,
+                business_unit_id: null,
+                department_id: item.department.id,
+                sub_unit_id: null,
+                location_id: item.location.id
+              })),
             })
 
           toast({
@@ -118,7 +134,7 @@ const TransactionTypesForm = (props) => {
               toast({
                 show: true,
                 title: "Error",
-                message: "Something went wrong whilst saving category.",
+                message: "Something went wrong whilst saving transaction type.",
                 severity: "error"
               })
           }

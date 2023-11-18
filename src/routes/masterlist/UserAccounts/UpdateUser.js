@@ -119,6 +119,10 @@ const UpdateUser = () => {
       {
         id: 25,
         name: "Transmittal of Official Receipt"
+      },
+      {
+        id: 26,
+        name: "Filing of Official Receipt"
       }
     ],
     audit: [
