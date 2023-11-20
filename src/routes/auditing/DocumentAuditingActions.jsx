@@ -58,7 +58,7 @@ const DocumentAuditingActions = ({
         disablePortal
       >
         {
-          state === `pending` &&
+          state === `pending-audit` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {

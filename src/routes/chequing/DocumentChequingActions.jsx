@@ -51,7 +51,7 @@ const DocumentChequingActions = ({ data, state, onReceive, onManage, onView, onC
         disablePortal
       >
         {
-          state === `pending` &&
+          state === `pending-cheque` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
