@@ -8,12 +8,11 @@ import {
 
 import {
   MoreHoriz as MoreIcon,
-  TaskOutlined as ReceiveIcon,
   VisibilityOutlined as ViewIcon,
   DescriptionOutlined as ManageIcon
 } from '@mui/icons-material'
 
-const DocumentClearingActions = ({ data, state, onReceive, onManage, onView }) => {
+const DocumentClearingActions = ({ data, state, onManage, onView }) => {
 
   const [anchor, setAnchor] = React.useState(null)
 
@@ -51,19 +50,6 @@ const DocumentClearingActions = ({ data, state, onReceive, onManage, onView }) =
       >
         {
           state === `pending-clear` &&
-          <MenuItem
-            sx={{ fontWeight: 500 }}
-            onClick={() => {
-              onReceive(data.id)
-              actionCloseHandler()
-            }}
-            dense
-          >
-            <ReceiveIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Receive
-          </MenuItem>}
-
-        {
-          state === `clear-receive` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {

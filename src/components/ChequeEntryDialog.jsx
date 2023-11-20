@@ -39,7 +39,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import ErrorIcon from '@mui/icons-material/Error';
+// import ErrorIcon from '@mui/icons-material/Error';
 
 import useBanks from '../hooks/useBanks'
 
@@ -447,18 +447,18 @@ const ChequeEntryDialog = ({
           <React.Fragment>
             <Button
               sx={{ float: "right", marginTop: 1, marginBottom: 2 }}
-              color={
-                accounts.some((item) => Boolean(item.entry.match(/credit/i))) && accounts.reduce((a, b) => a + b.amount / 2, 0) === (transaction?.document_amount || transaction?.referrence_amount)
-                  ? "primary"
-                  : "error"
-              }
-              startIcon={
-                (
-                  !accounts.some((item) => Boolean(item.entry.match(/credit/i))) ||
-                  !Boolean(accounts.reduce((a, b) => a + b.amount / 2, 0) === (transaction?.document_amount || transaction?.referrence_amount))
-                )
-                && <ErrorIcon />
-              }
+              // color={
+              //   accounts.some((item) => Boolean(item.entry.match(/credit/i))) && accounts.reduce((a, b) => a + b.amount / 2, 0) === (transaction?.document_amount || transaction?.referrence_amount)
+              //     ? "primary"
+              //     : "error"
+              // }
+              // startIcon={
+              //   (
+              //     !accounts.some((item) => Boolean(item.entry.match(/credit/i))) ||
+              //     !Boolean(accounts.reduce((a, b) => a + b.amount / 2, 0) === (transaction?.document_amount || transaction?.referrence_amount))
+              //   )
+              //   && <ErrorIcon />
+              // }
               onClick={viewAccountTitleHandler}
             > View Account Title Details
             </Button>
@@ -548,12 +548,12 @@ const ChequeEntryDialog = ({
               </Typography>
             </Stack>
 
-            {
+            {/* {
               Boolean(cheques.length) &&
               cheques.reduce((a, b) => a + b.amount, 0) !== (transaction?.document_amount || transaction?.referrence_amount) &&
               <Stack className="FstoStackAccountTitle-root" direction="row" justifyContent="flex-end">
                 <Typography variant="caption" color="error">Total cheque and document amount are not equal.</Typography>
-              </Stack>}
+              </Stack>} */}
           </React.Fragment>
         }
       </DialogContent>
@@ -577,11 +577,12 @@ const ChequeEntryDialog = ({
               !Boolean(accounts.length) ||
               !accounts.some((item) => item.entry.toLowerCase() === `debit`) ||
               !accounts.some((item) => item.entry.toLowerCase() === `credit`) ||
-              !(accounts.filter((item) => item.entry.toLowerCase() === `debit`).reduce((a, b) => a + b.amount, 0) === (transaction?.document_amount || transaction?.referrence_amount)) ||
-              !(accounts.filter((item) => item.entry.toLowerCase() === `credit`).reduce((a, b) => a + b.amount, 0) === (transaction?.document_amount || transaction?.referrence_amount)) ||
-              !(cheques.reduce((a, b) => a + b.amount, 0) === (transaction?.document_amount || transaction?.referrence_amount))
 
-              || (state?.match(/^issue/gi) && cheques.some((item) => item.date === null))
+              // !(accounts.filter((item) => item.entry.toLowerCase() === `debit`).reduce((a, b) => a + b.amount, 0) === (transaction?.document_amount || transaction?.referrence_amount)) ||
+              // !(accounts.filter((item) => item.entry.toLowerCase() === `credit`).reduce((a, b) => a + b.amount, 0) === (transaction?.document_amount || transaction?.referrence_amount)) ||
+              // !(cheques.reduce((a, b) => a + b.amount, 0) === (transaction?.document_amount || transaction?.referrence_amount))
+
+              (state?.match(/^issue/gi) && cheques.some((item) => item.date === null))
             }
             disableElevation
           > {state?.match(/receive$/gi) ? "Submit" : "Save"}
