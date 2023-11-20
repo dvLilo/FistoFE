@@ -338,7 +338,7 @@ const DocumentIssuing = () => {
             <TableHead className="FstoTableHead-root">
               <TableRow className="FstoTableRow-root">
                 {
-                  state === 'pending' && status === 'success' &&
+                  state === 'pending-issue' && status === 'success' &&
                   <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">
                     <IconButton onClick={(e) => setAnchor(e.currentTarget)} disabled={!selected.length}>
                       <MoreHoriz />
@@ -407,7 +407,7 @@ const DocumentIssuing = () => {
                 && data.data.map((item, index) => (
                   <TableRow className="FstoTableRow-root" key={index} selected={selected.includes(item.id)} hover>
                     {
-                      state === 'pending' && status === 'success' &&
+                      state === 'pending-issue' && status === 'success' &&
                       <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
                         <Checkbox className="FstoCheckbox-root" onChange={onCheck} value={item.id} checked={selected.includes(item.id)} />
                       </TableCell>}

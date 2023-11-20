@@ -82,7 +82,7 @@ const DocumentDistributingActions = ({
           </MenuItem>}
 
         {
-          `discharge-discharge` &&
+          state === `discharge-discharge` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {

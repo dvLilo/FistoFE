@@ -56,7 +56,7 @@ const DocumentSigningActions = ({
         disablePortal
       >
         {
-          state === `pending` &&
+          state === `pending-executive` &&
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {

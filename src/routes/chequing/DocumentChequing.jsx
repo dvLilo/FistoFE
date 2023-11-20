@@ -23,12 +23,17 @@ import {
   Stack,
   Chip,
   Divider,
-  OutlinedInput
+  OutlinedInput,
+  Checkbox,
+  MenuItem,
+  Menu
 } from '@mui/material'
 
 import {
   Search,
-  Close
+  Close,
+  TaskOutlined,
+  MoreHoriz
 } from '@mui/icons-material'
 
 import statusColor from '../../colors/statusColor'
@@ -73,8 +78,12 @@ const DocumentChequing = () => {
   const toast = useToast()
   const confirm = useConfirm()
 
+  const [anchor, setAnchor] = React.useState(null)
+
   const [search, setSearch] = React.useState("")
   const [state, setState] = React.useState("pending-cheque")
+
+  const [selected, setSelected] = React.useState([])
 
   const [reason, setReason] = React.useState({
     open: false,
@@ -242,6 +251,52 @@ const DocumentChequing = () => {
     }))
   }
 
+  const onCheck = (e) => {
+    if (e.target.checked) {
+      return setSelected((currentValue) => ([
+        ...currentValue,
+        parseInt(e.target.value)
+      ]))
+    }
+
+    setSelected((currentValue) => ([
+      ...currentValue.filter((item) => item !== parseInt(e.target.value))
+    ]))
+  }
+
+  const onReceiveAll = () => {
+    confirm({
+      open: true,
+      wait: true,
+      onConfirm: async () => {
+        let response
+        try {
+          response = await axios.post(`api/transactions/flow/receive`, {
+            process: CHEQUE,
+            transactions: selected
+          })
+
+          const { message } = response.data
+
+          setSelected([])
+          refetchData()
+          toast({
+            message,
+            title: "Success!"
+          })
+        } catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to receive transaction. Please try again later."
+          })
+        }
+      }
+    })
+  }
+
   return (
     <Box className="FstoBox-root">
       <Paper className="FstoPaperTable-root" elevation={1}>
@@ -317,6 +372,43 @@ const DocumentChequing = () => {
           <Table className="FstoTable-root" size="small">
             <TableHead className="FstoTableHead-root">
               <TableRow className="FstoTableRow-root">
+                {
+                  state === 'pending-cheque' && status === 'success' &&
+                  <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">
+                    <IconButton onClick={(e) => setAnchor(e.currentTarget)} disabled={!selected.length}>
+                      <MoreHoriz />
+                    </IconButton>
+
+                    <Menu
+                      open={!!anchor}
+                      elevation={2}
+                      anchorEl={anchor}
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                      }}
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'left',
+                      }}
+                      MenuListProps={{
+                        sx: { py: 0.5 }
+                      }}
+                      onClose={() => setAnchor(null)}
+                      disablePortal
+                    >
+                      <MenuItem
+                        sx={{ fontWeight: 500 }}
+                        onClick={() => {
+                          setAnchor(null)
+                          onReceiveAll()
+                        }}
+                        dense
+                      >
+                        <TaskOutlined sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Receive
+                      </MenuItem>
+                    </Menu>
+                  </TableCell>}
                 <TableCell className="FstoTableCell-root FstoTableCell-head">
                   <TableSortLabel active={false}>VOUCHER DETAILS</TableSortLabel>
                 </TableCell>
@@ -347,7 +439,13 @@ const DocumentChequing = () => {
               {
                 status === 'success'
                 && data.data.map((item, index) => (
-                  <TableRow className="FstoTableRow-root" key={index} hover>
+                  <TableRow className="FstoTableRow-root" key={index} selected={selected.includes(item.id)} hover>
+                    {
+                      state === 'pending-cheque' && status === 'success' &&
+                      <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
+                        <Checkbox className="FstoCheckbox-root" onChange={onCheck} value={item.id} checked={selected.includes(item.id)} />
+                      </TableCell>}
+
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
                       <Typography className="FstoTypography-root FstoTypography-transaction" variant="button" gap={1}>
                         <span>TAG#{item.tag_no}</span>
