@@ -468,7 +468,8 @@ const DocumentVoucheringTransaction = ({
                     }
                     onChange={(e, value) => setVoucherData((currentValue) => ({
                       ...currentValue,
-                      transaction_type: value
+                      transaction_type: value,
+                      accounts: []
                     }))}
                     fullWidth
                     disablePortal
