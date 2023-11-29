@@ -382,6 +382,14 @@ const DocumentFiling = () => {
                           item.supplier.supplier_type.id === 1 &&
                           <Chip className="FstoChip-root FstoChip-priority" label={item.supplier.supplier_type.name} size="small" color="secondary" />
                         }
+                        {
+                          item.supplier.supplier_type.id === 2 &&
+                          <Chip className="FstoChip-root FstoChip-priority" label={item.supplier.supplier_type.name} size="small" color="default" />
+                        }
+                        {
+                          item.supplier.supplier_type.id === 3 &&
+                          <Chip className="FstoChip-root FstoChip-priority" label={item.supplier.supplier_type.name} size="small" color="default" />
+                        }
                       </Typography>
 
                       <Typography className="FstoTypography-root FstoTypography-supplier" variant="caption">

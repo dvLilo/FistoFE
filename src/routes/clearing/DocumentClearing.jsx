@@ -62,7 +62,7 @@ const DocumentClearing = () => {
     changeStatus,
     changePage,
     changeRows
-  } = useCheques("/api/cheques", "pending-clear")
+  } = useCheques("/api/clear-cheques", "pending-clear")
 
   const toast = useToast()
   const confirm = useConfirm()
@@ -306,10 +306,8 @@ const DocumentClearing = () => {
 
                         <span>
                           {item.document.name}
-                          {
-                            item.supplier.type.toUpperCase() === "RUSH" &&
-                            <Chip className="FstoChip-root FstoChip-priority" label={item.supplier.type} size="small" color="secondary" />
-                          }
+
+                          <Chip className="FstoChip-root FstoChip-priority" label={item.supplier.type} size="small" color="secondary" />
                         </span>
                       </Typography>
 

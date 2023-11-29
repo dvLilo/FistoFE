@@ -424,10 +424,8 @@ const DocumentIssuing = () => {
 
                         <span>
                           {item.document.name}
-                          {
-                            item.supplier.type.toUpperCase() === "RUSH" &&
-                            <Chip className="FstoChip-root FstoChip-priority" label={item.supplier.type} size="small" color="secondary" />
-                          }
+
+                          <Chip className="FstoChip-root FstoChip-priority" label={item.supplier.type} size="small" color="secondary" />
                         </span>
                       </Typography>
 
