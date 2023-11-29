@@ -553,10 +553,12 @@ const AccountTitleDialog = ({
             </Stack>}
 
           {
+            !state?.match(/clear/gi) &&
             accounts.some((item) => item.entry === `Debit`) &&
             accounts.some((item) => item.entry === `Credit`) &&
-            accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0) &&
-            (accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) !== (transaction?.document_amount || transaction?.referrence_amount) || accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0) !== (transaction?.document_amount || transaction?.referrence_amount)) &&
+            accounts.filter((item) => item.entry === `Debit`).reduce((a, b) => a + b.amount, 0) === accounts.filter((item) => item.entry === `Credit`).reduce((a, b) => a + b.amount, 0) &&
+            accounts.filter((item) => item.entry === `Debit`).reduce((a, b) => a + b.amount, 0) !== (transaction?.document_amount || transaction?.referrence_amount) &&
+            accounts.filter((item) => item.entry === `Credit`).reduce((a, b) => a + b.amount, 0) !== (transaction?.document_amount || transaction?.referrence_amount) &&
             <Stack className="FstoStackAccountTitle-root" direction="row" justifyContent="flex-end">
               <Typography variant="caption" color="error">Total debit, credit and document amount are not equal.</Typography>
             </Stack>}
@@ -571,9 +573,13 @@ const AccountTitleDialog = ({
                   !Boolean(accounts.length) ||
                   !accounts.some((item) => item.entry.toLowerCase() === `debit`) ||
                   !accounts.some((item) => item.entry.toLowerCase() === `credit`) ||
-                  !(accounts.filter((item) => item.entry.toLowerCase() === `debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === (transaction?.document_amount || transaction?.referrence_amount)) ||
-                  !(accounts.filter((item) => item.entry.toLowerCase() === `credit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === (transaction?.document_amount || transaction?.referrence_amount)) ||
-                  !(accounts.filter((item) => item.entry.toLowerCase() === `debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) === accounts.filter((item) => item.entry.toLowerCase() === `credit`).map((item) => item.amount).reduce((a, b) => a + b, 0))
+                  (
+                    Boolean(state) && !Boolean(state.match(/clear/gi)) && (
+                      !(accounts.filter((item) => item.entry.toLowerCase() === `debit`).reduce((a, b) => a + b.amount, 0) === (transaction?.document_amount || transaction?.referrence_amount)) ||
+                      !(accounts.filter((item) => item.entry.toLowerCase() === `credit`).reduce((a, b) => a + b.amount, 0) === (transaction?.document_amount || transaction?.referrence_amount)) ||
+                      !(accounts.filter((item) => item.entry.toLowerCase() === `debit`).reduce((a, b) => a + b.amount, 0) === accounts.filter((item) => item.entry.toLowerCase() === `credit`).reduce((a, b) => a + b.amount, 0))
+                    )
+                  )
                 }
                 disableElevation
               > {state.match(/receive.*/) ? "Submit" : "Save"}

@@ -873,6 +873,15 @@ const TransactionDialog = ({
                     <span>Approved By:</span>
                     <strong>{data.voucher.approver.name}</strong>
                   </ListItem>}
+
+                {
+                  Boolean(data.file) && Boolean(data.file.box_no) &&
+                  <ListItem className="FstoListItemTransactionDetails-root" dense>
+                    <span>Box No:</span>
+                    <Stack direction="column">
+                      <strong>{data.file.box_no}</strong>
+                    </Stack>
+                  </ListItem>}
               </List>
             </React.Fragment>}
 
@@ -899,9 +908,6 @@ const TransactionDialog = ({
                       {
                         Boolean(data.executive) &&
                         <strong>{formatDates(data.executive.dates.received)} <Chip label="Transmitted" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}
-                      {
-                        Boolean(data.clear) &&
-                        <strong>{formatDates(data.clear.dates.received)} <Chip label="Cleared" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}
                     </Stack>
                   </ListItem>}
 
@@ -957,13 +963,6 @@ const TransactionDialog = ({
                         data.release && data.release.status === `release-release` &&
                         <strong>{formatDates(data.release.dates.released)}  <Chip label="External" size="small" sx={{ height: 20, fontWeight: 400 }} /></strong>}
                     </Stack>
-                  </ListItem>}
-
-                {
-                  data.clear && data.clear.status === `clear-clear` &&
-                  <ListItem className="FstoListItemTransactionDetails-root" dense>
-                    <span>Date Cleared:</span>
-                    <strong>{formatDates(data.clear.date)}</strong>
                   </ListItem>}
               </List>
             </React.Fragment>}

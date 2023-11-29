@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 
 import axios from 'axios'
 
@@ -389,11 +389,14 @@ const ChequeEntryDialog = ({
             <LocalizationProvider dateAdapter={DateAdapter}>
               <DatePicker
                 value={CQ.date}
+                minDate={
+                  CQ.type === "Cheque" && new Date()
+                }
                 disabled={
                   Boolean(state.match(/^cheque/gi))
                 }
                 renderInput={
-                  (props) => <TextField {...props} className="FstoTextfieldForm-root" label="Date" variant="outlined" size="small" onKeyPress={(e) => e.preventDefault()} />
+                  (props) => <TextField {...props} className="FstoTextfieldForm-root" label="Date" variant="outlined" size="small" onKeyDown={(e) => e.preventDefault()} />
                 }
                 onChange={(value) => setCQ(currentValue => ({
                   ...currentValue,
@@ -476,6 +479,10 @@ const ChequeEntryDialog = ({
                       Boolean(state) && !Boolean(state.match(/file|reverse|clear|return-tag|return-voucher|audit-|release-|counter-.*/)) &&
                       <TableCell align="right">Action</TableCell>
                     }
+                    {
+                      Boolean(state) && Boolean(state.match(/clear$/gi)) &&
+                      <TableCell>Date Cleared</TableCell>
+                    }
                   </TableRow>
                 </TableHead>
 
@@ -516,6 +523,17 @@ const ChequeEntryDialog = ({
                             <IconButton disabled={Boolean(state.match(/issue-|return-.*/))} onClick={() => removeChequeHandler(index)}>
                               <DeleteIcon fontSize="small" />
                             </IconButton>
+                          </TableCell>
+                        }
+
+                        {
+                          Boolean(state) && Boolean(state.match(/clear$/gi)) &&
+                          <TableCell size="small">
+                            {
+                              item.date_cleared
+                                ? moment(item.date_cleared).format("MMM. DD, YYYY HH:mm A")
+                                : <Fragment>&mdash;</Fragment>
+                            }
                           </TableCell>
                         }
                       </TableRow>
