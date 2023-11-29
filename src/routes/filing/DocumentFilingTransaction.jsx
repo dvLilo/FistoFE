@@ -8,7 +8,10 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
-  Button
+  Button,
+  Divider,
+  Box,
+  TextField
 } from '@mui/material'
 
 import CloseIcon from '@mui/icons-material/Close'
@@ -47,9 +50,10 @@ const DocumentFilingTransaction = (props) => {
     // eslint-disable-next-line
   }, [open])
 
-  const [fileData] = React.useState({
+  const [fileData, setFileData] = React.useState({
     process: "file",
     subprocess: "file",
+    box_no: ""
   })
 
   const [viewAccountTitle, setViewAccountTitle] = React.useState({
@@ -74,8 +78,16 @@ const DocumentFilingTransaction = (props) => {
     }))
   })
 
+  const clearHandler = () => {
+    setFileData(currentValue => ({
+      ...currentValue,
+      box_no: ""
+    }))
+  }
+
   const closeHandler = () => {
     onClose()
+    clearHandler()
   }
 
   const submitFileHandler = () => {
@@ -155,6 +167,30 @@ const DocumentFilingTransaction = (props) => {
 
         <DialogContent className="FstoDialogTransaction-content">
           <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
+
+          {
+            (state === `file-receive`) &&
+            <React.Fragment>
+              <Divider className="FstoDividerTransaction-root" variant="middle" />
+
+              <Box className="FstoBoxTransactionForm-root">
+                <Box className="FstoBoxTransactionForm-content">
+                  <TextField
+                    className="FstoTextfieldForm-root"
+                    label="Box No."
+                    variant="outlined"
+                    size="small"
+                    value={fileData.box_no}
+                    onChange={(e) => setFileData((currentValue) => ({
+                      ...currentValue,
+                      box_no: e.target.value
+                    }))}
+                    fullWidth
+                  />
+                </Box>
+              </Box>
+            </React.Fragment>
+          }
         </DialogContent>
 
         {
