@@ -8,13 +8,14 @@ import {
 
 import {
   MoreHoriz as MoreIcon,
+  UndoOutlined as RevertIcon,
   TaskOutlined as ReceiveIcon,
   VisibilityOutlined as ViewIcon,
   DescriptionOutlined as ManageIcon,
   ReplyOutlined as CancelIcon
 } from '@mui/icons-material'
 
-const DocumentChequingActions = ({ data, state, onReceive, onManage, onView, onCancel }) => {
+const DocumentChequingActions = ({ data, state, onReceive, onRevert, onManage, onView, onCancel }) => {
 
   const [anchor, setAnchor] = React.useState(null)
 
@@ -74,6 +75,19 @@ const DocumentChequingActions = ({ data, state, onReceive, onManage, onView, onC
             dense
           >
             <ManageIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Manage
+          </MenuItem>}
+
+        {
+          state === `cheque-cheque` &&
+          <MenuItem
+            sx={{ fontWeight: 500 }}
+            onClick={() => {
+              onRevert(data.id)
+              actionCloseHandler()
+            }}
+            dense
+          >
+            <RevertIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Revert
           </MenuItem>}
 
         {

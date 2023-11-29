@@ -33,7 +33,8 @@ import {
   Search,
   Close,
   TaskOutlined,
-  MoreHoriz
+  MoreHoriz,
+  DescriptionOutlined
 } from '@mui/icons-material'
 
 import statusColor from '../../colors/statusColor'
@@ -60,6 +61,7 @@ import TablePreloader from '../../components/TablePreloader'
 
 import DocumentChequingActions from './DocumentChequingActions'
 import DocumentChequingTransaction from './DocumentChequingTransaction'
+import DocumentChequingDialog from './DocumentChequingDialog'
 import DocumentChequingFilter from './DocumentChequingFilter'
 
 const DocumentChequing = () => {
@@ -107,6 +109,15 @@ const DocumentChequing = () => {
     }))
   })
 
+  const [multiCheque, setMultiCheque] = React.useState({
+    open: false,
+    transactions: [],
+    onClose: () => setMultiCheque(currentValue => ({
+      ...currentValue,
+      open: false
+    }))
+  })
+
   const onManage = (transaction) => {
     setManage(currentValue => ({
       ...currentValue,
@@ -136,6 +147,35 @@ const DocumentChequing = () => {
             process: CHEQUE,
             subprocess: RECEIVE
           })
+
+          const { message } = response.data
+
+          refetchData()
+          toast({
+            message,
+            title: "Success!"
+          })
+        } catch (error) {
+          console.log("Fisto Error Status", error.request)
+
+          toast({
+            severity: "error",
+            title: "Error!",
+            message: "Something went wrong whilst trying to receive transaction. Please try again later."
+          })
+        }
+      }
+    })
+  }
+
+  const onRevert = (ID) => {
+    confirm({
+      open: true,
+      wait: true,
+      onConfirm: async () => {
+        let response
+        try {
+          response = await axios.post(`/api/transactions/flow/cheque-revert/${ID}`)
 
           const { message } = response.data
 
@@ -297,6 +337,36 @@ const DocumentChequing = () => {
     })
   }
 
+
+  // For multiple voucher in one cheque
+  const [selectedVoucher, setSelectedVoucher] = React.useState([])
+
+  const onVoucherTick = (e) => {
+    if (e.target.checked) {
+      setSelectedVoucher((currentValue) => ([
+        ...currentValue,
+        JSON.parse(e.target.value)
+      ]))
+    }
+    else {
+      const value = JSON.parse(e.target.value)
+
+      setSelectedVoucher((currentValue) => {
+        return currentValue.filter((item) => item.id !== value.id)
+      })
+    }
+  }
+
+  const onManageAll = () => {
+    setMultiCheque(currentValue => ({
+      ...currentValue,
+      open: true,
+      transactions: selectedVoucher,
+
+      onBack: onManageAll
+    }))
+  }
+
   return (
     <Box className="FstoBox-root">
       <Paper className="FstoPaperTable-root" elevation={1}>
@@ -314,6 +384,9 @@ const DocumentChequing = () => {
               onChange={(e, value) => {
                 setState(value)
                 changeStatus(value)
+
+                setSelected([])
+                setSelectedVoucher([])
               }}
               TabIndicatorProps={{
                 className: "FstoTabsIndicator-root",
@@ -373,13 +446,14 @@ const DocumentChequing = () => {
             <TableHead className="FstoTableHead-root">
               <TableRow className="FstoTableRow-root">
                 {
-                  state === 'pending-cheque' && status === 'success' &&
+                  !!state.match(/pending|receive/gi) && status === 'success' &&
                   <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">
-                    <IconButton onClick={(e) => setAnchor(e.currentTarget)} disabled={!selected.length}>
+                    <IconButton onClick={(e) => setAnchor(e.currentTarget)} disabled={!selected.length && !selectedVoucher.length}>
                       <MoreHoriz />
                     </IconButton>
 
                     <Menu
+                      className="FstoTableMenu-root"
                       open={!!anchor}
                       elevation={2}
                       anchorEl={anchor}
@@ -397,18 +471,34 @@ const DocumentChequing = () => {
                       onClose={() => setAnchor(null)}
                       disablePortal
                     >
-                      <MenuItem
-                        sx={{ fontWeight: 500 }}
-                        onClick={() => {
-                          setAnchor(null)
-                          onReceiveAll()
-                        }}
-                        dense
-                      >
-                        <TaskOutlined sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Receive
-                      </MenuItem>
+                      {
+                        state === 'pending-cheque' &&
+                        <MenuItem
+                          sx={{ fontWeight: 500 }}
+                          onClick={() => {
+                            setAnchor(null)
+                            onReceiveAll()
+                          }}
+                          dense
+                        >
+                          <TaskOutlined sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Receive
+                        </MenuItem>}
+
+                      {
+                        state === 'cheque-receive' &&
+                        <MenuItem
+                          sx={{ fontWeight: 500 }}
+                          onClick={() => {
+                            setAnchor(null)
+                            onManageAll(selectedVoucher)
+                          }}
+                          dense
+                        >
+                          <DescriptionOutlined sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Manage
+                        </MenuItem>}
                     </Menu>
                   </TableCell>}
+
                 <TableCell className="FstoTableCell-root FstoTableCell-head">
                   <TableSortLabel active={false}>VOUCHER DETAILS</TableSortLabel>
                 </TableCell>
@@ -439,11 +529,23 @@ const DocumentChequing = () => {
               {
                 status === 'success'
                 && data.data.map((item, index) => (
-                  <TableRow className="FstoTableRow-root" key={index} selected={selected.includes(item.id)} hover>
+                  <TableRow className="FstoTableRow-root" key={index} selected={selected.includes(item.id) || selectedVoucher.some((selectedItem) => selectedItem.id === item.id)} hover>
                     {
                       state === 'pending-cheque' && status === 'success' &&
                       <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
                         <Checkbox className="FstoCheckbox-root" onChange={onCheck} value={item.id} checked={selected.includes(item.id)} />
+                      </TableCell>}
+
+                    {
+                      state === 'cheque-receive' && status === 'success' &&
+                      <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
+                        <Checkbox
+                          className="FstoCheckbox-root"
+                          value={JSON.stringify(item)}
+                          checked={selectedVoucher.some((selectedItem) => selectedItem.id === item.id)}
+                          disabled={selectedVoucher.some((selectedItem) => selectedItem.supplier.id !== item.supplier.id)}
+                          onChange={onVoucherTick}
+                        />
                       </TableCell>}
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
@@ -458,10 +560,8 @@ const DocumentChequing = () => {
 
                         <span>
                           {item.document.name}
-                          {
-                            item.supplier.type.toUpperCase() === "RUSH" &&
-                            <Chip className="FstoChip-root FstoChip-priority" label={item.supplier.type} size="small" color="secondary" />
-                          }
+
+                          <Chip className="FstoChip-root FstoChip-priority" label={item.supplier.type} size="small" color="secondary" />
                         </span>
                       </Typography>
 
@@ -562,6 +662,7 @@ const DocumentChequing = () => {
                         data={item}
                         state={state}
                         onReceive={onReceive}
+                        onRevert={onRevert}
                         onCancel={onUnreturn}
                         onManage={onManage}
                         onView={onView}
@@ -606,6 +707,13 @@ const DocumentChequing = () => {
           onUnhold={onUnhold}
           onReturn={onReturn}
           onVoid={onVoid}
+        />
+
+        <DocumentChequingDialog
+          {...multiCheque}
+          state={state}
+          refetchData={refetchData}
+          clearData={() => setSelectedVoucher([])}
         />
 
         <ReasonDialog {...reason} />
