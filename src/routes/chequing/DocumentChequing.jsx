@@ -172,6 +172,7 @@ const DocumentChequing = () => {
     confirm({
       open: true,
       wait: true,
+      message: "Are you sure you want to revert this cheque? All other transaction that is connected to this cheque will also reverted.",
       onConfirm: async () => {
         let response
         try {

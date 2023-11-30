@@ -27,6 +27,9 @@ const FistoProvider = ({ children }) => {
     open: false,
     wait: false,
     loading: false,
+
+    message: "Are you sure you want to proceed?",
+
     onConfirm: undefined
   })
 
@@ -60,6 +63,9 @@ const FistoProvider = ({ children }) => {
     const {
       open = true,
       wait = false,
+
+      message = "Are you sure you want to proceed?",
+
       onConfirm = () => { }
     } = params
 
@@ -67,6 +73,7 @@ const FistoProvider = ({ children }) => {
       ...currentValue,
       open,
       wait,
+      message,
       onConfirm
     }))
   }
@@ -134,7 +141,7 @@ const FistoProvider = ({ children }) => {
 
         <DialogContent sx={{ display: "flex", alignItems: "center", paddingLeft: 5, paddingRight: 5 }}>
           <WarningAmberRoundedIcon sx={{ marginRight: 2, fontSize: "3em" }} />
-          Are you sure you want to proceed?
+          {dialog.message}
         </DialogContent>
 
         <DialogActions sx={{ marginRight: 2 }}>
