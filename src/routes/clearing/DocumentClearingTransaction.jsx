@@ -157,7 +157,7 @@ const DocumentClearingTransaction = (props) => {
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/clear-cheques/${transaction.id}`, clearData)
+          response = await axios.post(`/api/transactions/flow/clear-cheques/${transaction.cheque_id}`, clearData)
 
           const { message } = response.data
 
