@@ -553,7 +553,7 @@ const AccountTitleDialog = ({
             </Stack>}
 
           {
-            !state?.match(/clear/gi) &&
+            !state?.match(/cheque|executive|issue|release|discharge|file|clear/gi) &&
             accounts.some((item) => item.entry === `Debit`) &&
             accounts.some((item) => item.entry === `Credit`) &&
             accounts.filter((item) => item.entry === `Debit`).reduce((a, b) => a + b.amount, 0) === accounts.filter((item) => item.entry === `Credit`).reduce((a, b) => a + b.amount, 0) &&
