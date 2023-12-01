@@ -354,7 +354,7 @@ const DocumentVouchering = () => {
                 <Tab className="FstoTab-root" label="Transferred" value="voucher-transfer" disableRipple />
               }
               <Tab className="FstoTab-root" label="Received" value="voucher-receive" disableRipple />
-              <Tab className="FstoTab-root" label="Approved" value="voucher-voucher" disableRipple />
+              <Tab className="FstoTab-root" label="Created" value="voucher-voucher" disableRipple />
               <Tab className="FstoTab-root" label="Held" value="voucher-hold" disableRipple />
               <Tab className="FstoTab-root" label="Returned" value="voucher-return" disableRipple />
               <Tab className="FstoTab-root" label="Voided" value="voucher-void" disableRipple />

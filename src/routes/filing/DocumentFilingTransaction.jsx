@@ -103,6 +103,7 @@ const DocumentFilingTransaction = (props) => {
           const { message } = response.data
 
           refetchData()
+          clearHandler()
           toast({
             message,
             title: "Success!"
