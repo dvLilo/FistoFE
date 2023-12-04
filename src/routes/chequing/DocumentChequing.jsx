@@ -449,7 +449,10 @@ const DocumentChequing = () => {
                 {
                   !!state.match(/pending|receive/gi) && status === 'success' &&
                   <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">
-                    <IconButton onClick={(e) => setAnchor(e.currentTarget)} disabled={!selected.length && !selectedVoucher.length}>
+                    <IconButton
+                      onClick={(e) => setAnchor(e.currentTarget)}
+                      disabled={selected.length < 2 && selectedVoucher.length < 2}
+                    >
                       <MoreHoriz />
                     </IconButton>
 
