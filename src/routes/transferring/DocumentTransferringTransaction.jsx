@@ -8,7 +8,12 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
-  Button
+  Button,
+  Divider,
+  Autocomplete,
+  Box,
+  TextField,
+  Paper
 } from '@mui/material'
 
 import CloseIcon from '@mui/icons-material/Close'
@@ -177,6 +182,34 @@ const DocumentTransferringTransaction = (props) => {
 
         <DialogContent className="FstoDialogTransaction-content">
           <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
+
+          <Divider className="FstoDividerTransaction-root" variant="middle" />
+
+          <Box className="FstoBoxTransactionForm-root">
+            <Box className="FstoBoxTransactionForm-content">
+              <Autocomplete
+                className="FstoSelectForm-root"
+                size="small"
+                options={[]}
+                value={data?.tag?.distributed_to || null}
+                renderInput={
+                  (props) => <TextField {...props} label="Distribute To" variant="outlined" />
+                }
+                PaperComponent={
+                  (props) => <Paper {...props} sx={{ textTransform: 'capitalize' }} />
+                }
+                getOptionLabel={
+                  (option) => option.name
+                }
+                isOptionEqualToValue={
+                  (option, value) => option.id === value.id
+                }
+                readOnly
+                disablePortal
+                disableClearable
+              />
+            </Box>
+          </Box>
         </DialogContent>
 
         {
