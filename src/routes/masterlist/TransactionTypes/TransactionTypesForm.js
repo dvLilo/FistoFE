@@ -81,11 +81,11 @@ const TransactionTypesForm = (props) => {
               account: transactionType.accounts.map((item) => ({
                 entry: item.entry,
                 account_title_id: item.account_title.id,
-                company_id: item.company.id,
-                business_unit_id: null,
-                department_id: item.department.id,
-                sub_unit_id: null,
-                location_id: item.location.id
+                // company_id: item.company.id,
+                // business_unit_id: null,
+                // department_id: item.department.id,
+                // sub_unit_id: null,
+                // location_id: item.location.id
               })),
             })
           else
@@ -94,11 +94,11 @@ const TransactionTypesForm = (props) => {
               account: transactionType.accounts.map((item) => ({
                 entry: item.entry,
                 account_title_id: item.account_title.id,
-                company_id: item.company.id,
-                business_unit_id: null,
-                department_id: item.department.id,
-                sub_unit_id: null,
-                location_id: item.location.id
+                // company_id: item.company.id,
+                // business_unit_id: null,
+                // department_id: item.department.id,
+                // sub_unit_id: null,
+                // location_id: item.location.id
               })),
             })
 

@@ -25,10 +25,10 @@ import {
   Edit
 } from '@mui/icons-material'
 
-import useAccountTitleCOA from "../../../hooks/useAccountTitleCOA"
-import useCompanyCOA from "../../../hooks/useCompanyCOA"
-import useDepartmentCOA from "../../../hooks/useDepartmentCOA"
-import useLocationCOA from "../../../hooks/useLocationCOA"
+import useAccountTitleCOA from '../../../hooks/useAccountTitleCOA'
+// import useCompanyCOA from '../../../hooks/useCompanyCOA'
+// import useDepartmentCOA from '../../../hooks/useDepartmentCOA'
+// import useLocationCOA from '../../../hooks/useLocationCOA'
 
 const ENTRY_LIST = ["Debit", "Credit"]
 
@@ -58,26 +58,26 @@ const TransactionTypesDialog = ({
     status: ACCOUNT_TITLE_STATUS
   } = useAccountTitleCOA({ enabled: open })
 
-  const {
-    data: COMPANY_LIST,
-    status: COMPANY_STATUS
-  } = useCompanyCOA({ enabled: open })
+  // const {
+  //   data: COMPANY_LIST,
+  //   status: COMPANY_STATUS
+  // } = useCompanyCOA({ enabled: open })
 
-  const {
-    data: DEPARTMENT_LIST,
-    status: DEPARTMENT_STATUS
-  } = useDepartmentCOA({
-    enabled: !!chartAccount.company,
-    company: chartAccount.company?.id
-  })
+  // const {
+  //   data: DEPARTMENT_LIST,
+  //   status: DEPARTMENT_STATUS
+  // } = useDepartmentCOA({
+  //   enabled: !!chartAccount.company,
+  //   company: chartAccount.company?.id
+  // })
 
-  const {
-    data: LOCATION_LIST,
-    status: LOCATION_STATUS
-  } = useLocationCOA({
-    enabled: !!chartAccount.department,
-    department: chartAccount.department?.id
-  })
+  // const {
+  //   data: LOCATION_LIST,
+  //   status: LOCATION_STATUS
+  // } = useLocationCOA({
+  //   enabled: !!chartAccount.department,
+  //   department: chartAccount.department?.id
+  // })
 
 
   const onAccountClearHandler = () => {
@@ -87,9 +87,9 @@ const TransactionTypesDialog = ({
 
       entry: null,
       account_title: null,
-      company: null,
-      department: null,
-      location: null
+      // company: null,
+      // department: null,
+      // location: null
     })
   }
 
@@ -196,6 +196,9 @@ const TransactionTypesDialog = ({
             getOptionLabel={
               (option) => `${option.code} - ${option.name}`
             }
+            getOptionDisabled={
+              (option) => accounts.some((item) => item.account_title.id === option.id)
+            }
             isOptionEqualToValue={
               (option, value) => option.id === value.id
             }
@@ -207,6 +210,7 @@ const TransactionTypesDialog = ({
             disableClearable
           />
 
+          {/*
           <Autocomplete
             className="FstoSelectForm-root"
             size="small"
@@ -305,6 +309,7 @@ const TransactionTypesDialog = ({
             // disablePortal
             disableClearable
           />
+          */}
 
           <Button
             className="FstoButtonForm-root"
@@ -314,11 +319,13 @@ const TransactionTypesDialog = ({
               chartAccount.update ? <Edit /> : <Add />
             }
             disabled={
+              // !chartAccount.entry ||
+              // !chartAccount.account_title ||
+              // !chartAccount.company ||
+              // !chartAccount.department ||
+              // !chartAccount.location
               !chartAccount.entry ||
-              !chartAccount.account_title ||
-              !chartAccount.company ||
-              !chartAccount.department ||
-              !chartAccount.location
+              !chartAccount.account_title
             }
             disableElevation
           >
@@ -334,9 +341,11 @@ const TransactionTypesDialog = ({
                 <TableRow>
                   <TableCell>Entry</TableCell>
                   <TableCell>Account Title</TableCell>
+                  {/*
                   <TableCell>Company</TableCell>
                   <TableCell>Department</TableCell>
                   <TableCell>Location</TableCell>
+                  */}
                   <TableCell align="center">Action</TableCell>
                 </TableRow>
               </TableHead>
@@ -347,9 +356,11 @@ const TransactionTypesDialog = ({
                     <TableRow key={index}>
                       <TableCell>{item.entry}</TableCell>
                       <TableCell>{item.account_title.name}</TableCell>
+                      {/*
                       <TableCell>{item.company.name}</TableCell>
                       <TableCell>{item.department.name}</TableCell>
                       <TableCell>{item.location.name}</TableCell>
+                      */}
                       <TableCell align="center">
                         <IconButton onClick={() => onAccountUpdateHandler(item, index)}>
                           <Edit fontSize="small" />
