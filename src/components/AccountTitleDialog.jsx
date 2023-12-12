@@ -111,16 +111,159 @@ const AccountTitleDialog = ({
     // eslint-disable-next-line
   }, [open])
 
+  React.useEffect(() => {
+    if (AT.entry && AT.entry === "Debit") {
+      setAT((currentValue) => ({
+        ...currentValue,
+
+        company: {
+          id: transaction.company_id,
+          code: transaction.company_code,
+          name: transaction.company
+        },
+        department: {
+          id: transaction.department_id,
+          code: transaction.department_code,
+          name: transaction.department,
+        },
+        location: {
+          id: transaction.location_id,
+          code: transaction.location_code,
+          name: transaction.location,
+        }
+      }))
+    }
+
+    if (AT.entry && AT.entry === "Credit") {
+      switch (transaction.company_code) {
+        case "10":
+          setAT((currentValue) => ({
+            ...currentValue,
+
+            company: {
+              id: transaction.company_id,
+              code: transaction.company_code,
+              name: transaction.company
+            },
+            department: {
+              id: 3,
+              code: "0010",
+              name: "Corporate Common",
+            },
+            location: {
+              id: 2,
+              code: "0001",
+              name: "Head Office",
+            }
+          }))
+          break
+
+        case "21":
+          setAT((currentValue) => ({
+            ...currentValue,
+
+            company: {
+              id: transaction.company_id,
+              code: transaction.company_code,
+              name: transaction.company
+            },
+            department: {
+              id: 40,
+              code: "2105",
+              name: "Feedmill Services",
+            },
+            location: {
+              id: 5,
+              code: "1001",
+              name: "FM - Lara",
+            }
+          }))
+          break
+
+        case "22":
+          setAT((currentValue) => ({
+            ...currentValue,
+
+            company: {
+              id: transaction.company_id,
+              code: transaction.company_code,
+              name: transaction.company
+            },
+            department: {
+              id: 42,
+              code: "3110",
+              name: "Broiler Farms",
+            },
+            location: {
+              id: 1,
+              code: "0000",
+              name: "Common",
+            }
+          }))
+          break
+
+        case "23":
+          setAT((currentValue) => ({
+            ...currentValue,
+
+            company: {
+              id: transaction.company_id,
+              code: transaction.company_code,
+              name: transaction.company
+            },
+            department: {
+              id: 48,
+              code: "4100",
+              name: "Swine Production Common",
+            },
+            location: {
+              id: 1,
+              code: "0000",
+              name: "Common",
+            }
+          }))
+          break
+
+        case "31":
+          setAT((currentValue) => ({
+            ...currentValue,
+
+            company: {
+              id: transaction.company_id,
+              code: transaction.company_code,
+              name: transaction.company
+            },
+            department: {
+              id: 51,
+              code: "5001",
+              name: "Meatshop Administration",
+            },
+            location: {
+              id: 1,
+              code: "0000",
+              name: "Common",
+            }
+          }))
+          break
+
+        default:
+          console.log("There is no company defined in this static setup.")
+      }
+    }
+
+    // eslint-disable-next-line
+  }, [AT.entry])
+
 
   const addAccountTitleHandler = () => {
-    const isDefault = ACCOUNT_ENTRY_LIST.filter((item) => item.account_title.id === AT.account_title.id).every((item) => item.company.id === AT.company.id && item.department.id === AT.department.id && item.location.id === AT.location.id)
+    const isDefault = transaction?.company_id === AT.company.id && transaction?.department_id === AT.department.id && transaction?.location_id === AT.location.id
 
     if (!AT.update)
       onInsert({
         entry: AT.entry,
         amount: parseFloat(AT.amount),
         remarks: AT.remarks,
-        is_default: isDefault,
+        is_default: AT.entry === "Debit" ? isDefault : true,
 
         account_title: AT.account_title,
         company: AT.company,
@@ -134,7 +277,7 @@ const AccountTitleDialog = ({
         entry: AT.entry,
         amount: parseFloat(AT.amount),
         remarks: AT.remarks,
-        is_default: isDefault,
+        is_default: AT.entry === "Debit" ? isDefault : true,
 
         account_title: AT.account_title,
         company: AT.company,
@@ -251,9 +394,9 @@ const AccountTitleDialog = ({
                     ...currentValue,
                     entry: value,
                     account_title: account.account_title,
-                    company: account.company,
-                    department: account.department,
-                    location: account.location
+                    company: null,
+                    department: null,
+                    location: null
                   }))
                 }
               }}
@@ -285,18 +428,10 @@ const AccountTitleDialog = ({
               isOptionEqualToValue={
                 (option, value) => option.id === value.id
               }
-              onChange={(e, value) => setAT(currentValue => {
-
-                const { company, department, location } = ACCOUNT_ENTRY_LIST.find((item) => item.account_title.id === value.id)
-
-                return {
-                  ...currentValue,
-                  account_title: value,
-                  company: company,
-                  department: department,
-                  location: location,
-                }
-              })}
+              onChange={(e, value) => setAT(currentValue => ({
+                ...currentValue,
+                account_title: value
+              }))}
               disablePortal
               disableClearable
             />
@@ -306,6 +441,9 @@ const AccountTitleDialog = ({
               size="small"
               options={COMPANY_LIST}
               value={AT.company}
+              disabled={
+                AT.entry === 'Credit'
+              }
               loading={
                 COMPANY_STATUS === 'loading'
               }
@@ -338,6 +476,9 @@ const AccountTitleDialog = ({
               size="small"
               options={DEPARTMENT_LIST}
               value={AT.department}
+              disabled={
+                AT.entry === 'Credit'
+              }
               loading={
                 DEPARTMENT_STATUS === 'loading'
               }
@@ -369,6 +510,9 @@ const AccountTitleDialog = ({
               size="small"
               options={LOCATION_LIST}
               value={AT.location}
+              disabled={
+                AT.entry === 'Credit'
+              }
               loading={
                 LOCATION_STATUS === 'loading'
               }
