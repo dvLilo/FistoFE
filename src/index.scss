@@ -321,6 +321,14 @@ body {
     line-height: 1.25;
   }
 
+  & .FstoTypography-voucher {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
   & .FstoTypography-supplier {
     font-size: 1.15em;
     text-transform: uppercase;
@@ -345,6 +353,10 @@ body {
 
   & .FstoTypography-requestor {
     text-transform: capitalize;
+  }
+
+  & .FstoTypography-bank {
+    font-weight: 700;
   }
 
   & .FstoTypography-number {

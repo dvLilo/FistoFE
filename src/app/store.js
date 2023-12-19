@@ -7,7 +7,9 @@ import sidebarReducer from '../features/sidebar/sidebar.slice'
 import userReducer from '../features/users/users.slice'
 import dialogReducer from '../features/dialog/dialog.slice'
 
-import { transactionApi } from "../features/transactions/transactions.api"
+import { companiesApi } from '../features/masterlist/companies/companies.api'
+
+import { transactionApi } from '../features/transactions/transactions.api'
 
 export const store = configureStore({
   reducer: {
@@ -18,9 +20,11 @@ export const store = configureStore({
 
     dialog: dialogReducer,
 
+    [companiesApi.reducerPath]: companiesApi.reducer,
+
     [transactionApi.reducerPath]: transactionApi.reducer
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat([transactionApi.middleware])
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat([companiesApi.middleware, transactionApi.middleware])
 })
 
 // optional, but required for refetchOnFocus/refetchOnReconnect behaviors

@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 
 import axios from 'axios'
+
+import DateAdapter from '@mui/lab/AdapterDateFns'
 
 import {
   Dialog,
@@ -8,19 +10,25 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
-  Button
+  Button,
+  Divider,
+  Box,
+  TextField
 } from '@mui/material'
+
+import {
+  LocalizationProvider,
+  DatePicker
+} from '@mui/lab'
 
 import CloseIcon from '@mui/icons-material/Close'
 
 import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
-import useTransaction from '../../hooks/useTransaction'
 
 import { ISSUE } from '../../constants'
 
-import TransactionDialog from '../../components/TransactionDialog'
-import ChequeEntryDialog from '../../components/ChequeEntryDialog'
+import ChequeDialog from '../../components/ChequeDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
 
 const DocumentIssuingTransaction = ({
@@ -28,10 +36,7 @@ const DocumentIssuingTransaction = ({
   open = false,
   transaction = null,
   refetchData = () => { },
-  // onHold = () => { },
   onUnhold = () => { },
-  // onReturn = () => { },
-  // onVoid = () => { },
   onBack = () => { },
   onClose = () => { }
 }) => {
@@ -39,35 +44,27 @@ const DocumentIssuingTransaction = ({
   const toast = useToast()
   const confirm = useConfirm()
 
-  const {
-    data,
-    status,
-    refetch: fetchTransaction
-  } = useTransaction(transaction?.id)
-
   React.useEffect(() => {
-    if (open) fetchTransaction()
-
-    // eslint-disable-next-line
-  }, [open])
-
-  React.useEffect(() => {
-    if (open && (state === `issue-receive` || state === `issue-issue` || state === `return-release`) && status === `success`) {
+    if (open) {
       setChequeData(currentValue => ({
         ...currentValue,
-        accounts: data.cheque.accounts,
-        cheques: data.cheque.cheques
+        bank_id: transaction?.bank.id,
+        cheque_no: transaction?.no,
+        cheque: transaction?.cheque,
+        accounts: transaction?.accounts
       }))
     }
 
     // eslint-disable-next-line
-  }, [open, data, status])
+  }, [open])
 
   const [chequeData, setChequeData] = React.useState({
     process: ISSUE,
     subprocess: ISSUE,
-    accounts: [],
-    cheques: []
+    bank_id: null,
+    cheque_no: null,
+    cheque: null,
+    accounts: []
   })
 
   const [manageAccountTitle, setManageAccountTitle] = React.useState({
@@ -85,26 +82,11 @@ const DocumentIssuingTransaction = ({
     })
   })
 
-  const [manageCheque, setManageCheque] = React.useState({
-    open: false,
-    state: null,
-    transaction: null,
-    onBack: undefined,
-    onClose: () => setManageCheque(currentValue => {
-      const { cheques, ...remainingItems } = currentValue
-
-      return ({
-        ...remainingItems,
-        open: false,
-      })
-    })
-  })
-
   const clearHandler = () => {
     setChequeData(currentValue => ({
       ...currentValue,
       accounts: [],
-      cheques: []
+      cheque: null
     }))
   }
 
@@ -121,7 +103,7 @@ const DocumentIssuingTransaction = ({
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, chequeData)
+          response = await axios.post(`/api/cheque/flow`, chequeData)
 
           const { message } = response.data
 
@@ -145,25 +127,10 @@ const DocumentIssuingTransaction = ({
     })
   }
 
-  // const submitHoldHandler = () => {
-  //   onClose()
-  //   onHold(transaction)
-  // }
-
   const submitUnholdHandler = () => {
     onClose()
     onUnhold(transaction.id)
   }
-
-  // const submitReturnHandler = () => {
-  //   onClose()
-  //   onReturn(transaction)
-  // }
-
-  // const submitVoidHandler = () => {
-  //   onClose()
-  //   onVoid(transaction)
-  // }
 
 
 
@@ -175,30 +142,7 @@ const DocumentIssuingTransaction = ({
       state,
       transaction,
       open: true,
-      onBack: onChequeManage
-    }))
-  }
-
-  const onAccountTitleView = () => {
-    onClose()
-
-    setManageAccountTitle(currentValue => ({
-      ...currentValue,
-      state,
-      transaction,
-      open: true,
-      onBack: onBack,
-
-      ...(Boolean(state.match(/-receive|-hold|-return|-void.*/)) && {
-        state: "transmit-",
-        accounts: Boolean(data.cheque.accounts.length)
-          ? data.cheque.accounts
-          : data.voucher.accounts
-      }),
-      ...(Boolean(state.match(/-release|return-.*/)) && {
-        state: "transmit-",
-        accounts: data.cheque.accounts
-      })
+      onBack: onBack
     }))
   }
 
@@ -235,98 +179,6 @@ const DocumentIssuingTransaction = ({
     }))
   }
 
-
-
-  const onChequeManage = () => {
-    onClose()
-
-    setManageCheque(currentValue => ({
-      ...currentValue,
-      state,
-      transaction,
-      open: true,
-      onBack: onBack
-    }))
-  }
-
-  const onChequeView = () => {
-    onClose()
-
-    setManageCheque(currentValue => ({
-      ...currentValue,
-      state,
-      transaction,
-      open: true,
-      onBack: onBack,
-
-      ...(Boolean(state.match(/-receive|-hold|-return|-void|return-release.*/)) && {
-        state: "release-"
-      }),
-      ...(Boolean(state.match(/-release.*/)) && {
-        cheques: data.cheque.cheques
-      })
-    }))
-  }
-
-  const onChequeInsert = (data) => {
-    setChequeData(currentValue => ({
-      ...currentValue,
-      accounts: [
-        ...currentValue.accounts, {
-          entry: "Credit",
-          account_title: data.bank.account_title_one,
-          amount: data.amount,
-          remarks: null
-        }
-      ],
-      cheques: [
-        ...currentValue.cheques,
-        data
-      ]
-    }))
-  }
-
-  const onChequeUpdate = (data, index) => {
-    setChequeData(currentValue => ({
-      ...currentValue,
-      accounts: [
-        ...currentValue.accounts.filter((item) => item.entry.toLowerCase() === "debit"),
-        ...currentValue.accounts.filter((item) => item.entry.toLowerCase() === "credit").map((item, itemIndex) => {
-          if (itemIndex === index)
-            return {
-              ...item,
-              account_title: data.bank.account_title_one,
-              amount: data.amount
-            }
-          return item
-        })
-      ],
-      cheques: [
-        ...currentValue.cheques.map((item, itemIndex) => {
-          if (itemIndex === index) return data
-          return item
-        })
-      ]
-    }))
-  }
-
-  const onChequeRemove = (index) => {
-    setChequeData(currentValue => ({
-      ...currentValue,
-      accounts: [
-        ...currentValue.accounts.filter((item) => item.entry.toLowerCase() === "debit"),
-        ...currentValue.accounts.filter((item) => item.entry.toLowerCase() === "credit").filter((item, itemIndex) => {
-          return itemIndex !== index
-        })
-      ],
-      cheques: [
-        ...currentValue.cheques.filter((item, itemIndex) => {
-          return itemIndex !== index
-        })
-      ]
-    }))
-  }
-
   return (
     <React.Fragment>
       <Dialog
@@ -348,7 +200,36 @@ const DocumentIssuingTransaction = ({
         </DialogTitle>
 
         <DialogContent className="FstoDialogTransaction-content">
-          <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
+          <ChequeDialog data={transaction} />
+
+          {
+            state === `issue-receive` && (
+              <Fragment>
+                <Divider className="FstoDividerTransaction-root" variant="middle" />
+
+                <Box className="FstoBoxTransactionForm-root">
+                  <Box className="FstoBoxTransactionForm-content">
+                    <LocalizationProvider dateAdapter={DateAdapter}>
+                      <DatePicker
+                        value={chequeData.cheque?.date || null}
+                        minDate={new Date()}
+                        renderInput={
+                          (props) => <TextField {...props} className="FstoTextfieldForm-root" label="Cheque Date" variant="outlined" size="small" onKeyDown={(e) => e.preventDefault()} fullWidth />
+                        }
+                        onChange={(value) => setChequeData(currentValue => ({
+                          ...currentValue,
+                          cheque: {
+                            ...currentValue.cheque,
+                            date: new Date(value).toISOString()
+                          }
+                        }))}
+                        showToolbar
+                      />
+                    </LocalizationProvider>
+                  </Box>
+                </Box>
+              </Fragment>
+            )}
         </DialogContent>
 
         {
@@ -358,7 +239,10 @@ const DocumentIssuingTransaction = ({
               (state === `issue-receive` || state === `return-release`) &&
               <Button
                 variant="contained"
-                onClick={onChequeManage}
+                onClick={onAccountTitleManage}
+                disabled={
+                  !chequeData.cheque?.date
+                }
                 disableElevation
               > Release
               </Button>
@@ -373,35 +257,6 @@ const DocumentIssuingTransaction = ({
               > Unhold
               </Button>
             }
-
-            {/* 
-            {
-              state !== `issue-hold` &&
-              <Button
-                variant="outlined"
-                color="error"
-                onClick={submitHoldHandler}
-                disableElevation
-              > Hold
-              </Button>
-            }
-
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={submitReturnHandler}
-              disableElevation
-            > Return
-            </Button>
-
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={submitVoidHandler}
-              disableElevation
-            > Void
-            </Button>
-            */}
           </DialogActions>
         }
       </Dialog>
@@ -410,26 +265,14 @@ const DocumentIssuingTransaction = ({
         accounts={chequeData.accounts}
         onClear={clearHandler}
         onSubmit={
-          !!state.match(/-receive.*/)
-            ? onChequeManage
-            : submitChequeHandler
+          !!state.match(/-receive/)
+            ? submitChequeHandler
+            : onAccountTitleManage
         }
         onInsert={onAccountTitleInsert}
         onUpdate={onAccountTitleUpdate}
         onRemove={onAccountTitleRemove}
         {...manageAccountTitle}
-      />
-
-      <ChequeEntryDialog
-        accounts={chequeData.accounts}
-        cheques={chequeData.cheques}
-        onView={onAccountTitleManage}
-        onClear={clearHandler}
-        onSubmit={submitChequeHandler}
-        onInsert={onChequeInsert}
-        onUpdate={onChequeUpdate}
-        onRemove={onChequeRemove}
-        {...manageCheque}
       />
     </React.Fragment>
   )

@@ -25,37 +25,23 @@ import CloseIcon from '@mui/icons-material/Close'
 
 import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
-import useTransaction from '../../hooks/useTransaction'
 
-import TransactionDialog from '../../components/TransactionDialog'
+import { CLEAR } from '../../constants'
+
+import ChequeDialog from '../../components/ChequeDialog'
 import AccountTitleDialog from '../../components/AccountTitleDialog'
-import ChequeEntryDialog from '../../components/ChequeEntryDialog'
 
-const DocumentClearingTransaction = (props) => {
-
-  const {
-    state,
-    open = false,
-    transaction = null,
-    refetchData = () => { },
-    onBack = () => { },
-    onClose = () => { }
-  } = props
+const DocumentClearingTransaction = ({
+  state,
+  open = false,
+  transaction = null,
+  refetchData = () => { },
+  onBack = () => { },
+  onClose = () => { }
+}) => {
 
   const toast = useToast()
   const confirm = useConfirm()
-
-  const {
-    data,
-    status,
-    refetch: fetchTransaction
-  } = useTransaction(transaction?.id)
-
-  React.useEffect(() => {
-    if (open) fetchTransaction()
-
-    // eslint-disable-next-line
-  }, [open])
 
   React.useEffect(() => {
     if (open && state === `pending-clear` && !Boolean(clearData.accounts.length)) {
@@ -74,17 +60,19 @@ const DocumentClearingTransaction = (props) => {
 
       setClearData(currentValue => ({
         ...currentValue,
+        bank_id: transaction?.bank.id,
+        cheque_no: transaction?.no,
         accounts: [
           ...accounts,
           {
             entry: "Credit",
-            account_title: transaction?.cheques?.at(0)?.bank?.account_title_two,
-            company: transaction?.cheques?.at(0)?.bank?.company_two,
+            account_title: transaction?.cheque?.bank?.account_title_two,
+            company: transaction?.cheque?.bank?.company_two,
             business_unit: null,
-            department: transaction?.cheques?.at(0)?.bank?.department_two,
+            department: transaction?.cheque?.bank?.department_two,
             sub_unit: null,
-            location: transaction?.cheques?.at(0)?.bank?.location_two,
-            amount: transaction?.cheques?.at(0)?.amount,
+            location: transaction?.cheque?.bank?.location_two,
+            amount: transaction?.cheque?.amount,
             remarks: null,
             is_default: true
           }
@@ -92,20 +80,24 @@ const DocumentClearingTransaction = (props) => {
       }))
     }
 
-    if (open && state === `clear-clear` && status === `success` && !Boolean(clearData.date) && !Boolean(clearData.accounts.length)) {
+    if (open && state === `clear-clear` && !Boolean(clearData.date) && !Boolean(clearData.accounts.length)) {
       setClearData(currentValue => ({
         ...currentValue,
-        date: data.clear.date,
-        accounts: data.clear.accounts
+        bank_id: transaction?.bank.id,
+        cheque_no: transaction?.no,
+        date: transaction?.cheque.date_cleared,
+        accounts: transaction?.accounts
       }))
     }
 
     // eslint-disable-next-line
-  }, [open, data, status])
+  }, [open, transaction])
 
   const [clearData, setClearData] = React.useState({
-    process: "clear",
-    subprocess: "clear",
+    process: CLEAR,
+    subprocess: CLEAR,
+    bank_id: null,
+    cheque_no: null,
     date: null,
     accounts: []
   })
@@ -125,20 +117,11 @@ const DocumentClearingTransaction = (props) => {
     })
   })
 
-  const [viewCheque, setViewCheque] = React.useState({
-    open: false,
-    state: null,
-    transaction: null,
-    onBack: undefined,
-    onClose: () => setViewCheque(currentValue => ({
-      ...currentValue,
-      open: false,
-    }))
-  })
-
   const clearHandler = () => {
     setClearData(currentValue => ({
       ...currentValue,
+      bank_id: null,
+      cheque_no: null,
       date: null,
       accounts: []
     }))
@@ -157,7 +140,7 @@ const DocumentClearingTransaction = (props) => {
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/clear-cheques/${transaction.cheque_id}`, clearData)
+          response = await axios.post(`/api/cheque/flow`, clearData)
 
           const { message } = response.data
 
@@ -192,25 +175,9 @@ const DocumentClearingTransaction = (props) => {
       open: true,
       onBack: onBack,
 
-      // accounts: transaction?.accounts,
-
       ...(Boolean(state.match(/clear$/)) && {
         state: "clear-receive"
       })
-    }))
-  }
-
-  const onAccountTitleView = () => {
-    onClose()
-
-    setManageAccountTitle(currentValue => ({
-      ...currentValue,
-      state,
-      transaction,
-      open: true,
-      onBack: onBack,
-
-      accounts: transaction?.accounts
     }))
   }
 
@@ -248,18 +215,6 @@ const DocumentClearingTransaction = (props) => {
   }
 
 
-  const onChequeView = () => {
-    onClose()
-
-    setViewCheque(currentValue => ({
-      ...currentValue,
-      state,
-      transaction,
-      open: true,
-      onBack: onBack
-    }))
-  }
-
   return (
     <React.Fragment>
       <Dialog
@@ -281,7 +236,7 @@ const DocumentClearingTransaction = (props) => {
         </DialogTitle>
 
         <DialogContent className="FstoDialogTransaction-content">
-          <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
+          <ChequeDialog data={transaction} />
 
           <Divider className="FstoDividerTransaction-root" variant="middle" />
 
@@ -290,6 +245,7 @@ const DocumentClearingTransaction = (props) => {
               <LocalizationProvider dateAdapter={DateAdapter}>
                 <DatePicker
                   value={clearData.date}
+                  maxDate={new Date()}
                   renderInput={
                     (props) => <TextField {...props} className="FstoTextfieldForm-root" label="Date Clear" variant="outlined" size="small" onKeyPress={(e) => e.preventDefault()} fullWidth />
                   }
@@ -308,11 +264,7 @@ const DocumentClearingTransaction = (props) => {
         <DialogActions className="FstoDialogTransaction-actions">
           <Button
             variant="contained"
-            onClick={
-              state === `pending-clear`
-                ? onAccountTitleManage
-                : submitClearHandler
-            }
+            onClick={onAccountTitleManage}
             disabled={
               !Boolean(clearData.date)
             }
@@ -330,14 +282,6 @@ const DocumentClearingTransaction = (props) => {
         onUpdate={onAccountTitleUpdate}
         onRemove={onAccountTitleRemove}
         {...manageAccountTitle}
-      />
-
-      <ChequeEntryDialog
-        accounts={clearData.accounts}
-        cheques={data?.cheque?.cheques}
-        onView={onAccountTitleView}
-        onClear={clearHandler}
-        {...viewCheque}
       />
     </React.Fragment>
   )

@@ -1,7 +1,5 @@
 import React, { Fragment } from 'react'
 
-import axios from 'axios'
-
 import moment from 'moment'
 
 import {
@@ -23,23 +21,16 @@ import {
   Stack,
   Chip,
   Divider,
-  OutlinedInput,
-  Menu,
-  MenuItem,
-  Checkbox
+  OutlinedInput
 } from '@mui/material'
 
 import {
   Search,
-  Close,
-  MoreHoriz,
-  TaskOutlined
+  Close
 } from '@mui/icons-material'
 
 import statusColor from '../../colors/statusColor'
 
-import useToast from '../../hooks/useToast'
-import useConfirm from '../../hooks/useConfirm'
 import useCheques from '../../hooks/useCheques'
 
 import EmptyImage from '../../assets/img/empty.svg'
@@ -49,7 +40,6 @@ import FilterPopover from '../../components/FilterPopover'
 
 import DocumentClearingActions from './DocumentClearingActions'
 import DocumentClearingTransaction from './DocumentClearingTransaction'
-import { CLEAR } from "../../constants"
 
 const DocumentClearing = () => {
 
@@ -62,17 +52,10 @@ const DocumentClearing = () => {
     changeStatus,
     changePage,
     changeRows
-  } = useCheques("/api/clear-cheques", "pending-clear")
-
-  const toast = useToast()
-  const confirm = useConfirm()
-
-  const [anchor, setAnchor] = React.useState(null)
+  } = useCheques("/api/cheques1", "pending-clear")
 
   const [search, setSearch] = React.useState("")
   const [state, setState] = React.useState("pending-clear")
-
-  const [selected, setSelected] = React.useState([])
 
   const [manage, setManage] = React.useState({
     open: false,
@@ -100,52 +83,6 @@ const DocumentClearing = () => {
       open: true,
       onBack: onView
     }))
-  }
-
-  const onCheck = (e) => {
-    if (e.target.checked) {
-      return setSelected((currentValue) => ([
-        ...currentValue,
-        parseInt(e.target.value)
-      ]))
-    }
-
-    setSelected((currentValue) => ([
-      ...currentValue.filter((item) => item !== parseInt(e.target.value))
-    ]))
-  }
-
-  const onReceiveAll = () => {
-    confirm({
-      open: true,
-      wait: true,
-      onConfirm: async () => {
-        let response
-        try {
-          response = await axios.post(`api/transactions/flow/receive`, {
-            process: CLEAR,
-            transactions: selected
-          })
-
-          const { message } = response.data
-
-          setSelected([])
-          refetchData()
-          toast({
-            message,
-            title: "Success!"
-          })
-        } catch (error) {
-          console.log("Fisto Error Status", error.request)
-
-          toast({
-            severity: "error",
-            title: "Error!",
-            message: "Something went wrong whilst trying to receive transaction. Please try again later."
-          })
-        }
-      }
-    })
   }
 
   return (
@@ -219,50 +156,12 @@ const DocumentClearing = () => {
           <Table className="FstoTable-root" size="small">
             <TableHead className="FstoTableHead-root">
               <TableRow className="FstoTableRow-root">
-                {
-                  state === 'pending' && status === 'success' &&
-                  <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">
-                    <IconButton onClick={(e) => setAnchor(e.currentTarget)} disabled={!selected.length}>
-                      <MoreHoriz />
-                    </IconButton>
-
-                    <Menu
-                      open={!!anchor}
-                      elevation={2}
-                      anchorEl={anchor}
-                      anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'left',
-                      }}
-                      transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'left',
-                      }}
-                      MenuListProps={{
-                        sx: { py: 0.5 }
-                      }}
-                      onClose={() => setAnchor(null)}
-                      disablePortal
-                    >
-                      <MenuItem
-                        sx={{ fontWeight: 500 }}
-                        onClick={() => {
-                          setAnchor(null)
-                          onReceiveAll()
-                        }}
-                        dense
-                      >
-                        <TaskOutlined sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Receive
-                      </MenuItem>
-                    </Menu>
-                  </TableCell>}
-
                 <TableCell className="FstoTableCell-root FstoTableCell-head">
-                  <TableSortLabel active={false}>VOUCHER DETAILS</TableSortLabel>
+                  <TableSortLabel active={false}>CHEQUE DETAILS</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableCell-root FstoTableCell-head">
-                  <TableSortLabel active={false}>CHEQUE DETAILS</TableSortLabel>
+                  <TableSortLabel active={false}>VOUCHER DETAILS</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableCell-root FstoTableCell-head">
@@ -287,97 +186,68 @@ const DocumentClearing = () => {
               {
                 status === 'success'
                 && data.data.map((item, index) => (
-                  <TableRow className="FstoTableRow-root" key={index} selected={selected.includes(item.id)} hover>
-                    {
-                      state === 'pending' && status === 'success' &&
-                      <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                        <Checkbox className="FstoCheckbox-root" onChange={onCheck} value={item.id} checked={selected.includes(item.id)} />
-                      </TableCell>}
-
+                  <TableRow className="FstoTableRow-root" key={index} hover>
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
-                      <Typography className="FstoTypography-root FstoTypography-transaction" variant="button" gap={1}>
-                        <span>TAG#{item.tag_no}</span>
+                      <Typography className="FstoTypography-root FstoTypography-bank" variant="body1">
+                        {item.bank.name}
+                      </Typography>
 
-                        &mdash;
+                      <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
+                        {item.no}
+                      </Typography>
 
-                        <span>{item.voucher.no}</span>
-
-                        &mdash;
-
-                        <span>
-                          {item.document.name}
-
-                          <Chip className="FstoChip-root FstoChip-priority" label={item.supplier.type} size="small" color="secondary" />
-                        </span>
+                      <Typography className="FstoTypography-root FstoTypography-amount" variant="h6">
+                        &#8369;{item.amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
                       </Typography>
 
                       <Typography className="FstoTypography-root FstoTypography-dates" variant="caption">
-                        Voucher Month: {moment(item.date_requested).format("MMMM YYYY")}
-                      </Typography>
-
-                      <Typography className="FstoTypography-root FstoTypography-remarks" variant="h6">
-                        {item.supplier.name}
-                      </Typography>
-
-                      <Typography className="FstoTypography-root FstoTypography-supplier" variant="caption" sx={{ textTransform: "unset!important" }}>
-                        {
-                          item.remarks
-                            ? item.remarks
-                            : <Fragment>&mdash;</Fragment>
-                        }
-                      </Typography>
-
-                      <Typography className="FstoTypography-root FstoTypography-dates" variant="caption">
-                        {moment(item.date_requested).format("MMMM DD, YYYY — hh:mm A")}
+                        {item.date && moment(item.date).format("MMMM YYYY")}
                       </Typography>
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
-                      <Stack direction="row" alignItems="center">
-                        <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
-                          {item.cheques.at(0).bank.name}
-                        </Typography>
+                      {
+                        item.transactions.map((trxnItem) => (
+                          <Typography className="FstoTypography-root FstoTypography-voucher" variant="button" gap={1}>
+                            <Stack direction="column">
+                              <Typography>{trxnItem.document.name}</Typography>
 
-                        {
-                          item.cheques.length > 1 &&
-                          <Chip className="FstoChip-root FstoChip-priority" label={`+${item.cheques.length - 1} more`} size="small" />
-                        }
-                      </Stack>
-
-                      <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
-                        {item.cheques.at(0).no}
-                      </Typography>
-
-                      <Typography className="FstoTypography-root FstoTypography-amount" variant="h6">
-                        &#8369;{item.cheques.at(0).amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
-                      </Typography>
+                              <span>TAG#{trxnItem.tag_no} &mdash; {trxnItem.voucher.no}</span>
+                            </Stack>
+                          </Typography>
+                        ))}
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
                       <Typography variant="subtitle1">
-                        {item.company.name}
+                        {item.transactions.at(0).company.name}
                       </Typography>
 
                       <Typography variant="subtitle2">
-                        {item.department.name}
+                        {item.transactions.at(0).department.name}
                       </Typography>
 
                       <Typography variant="subtitle2">
-                        {item.location.name}
+                        {item.transactions.at(0).location.name}
                       </Typography>
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
-                      <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
-                        {item.document_id !== 4 && item.document_no?.toUpperCase()}
-                        {item.document_id === 4 && item.referrence_no?.toUpperCase()}
-                      </Typography>
+                      {
+                        item.transactions.map((trxnItem) => (
+                          <Fragment>
+                            <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
+                              {trxnItem.document.id !== 4 && trxnItem.document_no?.toUpperCase()}
+                              {trxnItem.document.id === 4 && trxnItem.referrence_no?.toUpperCase()}
+                            </Typography>
 
-                      <Typography className="FstoTypography-root FstoTypography-amount" variant="h6">
-                        &#8369;
-                        {item.document_id !== 4 && item.document_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
-                        {item.document_id === 4 && item.referrence_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
-                      </Typography>
+                            <Typography className="FstoTypography-root FstoTypography-amount" variant="h6">
+                              &#8369;
+                              {trxnItem.document.id !== 4 && trxnItem.document_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                              {trxnItem.document.id === 4 && trxnItem.referrence_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                            </Typography>
+                          </Fragment>
+                        ))}
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
@@ -385,9 +255,9 @@ const DocumentClearing = () => {
                         className="FstoChip-root FstoChip-status"
                         size="small"
                         color="primary"
-                        label={item.status}
+                        label={item.transactions.at(0).state}
                         sx={{
-                          backgroundColor: statusColor(item.status)
+                          backgroundColor: statusColor(item.transactions.at(0).status)
                         }}
                       />
                     </TableCell>

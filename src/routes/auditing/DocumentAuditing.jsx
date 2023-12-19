@@ -53,7 +53,7 @@ import {
 
 import EmptyImage from '../../assets/img/empty.svg'
 
-import ReasonDialog from '../../components/ReasonDialog'
+import ReasonChequeDialog from '../../components/ReasonChequeDialog'
 import TablePreloader from '../../components/TablePreloader'
 import FilterPopover from '../../components/FilterPopover'
 
@@ -71,7 +71,7 @@ const DocumentAuditing = () => {
     changeStatus,
     changePage,
     changeRows
-  } = useCheques("/api/cheques", "pending-audit")
+  } = useCheques("/api/cheques1", "pending-audit")
 
   const toast = useToast()
   const confirm = useConfirm()
@@ -123,16 +123,18 @@ const DocumentAuditing = () => {
     }))
   }
 
-  const onReceive = (ID) => {
+  const onReceive = (data) => {
     confirm({
       open: true,
       wait: true,
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
+          response = await axios.post(`/api/cheque/flow`, {
             process: AUDIT,
-            subprocess: RECEIVE
+            subprocess: RECEIVE,
+
+            ...data
           })
 
           const { message } = response.data
@@ -165,16 +167,18 @@ const DocumentAuditing = () => {
     }))
   }
 
-  const onUnhold = (ID) => {
+  const onUnhold = (data) => {
     confirm({
       open: true,
       wait: true,
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
+          response = await axios.post(`/api/cheque/flow`, {
             process: AUDIT,
-            subprocess: UNHOLD
+            subprocess: UNHOLD,
+
+            ...data
           })
 
           const { message } = response.data
@@ -207,16 +211,18 @@ const DocumentAuditing = () => {
     }))
   }
 
-  const onUnreturn = (ID) => {
+  const onUnreturn = (data) => {
     confirm({
       open: true,
       wait: true,
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${ID}`, {
+          response = await axios.post(`/api/cheque/flow`, {
             process: AUDIT,
-            subprocess: UNRETURN
+            subprocess: UNRETURN,
+
+            ...data
           })
 
           const { message } = response.data
@@ -243,12 +249,12 @@ const DocumentAuditing = () => {
     if (e.target.checked) {
       return setSelected((currentValue) => ([
         ...currentValue,
-        parseInt(e.target.value)
+        JSON.parse(e.target.value)
       ]))
     }
 
     setSelected((currentValue) => ([
-      ...currentValue.filter((item) => item !== parseInt(e.target.value))
+      ...currentValue.filter((item) => item.cheque_no !== JSON.parse(e.target.value).cheque_no)
     ]))
   }
 
@@ -259,9 +265,9 @@ const DocumentAuditing = () => {
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`api/transactions/flow/receive`, {
+          response = await axios.post(`api/cheques/flow/receive`, {
             process: AUDIT,
-            transactions: selected
+            banks: selected
           })
 
           const { message } = response.data
@@ -300,6 +306,7 @@ const DocumentAuditing = () => {
               className="FstoTabsToolbar-root"
               value={state}
               onChange={(e, value) => {
+                setSelected([])
                 setState(value)
                 changeStatus(value)
               }}
@@ -308,7 +315,7 @@ const DocumentAuditing = () => {
                 children: <span className="FstoTabsIndicator-root" />
               }}
             >
-              <Tab className="FstoTab-root" label="Pending" value="pending" disableRipple />
+              <Tab className="FstoTab-root" label="Pending" value="pending-audit" disableRipple />
               <Tab className="FstoTab-root" label="Received" value="audit-receive" disableRipple />
               <Tab className="FstoTab-root" label="Approved" value="audit-audit" disableRipple />
               <Tab className="FstoTab-root" label="Held" value="audit-hold" disableRipple />
@@ -398,11 +405,11 @@ const DocumentAuditing = () => {
                   </TableCell>}
 
                 <TableCell className="FstoTableCell-root FstoTableCell-head">
-                  <TableSortLabel active={false}>VOUCHER DETAILS</TableSortLabel>
+                  <TableSortLabel active={false}>CHEQUE DETAILS</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableCell-root FstoTableCell-head">
-                  <TableSortLabel active={false}>CHEQUE DETAILS</TableSortLabel>
+                  <TableSortLabel active={false}>VOUCHER DETAILS</TableSortLabel>
                 </TableCell>
 
                 <TableCell className="FstoTableCell-root FstoTableCell-head">
@@ -427,97 +434,74 @@ const DocumentAuditing = () => {
               {
                 status === 'success'
                 && data.data.map((item, index) => (
-                  <TableRow className="FstoTableRow-root" key={index} selected={selected.includes(item.id)} hover>
+                  <TableRow className="FstoTableRow-root" key={index} selected={selected.some((selectedItem) => selectedItem.cheque_no === item.no)} hover>
                     {
                       state === 'pending-audit' && status === 'success' &&
                       <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
-                        <Checkbox className="FstoCheckbox-root" onChange={onCheck} value={item.id} checked={selected.includes(item.id)} />
+                        <Checkbox className="FstoCheckbox-root" onChange={onCheck} value={JSON.stringify({ id: item.bank.id, cheque_no: item.no })} checked={selected.some((selectedItem) => selectedItem.cheque_no === item.no)} />
                       </TableCell>}
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
-                      <Typography className="FstoTypography-root FstoTypography-transaction" variant="button" gap={1}>
-                        <span>TAG#{item.tag_no}</span>
+                      <Typography className="FstoTypography-root FstoTypography-bank" variant="body1">
+                        {item.bank.name}
+                      </Typography>
 
-                        &mdash;
+                      <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
+                        {item.no}
+                      </Typography>
 
-                        <span>{item.voucher.no}</span>
-
-                        &mdash;
-
-                        <span>
-                          {item.document.name}
-
-                          <Chip className="FstoChip-root FstoChip-priority" label={item.supplier.type} size="small" color="secondary" />
-                        </span>
+                      <Typography className="FstoTypography-root FstoTypography-amount" variant="h6">
+                        &#8369;{item.amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
                       </Typography>
 
                       <Typography className="FstoTypography-root FstoTypography-dates" variant="caption">
-                        Voucher Month: {moment(item.date_requested).format("MMMM YYYY")}
-                      </Typography>
-
-                      <Typography className="FstoTypography-root FstoTypography-remarks" variant="h6">
-                        {item.supplier.name}
-                      </Typography>
-
-                      <Typography className="FstoTypography-root FstoTypography-supplier" variant="caption" sx={{ textTransform: "unset!important" }}>
-                        {
-                          item.remarks
-                            ? item.remarks
-                            : <Fragment>&mdash;</Fragment>
-                        }
-                      </Typography>
-
-                      <Typography className="FstoTypography-root FstoTypography-dates" variant="caption">
-                        {moment(item.date_requested).format("MMMM DD, YYYY — hh:mm A")}
+                        {item.date && moment(item.date).format("MMMM YYYY")}
                       </Typography>
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
-                      <Stack direction="row" alignItems="center">
-                        <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
-                          {item.cheques.at(0).bank.name}
-                        </Typography>
+                      {
+                        item.transactions.map((trxnItem) => (
+                          <Typography className="FstoTypography-root FstoTypography-voucher" variant="button" gap={1}>
+                            <Stack direction="column">
+                              <Typography>{trxnItem.document.name}</Typography>
 
-                        {
-                          item.cheques.length > 1 &&
-                          <Chip className="FstoChip-root FstoChip-priority" label={`+${item.cheques.length - 1} more`} size="small" />
-                        }
-                      </Stack>
-
-                      <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
-                        {item.cheques.at(0).no}
-                      </Typography>
-
-                      <Typography className="FstoTypography-root FstoTypography-amount" variant="h6">
-                        &#8369;{item.cheques.at(0).amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
-                      </Typography>
+                              <span>TAG#{trxnItem.tag_no} &mdash; {trxnItem.voucher.no}</span>
+                            </Stack>
+                          </Typography>
+                        ))}
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
                       <Typography variant="subtitle1">
-                        {item.company.name}
+                        {item.transactions.at(0).company.name}
                       </Typography>
 
                       <Typography variant="subtitle2">
-                        {item.department.name}
+                        {item.transactions.at(0).department.name}
                       </Typography>
 
                       <Typography variant="subtitle2">
-                        {item.location.name}
+                        {item.transactions.at(0).location.name}
                       </Typography>
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
-                      <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
-                        {item.document_id !== 4 && item.document_no?.toUpperCase()}
-                        {item.document_id === 4 && item.referrence_no?.toUpperCase()}
-                      </Typography>
+                      {
+                        item.transactions.map((trxnItem) => (
+                          <Fragment>
+                            <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
+                              {trxnItem.document.id !== 4 && trxnItem.document_no?.toUpperCase()}
+                              {trxnItem.document.id === 4 && trxnItem.referrence_no?.toUpperCase()}
+                            </Typography>
 
-                      <Typography className="FstoTypography-root FstoTypography-amount" variant="h6">
-                        &#8369;
-                        {item.document_id !== 4 && item.document_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
-                        {item.document_id === 4 && item.referrence_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
-                      </Typography>
+                            <Typography className="FstoTypography-root FstoTypography-amount" variant="h6">
+                              &#8369;
+                              {trxnItem.document.id !== 4 && trxnItem.document_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                              {trxnItem.document.id === 4 && trxnItem.referrence_amount?.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}
+                            </Typography>
+                          </Fragment>
+                        ))}
                     </TableCell>
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
@@ -525,9 +509,9 @@ const DocumentAuditing = () => {
                         className="FstoChip-root FstoChip-status"
                         size="small"
                         color="primary"
-                        label={item.status}
+                        label={item.transactions.at(0).state}
                         sx={{
-                          backgroundColor: statusColor(item.status)
+                          backgroundColor: statusColor(item.transactions.at(0).status)
                         }}
                       />
                     </TableCell>
@@ -582,7 +566,7 @@ const DocumentAuditing = () => {
           onReturn={onReturn}
         />
 
-        <ReasonDialog {...reason} />
+        <ReasonChequeDialog {...reason} />
       </Paper>
     </Box>
   )

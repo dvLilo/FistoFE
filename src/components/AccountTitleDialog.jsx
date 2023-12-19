@@ -678,20 +678,28 @@ const AccountTitleDialog = ({
             </Typography>
           </Stack>
 
+          <Stack className="FstoStackAccountTitle-root" direction="row">
+            <Typography variant="body1" sx={{ flex: 1 }}>Document/Reference Amount</Typography>
+            <Typography variant="h6">
+              &#8369;{(transaction?.document_amount || transaction?.referrence_amount).toLocaleString()}
+            </Typography>
+          </Stack>
+
           <Divider variant="middle" sx={{ marginY: 2 }} />
 
           <Stack className="FstoStackAccountTitle-root" direction="row">
             <Typography variant="body1" sx={{ flex: 1 }}>Variance</Typography>
             <Typography variant="h6">
               &#8369;
-              {((accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0)) - (accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0))).toLocaleString()}
+              {((accounts.filter((item) => item.entry === `Debit`).reduce((a, b) => a + b.amount, 0)) - (accounts.filter((item) => item.entry === `Credit`).reduce((a, b) => a + b.amount, 0))).toLocaleString()}
             </Typography>
           </Stack>
 
           {
+            !state?.match(/cheque|executive|issue|release|discharge|file|clear/gi) &&
             accounts.some((item) => item.entry === `Debit`) &&
             accounts.some((item) => item.entry === `Credit`) &&
-            accounts.filter((item) => item.entry === `Debit`).map((item) => item.amount).reduce((a, b) => a + b, 0) !== accounts.filter((item) => item.entry === `Credit`).map((item) => item.amount).reduce((a, b) => a + b, 0) &&
+            accounts.filter((item) => item.entry === `Debit`).reduce((a, b) => a + b.amount, 0) !== accounts.filter((item) => item.entry === `Credit`).reduce((a, b) => a + b.amount, 0) &&
             <Stack className="FstoStackAccountTitle-root" direction="row" justifyContent="flex-end">
               <Typography variant="caption" color="error">Total debit and credit amount are not equal.</Typography>
             </Stack>}
@@ -709,7 +717,7 @@ const AccountTitleDialog = ({
 
           <Stack direction="row-reverse" gap={1} marginTop="auto">
             {
-              Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|audit-|executive-|issue-|counter-.*/)) &&
+              Boolean(state) && !Boolean(state.match(/approve-|transmit-|release-|file-|reverse-|pending-|audit-|executive-|counter-.*/)) &&
               <Button
                 variant="contained"
                 onClick={submitAccountTitleHandler}
@@ -718,7 +726,7 @@ const AccountTitleDialog = ({
                   !accounts.some((item) => item.entry.toLowerCase() === `debit`) ||
                   !accounts.some((item) => item.entry.toLowerCase() === `credit`) ||
                   (
-                    Boolean(state) && !Boolean(state.match(/clear/gi)) && (
+                    Boolean(state) && !Boolean(state.match(/clear|issue/gi)) && (
                       !(accounts.filter((item) => item.entry.toLowerCase() === `debit`).reduce((a, b) => a + b.amount, 0) === (transaction?.document_amount || transaction?.referrence_amount)) ||
                       !(accounts.filter((item) => item.entry.toLowerCase() === `credit`).reduce((a, b) => a + b.amount, 0) === (transaction?.document_amount || transaction?.referrence_amount)) ||
                       !(accounts.filter((item) => item.entry.toLowerCase() === `debit`).reduce((a, b) => a + b.amount, 0) === accounts.filter((item) => item.entry.toLowerCase() === `credit`).reduce((a, b) => a + b.amount, 0))

@@ -62,7 +62,10 @@ const DocumentAuditingActions = ({
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
-              onReceive(data.id)
+              onReceive({
+                bank_id: data.bank.id,
+                cheque_no: data.no
+              })
               actionCloseHandler()
             }}
             dense
@@ -101,7 +104,10 @@ const DocumentAuditingActions = ({
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
-              onCancel(data.id)
+              onCancel({
+                bank_id: data.bank.id,
+                cheque_no: data.no
+              })
               actionCloseHandler()
             }}
             dense

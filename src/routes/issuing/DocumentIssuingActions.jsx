@@ -10,7 +10,8 @@ import {
   MoreHoriz as MoreIcon,
   TaskOutlined as ReceiveIcon,
   VisibilityOutlined as ViewIcon,
-  DescriptionOutlined as ManageIcon
+  DescriptionOutlined as ManageIcon,
+  ReplyOutlined as CancelIcon
 } from '@mui/icons-material'
 
 const DocumentIssuingActions = ({
@@ -18,7 +19,8 @@ const DocumentIssuingActions = ({
   state,
   onReceive,
   onManage,
-  onView
+  onView,
+  onCancel
 }) => {
 
   const [anchor, setAnchor] = React.useState(null)
@@ -60,7 +62,10 @@ const DocumentIssuingActions = ({
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
-              onReceive(data.id)
+              onReceive({
+                bank_id: data.bank.id,
+                cheque_no: data.no
+              })
               actionCloseHandler()
             }}
             dense
@@ -92,6 +97,22 @@ const DocumentIssuingActions = ({
             dense
           >
             <ViewIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> View
+          </MenuItem>}
+
+        {
+          state === `audit-return` &&
+          <MenuItem
+            sx={{ fontWeight: 500 }}
+            onClick={() => {
+              onCancel({
+                bank_id: data.bank.id,
+                cheque_no: data.no
+              })
+              actionCloseHandler()
+            }}
+            dense
+          >
+            <CancelIcon sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Cancel
           </MenuItem>}
 
       </Menu>

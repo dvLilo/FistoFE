@@ -15,69 +15,24 @@ import CloseIcon from '@mui/icons-material/Close'
 
 import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
-import useTransaction from '../../hooks/useTransaction'
 
 import { AUDIT } from '../../constants'
 
-import TransactionDialog from '../../components/TransactionDialog'
-import AccountTitleDialog from '../../components/AccountTitleDialog'
-import ChequeEntryDialog from '../../components/ChequeEntryDialog'
+import ChequeDialog from '../../components/ChequeDialog'
 
-const DocumentAuditingTransaction = (props) => {
-
-  const {
-    state,
-    open = false,
-    transaction = null,
-    refetchData = () => { },
-    onHold = () => { },
-    onUnhold = () => { },
-    onReturn = () => { },
-    onBack = () => { },
-    onClose = () => { }
-  } = props
+const DocumentAuditingTransaction = ({
+  state,
+  open = false,
+  transaction = null,
+  refetchData = () => { },
+  onHold = () => { },
+  onUnhold = () => { },
+  onReturn = () => { },
+  onClose = () => { }
+}) => {
 
   const toast = useToast()
   const confirm = useConfirm()
-
-  const {
-    data,
-    status,
-    refetch: fetchTransaction
-  } = useTransaction(transaction?.id)
-
-  React.useEffect(() => {
-    if (open) fetchTransaction()
-
-    // eslint-disable-next-line
-  }, [open])
-
-  const [auditData] = React.useState({
-    process: AUDIT,
-    subprocess: AUDIT
-  })
-
-  const [viewAccountTitle, setViewAccountTitle] = React.useState({
-    open: false,
-    state: null,
-    transaction: null,
-    onBack: undefined,
-    onClose: () => setViewAccountTitle(currentValue => ({
-      ...currentValue,
-      open: false
-    }))
-  })
-
-  const [viewCheque, setViewCheque] = React.useState({
-    open: false,
-    state: null,
-    transaction: null,
-    onBack: undefined,
-    onClose: () => setViewCheque(currentValue => ({
-      ...currentValue,
-      open: false,
-    }))
-  })
 
   const closeHandler = () => {
     onClose()
@@ -91,7 +46,13 @@ const DocumentAuditingTransaction = (props) => {
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, auditData)
+          response = await axios.post(`/api/cheque/flow`, {
+            process: AUDIT,
+            subprocess: AUDIT,
+
+            bank_id: transaction?.bank.id,
+            cheque_no: transaction?.no
+          })
 
           const { message } = response.data
 
@@ -116,43 +77,26 @@ const DocumentAuditingTransaction = (props) => {
 
   const submitHoldHandler = () => {
     onClose()
-    onHold(transaction)
+    onHold({
+      bank_id: transaction?.bank.id,
+      cheque_no: transaction?.no
+    })
   }
 
   const submitUnholdHandler = () => {
     onClose()
-    onUnhold(transaction.id)
+    onUnhold({
+      bank_id: transaction?.bank.id,
+      cheque_no: transaction?.no
+    })
   }
 
   const submitReturnHandler = () => {
     onClose()
-    onReturn(transaction)
-  }
-
-
-  const onAccountTitleView = () => {
-    onClose()
-
-    setViewAccountTitle(currentValue => ({
-      ...currentValue,
-      state,
-      transaction,
-      open: true,
-      onBack: onBack
-    }))
-  }
-
-
-  const onChequeView = () => {
-    onClose()
-
-    setViewCheque(currentValue => ({
-      ...currentValue,
-      state,
-      transaction,
-      open: true,
-      onBack: onBack
-    }))
+    onReturn({
+      bank_id: transaction?.bank.id,
+      cheque_no: transaction?.no
+    })
   }
 
   return (
@@ -176,7 +120,7 @@ const DocumentAuditingTransaction = (props) => {
         </DialogTitle>
 
         <DialogContent className="FstoDialogTransaction-content">
-          <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
+          <ChequeDialog data={transaction} />
         </DialogContent>
 
         {
@@ -224,18 +168,6 @@ const DocumentAuditingTransaction = (props) => {
           </DialogActions>
         }
       </Dialog>
-
-      <AccountTitleDialog
-        accounts={data?.cheque?.accounts || data?.voucher?.accounts}
-        {...viewAccountTitle}
-      />
-
-      <ChequeEntryDialog
-        accounts={data?.cheque?.accounts || data?.voucher?.accounts}
-        cheques={data?.cheque?.cheques}
-        onView={onAccountTitleView}
-        {...viewCheque}
-      />
     </React.Fragment>
   )
 }

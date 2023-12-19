@@ -60,7 +60,10 @@ const DocumentSigningActions = ({
           <MenuItem
             sx={{ fontWeight: 500 }}
             onClick={() => {
-              onReceive(data.id)
+              onReceive({
+                bank_id: data.bank.id,
+                cheque_no: data.no
+              })
               actionCloseHandler()
             }}
             dense

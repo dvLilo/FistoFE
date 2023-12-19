@@ -21,88 +21,59 @@ import CloseIcon from '@mui/icons-material/Close'
 import useToast from '../../hooks/useToast'
 import useConfirm from '../../hooks/useConfirm'
 import useDistribute from '../../hooks/useDistribute'
-import useTransaction from '../../hooks/useTransaction'
 
-import TransactionDialog from '../../components/TransactionDialog'
-import AccountTitleDialog from '../../components/AccountTitleDialog'
-import ChequeEntryDialog from '../../components/ChequeEntryDialog'
+import ChequeDialog from '../../components/ChequeDialog'
 
-const DocumentReleasingTransaction = (props) => {
-
-  const {
-    state,
-    open = false,
-    transaction = null,
-    refetchData = () => { },
-    onReturn = () => { },
-    onBack = () => { },
-    onClose = () => { }
-  } = props
+const DocumentReleasingTransaction = ({
+  state,
+  open = false,
+  transaction = null,
+  refetchData = () => { },
+  onReturn = () => { },
+  onClose = () => { }
+}) => {
 
   const toast = useToast()
   const confirm = useConfirm()
 
   const {
-    data,
-    status,
-    refetch: fetchTransaction
-  } = useTransaction(transaction?.id)
-
-  const {
     refetch: fetchDistribute,
     data: DISTUBUTE_LIST,
     status: DISTRIBUTE_STATUS
-  } = useDistribute(transaction?.company_id)
+  } = useDistribute(transaction?.transactions.at(0).company.id)
 
   React.useEffect(() => {
-    if (open) fetchTransaction()
-
     if (open && !DISTUBUTE_LIST) fetchDistribute()
+
     // eslint-disable-next-line
   }, [open])
 
   React.useEffect(() => {
-    if (open && status === `success`) {
+    if (open) {
       setReleaseData(currentValue => ({
         ...currentValue,
-        distributed_to: data.tag.distributed_to
+        bank_id: transaction?.bank.id,
+        cheque_no: transaction?.no,
+        distributed_to: transaction?.distributed
       }))
     }
 
     // eslint-disable-next-line
-  }, [open, status])
+  }, [open])
 
   const [releaseData, setReleaseData] = React.useState({
     process: "release",
     subprocess: "release",
+    bank_id: null,
+    cheque_no: null,
     distributed_to: null
-  })
-
-  const [viewAccountTitle, setViewAccountTitle] = React.useState({
-    open: false,
-    state: null,
-    transaction: null,
-    onBack: undefined,
-    onClose: () => setViewAccountTitle(currentValue => ({
-      ...currentValue,
-      open: false,
-    }))
-  })
-
-  const [viewCheque, setViewCheque] = React.useState({
-    open: false,
-    state: null,
-    transaction: null,
-    onBack: undefined,
-    onClose: () => setViewCheque(currentValue => ({
-      ...currentValue,
-      open: false,
-    }))
   })
 
   const clearHandler = () => {
     setReleaseData(currentValue => ({
       ...currentValue,
+      bank_id: null,
+      cheque_no: null,
       distributed_to: null
     }))
   }
@@ -121,7 +92,7 @@ const DocumentReleasingTransaction = (props) => {
       onConfirm: async () => {
         let response
         try {
-          response = await axios.post(`/api/transactions/flow/update-transaction/${transaction.id}`, releaseData)
+          response = await axios.post(`/api/cheque/flow`, releaseData)
 
           const { message } = response.data
 
@@ -147,32 +118,12 @@ const DocumentReleasingTransaction = (props) => {
 
   const submitReturnHandler = () => {
     onClose()
-    onReturn(transaction)
+    onReturn({
+      bank_id: transaction?.bank.id,
+      cheque_no: transaction?.no
+    })
   }
 
-  const onAccountTitleView = () => {
-    onClose()
-
-    setViewAccountTitle(currentValue => ({
-      ...currentValue,
-      state,
-      transaction,
-      open: true,
-      onBack: onBack
-    }))
-  }
-
-  const onChequeView = () => {
-    onClose()
-
-    setViewCheque(currentValue => ({
-      ...currentValue,
-      state,
-      transaction,
-      open: true,
-      onBack: onBack
-    }))
-  }
 
   return (
     <React.Fragment>
@@ -195,7 +146,7 @@ const DocumentReleasingTransaction = (props) => {
         </DialogTitle>
 
         <DialogContent className="FstoDialogTransaction-content">
-          <TransactionDialog data={data} status={status} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
+          <ChequeDialog data={transaction} />
 
           {
             (state === `release-receive` || state === `release-release`) &&
@@ -260,20 +211,6 @@ const DocumentReleasingTransaction = (props) => {
           </DialogActions>
         }
       </Dialog>
-
-      <AccountTitleDialog
-        accounts={data?.cheque.accounts}
-        onClear={clearHandler}
-        {...viewAccountTitle}
-      />
-
-      <ChequeEntryDialog
-        accounts={data?.cheque?.accounts || data?.voucher?.accounts}
-        cheques={data?.cheque.cheques}
-        onView={onAccountTitleView}
-        {...viewCheque}
-      />
-
     </React.Fragment>
   )
 }

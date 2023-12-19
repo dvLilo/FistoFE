@@ -31,7 +31,7 @@ import {
   ReceiptOutlined as ReleaseIcon,
   FactCheckOutlined as ApprovalIcon,
   SecurityOutlined as ConfidentialIcon,
-  AssessmentOutlined as ReportsIcon
+  // AssessmentOutlined as ReportsIcon
 } from '@mui/icons-material'
 
 import '../assets/css/styles.sidebar.scss'
@@ -339,6 +339,7 @@ const Sidebar = () => {
             </Accordion>
           }
 
+          {/*
           { // Reports
             !!user &&
             <Accordion elevation={0} square disableGutters>
@@ -354,6 +355,7 @@ const Sidebar = () => {
               </AccordionDetails>
             </Accordion>
           }
+          */}
         </Box>
       </aside>
 
