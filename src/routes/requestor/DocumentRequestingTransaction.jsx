@@ -107,7 +107,7 @@ const DocumentRequestingTransaction = (props) => {
       </Dialog>
 
       <AccountTitleDialog
-        accounts={data?.cheque?.accounts || data?.voucher?.accounts}
+        accounts={data?.cheque?.accounts.length ? data?.cheque?.accounts : data?.voucher?.accounts}
         {...viewAccountTitle}
       />
 

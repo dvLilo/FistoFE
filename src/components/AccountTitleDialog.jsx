@@ -681,7 +681,7 @@ const AccountTitleDialog = ({
           <Stack className="FstoStackAccountTitle-root" direction="row">
             <Typography variant="body1" sx={{ flex: 1 }}>Document/Reference Amount</Typography>
             <Typography variant="h6">
-              &#8369;{(transaction?.document_amount || transaction?.referrence_amount).toLocaleString()}
+              &#8369;{(transaction?.document_amount || transaction?.referrence_amount)?.toLocaleString()}
             </Typography>
           </Stack>
 

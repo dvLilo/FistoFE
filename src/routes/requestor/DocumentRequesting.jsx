@@ -253,6 +253,21 @@ const DocumentRequesting = () => {
 
         break
 
+      case "gas":
+        if (subprocess === 'receive')
+          return "Received by GAS Associate for transmittal."
+
+        if (subprocess === 'gas')
+          return "Transmitted by GAS Associate."
+
+        if (subprocess === 'hold')
+          return "Held by GAS Associate"
+
+        if (subprocess === 'return')
+          return "Returned by GAS Associate"
+
+        break
+
       case "voucher":
         if (subprocess === 'receive')
           return "Received by AP Associate for vouchering."
@@ -314,15 +329,6 @@ const DocumentRequesting = () => {
         if (subprocess === 'cheque')
           return "Created cheque by Treasury Associate."
 
-        if (subprocess === 'release')
-          return "Released cheque by Treasury Associate."
-
-        if (subprocess === 'reverse')
-          return "Reversed cheque by Treasury Associate."
-
-        if (subprocess === 'file')
-          return "Filed by Treasury Associate."
-
         if (subprocess === 'hold')
           return "Held by Treasury Associate."
 
@@ -331,6 +337,43 @@ const DocumentRequesting = () => {
 
         if (subprocess === 'void')
           return "Voided by Treasury Associate."
+
+        break
+
+      case "audit":
+        if (subprocess === 'receive')
+          return "Received by Audit Associate for auditing of cheque."
+
+        if (subprocess === 'audit')
+          return "Audited by Audit Associate."
+
+        if (subprocess === 'hold')
+          return "Held by Audit Associate."
+
+        if (subprocess === 'return')
+          return "Returned by Audit Associate."
+
+        break
+
+      case "executive":
+        if (subprocess === 'receive')
+          return "Received by Executive Assistant for signing of cheque."
+
+        if (subprocess === 'executive')
+          return "Transmitted by Executive Assistant."
+
+        break
+
+
+      case "issue":
+        if (subprocess === 'receive')
+          return "Received by Treasury Associate for releasing."
+
+        if (subprocess === 'issue')
+          return "Released cheque by Treasury Associate."
+
+        if (subprocess === 'hold')
+          return "Held by Treasury Associate."
 
         break
 
@@ -404,19 +447,19 @@ const DocumentRequesting = () => {
 
     switch (subprocess) {
       case "tag":
-        return `${process} • tagged`
+        return `tagged`
 
       case "hold":
-        return `${process} • held`
+        return `held`
 
       case "transmit":
-        return `${process} • transmitted`
+        return `transmitted`
 
       default:
         if (subprocess.endsWith("e"))
-          return `${process} • ${subprocess}d`
+          return `${subprocess}d`
 
-        return `${process} • ${subprocess}ed`
+        return `${subprocess}ed`
     }
   }
 
