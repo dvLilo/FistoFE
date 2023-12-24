@@ -322,6 +322,21 @@ const DocumentRequesting = () => {
 
         break
 
+      case "inspect":
+        if (subprocess === 'receive')
+          return "Received by Audit Associate for auditing of voucher."
+
+        if (subprocess === 'inspect')
+          return "Audited by Audit Associate."
+
+        if (subprocess === 'hold')
+          return "Held by Audit Associate."
+
+        if (subprocess === 'return')
+          return "Returned by Audit Associate."
+
+        break
+
       case "cheque":
         if (subprocess === 'receive')
           return "Received by Treasury Associate for cheque creation."
@@ -364,7 +379,6 @@ const DocumentRequesting = () => {
 
         break
 
-
       case "issue":
         if (subprocess === 'receive')
           return "Received by Treasury Associate for releasing."
@@ -395,6 +409,15 @@ const DocumentRequesting = () => {
 
         break
 
+      case "discharge":
+        if (subprocess === 'receive')
+          return "Received by GAS Associate for voucher filing."
+
+        if (subprocess === 'discharge')
+          return "Transmitted by GAS Associate."
+
+        break
+
       case "file":
         if (subprocess === 'receive')
           return "Received by AP Associate for voucher filing."
@@ -402,14 +425,11 @@ const DocumentRequesting = () => {
         if (subprocess === 'file')
           return "Filed by AP Associate."
 
-        if (subprocess === 'hold')
-          return "Held by AP Associate."
+        break
 
-        if (subprocess === 'return')
-          return "Returned by AP Associate."
-
-        if (subprocess === 'void')
-          return "Voided by AP Associate."
+      case "clear":
+        if (subprocess === 'clear')
+          return "Cleared by Treasury Associate."
 
         break
 

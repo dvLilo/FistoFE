@@ -401,7 +401,7 @@ const DocumentVoucheringTransaction = ({
         </DialogTitle>
 
         <DialogContent className="FstoDialogTransaction-content">
-          <TransactionDialog data={data} status={status} onPrintView={onPrintView} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
+          <TransactionDialog data={data} state={state} status={status} onPrintView={onPrintView} onAccountTitleView={onAccountTitleView} onChequeView={onChequeView} />
 
           {
             (state === `voucher-receive` || state === `voucher-voucher` || state === `return-voucher`) &&

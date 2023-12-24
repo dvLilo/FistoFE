@@ -28,7 +28,8 @@ import '../assets/css/styles.transaction.scss'
 
 const TransactionDialog = ({
   data,
-  status,
+  state = "pending",
+  status = "loading",
   onAccountTitleView = () => { },
   onChequeView = () => { },
   onPrintView = () => { }
@@ -770,7 +771,7 @@ const TransactionDialog = ({
                   <Typography variant="h6" sx={{ fontWeight: 700 }}>Voucher</Typography>
 
                   {
-                    user?.role.match(/(AP ASSOCIATE|AP SPECIALIST)/gi) &&
+                    state?.match(/VOUCHER/gi) && user?.role.match(/(AP ASSOCIATE|AP SPECIALIST)/gi) &&
                     <IconButton onClick={onPrintView}>
                       <PrintIcon />
                     </IconButton>
