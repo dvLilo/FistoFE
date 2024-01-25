@@ -207,7 +207,10 @@ const DocumentAuditing = () => {
       open: true,
       process: AUDIT,
       subprocess: RETURN,
-      data,
+      data: {
+        ...data,
+        message: "Returning this cheque will revert the cheque details and it cannot be undone."
+      },
     }))
   }
 
@@ -319,7 +322,6 @@ const DocumentAuditing = () => {
               <Tab className="FstoTab-root" label="Received" value="audit-receive" disableRipple />
               <Tab className="FstoTab-root" label="Approved" value="audit-audit" disableRipple />
               <Tab className="FstoTab-root" label="Held" value="audit-hold" disableRipple />
-              <Tab className="FstoTab-root" label="Returned" value="audit-return" disableRipple />
             </Tabs>
 
             <Stack direction="row" alignItems="center" justifyContent="center" gap={1}>
@@ -461,8 +463,8 @@ const DocumentAuditing = () => {
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
                       {
-                        item.transactions.map((trxnItem) => (
-                          <Typography className="FstoTypography-root FstoTypography-voucher" variant="button" gap={1}>
+                        item.transactions.map((trxnItem, trxnIndex) => (
+                          <Typography className="FstoTypography-root FstoTypography-voucher" variant="button" gap={1} key={trxnIndex}>
                             <Stack direction="column">
                               <Typography>{trxnItem.document.name}</Typography>
 
@@ -488,8 +490,8 @@ const DocumentAuditing = () => {
 
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
                       {
-                        item.transactions.map((trxnItem) => (
-                          <Fragment>
+                        item.transactions.map((trxnItem, trxnIndex) => (
+                          <Fragment key={trxnIndex}>
                             <Typography className="FstoTypography-root FstoTypography-number" variant="caption">
                               {trxnItem.document.id !== 4 && trxnItem.document_no?.toUpperCase()}
                               {trxnItem.document.id === 4 && trxnItem.referrence_no?.toUpperCase()}

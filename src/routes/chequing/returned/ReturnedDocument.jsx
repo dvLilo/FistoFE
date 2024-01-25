@@ -21,12 +21,17 @@ import {
   Chip,
   Divider,
   OutlinedInput,
-  TableSortLabel
+  TableSortLabel,
+  Menu,
+  MenuItem,
+  Checkbox
 } from '@mui/material'
 
 import {
   Search,
-  Close
+  Close,
+  MoreHoriz,
+  DescriptionOutlined
 } from '@mui/icons-material'
 
 import statusColor from '../../../colors/statusColor'
@@ -48,6 +53,7 @@ import TablePreloader from '../../../components/TablePreloader'
 import ReturnedDocumentActions from './ReturnedDocumentActions'
 
 import DocumentChequingTransaction from '../DocumentChequingTransaction'
+import DocumentChequingDialog from '../DocumentChequingDialog'
 import DocumentChequingFilter from '../DocumentChequingFilter'
 
 const ReturnedDocument = () => {
@@ -62,6 +68,8 @@ const ReturnedDocument = () => {
     changePage,
     changeRows
   } = useCheques("/api/cheques", "return-cheque")
+
+  const [anchor, setAnchor] = React.useState(null)
 
   const [search, setSearch] = React.useState("")
   const [state, setState] = React.useState("return-cheque")
@@ -83,6 +91,15 @@ const ReturnedDocument = () => {
     transaction: null,
     onBack: undefined,
     onClose: () => setManage(currentValue => ({
+      ...currentValue,
+      open: false
+    }))
+  })
+
+  const [multiCheque, setMultiCheque] = React.useState({
+    open: false,
+    transactions: [],
+    onClose: () => setMultiCheque(currentValue => ({
       ...currentValue,
       open: false
     }))
@@ -116,6 +133,16 @@ const ReturnedDocument = () => {
     }))
   }
 
+  const onReturn = (data) => {
+    setReason(currentValue => ({
+      ...currentValue,
+      open: true,
+      process: CHEQUE,
+      subprocess: RETURN,
+      data,
+    }))
+  }
+
   const onVoid = (data) => {
     setReason(currentValue => ({
       ...currentValue,
@@ -126,13 +153,33 @@ const ReturnedDocument = () => {
     }))
   }
 
-  const onReturn = (data) => {
-    setReason(currentValue => ({
+
+  // For multiple voucher in one cheque
+  const [selectedVoucher, setSelectedVoucher] = React.useState([])
+
+  const onVoucherTick = (e) => {
+    if (e.target.checked) {
+      setSelectedVoucher((currentValue) => ([
+        ...currentValue,
+        JSON.parse(e.target.value)
+      ]))
+    }
+    else {
+      const value = JSON.parse(e.target.value)
+
+      setSelectedVoucher((currentValue) => {
+        return currentValue.filter((item) => item.id !== value.id)
+      })
+    }
+  }
+
+  const onManageAll = () => {
+    setMultiCheque(currentValue => ({
       ...currentValue,
       open: true,
-      process: CHEQUE,
-      subprocess: RETURN,
-      data,
+      transactions: selectedVoucher,
+
+      onBack: onManageAll
     }))
   }
 
@@ -207,6 +254,50 @@ const ReturnedDocument = () => {
           <Table className="FstoTable-root" size="small">
             <TableHead className="FstoTableHead-root">
               <TableRow className="FstoTableRow-root">
+                {
+                  !!state.match(/return/gi) && status === 'success' &&
+                  <TableCell className="FstoTableCell-root FstoTableCell-head" align="center">
+                    <IconButton
+                      onClick={(e) => setAnchor(e.currentTarget)}
+                      disabled={selectedVoucher.length < 2}
+                    >
+                      <MoreHoriz />
+                    </IconButton>
+
+                    <Menu
+                      className="FstoTableMenu-root"
+                      open={!!anchor}
+                      elevation={2}
+                      anchorEl={anchor}
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                      }}
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'left',
+                      }}
+                      MenuListProps={{
+                        sx: { py: 0.5 }
+                      }}
+                      onClose={() => setAnchor(null)}
+                      disablePortal
+                    >
+                      {
+                        state === 'return-cheque' &&
+                        <MenuItem
+                          sx={{ fontWeight: 500 }}
+                          onClick={() => {
+                            setAnchor(null)
+                            onManageAll(selectedVoucher)
+                          }}
+                          dense
+                        >
+                          <DescriptionOutlined sx={{ fontSize: 21, marginRight: 1, opacity: 0.75 }} /> Manage
+                        </MenuItem>}
+                    </Menu>
+                  </TableCell>}
+
                 <TableCell className="FstoTableCell-root FstoTableCell-head">
                   <TableSortLabel active={false}>VOUCHER DETAILS</TableSortLabel>
                 </TableCell>
@@ -238,6 +329,18 @@ const ReturnedDocument = () => {
                 status === 'success'
                 && data.data.map((item, index) => (
                   <TableRow className="FstoTableRow-root" key={index} hover>
+                    {
+                      state === 'return-cheque' && status === 'success' &&
+                      <TableCell className="FstoTableCell-root FstoTableCell-body" align="center">
+                        <Checkbox
+                          className="FstoCheckbox-root"
+                          value={JSON.stringify(item)}
+                          checked={selectedVoucher.some((selectedItem) => selectedItem.id === item.id)}
+                          disabled={selectedVoucher.some((selectedItem) => selectedItem.supplier.id !== item.supplier.id)}
+                          onChange={onVoucherTick}
+                        />
+                      </TableCell>}
+
                     <TableCell className="FstoTableCell-root FstoTableCell-body">
                       <Typography className="FstoTypography-root FstoTypography-transaction" variant="button" gap={1}>
                         <span>TAG#{item.tag_no}</span>
@@ -395,6 +498,13 @@ const ReturnedDocument = () => {
           onHold={onHold}
           onReturn={onReturn}
           onVoid={onVoid}
+        />
+
+        <DocumentChequingDialog
+          {...multiCheque}
+          state={state}
+          refetchData={refetchData}
+          clearData={() => setSelectedVoucher([])}
         />
 
         <ReasonDialog {...reason} />

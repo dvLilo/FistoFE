@@ -98,8 +98,8 @@ const ChequeDialog = ({
 
         <Stack direction="row" gap={1} margin={1}>
           {
-            data?.transactions.map((item) => (
-              <Chip label={item.voucher.no} color={transaction.id === item.id ? "primary" : "default"} onClick={() => setTransaction(item)} />
+            data?.transactions.map((item, index) => (
+              <Chip key={index} label={item.voucher.no} color={transaction.id === item.id ? "primary" : "default"} onClick={() => setTransaction(item)} />
             ))}
         </Stack>
       </Box>

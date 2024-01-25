@@ -54,7 +54,7 @@ const DocumentChequingTransaction = (props) => {
   }, [open])
 
   React.useEffect(() => {
-    if (open && state === `cheque-receive` && status === `success` && !Boolean(chequeData.accounts.length)) {
+    if (open && (state === `cheque-receive` || state === `return-cheque`) && status === `success` && !Boolean(chequeData.accounts.length)) {
       const accounts = Boolean(data.cheque?.accounts?.length) ? data.cheque?.accounts : data.voucher?.accounts?.filter((item) => item.entry.toLowerCase() === `credit`).map((item) => ({
         entry: "Debit",
         account_title: item.account_title,
@@ -75,7 +75,7 @@ const DocumentChequingTransaction = (props) => {
       }))
     }
 
-    if (open && (state === `cheque-cheque` || state === `cheque-hold` || state === `cheque-return` || state === `cheque-void` || state === `return-cheque`) && status === `success`) {
+    if (open && (state === `cheque-cheque` || state === `cheque-hold` || state === `cheque-return` || state === `cheque-void`) && status === `success`) {
       setChequeData(currentValue => ({
         ...currentValue,
         accounts: data.cheque.accounts || data.voucher.accounts,
@@ -280,13 +280,13 @@ const DocumentChequingTransaction = (props) => {
       open: true,
       onBack: onBack,
 
-      ...(Boolean(state.match(/-receive|-hold|cheque-return|-void.*/)) && {
+      ...(Boolean(state.match(/-receive|-hold|cheque-return|-void|return-.*/)) && {
         state: "transmit-",
         accounts: Boolean(data.cheque.accounts.length)
           ? data.cheque.accounts
           : data.voucher.accounts
       }),
-      ...(Boolean(state.match(/-release|return-.*/)) && {
+      ...(Boolean(state.match(/-release.*/)) && {
         state: "transmit-",
         accounts: data.cheque.accounts
       })
@@ -514,7 +514,7 @@ const DocumentChequingTransaction = (props) => {
           (state === `cheque-receive` || state === `cheque-cheque` || state === `return-cheque` || state === `cheque-hold`) &&
           <DialogActions className="FstoDialogTransaction-actions">
             {
-              state === `cheque-receive` &&
+              (state === `cheque-receive` || state === `return-cheque`) &&
               <Button
                 variant="contained"
                 onClick={onChequeManage}

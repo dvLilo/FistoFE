@@ -298,7 +298,8 @@ const ChequeEntryDialog = ({
               options={TYPE_LIST}
               value={TYPE_LIST.find((row) => row.name === CQ.type) || null}
               disabled={
-                Boolean(state.match(/^issue|^return/gi))
+                // Boolean(state.match(/^issue|^return/gi))
+                Boolean(state.match(/^issue/gi))
               }
               renderInput={
                 (props) => <TextField {...props} label="Type" variant="outlined" />
@@ -329,7 +330,8 @@ const ChequeEntryDialog = ({
               options={BANKS_LIST || []}
               value={CQ.bank}
               disabled={
-                Boolean(state.match(/^issue|^return/gi))
+                // Boolean(state.match(/^issue|^return/gi))
+                Boolean(state.match(/^issue/gi))
               }
               loading={
                 BANKS_STATUS === 'loading'
@@ -393,7 +395,7 @@ const ChequeEntryDialog = ({
                   CQ.type === "Cheque" && new Date()
                 }
                 disabled={
-                  Boolean(state.match(/^cheque/gi))
+                  Boolean(state.match(/^cheque|return-cheque/gi))
                 }
                 renderInput={
                   (props) => <TextField {...props} className="FstoTextfieldForm-root" label="Date" variant="outlined" size="small" onKeyDown={(e) => e.preventDefault()} />
@@ -414,7 +416,8 @@ const ChequeEntryDialog = ({
               size="small"
               value={CQ.amount}
               disabled={
-                Boolean(state.match(/^issue|^return/gi))
+                // Boolean(state.match(/^issue|^return/gi))
+                Boolean(state.match(/^issue/gi))
               }
               InputProps={{
                 inputComponent: NumberField
@@ -603,7 +606,7 @@ const ChequeEntryDialog = ({
               (state?.match(/^issue/gi) && cheques.some((item) => item.date === null))
             }
             disableElevation
-          > {state?.match(/receive$/gi) ? "Submit" : "Save"}
+          > {state?.match(/receive$|^return/gi) ? "Submit" : "Save"}
           </Button>
         }
       </DialogActions>

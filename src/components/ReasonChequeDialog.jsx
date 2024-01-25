@@ -116,7 +116,7 @@ const ReasonChequeDialog = ({
       <DialogContent className="FstoDialogContentReason-root">
         <Box className="FstoDialogContentReason-box">
           <WarningIcon className="FstoDialogContentReason-icon" />
-          Are you sure you want to {subprocess} this transaction?
+          Are you sure you want to {subprocess} this transaction? {reason.message}
         </Box>
 
         <form className="FstoDialogContentReason-form" >
