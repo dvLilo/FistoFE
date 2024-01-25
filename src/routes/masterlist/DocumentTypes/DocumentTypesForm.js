@@ -127,27 +127,13 @@ const DocumentTypesForm = (props) => {
             response = await axios.put(`/api/admin/documents/${data.id}`, {
               type: document.type,
               description: document.description,
-              categories: document.categories.map(cat => cat.id),
-              account: document.accounts.map(act => ({
-                entry: act.entry,
-                account_title_id: act.account_title.id,
-                company_id: act.company.id,
-                department_id: act.department.id,
-                location_id: act.location.id,
-              }))
+              categories: document.categories.map(cat => cat.id)
             })
           else
             response = await axios.post(`/api/admin/documents`, {
               type: document.type,
               description: document.description,
-              categories: document.categories.map(cat => cat.id),
-              account: document.accounts.map(act => ({
-                entry: act.entry,
-                account_title_id: act.account_title.id,
-                company_id: act.company.id,
-                department_id: act.department.id,
-                location_id: act.location.id,
-              }))
+              categories: document.categories.map(cat => cat.id)
             })
 
           toast({
