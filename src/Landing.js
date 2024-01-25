@@ -20,7 +20,8 @@ import {
   AlertTitle,
   TextField,
   IconButton,
-  InputAdornment
+  InputAdornment,
+  Typography
 } from '@mui/material'
 
 import {
@@ -226,6 +227,8 @@ const Landing = () => {
           </Box>
         </Box>
       </Box>
+
+      <Typography className="FstoLoginBox-version">version 2.0</Typography>
 
       <Snackbar
         anchorOrigin={{

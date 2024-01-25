@@ -52,6 +52,15 @@
   }
 }
 
+.FstoLoginBox-version {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+
+  color: #ffffff;
+  opacity: 0.36;
+}
+
 @keyframes LoginAnimation {
   0% {
     background-size: 100% 100%;
