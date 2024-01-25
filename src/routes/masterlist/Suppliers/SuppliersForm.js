@@ -35,7 +35,8 @@ const SuppliersForm = (props) => {
   const [dropdown, setDropdown] = React.useState({
     isFetching: false,
     supplier_types: [],
-    references: []
+    references: [],
+    receipt_type: ["Official", "Unofficial"]
   })
 
   // Form Data State
@@ -43,7 +44,8 @@ const SuppliersForm = (props) => {
     code: "",
     name: "",
     terms: "",
-    type: null,
+    supplier_type: null,
+    receipt_type: null,
     references: []
   })
 
@@ -69,6 +71,7 @@ const SuppliersForm = (props) => {
         } = response.data.result
 
         setDropdown(currentValue => ({
+          ...currentValue,
           isFetching: false,
           supplier_types,
           references
@@ -85,6 +88,7 @@ const SuppliersForm = (props) => {
         }
 
         setDropdown(currentValue => ({
+          ...currentValue,
           isFetching: false,
           supplier_types: [],
           references: []
@@ -103,7 +107,8 @@ const SuppliersForm = (props) => {
         code: data.code,
         name: data.name,
         terms: data.terms,
-        type: data.supplier_type,
+        supplier_type: data.supplier_type,
+        receipt_type: data.receipt_type,
         references: data.references
       })
     }
@@ -119,7 +124,8 @@ const SuppliersForm = (props) => {
       code: "",
       name: "",
       terms: "",
-      type: null,
+      supplier_type: null,
+      receipt_type: null,
       references: []
     })
   }
@@ -145,7 +151,8 @@ const SuppliersForm = (props) => {
               code: supplier.code,
               name: supplier.name,
               terms: supplier.terms,
-              supplier_type_id: supplier.type.id,
+              receipt_type: supplier.receipt_type,
+              supplier_type_id: supplier.supplier_type.id,
               references: supplier.references.map(ref => ref.id)
             })
           else
@@ -153,7 +160,8 @@ const SuppliersForm = (props) => {
               code: supplier.code,
               name: supplier.name,
               terms: supplier.terms,
-              supplier_type_id: supplier.type.id,
+              receipt_type: supplier.receipt_type,
+              supplier_type_id: supplier.supplier_type.id,
               references: supplier.references.map(ref => ref.id)
             })
 
@@ -272,14 +280,14 @@ const SuppliersForm = (props) => {
         className="FstoSelectForm-root"
         size="small"
         options={dropdown.supplier_types}
-        value={supplier.type}
+        value={supplier.supplier_type}
         filterOptions={filterOptions}
         renderInput={
           props =>
             <TextField
               {...props}
               variant="outlined"
-              label="Type"
+              label="Supplier Type"
               error={!Boolean(dropdown.supplier_types) && !dropdown.isFetching}
               helperText={!Boolean(dropdown.supplier_types) && !dropdown.isFetching && "No supplier types found."}
             />
@@ -301,7 +309,43 @@ const SuppliersForm = (props) => {
           (e, value) => {
             setSupplier({
               ...supplier,
-              type: value
+              supplier_type: value
+            })
+          }
+        }
+        fullWidth
+        disablePortal
+        disableClearable
+      />
+
+      <Autocomplete
+        className="FstoSelectForm-root"
+        size="small"
+        options={dropdown.receipt_type}
+        value={supplier.receipt_type}
+        renderInput={
+          props =>
+            <TextField
+              {...props}
+              variant="outlined"
+              label="Receipt Type"
+            />
+        }
+        PaperComponent={
+          props =>
+            <Paper
+              {...props}
+              sx={{ textTransform: 'uppercase' }}
+            />
+        }
+        isOptionEqualToValue={
+          (option, value) => option === value
+        }
+        onChange={
+          (e, value) => {
+            setSupplier({
+              ...supplier,
+              receipt_type: value
             })
           }
         }
@@ -367,7 +411,8 @@ const SuppliersForm = (props) => {
           !Boolean(supplier.code.trim()) ||
           !Boolean(supplier.name.trim()) ||
           !Boolean(supplier.terms.trim()) ||
-          !Boolean(supplier.type) ||
+          !Boolean(supplier.supplier_type) ||
+          !Boolean(supplier.receipt_type) ||
           !Boolean(supplier.references.length)
         }
         disableElevation

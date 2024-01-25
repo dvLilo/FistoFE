@@ -100,6 +100,15 @@ const SuppliersTable = (props) => {
             </TableSortLabel>
           </TableCell>
 
+          <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">
+            <TableSortLabel
+              active={orderBy === `receipt_type`}
+              direction={orderBy === `receipt_type` ? order : `asc`}
+              onClick={() => onSort(`receipt_type`, `type`)}
+            > RECEIPT
+            </TableSortLabel>
+          </TableCell>
+
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">REFERENCES</TableCell>
 
           <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-head">STATUS</TableCell>
@@ -119,7 +128,7 @@ const SuppliersTable = (props) => {
       <TableBody className="FstoTableHeadMasterlist-root">
         {
           fetching
-            ? <Preloader row={5} col={9} />
+            ? <Preloader row={5} col={10} />
             : data
               ? data.sort(comparator(order, orderBy, orderKey)).map((data, index) => (
                 <TableRow className="FstoTableRowMasterlist-root" key={index} hover>
@@ -141,6 +150,10 @@ const SuppliersTable = (props) => {
 
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body" sx={{ textTransform: "capitalize" }}>
                     {data.supplier_type?.type}
+                  </TableCell>
+
+                  <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body" sx={{ textTransform: "capitalize" }}>
+                    {data.receipt_type}
                   </TableCell>
 
                   <TableCell className="FstoTableCellMasterlist-root FstoTableCellMasterlist-body" sx={{ textTransform: "uppercase" }}>

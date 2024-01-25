@@ -85,13 +85,14 @@ const Suppliers = () => {
   }
 
   const dataUpdateHandler = (data) => {
-    const { id, code, name, terms, supplier_type, references } = data
+    const { id, code, name, terms, supplier_type, receipt_type, references } = data
     setUpdate({
       id,
       code,
       name,
       terms,
       supplier_type,
+      receipt_type,
       references
     })
     window.scrollTo(0, 0)
